@@ -1,0 +1,327 @@
+{
+  "test_case_id": "A26",
+  "scenario": "研发测试服务器执行数据清理脚本被误判为数据泄露（误报）",
+  "difficulty": "hard",
+  "is_positive": false,
+  "expected_severity": "false_positive",
+  "status": "completed",
+  "agent_output": {
+    "alert_id": "A26",
+    "judgment": {
+      "severity": "false_positive",
+      "attack_type": "误报 - 计划内运维任务",
+      "confidence": 0.95,
+      "summary": "经多源关联分析，该告警确认为研发中心的计划内数据归档与清理任务。源主机与目的主机均为测试环境资产，威胁情报显示无恶意行为，且存在时间戳吻合的定时任务告警佐证。",
+      "evidence_chain": [
+        "资产信息确认源 IP(10.0.9.45) 为'QA 测试数据库'，目的 IP(10.0.9.100) 为'QA 测试数据归档服务器'，均位于'测试环境'且非扫描器/堡垒机/蜜罐。",
+        "威胁情报显示源 IP 信誉分 100，备注明确提及'Regular data cleansing task according to QA schedule'（按 QA 计划进行的常规数据清理任务）。",
+        "关联告警在 DLP 触发前 15 秒记录到 Cron 任务'cleanup_and_archive.sh'执行，摘要说明正在将旧测试数据移至目标归档服务器。",
+        "原始日志显示数据传输至内部服务器 10.0.9.100，符合内部归档特征而非外部外泄。"
+      ],
+      "iocs": [
+        {
+          "type": "ip",
+          "value": "10.0.9.45",
+          "malicious": false,
+          "context": "内部 QA 测试数据库服务器，威胁情报标记为正常业务活动"
+        },
+        {
+          "type": "ip",
+          "value": "10.0.9.100",
+          "malicious": false,
+          "context": "内部 QA 测试数据归档服务器，合法接收端"
+        }
+      ]
+    },
+    "remediation": [
+      "优先级 1：将该告警标记为误报并关闭，无需进行隔离或阻断操作。",
+      "优先级 2：联系 DLP 策略管理员，在白名单中添加源 IP(10.0.9.45) 到目的 IP(10.0.9.100) 的 FTP 传输规则，排除测试环境特定时间段的大文件传输告警。",
+      "优先级 3：审查其他测试环境的自动化脚本，确保类似的数据归档流程已被纳入安全基线管理，减少噪音。"
+    ],
+    "metadata": {
+      "tools_called": [
+        "query_alert_detail",
+        "query_asset_info",
+        "query_threat_intel",
+        "query_related_alerts"
+      ]
+    }
+  },
+  "code_graders": {
+    "tools_called_minimum": {
+      "passed": true,
+      "reason": "required tools present",
+      "expected": [
+        "query_alert_detail",
+        "query_asset_info",
+        "query_related_alerts"
+      ],
+      "actual": [
+        "query_alert_detail",
+        "query_asset_info",
+        "query_threat_intel",
+        "query_related_alerts"
+      ]
+    },
+    "output_schema": {
+      "passed": true,
+      "reason": "required fields present",
+      "expected": null,
+      "actual": null
+    },
+    "severity_enum": {
+      "passed": true,
+      "reason": "severity is valid",
+      "expected": [
+        "critical",
+        "false_positive",
+        "high",
+        "low",
+        "medium"
+      ],
+      "actual": "false_positive"
+    },
+    "severity_match": {
+      "passed": true,
+      "reason": "severity matches",
+      "expected": "false_positive",
+      "actual": "false_positive"
+    },
+    "confidence_range": {
+      "passed": true,
+      "reason": "confidence in range",
+      "expected": "0..1",
+      "actual": 0.95
+    },
+    "remediation_not_empty": {
+      "passed": true,
+      "reason": "remediation actionable",
+      "expected": "at least one item >=10 chars",
+      "actual": [
+        "优先级 1：将该告警标记为误报并关闭，无需进行隔离或阻断操作。",
+        "优先级 2：联系 DLP 策略管理员，在白名单中添加源 IP(10.0.9.45) 到目的 IP(10.0.9.100) 的 FTP 传输规则，排除测试环境特定时间段的大文件传输告警。",
+        "优先级 3：审查其他测试环境的自动化脚本，确保类似的数据归档流程已被纳入安全基线管理，减少噪音。"
+      ]
+    }
+  },
+  "quality_scores": {
+    "severity_rationality": {
+      "score": 5,
+      "reason": "Agent 的误报判定逻辑严密，结论与输入证据高度一致。证据链完整：资产信息确认源/目 IP 均为测试环境内部资产（非扫描器/蜜罐）；威胁情报明确标记该 IP 为正常业务活动且信誉分满分；关联告警在时间戳上精确匹配（DLP 触发前 15 秒执行了同名的归档脚本），直接佐证了数据传输是计划内的自动化任务而非恶意外泄。所有关键论断均有对应的 API 响应数据支撑。",
+      "evidence_quotes": [
+        "query_threat_intel_ip_10.0.9.45.raw_intel: 'Internal QA test database server. No external threat. Regular data cleansing task according to QA schedule.'",
+        "query_asset_info_10.0.9.45.network_zone: '测试环境'",
+        "query_asset_info_10.0.9.100.business_system: 'QA 测试数据归档服务器'",
+        "query_related_alerts_10.0.9.45_48h.related_alerts[0].summary: \"Cron job 'cleanup_and_archive.sh' executed on qa-testdb-01, moving old test data to qa-storage-01.\"",
+        "query_related_alerts_10.0.9.45_48h.related_alerts[0].timestamp: '2026-07-14T02:00:00Z'"
+      ]
+    },
+    "remediation_actionability": {
+      "score": 5,
+      "reason": "处置建议非常具体、可执行且逻辑清晰。优先级 1 直接针对误报结论进行闭环（标记并关闭）；优先级 2 提供了具体的白名单配置细节（源 IP、目的 IP、协议及时间段），有效解决噪音问题；优先级 3 提出了流程优化建议。所有建议均严格基于输入证据中的资产信息、威胁情报和关联告警，符合安全运营最佳实践。",
+      "evidence_quotes": [
+        "优先级 1：将该告警标记为误报并关闭，无需进行隔离或阻断操作。",
+        "优先级 2：联系 DLP 策略管理员，在白名单中添加源 IP(10.0.9.45) 到目的 IP(10.0.9.100) 的 FTP 传输规则，排除测试环境特定时间段的大文件传输告警。",
+        "优先级 3：审查其他测试环境的自动化脚本，确保类似的数据归档流程已被纳入安全基线管理，减少噪音。"
+      ]
+    },
+    "evidence_completeness": {
+      "score": 5,
+      "reason": "证据链完整覆盖了关键 IOC（源/目的 IP）与行为特征（资产属性、威胁情报、关联告警）。具体包括：1. 资产信息确认源/目 IP 均为测试环境内部资产且非攻击工具；2. 威胁情报明确标记为正常业务活动并引用了'Regular data cleansing task'备注；3. 关联告警在时间戳上吻合，佐证了 Cron 任务执行；4. 原始日志显示数据传输至内部服务器，符合归档特征。所有关键要素均有输入数据直接支撑，逻辑闭环。",
+      "evidence_quotes": [
+        "资产信息确认源 IP(10.0.9.45) 为'QA 测试数据库'，目的 IP(10.0.9.100) 为'QA 测试数据归档服务器'，均位于'测试环境'且非扫描器/堡垒机/蜜罐。",
+        "威胁情报显示源 IP 信誉分 100，备注明确提及'Regular data cleansing task according to QA schedule'（按 QA 计划进行的常规数据清理任务）。",
+        "关联告警在 DLP 触发前 15 秒记录到 Cron 任务'cleanup_and_archive.sh'执行，摘要说明正在将旧测试数据移至目标归档服务器。",
+        "原始日志显示数据传输至内部服务器 10.0.9.100，符合内部归档特征而非外部外泄。"
+      ]
+    }
+  },
+  "hallucination": {
+    "total_statements": 4,
+    "verifiable": 4,
+    "hallucinations": 0,
+    "uncertain": 0,
+    "details": [
+      {
+        "statement": "资产信息确认源 IP(10.0.9.45) 为'QA 测试数据库'，目的 IP(10.0.9.100) 为'QA 测试数据归档服务器'，均位于'测试环境'且非扫描器/堡垒机/蜜罐。",
+        "verdict": "verifiable",
+        "reason": "证据 'query_asset_info_10.0.9.45' 和 'query_asset_info_10.0.9.100' 明确显示源 IP 业务系统为'QA 测试数据库'，目的 IP 为'QA 测试数据归档服务器'，网络区域均为'测试环境'，且 is_scanner、is_bastion、is_honeypot 均为 false。"
+      },
+      {
+        "statement": "威胁情报显示源 IP 信誉分 100，备注明确提及'Regular data cleansing task according to QA schedule'（按 QA 计划进行的常规数据清理任务）。",
+        "verdict": "verifiable",
+        "reason": "证据 'query_threat_intel_ip_10.0.9.45' 中 reputation_score 为 100，raw_intel 字段包含 'Regular data cleansing task according to QA schedule'。"
+      },
+      {
+        "statement": "关联告警在 DLP 触发前 15 秒记录到 Cron 任务'cleanup_and_archive.sh'执行，摘要说明正在将旧测试数据移至目标归档服务器。",
+        "verdict": "verifiable",
+        "reason": "证据 'query_alert_detail_A26' 显示 DLP 告警时间为 2026-07-14T02:00:15Z；证据 'query_related_alerts_10.0.9.45_48h' 显示 Cron 任务告警时间为 2026-07-14T02:00:00Z，相差 15 秒，且摘要提及 'moving old test data to qa-storage-01'。"
+      },
+      {
+        "statement": "原始日志显示数据传输至内部服务器 10.0.9.100，符合内部归档特征而非外部外泄。",
+        "verdict": "verifiable",
+        "reason": "证据 'query_alert_detail_A26' 的 raw_log 显示 'Host 10.0.9.45 sent ... to 10.0.9.100 via FTP'，且 10.0.9.100 被确认为内部测试环境资产（见 query_asset_info_10.0.9.100），符合内部归档特征。"
+      }
+    ]
+  },
+  "calls": [
+    {
+      "label": "agent",
+      "parsed": {
+        "alert_id": "A26",
+        "judgment": {
+          "severity": "false_positive",
+          "attack_type": "误报 - 计划内运维任务",
+          "confidence": 0.95,
+          "summary": "经多源关联分析，该告警确认为研发中心的计划内数据归档与清理任务。源主机与目的主机均为测试环境资产，威胁情报显示无恶意行为，且存在时间戳吻合的定时任务告警佐证。",
+          "evidence_chain": [
+            "资产信息确认源 IP(10.0.9.45) 为'QA 测试数据库'，目的 IP(10.0.9.100) 为'QA 测试数据归档服务器'，均位于'测试环境'且非扫描器/堡垒机/蜜罐。",
+            "威胁情报显示源 IP 信誉分 100，备注明确提及'Regular data cleansing task according to QA schedule'（按 QA 计划进行的常规数据清理任务）。",
+            "关联告警在 DLP 触发前 15 秒记录到 Cron 任务'cleanup_and_archive.sh'执行，摘要说明正在将旧测试数据移至目标归档服务器。",
+            "原始日志显示数据传输至内部服务器 10.0.9.100，符合内部归档特征而非外部外泄。"
+          ],
+          "iocs": [
+            {
+              "type": "ip",
+              "value": "10.0.9.45",
+              "malicious": false,
+              "context": "内部 QA 测试数据库服务器，威胁情报标记为正常业务活动"
+            },
+            {
+              "type": "ip",
+              "value": "10.0.9.100",
+              "malicious": false,
+              "context": "内部 QA 测试数据归档服务器，合法接收端"
+            }
+          ]
+        },
+        "remediation": [
+          "优先级 1：将该告警标记为误报并关闭，无需进行隔离或阻断操作。",
+          "优先级 2：联系 DLP 策略管理员，在白名单中添加源 IP(10.0.9.45) 到目的 IP(10.0.9.100) 的 FTP 传输规则，排除测试环境特定时间段的大文件传输告警。",
+          "优先级 3：审查其他测试环境的自动化脚本，确保类似的数据归档流程已被纳入安全基线管理，减少噪音。"
+        ],
+        "metadata": {
+          "tools_called": [
+            "query_alert_detail",
+            "query_asset_info",
+            "query_threat_intel",
+            "query_related_alerts"
+          ]
+        }
+      },
+      "raw_text": "{\n  \"alert_id\": \"A26\",\n  \"judgment\": {\n    \"severity\": \"false_positive\",\n    \"attack_type\": \"误报 - 计划内运维任务\",\n    \"confidence\": 0.95,\n    \"summary\": \"经多源关联分析，该告警确认为研发中心的计划内数据归档与清理任务。源主机与目的主机均为测试环境资产，威胁情报显示无恶意行为，且存在时间戳吻合的定时任务告警佐证。\",\n    \"evidence_chain\": [\n      \"资产信息确认源 IP(10.0.9.45) 为'QA 测试数据库'，目的 IP(10.0.9.100) 为'QA 测试数据归档服务器'，均位于'测试环境'且非扫描器/堡垒机/蜜罐。\",\n      \"威胁情报显示源 IP 信誉分 100，备注明确提及'Regular data cleansing task according to QA schedule'（按 QA 计划进行的常规数据清理任务）。\",\n      \"关联告警在 DLP 触发前 15 秒记录到 Cron 任务'cleanup_and_archive.sh'执行，摘要说明正在将旧测试数据移至目标归档服务器。\",\n      \"原始日志显示数据传输至内部服务器 10.0.9.100，符合内部归档特征而非外部外泄。\"\n    ],\n    \"iocs\": [\n      {\n        \"type\": \"ip\",\n        \"value\": \"10.0.9.45\",\n        \"malicious\": false,\n        \"context\": \"内部 QA 测试数据库服务器，威胁情报标记为正常业务活动\"\n      },\n      {\n        \"type\": \"ip\",\n        \"value\": \"10.0.9.100\",\n        \"malicious\": false,\n        \"context\": \"内部 QA 测试数据归档服务器，合法接收端\"\n      }\n    ]\n  },\n  \"remediation\": [\n    \"优先级 1：将该告警标记为误报并关闭，无需进行隔离或阻断操作。\",\n    \"优先级 2：联系 DLP 策略管理员，在白名单中添加源 IP(10.0.9.45) 到目的 IP(10.0.9.100) 的 FTP 传输规则，排除测试环境特定时间段的大文件传输告警。\",\n    \"优先级 3：审查其他测试环境的自动化脚本，确保类似的数据归档流程已被纳入安全基线管理，减少噪音。\"\n  ],\n  \"metadata\": {\n    \"tools_called\": [\n      \"query_alert_detail\",\n      \"query_asset_info\",\n      \"query_threat_intel\",\n      \"query_related_alerts\"\n    ]\n  }\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1219,
+      "output_tokens": 3422,
+      "latency_ms": 40033,
+      "attempts": 1
+    },
+    {
+      "label": "severity_rationality",
+      "parsed": {
+        "score": 5,
+        "reason": "Agent 的误报判定逻辑严密，结论与输入证据高度一致。证据链完整：资产信息确认源/目 IP 均为测试环境内部资产（非扫描器/蜜罐）；威胁情报明确标记该 IP 为正常业务活动且信誉分满分；关联告警在时间戳上精确匹配（DLP 触发前 15 秒执行了同名的归档脚本），直接佐证了数据传输是计划内的自动化任务而非恶意外泄。所有关键论断均有对应的 API 响应数据支撑。",
+        "evidence_quotes": [
+          "query_threat_intel_ip_10.0.9.45.raw_intel: 'Internal QA test database server. No external threat. Regular data cleansing task according to QA schedule.'",
+          "query_asset_info_10.0.9.45.network_zone: '测试环境'",
+          "query_asset_info_10.0.9.100.business_system: 'QA 测试数据归档服务器'",
+          "query_related_alerts_10.0.9.45_48h.related_alerts[0].summary: \"Cron job 'cleanup_and_archive.sh' executed on qa-testdb-01, moving old test data to qa-storage-01.\"",
+          "query_related_alerts_10.0.9.45_48h.related_alerts[0].timestamp: '2026-07-14T02:00:00Z'"
+        ]
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"Agent 的误报判定逻辑严密，结论与输入证据高度一致。证据链完整：资产信息确认源/目 IP 均为测试环境内部资产（非扫描器/蜜罐）；威胁情报明确标记该 IP 为正常业务活动且信誉分满分；关联告警在时间戳上精确匹配（DLP 触发前 15 秒执行了同名的归档脚本），直接佐证了数据传输是计划内的自动化任务而非恶意外泄。所有关键论断均有对应的 API 响应数据支撑。\",\n  \"evidence_quotes\": [\n    \"query_threat_intel_ip_10.0.9.45.raw_intel: 'Internal QA test database server. No external threat. Regular data cleansing task according to QA schedule.'\",\n    \"query_asset_info_10.0.9.45.network_zone: '测试环境'\",\n    \"query_asset_info_10.0.9.100.business_system: 'QA 测试数据归档服务器'\",\n    \"query_related_alerts_10.0.9.45_48h.related_alerts[0].summary: \\\"Cron job 'cleanup_and_archive.sh' executed on qa-testdb-01, moving old test data to qa-storage-01.\\\"\",\n    \"query_related_alerts_10.0.9.45_48h.related_alerts[0].timestamp: '2026-07-14T02:00:00Z'\"\n  ]\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1641,
+      "output_tokens": 346,
+      "latency_ms": 5201,
+      "attempts": 1
+    },
+    {
+      "label": "remediation_actionability",
+      "parsed": {
+        "score": 5,
+        "reason": "处置建议非常具体、可执行且逻辑清晰。优先级 1 直接针对误报结论进行闭环（标记并关闭）；优先级 2 提供了具体的白名单配置细节（源 IP、目的 IP、协议及时间段），有效解决噪音问题；优先级 3 提出了流程优化建议。所有建议均严格基于输入证据中的资产信息、威胁情报和关联告警，符合安全运营最佳实践。",
+        "evidence_quotes": [
+          "优先级 1：将该告警标记为误报并关闭，无需进行隔离或阻断操作。",
+          "优先级 2：联系 DLP 策略管理员，在白名单中添加源 IP(10.0.9.45) 到目的 IP(10.0.9.100) 的 FTP 传输规则，排除测试环境特定时间段的大文件传输告警。",
+          "优先级 3：审查其他测试环境的自动化脚本，确保类似的数据归档流程已被纳入安全基线管理，减少噪音。"
+        ]
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"处置建议非常具体、可执行且逻辑清晰。优先级 1 直接针对误报结论进行闭环（标记并关闭）；优先级 2 提供了具体的白名单配置细节（源 IP、目的 IP、协议及时间段），有效解决噪音问题；优先级 3 提出了流程优化建议。所有建议均严格基于输入证据中的资产信息、威胁情报和关联告警，符合安全运营最佳实践。\",\n  \"evidence_quotes\": [\n    \"优先级 1：将该告警标记为误报并关闭，无需进行隔离或阻断操作。\",\n    \"优先级 2：联系 DLP 策略管理员，在白名单中添加源 IP(10.0.9.45) 到目的 IP(10.0.9.100) 的 FTP 传输规则，排除测试环境特定时间段的大文件传输告警。\",\n    \"优先级 3：审查其他测试环境的自动化脚本，确保类似的数据归档流程已被纳入安全基线管理，减少噪音。\"\n  ]\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1644,
+      "output_tokens": 236,
+      "latency_ms": 3133,
+      "attempts": 1
+    },
+    {
+      "label": "evidence_completeness",
+      "parsed": {
+        "score": 5,
+        "reason": "证据链完整覆盖了关键 IOC（源/目的 IP）与行为特征（资产属性、威胁情报、关联告警）。具体包括：1. 资产信息确认源/目 IP 均为测试环境内部资产且非攻击工具；2. 威胁情报明确标记为正常业务活动并引用了'Regular data cleansing task'备注；3. 关联告警在时间戳上吻合，佐证了 Cron 任务执行；4. 原始日志显示数据传输至内部服务器，符合归档特征。所有关键要素均有输入数据直接支撑，逻辑闭环。",
+        "evidence_quotes": [
+          "资产信息确认源 IP(10.0.9.45) 为'QA 测试数据库'，目的 IP(10.0.9.100) 为'QA 测试数据归档服务器'，均位于'测试环境'且非扫描器/堡垒机/蜜罐。",
+          "威胁情报显示源 IP 信誉分 100，备注明确提及'Regular data cleansing task according to QA schedule'（按 QA 计划进行的常规数据清理任务）。",
+          "关联告警在 DLP 触发前 15 秒记录到 Cron 任务'cleanup_and_archive.sh'执行，摘要说明正在将旧测试数据移至目标归档服务器。",
+          "原始日志显示数据传输至内部服务器 10.0.9.100，符合内部归档特征而非外部外泄。"
+        ]
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"证据链完整覆盖了关键 IOC（源/目的 IP）与行为特征（资产属性、威胁情报、关联告警）。具体包括：1. 资产信息确认源/目 IP 均为测试环境内部资产且非攻击工具；2. 威胁情报明确标记为正常业务活动并引用了'Regular data cleansing task'备注；3. 关联告警在时间戳上吻合，佐证了 Cron 任务执行；4. 原始日志显示数据传输至内部服务器，符合归档特征。所有关键要素均有输入数据直接支撑，逻辑闭环。\",\n  \"evidence_quotes\": [\n    \"资产信息确认源 IP(10.0.9.45) 为'QA 测试数据库'，目的 IP(10.0.9.100) 为'QA 测试数据归档服务器'，均位于'测试环境'且非扫描器/堡垒机/蜜罐。\",\n    \"威胁情报显示源 IP 信誉分 100，备注明确提及'Regular data cleansing task according to QA schedule'（按 QA 计划进行的常规数据清理任务）。\",\n    \"关联告警在 DLP 触发前 15 秒记录到 Cron 任务'cleanup_and_archive.sh'执行，摘要说明正在将旧测试数据移至目标归档服务器。\",\n    \"原始日志显示数据传输至内部服务器 10.0.9.100，符合内部归档特征而非外部外泄。\"\n  ]\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1644,
+      "output_tokens": 335,
+      "latency_ms": 4448,
+      "attempts": 1
+    },
+    {
+      "label": "hallucination_check",
+      "parsed": {
+        "total_statements": 4,
+        "verifiable": 4,
+        "hallucinations": 0,
+        "uncertain": 0,
+        "details": [
+          {
+            "statement": "资产信息确认源 IP(10.0.9.45) 为'QA 测试数据库'，目的 IP(10.0.9.100) 为'QA 测试数据归档服务器'，均位于'测试环境'且非扫描器/堡垒机/蜜罐。",
+            "verdict": "verifiable",
+            "reason": "证据 'query_asset_info_10.0.9.45' 和 'query_asset_info_10.0.9.100' 明确显示源 IP 业务系统为'QA 测试数据库'，目的 IP 为'QA 测试数据归档服务器'，网络区域均为'测试环境'，且 is_scanner、is_bastion、is_honeypot 均为 false。"
+          },
+          {
+            "statement": "威胁情报显示源 IP 信誉分 100，备注明确提及'Regular data cleansing task according to QA schedule'（按 QA 计划进行的常规数据清理任务）。",
+            "verdict": "verifiable",
+            "reason": "证据 'query_threat_intel_ip_10.0.9.45' 中 reputation_score 为 100，raw_intel 字段包含 'Regular data cleansing task according to QA schedule'。"
+          },
+          {
+            "statement": "关联告警在 DLP 触发前 15 秒记录到 Cron 任务'cleanup_and_archive.sh'执行，摘要说明正在将旧测试数据移至目标归档服务器。",
+            "verdict": "verifiable",
+            "reason": "证据 'query_alert_detail_A26' 显示 DLP 告警时间为 2026-07-14T02:00:15Z；证据 'query_related_alerts_10.0.9.45_48h' 显示 Cron 任务告警时间为 2026-07-14T02:00:00Z，相差 15 秒，且摘要提及 'moving old test data to qa-storage-01'。"
+          },
+          {
+            "statement": "原始日志显示数据传输至内部服务器 10.0.9.100，符合内部归档特征而非外部外泄。",
+            "verdict": "verifiable",
+            "reason": "证据 'query_alert_detail_A26' 的 raw_log 显示 'Host 10.0.9.45 sent ... to 10.0.9.100 via FTP'，且 10.0.9.100 被确认为内部测试环境资产（见 query_asset_info_10.0.9.100），符合内部归档特征。"
+          }
+        ]
+      },
+      "raw_text": "{\n  \"total_statements\": 4,\n  \"verifiable\": 4,\n  \"hallucinations\": 0,\n  \"uncertain\": 0,\n  \"details\": [\n    {\n      \"statement\": \"资产信息确认源 IP(10.0.9.45) 为'QA 测试数据库'，目的 IP(10.0.9.100) 为'QA 测试数据归档服务器'，均位于'测试环境'且非扫描器/堡垒机/蜜罐。\",\n      \"verdict\": \"verifiable\",\n      \"reason\": \"证据 'query_asset_info_10.0.9.45' 和 'query_asset_info_10.0.9.100' 明确显示源 IP 业务系统为'QA 测试数据库'，目的 IP 为'QA 测试数据归档服务器'，网络区域均为'测试环境'，且 is_scanner、is_bastion、is_honeypot 均为 false。\"\n    },\n    {\n      \"statement\": \"威胁情报显示源 IP 信誉分 100，备注明确提及'Regular data cleansing task according to QA schedule'（按 QA 计划进行的常规数据清理任务）。\",\n      \"verdict\": \"verifiable\",\n      \"reason\": \"证据 'query_threat_intel_ip_10.0.9.45' 中 reputation_score 为 100，raw_intel 字段包含 'Regular data cleansing task according to QA schedule'。\"\n    },\n    {\n      \"statement\": \"关联告警在 DLP 触发前 15 秒记录到 Cron 任务'cleanup_and_archive.sh'执行，摘要说明正在将旧测试数据移至目标归档服务器。\",\n      \"verdict\": \"verifiable\",\n      \"reason\": \"证据 'query_alert_detail_A26' 显示 DLP 告警时间为 2026-07-14T02:00:15Z；证据 'query_related_alerts_10.0.9.45_48h' 显示 Cron 任务告警时间为 2026-07-14T02:00:00Z，相差 15 秒，且摘要提及 'moving old test data to qa-storage-01'。\"\n    },\n    {\n      \"statement\": \"原始日志显示数据传输至内部服务器 10.0.9.100，符合内部归档特征而非外部外泄。\",\n      \"verdict\": \"verifiable\",\n      \"reason\": \"证据 'query_alert_detail_A26' 的 raw_log 显示 'Host 10.0.9.45 sent ... to 10.0.9.100 via FTP'，且 10.0.9.100 被确认为内部测试环境资产（见 query_asset_info_10.0.9.100），符合内部归档特征。\"\n    }\n  ]\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1675,
+      "output_tokens": 679,
+      "latency_ms": 7640,
+      "attempts": 1
+    }
+  ],
+  "overall_pass": true,
+  "error_type": null,
+  "error_message": null
+}

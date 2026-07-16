@@ -1,0 +1,19 @@
+.env
+.env.*
+!.env.example
+.DS_Store
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+htmlcov/
+
+# 本地研发过程材料，不进入正式 GitLab 交付
+/Eval-example/
+/plan_file/
+/.superpowers/
+/docs/superpowers/
+
+# 运行时新生成的结果；正式基线放在 eval/results/ 下
+scenarios/**/eval/output/
+

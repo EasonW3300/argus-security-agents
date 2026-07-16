@@ -1,0 +1,331 @@
+{
+  "test_case_id": "A02",
+  "scenario": "检测到 WebShell 文件上传成功",
+  "difficulty": "easy",
+  "is_positive": true,
+  "expected_severity": "critical",
+  "status": "completed",
+  "agent_output": {
+    "alert_id": "A02",
+    "judgment": {
+      "severity": "critical",
+      "attack_type": "WebShell Upload",
+      "confidence": 0.95,
+      "summary": "攻击者成功向高价值生产资产上传已知恶意 WebShell，确认为真实攻击事件。",
+      "evidence_chain": [
+        "WAF 告警详情显示 POST 请求包含 filename shell.php 且 payload 含 eval(base64_decode(...)) 特征 (query_alert_detail)",
+        "目标资产 10.0.2.5 标记为生产环境 CMS 系统，非扫描器、堡垒机或蜜罐 (query_asset_info)",
+        "文件哈希 d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9 在威胁情报中被标记为恶意 WebShell (China Chopper 变种) (query_threat_intel)",
+        "源 IP 198.51.100.17 在威胁情报中记录有上传 WebShell 的历史行为 (query_threat_intel)"
+      ],
+      "iocs": [
+        {
+          "type": "ip",
+          "value": "198.51.100.17",
+          "malicious": true,
+          "context": "威胁情报标记为恶意，关联 WebShell 上传行为"
+        },
+        {
+          "type": "hash",
+          "value": "d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9",
+          "malicious": true,
+          "context": "威胁情报确认为中国虾 WebShell 变种"
+        }
+      ]
+    },
+    "remediation": [
+      "立即在防火墙和 WAF 上封禁源 IP 198.51.100.17",
+      "登录服务器删除 /uploads/shell.php 文件并检查其他可疑文件",
+      "排查服务器是否存在持久化后门及横向移动痕迹",
+      "修复文件上传接口的验证逻辑，禁止执行权限"
+    ],
+    "metadata": {
+      "tools_called": [
+        "query_alert_detail",
+        "query_asset_info",
+        "query_threat_intel",
+        "query_related_alerts"
+      ]
+    }
+  },
+  "code_graders": {
+    "tools_called_minimum": {
+      "passed": true,
+      "reason": "required tools present",
+      "expected": [
+        "query_alert_detail",
+        "query_threat_intel"
+      ],
+      "actual": [
+        "query_alert_detail",
+        "query_asset_info",
+        "query_threat_intel",
+        "query_related_alerts"
+      ]
+    },
+    "output_schema": {
+      "passed": true,
+      "reason": "required fields present",
+      "expected": null,
+      "actual": null
+    },
+    "severity_enum": {
+      "passed": true,
+      "reason": "severity is valid",
+      "expected": [
+        "critical",
+        "false_positive",
+        "high",
+        "low",
+        "medium"
+      ],
+      "actual": "critical"
+    },
+    "severity_match": {
+      "passed": true,
+      "reason": "severity matches",
+      "expected": "critical",
+      "actual": "critical"
+    },
+    "confidence_range": {
+      "passed": true,
+      "reason": "confidence in range",
+      "expected": "0..1",
+      "actual": 0.95
+    },
+    "remediation_not_empty": {
+      "passed": true,
+      "reason": "remediation actionable",
+      "expected": "at least one item >=10 chars",
+      "actual": [
+        "立即在防火墙和 WAF 上封禁源 IP 198.51.100.17",
+        "登录服务器删除 /uploads/shell.php 文件并检查其他可疑文件",
+        "排查服务器是否存在持久化后门及横向移动痕迹",
+        "修复文件上传接口的验证逻辑，禁止执行权限"
+      ]
+    }
+  },
+  "quality_scores": {
+    "severity_rationality": {
+      "score": 5,
+      "reason": "Agent 的评估结论（严重度：critical，攻击类型：WebShell Upload）与提供的输入证据高度一致。证据链完整且确凿：1) WAF 日志直接捕获了包含恶意特征（eval/base64_decode）的文件上传行为；2) 威胁情报确认文件哈希为已知的 China Chopper WebShell 变种；3) 源 IP 在威胁情报中被标记为恶意且有历史攻击记录；4) 目标资产被明确标识为高价值生产环境 CMS 系统。所有关键判断均有对应的 API 响应数据支撑，无逻辑跳跃或证据缺失。",
+      "evidence_quotes": [
+        "payload_highlights: 'PHP code contains eval(base64_decode(...))'",
+        "raw_intel (hash): 'SHA256 hash identified as China Chopper WebShell variant. Allows remote command execution and file management.'",
+        "raw_intel (ip): 'IP observed uploading WebShells to vulnerable web servers. Associated with multiple defacement incidents.'",
+        "asset_level: 'high', business_system: '公司官网 CMS', is_honeypot: false, is_scanner: false"
+      ]
+    },
+    "remediation_actionability": {
+      "score": 5,
+      "reason": "处置建议非常具体、可执行且逻辑清晰。建议按优先级排列：首先阻断攻击源（封禁 IP），其次清除威胁（删除文件并排查持久化），最后修复漏洞（修复上传接口）。所有建议均直接针对证据中确认的攻击类型（WebShell 上传）和受影响资产（生产环境 CMS）。",
+      "evidence_quotes": [
+        "立即在防火墙和 WAF 上封禁源 IP 198.51.100.17",
+        "登录服务器删除 /uploads/shell.php 文件并检查其他可疑文件",
+        "排查服务器是否存在持久化后门及横向移动痕迹",
+        "修复文件上传接口的验证逻辑，禁止执行权限"
+      ]
+    },
+    "evidence_completeness": {
+      "score": 5,
+      "reason": "证据链完整且逻辑严密，成功覆盖了攻击判定所需的所有关键 IOC 与行为特征。具体包括：1. 行为特征：WAF 告警明确捕获了包含 'eval(base64_decode(...))' 特征的 POST 请求及文件名 'shell.php'；2. 目标资产确认：通过查询确认目标为高价值生产环境 CMS 系统，排除了误报源（如蜜罐、扫描器）；3. 恶意文件确认：文件哈希在威胁情报中被标记为 'China Chopper WebShell 变种' 且确认为恶意；4. 攻击者画像：源 IP 在威胁情报中记录有上传 WebShell 的历史行为。所有关键要素均有对应的 API 响应数据支撑，形成了闭环的证据链。",
+      "evidence_quotes": [
+        "payload_highlights: 'PHP code contains eval(base64_decode(...))'",
+        "raw_log: 'filename=shell.php content-type=application/x-php'",
+        "query_asset_info: 'is_bastion': false, 'is_honeypot': false, 'asset_level': 'high'",
+        "query_threat_intel_hash: 'ioc_value': 'd4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9', 'is_malicious': true, 'raw_intel': 'SHA256 hash identified as China Chopper WebShell variant'",
+        "query_threat_intel_ip: 'ioc_value': '198.51.100.17', 'is_malicious': true, 'raw_intel': 'IP observed uploading WebShells to vulnerable web servers'"
+      ]
+    }
+  },
+  "hallucination": {
+    "total_statements": 4,
+    "verifiable": 3,
+    "hallucinations": 0,
+    "uncertain": 1,
+    "details": [
+      {
+        "statement": "WAF 告警详情显示 POST 请求包含 filename shell.php 且 payload 含 eval(base64_decode(...)) 特征",
+        "verdict": "verifiable",
+        "reason": "mock_api_responses 中的 query_alert_detail_A02 明确包含 payload_highlights: 'filename shell.php matches WebShell signature' 和 'PHP code contains eval(base64_decode(...))'，以及 raw_log 中包含 filename=shell.php。"
+      },
+      {
+        "statement": "目标资产 10.0.2.5 标记为生产环境 CMS 系统，非扫描器、堡垒机或蜜罐",
+        "verdict": "verifiable",
+        "reason": "mock_api_responses 中的 query_asset_info_10.0.2.5 显示 business_system 为 '公司官网 CMS'，network_zone 为 '生产-DMZ'，且 is_scanner, is_bastion, is_honeypot 均为 false。"
+      },
+      {
+        "statement": "文件哈希 d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9 在威胁情报中被标记为恶意 WebShell (China Chopper 变种)",
+        "verdict": "verifiable",
+        "reason": "mock_api_responses 中的 query_threat_intel_hash_d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9 显示 ioc_value 匹配该哈希，is_malicious 为 true，raw_intel 明确指出 'identified as China Chopper WebShell variant'。"
+      },
+      {
+        "statement": "源 IP 198.51.100.17 在威胁情报中记录有上传 WebShell 的历史行为",
+        "verdict": "uncertain",
+        "reason": "虽然 query_threat_intel_ip_198.51.100.17 的 raw_intel 提到 'IP observed uploading WebShells'，但 agent_output 的证据链描述为 '记录有上传 WebShell 的历史行为'，这通常暗示具体的历史事件记录。然而，mock_api_responses 中的 query_related_alerts_198.51.100.17_48h 返回 related_alerts 为空数组 (total_related: 0)，这意味着在最近的 48 小时内没有关联的告警记录来直接证实‘历史行为’的具体实例，仅凭威胁情报的描述性文本无法完全确证具体的‘历史记录’事实，存在推断成分。"
+      }
+    ]
+  },
+  "calls": [
+    {
+      "label": "agent",
+      "parsed": {
+        "alert_id": "A02",
+        "judgment": {
+          "severity": "critical",
+          "attack_type": "WebShell Upload",
+          "confidence": 0.95,
+          "summary": "攻击者成功向高价值生产资产上传已知恶意 WebShell，确认为真实攻击事件。",
+          "evidence_chain": [
+            "WAF 告警详情显示 POST 请求包含 filename shell.php 且 payload 含 eval(base64_decode(...)) 特征 (query_alert_detail)",
+            "目标资产 10.0.2.5 标记为生产环境 CMS 系统，非扫描器、堡垒机或蜜罐 (query_asset_info)",
+            "文件哈希 d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9 在威胁情报中被标记为恶意 WebShell (China Chopper 变种) (query_threat_intel)",
+            "源 IP 198.51.100.17 在威胁情报中记录有上传 WebShell 的历史行为 (query_threat_intel)"
+          ],
+          "iocs": [
+            {
+              "type": "ip",
+              "value": "198.51.100.17",
+              "malicious": true,
+              "context": "威胁情报标记为恶意，关联 WebShell 上传行为"
+            },
+            {
+              "type": "hash",
+              "value": "d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9",
+              "malicious": true,
+              "context": "威胁情报确认为中国虾 WebShell 变种"
+            }
+          ]
+        },
+        "remediation": [
+          "立即在防火墙和 WAF 上封禁源 IP 198.51.100.17",
+          "登录服务器删除 /uploads/shell.php 文件并检查其他可疑文件",
+          "排查服务器是否存在持久化后门及横向移动痕迹",
+          "修复文件上传接口的验证逻辑，禁止执行权限"
+        ],
+        "metadata": {
+          "tools_called": [
+            "query_alert_detail",
+            "query_asset_info",
+            "query_threat_intel",
+            "query_related_alerts"
+          ]
+        }
+      },
+      "raw_text": "{\n  \"alert_id\": \"A02\",\n  \"judgment\": {\n    \"severity\": \"critical\",\n    \"attack_type\": \"WebShell Upload\",\n    \"confidence\": 0.95,\n    \"summary\": \"攻击者成功向高价值生产资产上传已知恶意 WebShell，确认为真实攻击事件。\",\n    \"evidence_chain\": [\n      \"WAF 告警详情显示 POST 请求包含 filename shell.php 且 payload 含 eval(base64_decode(...)) 特征 (query_alert_detail)\",\n      \"目标资产 10.0.2.5 标记为生产环境 CMS 系统，非扫描器、堡垒机或蜜罐 (query_asset_info)\",\n      \"文件哈希 d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9 在威胁情报中被标记为恶意 WebShell (China Chopper 变种) (query_threat_intel)\",\n      \"源 IP 198.51.100.17 在威胁情报中记录有上传 WebShell 的历史行为 (query_threat_intel)\"\n    ],\n    \"iocs\": [\n      {\n        \"type\": \"ip\",\n        \"value\": \"198.51.100.17\",\n        \"malicious\": true,\n        \"context\": \"威胁情报标记为恶意，关联 WebShell 上传行为\"\n      },\n      {\n        \"type\": \"hash\",\n        \"value\": \"d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9\",\n        \"malicious\": true,\n        \"context\": \"威胁情报确认为中国虾 WebShell 变种\"\n      }\n    ]\n  },\n  \"remediation\": [\n    \"立即在防火墙和 WAF 上封禁源 IP 198.51.100.17\",\n    \"登录服务器删除 /uploads/shell.php 文件并检查其他可疑文件\",\n    \"排查服务器是否存在持久化后门及横向移动痕迹\",\n    \"修复文件上传接口的验证逻辑，禁止执行权限\"\n  ],\n  \"metadata\": {\n    \"tools_called\": [\n      \"query_alert_detail\",\n      \"query_asset_info\",\n      \"query_threat_intel\",\n      \"query_related_alerts\"\n    ]\n  }\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1233,
+      "output_tokens": 3680,
+      "latency_ms": 35809,
+      "attempts": 1
+    },
+    {
+      "label": "severity_rationality",
+      "parsed": {
+        "score": 5,
+        "reason": "Agent 的评估结论（严重度：critical，攻击类型：WebShell Upload）与提供的输入证据高度一致。证据链完整且确凿：1) WAF 日志直接捕获了包含恶意特征（eval/base64_decode）的文件上传行为；2) 威胁情报确认文件哈希为已知的 China Chopper WebShell 变种；3) 源 IP 在威胁情报中被标记为恶意且有历史攻击记录；4) 目标资产被明确标识为高价值生产环境 CMS 系统。所有关键判断均有对应的 API 响应数据支撑，无逻辑跳跃或证据缺失。",
+        "evidence_quotes": [
+          "payload_highlights: 'PHP code contains eval(base64_decode(...))'",
+          "raw_intel (hash): 'SHA256 hash identified as China Chopper WebShell variant. Allows remote command execution and file management.'",
+          "raw_intel (ip): 'IP observed uploading WebShells to vulnerable web servers. Associated with multiple defacement incidents.'",
+          "asset_level: 'high', business_system: '公司官网 CMS', is_honeypot: false, is_scanner: false"
+        ]
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"Agent 的评估结论（严重度：critical，攻击类型：WebShell Upload）与提供的输入证据高度一致。证据链完整且确凿：1) WAF 日志直接捕获了包含恶意特征（eval/base64_decode）的文件上传行为；2) 威胁情报确认文件哈希为已知的 China Chopper WebShell 变种；3) 源 IP 在威胁情报中被标记为恶意且有历史攻击记录；4) 目标资产被明确标识为高价值生产环境 CMS 系统。所有关键判断均有对应的 API 响应数据支撑，无逻辑跳跃或证据缺失。\",\n  \"evidence_quotes\": [\n    \"payload_highlights: 'PHP code contains eval(base64_decode(...))'\",\n    \"raw_intel (hash): 'SHA256 hash identified as China Chopper WebShell variant. Allows remote command execution and file management.'\",\n    \"raw_intel (ip): 'IP observed uploading WebShells to vulnerable web servers. Associated with multiple defacement incidents.'\",\n    \"asset_level: 'high', business_system: '公司官网 CMS', is_honeypot: false, is_scanner: false\"\n  ]\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1676,
+      "output_tokens": 268,
+      "latency_ms": 3750,
+      "attempts": 1
+    },
+    {
+      "label": "remediation_actionability",
+      "parsed": {
+        "score": 5,
+        "reason": "处置建议非常具体、可执行且逻辑清晰。建议按优先级排列：首先阻断攻击源（封禁 IP），其次清除威胁（删除文件并排查持久化），最后修复漏洞（修复上传接口）。所有建议均直接针对证据中确认的攻击类型（WebShell 上传）和受影响资产（生产环境 CMS）。",
+        "evidence_quotes": [
+          "立即在防火墙和 WAF 上封禁源 IP 198.51.100.17",
+          "登录服务器删除 /uploads/shell.php 文件并检查其他可疑文件",
+          "排查服务器是否存在持久化后门及横向移动痕迹",
+          "修复文件上传接口的验证逻辑，禁止执行权限"
+        ]
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"处置建议非常具体、可执行且逻辑清晰。建议按优先级排列：首先阻断攻击源（封禁 IP），其次清除威胁（删除文件并排查持久化），最后修复漏洞（修复上传接口）。所有建议均直接针对证据中确认的攻击类型（WebShell 上传）和受影响资产（生产环境 CMS）。\",\n  \"evidence_quotes\": [\n    \"立即在防火墙和 WAF 上封禁源 IP 198.51.100.17\",\n    \"登录服务器删除 /uploads/shell.php 文件并检查其他可疑文件\",\n    \"排查服务器是否存在持久化后门及横向移动痕迹\",\n    \"修复文件上传接口的验证逻辑，禁止执行权限\"\n  ]\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1679,
+      "output_tokens": 175,
+      "latency_ms": 1750,
+      "attempts": 1
+    },
+    {
+      "label": "evidence_completeness",
+      "parsed": {
+        "score": 5,
+        "reason": "证据链完整且逻辑严密，成功覆盖了攻击判定所需的所有关键 IOC 与行为特征。具体包括：1. 行为特征：WAF 告警明确捕获了包含 'eval(base64_decode(...))' 特征的 POST 请求及文件名 'shell.php'；2. 目标资产确认：通过查询确认目标为高价值生产环境 CMS 系统，排除了误报源（如蜜罐、扫描器）；3. 恶意文件确认：文件哈希在威胁情报中被标记为 'China Chopper WebShell 变种' 且确认为恶意；4. 攻击者画像：源 IP 在威胁情报中记录有上传 WebShell 的历史行为。所有关键要素均有对应的 API 响应数据支撑，形成了闭环的证据链。",
+        "evidence_quotes": [
+          "payload_highlights: 'PHP code contains eval(base64_decode(...))'",
+          "raw_log: 'filename=shell.php content-type=application/x-php'",
+          "query_asset_info: 'is_bastion': false, 'is_honeypot': false, 'asset_level': 'high'",
+          "query_threat_intel_hash: 'ioc_value': 'd4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9', 'is_malicious': true, 'raw_intel': 'SHA256 hash identified as China Chopper WebShell variant'",
+          "query_threat_intel_ip: 'ioc_value': '198.51.100.17', 'is_malicious': true, 'raw_intel': 'IP observed uploading WebShells to vulnerable web servers'"
+        ]
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"证据链完整且逻辑严密，成功覆盖了攻击判定所需的所有关键 IOC 与行为特征。具体包括：1. 行为特征：WAF 告警明确捕获了包含 'eval(base64_decode(...))' 特征的 POST 请求及文件名 'shell.php'；2. 目标资产确认：通过查询确认目标为高价值生产环境 CMS 系统，排除了误报源（如蜜罐、扫描器）；3. 恶意文件确认：文件哈希在威胁情报中被标记为 'China Chopper WebShell 变种' 且确认为恶意；4. 攻击者画像：源 IP 在威胁情报中记录有上传 WebShell 的历史行为。所有关键要素均有对应的 API 响应数据支撑，形成了闭环的证据链。\",\n  \"evidence_quotes\": [\n    \"payload_highlights: 'PHP code contains eval(base64_decode(...))'\",\n    \"raw_log: 'filename=shell.php content-type=application/x-php'\",\n    \"query_asset_info: 'is_bastion': false, 'is_honeypot': false, 'asset_level': 'high'\",\n    \"query_threat_intel_hash: 'ioc_value': 'd4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9', 'is_malicious': true, 'raw_intel': 'SHA256 hash identified as China Chopper WebShell variant'\",\n    \"query_threat_intel_ip: 'ioc_value': '198.51.100.17', 'is_malicious': true, 'raw_intel': 'IP observed uploading WebShells to vulnerable web servers'\"\n  ]\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1679,
+      "output_tokens": 389,
+      "latency_ms": 4513,
+      "attempts": 1
+    },
+    {
+      "label": "hallucination_check",
+      "parsed": {
+        "total_statements": 4,
+        "verifiable": 3,
+        "hallucinations": 0,
+        "uncertain": 1,
+        "details": [
+          {
+            "statement": "WAF 告警详情显示 POST 请求包含 filename shell.php 且 payload 含 eval(base64_decode(...)) 特征",
+            "verdict": "verifiable",
+            "reason": "mock_api_responses 中的 query_alert_detail_A02 明确包含 payload_highlights: 'filename shell.php matches WebShell signature' 和 'PHP code contains eval(base64_decode(...))'，以及 raw_log 中包含 filename=shell.php。"
+          },
+          {
+            "statement": "目标资产 10.0.2.5 标记为生产环境 CMS 系统，非扫描器、堡垒机或蜜罐",
+            "verdict": "verifiable",
+            "reason": "mock_api_responses 中的 query_asset_info_10.0.2.5 显示 business_system 为 '公司官网 CMS'，network_zone 为 '生产-DMZ'，且 is_scanner, is_bastion, is_honeypot 均为 false。"
+          },
+          {
+            "statement": "文件哈希 d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9 在威胁情报中被标记为恶意 WebShell (China Chopper 变种)",
+            "verdict": "verifiable",
+            "reason": "mock_api_responses 中的 query_threat_intel_hash_d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9 显示 ioc_value 匹配该哈希，is_malicious 为 true，raw_intel 明确指出 'identified as China Chopper WebShell variant'。"
+          },
+          {
+            "statement": "源 IP 198.51.100.17 在威胁情报中记录有上传 WebShell 的历史行为",
+            "verdict": "uncertain",
+            "reason": "虽然 query_threat_intel_ip_198.51.100.17 的 raw_intel 提到 'IP observed uploading WebShells'，但 agent_output 的证据链描述为 '记录有上传 WebShell 的历史行为'，这通常暗示具体的历史事件记录。然而，mock_api_responses 中的 query_related_alerts_198.51.100.17_48h 返回 related_alerts 为空数组 (total_related: 0)，这意味着在最近的 48 小时内没有关联的告警记录来直接证实‘历史行为’的具体实例，仅凭威胁情报的描述性文本无法完全确证具体的‘历史记录’事实，存在推断成分。"
+          }
+        ]
+      },
+      "raw_text": "{\n  \"total_statements\": 4,\n  \"verifiable\": 3,\n  \"hallucinations\": 0,\n  \"uncertain\": 1,\n  \"details\": [\n    {\n      \"statement\": \"WAF 告警详情显示 POST 请求包含 filename shell.php 且 payload 含 eval(base64_decode(...)) 特征\",\n      \"verdict\": \"verifiable\",\n      \"reason\": \"mock_api_responses 中的 query_alert_detail_A02 明确包含 payload_highlights: 'filename shell.php matches WebShell signature' 和 'PHP code contains eval(base64_decode(...))'，以及 raw_log 中包含 filename=shell.php。\"\n    },\n    {\n      \"statement\": \"目标资产 10.0.2.5 标记为生产环境 CMS 系统，非扫描器、堡垒机或蜜罐\",\n      \"verdict\": \"verifiable\",\n      \"reason\": \"mock_api_responses 中的 query_asset_info_10.0.2.5 显示 business_system 为 '公司官网 CMS'，network_zone 为 '生产-DMZ'，且 is_scanner, is_bastion, is_honeypot 均为 false。\"\n    },\n    {\n      \"statement\": \"文件哈希 d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9 在威胁情报中被标记为恶意 WebShell (China Chopper 变种)\",\n      \"verdict\": \"verifiable\",\n      \"reason\": \"mock_api_responses 中的 query_threat_intel_hash_d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9 显示 ioc_value 匹配该哈希，is_malicious 为 true，raw_intel 明确指出 'identified as China Chopper WebShell variant'。\"\n    },\n    {\n      \"statement\": \"源 IP 198.51.100.17 在威胁情报中记录有上传 WebShell 的历史行为\",\n      \"verdict\": \"uncertain\",\n      \"reason\": \"虽然 query_threat_intel_ip_198.51.100.17 的 raw_intel 提到 'IP observed uploading WebShells'，但 agent_output 的证据链描述为 '记录有上传 WebShell 的历史行为'，这通常暗示具体的历史事件记录。然而，mock_api_responses 中的 query_related_alerts_198.51.100.17_48h 返回 related_alerts 为空数组 (total_related: 0)，这意味着在最近的 48 小时内没有关联的告警记录来直接证实‘历史行为’的具体实例，仅凭威胁情报的描述性文本无法完全确证具体的‘历史记录’事实，存在推断成分。\"\n    }\n  ]\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1710,
+      "output_tokens": 647,
+      "latency_ms": 6849,
+      "attempts": 1
+    }
+  ],
+  "overall_pass": true,
+  "error_type": null,
+  "error_message": null
+}

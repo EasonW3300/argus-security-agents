@@ -1,0 +1,312 @@
+{
+  "test_case_id": "A06",
+  "scenario": "内部钓鱼邮件演练触发恶意 URL 告警（误报）",
+  "difficulty": "easy",
+  "is_positive": false,
+  "expected_severity": "false_positive",
+  "status": "completed",
+  "agent_output": {
+    "alert_id": "A06",
+    "judgment": {
+      "severity": "false_positive",
+      "attack_type": "Phishing Simulation",
+      "confidence": 0.95,
+      "summary": "EDR alert triggered by phishing signature match on URL http://phish-test.internal/, but Threat Intelligence confirms this is a legitimate internal security awareness simulation campaign, not a real threat.",
+      "evidence_chain": [
+        "query_alert_detail shows source IP 10.0.3.45 clicked URL http://phish-test.internal/ which matched rule 'Phishing Link Clicked - Malicious URL Detected'.",
+        "query_threat_intel reports ioc_value 'http://phish-test.internal/' has is_malicious set to false with source 'Internal Security Awareness Platform'.",
+        "query_threat_intel raw_intel explicitly states 'URL is part of internal phishing simulation campaign run by Security Awareness team.'",
+        "query_asset_info confirms asset 10.0.3.45 (hr-workstation-12) is a normal workstation, not a scanner, bastion, or honeypot."
+      ],
+      "iocs": [
+        {
+          "type": "url",
+          "value": "http://phish-test.internal/",
+          "malicious": false,
+          "context": "Internal Security Awareness Platform simulation"
+        }
+      ]
+    },
+    "remediation": [
+      "Mark alert A06 as false positive in the SOC platform to close the investigation ticket immediately.",
+      "Send a notification to user jane.doe@company.com confirming the click was part of a scheduled security awareness drill to reinforce training.",
+      "Review detection rules to whitelist known internal simulation domains if they continue to generate high-severity alerts unnecessarily."
+    ],
+    "metadata": {
+      "tools_called": [
+        "query_alert_detail",
+        "query_asset_info",
+        "query_threat_intel",
+        "query_related_alerts"
+      ]
+    }
+  },
+  "code_graders": {
+    "tools_called_minimum": {
+      "passed": true,
+      "reason": "required tools present",
+      "expected": [
+        "query_alert_detail",
+        "query_threat_intel"
+      ],
+      "actual": [
+        "query_alert_detail",
+        "query_asset_info",
+        "query_threat_intel",
+        "query_related_alerts"
+      ]
+    },
+    "output_schema": {
+      "passed": true,
+      "reason": "required fields present",
+      "expected": null,
+      "actual": null
+    },
+    "severity_enum": {
+      "passed": true,
+      "reason": "severity is valid",
+      "expected": [
+        "critical",
+        "false_positive",
+        "high",
+        "low",
+        "medium"
+      ],
+      "actual": "false_positive"
+    },
+    "severity_match": {
+      "passed": true,
+      "reason": "severity matches",
+      "expected": "false_positive",
+      "actual": "false_positive"
+    },
+    "confidence_range": {
+      "passed": true,
+      "reason": "confidence in range",
+      "expected": "0..1",
+      "actual": 0.95
+    },
+    "remediation_not_empty": {
+      "passed": true,
+      "reason": "remediation actionable",
+      "expected": "at least one item >=10 chars",
+      "actual": [
+        "Mark alert A06 as false positive in the SOC platform to close the investigation ticket immediately.",
+        "Send a notification to user jane.doe@company.com confirming the click was part of a scheduled security awareness drill to reinforce training.",
+        "Review detection rules to whitelist known internal simulation domains if they continue to generate high-severity alerts unnecessarily."
+      ]
+    }
+  },
+  "quality_scores": {
+    "severity_rationality": {
+      "score": 5,
+      "reason": "Agent correctly identified the alert as a false positive by cross-referencing the EDR alert with threat intelligence data. The evidence chain explicitly cites the 'Internal Security Awareness Platform' confirming the URL is part of a legitimate simulation campaign, directly contradicting the initial high-severity classification. The reasoning is fully supported by the provided mock API responses.",
+      "evidence_quotes": [
+        "URL http://phish-test.internal/ matches phishing signature",
+        "is_malicious set to false with source 'Internal Security Awareness Platform'",
+        "URL is part of internal phishing simulation campaign run by Security Awareness team.",
+        "asset 10.0.3.45 (hr-workstation-12) is a normal workstation"
+      ]
+    },
+    "remediation_actionability": {
+      "score": 5,
+      "reason": "处置建议非常具体、可执行且逻辑清晰。首先，建议立即在 SOC 平台将告警标记为误报以关闭工单，直接解决了当前的运营负担；其次，建议通知用户确认这是安全演练的一部分，既消除了用户的恐慌又起到了教育作用；最后，建议审查检测规则并白名单化内部模拟域名，提供了长期的优化方案。这三条建议按‘紧急处置-用户沟通-长期优化’的优先级排列，完全基于提供的证据（如威胁情报确认是内部演练、资产信息确认是正常终端）。",
+      "evidence_quotes": [
+        "Mark alert A06 as false positive in the SOC platform to close the investigation ticket immediately.",
+        "Send a notification to user jane.doe@company.com confirming the click was part of a scheduled security awareness drill to reinforce training.",
+        "Review detection rules to whitelist known internal simulation domains if they continue to generate high-severity alerts unnecessarily."
+      ]
+    },
+    "evidence_completeness": {
+      "score": 5,
+      "reason": "证据链完整覆盖了关键 IOC（URL）与行为特征，并提供了确凿的上下文信息。具体包括：1. 原始告警日志确认了用户点击 URL 的行为及触发的规则；2. 威胁情报明确标记该 URL 为 'is_malicious: false' 且来源为内部安全平台；3. raw_intel 直接声明这是内部模拟活动；4. 资产信息排除了异常设备的可能性。所有关键要素均被引用并相互印证，足以判定为误报。",
+      "evidence_quotes": [
+        "User jane.doe opened URL http://phish-test.internal/ from Outlook.",
+        "URL is part of internal phishing simulation campaign run by Security Awareness team. Not a real threat.",
+        "is_malicious set to false with source 'Internal Security Awareness Platform'.",
+        "asset 10.0.3.45 (hr-workstation-12) is a normal workstation, not a scanner, bastion, or honeypot."
+      ]
+    }
+  },
+  "hallucination": {
+    "total_statements": 4,
+    "verifiable": 4,
+    "hallucinations": 0,
+    "uncertain": 0,
+    "details": [
+      {
+        "statement": "query_alert_detail shows source IP 10.0.3.45 clicked URL http://phish-test.internal/ which matched rule 'Phishing Link Clicked - Malicious URL Detected'.",
+        "verdict": "verifiable",
+        "reason": "The mock_api_response for query_alert_detail_A06 confirms source_ip is '10.0.3.45', payload_highlights mention the URL matches a phishing signature, and rule_name is 'Phishing Link Clicked - Malicious URL Detected'."
+      },
+      {
+        "statement": "query_threat_intel reports ioc_value 'http://phish-test.internal/' has is_malicious set to false with source 'Internal Security Awareness Platform'.",
+        "verdict": "verifiable",
+        "reason": "The mock_api_response for query_threat_intel_url_http://phish-test.internal/ explicitly shows ioc_value as 'http://phish-test.internal/', is_malicious as false, and source as 'Internal Security Awareness Platform'."
+      },
+      {
+        "statement": "query_threat_intel raw_intel explicitly states 'URL is part of internal phishing simulation campaign run by Security Awareness team.'",
+        "verdict": "verifiable",
+        "reason": "The mock_api_response for query_threat_intel_url_http://phish-test.internal/ contains raw_intel field with the exact text: 'URL is part of internal phishing simulation campaign run by Security Awareness team. Not a real threat.'"
+      },
+      {
+        "statement": "query_asset_info confirms asset 10.0.3.45 (hr-workstation-12) is a normal workstation, not a scanner, bastion, or honeypot.",
+        "verdict": "verifiable",
+        "reason": "The mock_api_response for query_asset_info_10.0.3.45 shows hostname 'hr-workstation-12', ip '10.0.3.45', and flags is_scanner, is_bastion, and is_honeypot all set to false."
+      }
+    ]
+  },
+  "calls": [
+    {
+      "label": "agent",
+      "parsed": {
+        "alert_id": "A06",
+        "judgment": {
+          "severity": "false_positive",
+          "attack_type": "Phishing Simulation",
+          "confidence": 0.95,
+          "summary": "EDR alert triggered by phishing signature match on URL http://phish-test.internal/, but Threat Intelligence confirms this is a legitimate internal security awareness simulation campaign, not a real threat.",
+          "evidence_chain": [
+            "query_alert_detail shows source IP 10.0.3.45 clicked URL http://phish-test.internal/ which matched rule 'Phishing Link Clicked - Malicious URL Detected'.",
+            "query_threat_intel reports ioc_value 'http://phish-test.internal/' has is_malicious set to false with source 'Internal Security Awareness Platform'.",
+            "query_threat_intel raw_intel explicitly states 'URL is part of internal phishing simulation campaign run by Security Awareness team.'",
+            "query_asset_info confirms asset 10.0.3.45 (hr-workstation-12) is a normal workstation, not a scanner, bastion, or honeypot."
+          ],
+          "iocs": [
+            {
+              "type": "url",
+              "value": "http://phish-test.internal/",
+              "malicious": false,
+              "context": "Internal Security Awareness Platform simulation"
+            }
+          ]
+        },
+        "remediation": [
+          "Mark alert A06 as false positive in the SOC platform to close the investigation ticket immediately.",
+          "Send a notification to user jane.doe@company.com confirming the click was part of a scheduled security awareness drill to reinforce training.",
+          "Review detection rules to whitelist known internal simulation domains if they continue to generate high-severity alerts unnecessarily."
+        ],
+        "metadata": {
+          "tools_called": [
+            "query_alert_detail",
+            "query_asset_info",
+            "query_threat_intel",
+            "query_related_alerts"
+          ]
+        }
+      },
+      "raw_text": "{\n  \"alert_id\": \"A06\",\n  \"judgment\": {\n    \"severity\": \"false_positive\",\n    \"attack_type\": \"Phishing Simulation\",\n    \"confidence\": 0.95,\n    \"summary\": \"EDR alert triggered by phishing signature match on URL http://phish-test.internal/, but Threat Intelligence confirms this is a legitimate internal security awareness simulation campaign, not a real threat.\",\n    \"evidence_chain\": [\n      \"query_alert_detail shows source IP 10.0.3.45 clicked URL http://phish-test.internal/ which matched rule 'Phishing Link Clicked - Malicious URL Detected'.\",\n      \"query_threat_intel reports ioc_value 'http://phish-test.internal/' has is_malicious set to false with source 'Internal Security Awareness Platform'.\",\n      \"query_threat_intel raw_intel explicitly states 'URL is part of internal phishing simulation campaign run by Security Awareness team.'\",\n      \"query_asset_info confirms asset 10.0.3.45 (hr-workstation-12) is a normal workstation, not a scanner, bastion, or honeypot.\"\n    ],\n    \"iocs\": [\n      {\n        \"type\": \"url\",\n        \"value\": \"http://phish-test.internal/\",\n        \"malicious\": false,\n        \"context\": \"Internal Security Awareness Platform simulation\"\n      }\n    ]\n  },\n  \"remediation\": [\n    \"Mark alert A06 as false positive in the SOC platform to close the investigation ticket immediately.\",\n    \"Send a notification to user jane.doe@company.com confirming the click was part of a scheduled security awareness drill to reinforce training.\",\n    \"Review detection rules to whitelist known internal simulation domains if they continue to generate high-severity alerts unnecessarily.\"\n  ],\n  \"metadata\": {\n    \"tools_called\": [\n      \"query_alert_detail\",\n      \"query_asset_info\",\n      \"query_threat_intel\",\n      \"query_related_alerts\"\n    ]\n  }\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 899,
+      "output_tokens": 2266,
+      "latency_ms": 23130,
+      "attempts": 1
+    },
+    {
+      "label": "severity_rationality",
+      "parsed": {
+        "score": 5,
+        "reason": "Agent correctly identified the alert as a false positive by cross-referencing the EDR alert with threat intelligence data. The evidence chain explicitly cites the 'Internal Security Awareness Platform' confirming the URL is part of a legitimate simulation campaign, directly contradicting the initial high-severity classification. The reasoning is fully supported by the provided mock API responses.",
+        "evidence_quotes": [
+          "URL http://phish-test.internal/ matches phishing signature",
+          "is_malicious set to false with source 'Internal Security Awareness Platform'",
+          "URL is part of internal phishing simulation campaign run by Security Awareness team.",
+          "asset 10.0.3.45 (hr-workstation-12) is a normal workstation"
+        ]
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"Agent correctly identified the alert as a false positive by cross-referencing the EDR alert with threat intelligence data. The evidence chain explicitly cites the 'Internal Security Awareness Platform' confirming the URL is part of a legitimate simulation campaign, directly contradicting the initial high-severity classification. The reasoning is fully supported by the provided mock API responses.\",\n  \"evidence_quotes\": [\n    \"URL http://phish-test.internal/ matches phishing signature\",\n    \"is_malicious set to false with source 'Internal Security Awareness Platform'\",\n    \"URL is part of internal phishing simulation campaign run by Security Awareness team.\",\n    \"asset 10.0.3.45 (hr-workstation-12) is a normal workstation\"\n  ]\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1198,
+      "output_tokens": 173,
+      "latency_ms": 2140,
+      "attempts": 1
+    },
+    {
+      "label": "remediation_actionability",
+      "parsed": {
+        "score": 5,
+        "reason": "处置建议非常具体、可执行且逻辑清晰。首先，建议立即在 SOC 平台将告警标记为误报以关闭工单，直接解决了当前的运营负担；其次，建议通知用户确认这是安全演练的一部分，既消除了用户的恐慌又起到了教育作用；最后，建议审查检测规则并白名单化内部模拟域名，提供了长期的优化方案。这三条建议按‘紧急处置-用户沟通-长期优化’的优先级排列，完全基于提供的证据（如威胁情报确认是内部演练、资产信息确认是正常终端）。",
+        "evidence_quotes": [
+          "Mark alert A06 as false positive in the SOC platform to close the investigation ticket immediately.",
+          "Send a notification to user jane.doe@company.com confirming the click was part of a scheduled security awareness drill to reinforce training.",
+          "Review detection rules to whitelist known internal simulation domains if they continue to generate high-severity alerts unnecessarily."
+        ]
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"处置建议非常具体、可执行且逻辑清晰。首先，建议立即在 SOC 平台将告警标记为误报以关闭工单，直接解决了当前的运营负担；其次，建议通知用户确认这是安全演练的一部分，既消除了用户的恐慌又起到了教育作用；最后，建议审查检测规则并白名单化内部模拟域名，提供了长期的优化方案。这三条建议按‘紧急处置-用户沟通-长期优化’的优先级排列，完全基于提供的证据（如威胁情报确认是内部演练、资产信息确认是正常终端）。\",\n  \"evidence_quotes\": [\n    \"Mark alert A06 as false positive in the SOC platform to close the investigation ticket immediately.\",\n    \"Send a notification to user jane.doe@company.com confirming the click was part of a scheduled security awareness drill to reinforce training.\",\n    \"Review detection rules to whitelist known internal simulation domains if they continue to generate high-severity alerts unnecessarily.\"\n  ]\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1201,
+      "output_tokens": 217,
+      "latency_ms": 3256,
+      "attempts": 1
+    },
+    {
+      "label": "evidence_completeness",
+      "parsed": {
+        "score": 5,
+        "reason": "证据链完整覆盖了关键 IOC（URL）与行为特征，并提供了确凿的上下文信息。具体包括：1. 原始告警日志确认了用户点击 URL 的行为及触发的规则；2. 威胁情报明确标记该 URL 为 'is_malicious: false' 且来源为内部安全平台；3. raw_intel 直接声明这是内部模拟活动；4. 资产信息排除了异常设备的可能性。所有关键要素均被引用并相互印证，足以判定为误报。",
+        "evidence_quotes": [
+          "User jane.doe opened URL http://phish-test.internal/ from Outlook.",
+          "URL is part of internal phishing simulation campaign run by Security Awareness team. Not a real threat.",
+          "is_malicious set to false with source 'Internal Security Awareness Platform'.",
+          "asset 10.0.3.45 (hr-workstation-12) is a normal workstation, not a scanner, bastion, or honeypot."
+        ]
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"证据链完整覆盖了关键 IOC（URL）与行为特征，并提供了确凿的上下文信息。具体包括：1. 原始告警日志确认了用户点击 URL 的行为及触发的规则；2. 威胁情报明确标记该 URL 为 'is_malicious: false' 且来源为内部安全平台；3. raw_intel 直接声明这是内部模拟活动；4. 资产信息排除了异常设备的可能性。所有关键要素均被引用并相互印证，足以判定为误报。\",\n  \"evidence_quotes\": [\n    \"User jane.doe opened URL http://phish-test.internal/ from Outlook.\",\n    \"URL is part of internal phishing simulation campaign run by Security Awareness team. Not a real threat.\",\n    \"is_malicious set to false with source 'Internal Security Awareness Platform'.\",\n    \"asset 10.0.3.45 (hr-workstation-12) is a normal workstation, not a scanner, bastion, or honeypot.\"\n  ]\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1201,
+      "output_tokens": 238,
+      "latency_ms": 2613,
+      "attempts": 1
+    },
+    {
+      "label": "hallucination_check",
+      "parsed": {
+        "total_statements": 4,
+        "verifiable": 4,
+        "hallucinations": 0,
+        "uncertain": 0,
+        "details": [
+          {
+            "statement": "query_alert_detail shows source IP 10.0.3.45 clicked URL http://phish-test.internal/ which matched rule 'Phishing Link Clicked - Malicious URL Detected'.",
+            "verdict": "verifiable",
+            "reason": "The mock_api_response for query_alert_detail_A06 confirms source_ip is '10.0.3.45', payload_highlights mention the URL matches a phishing signature, and rule_name is 'Phishing Link Clicked - Malicious URL Detected'."
+          },
+          {
+            "statement": "query_threat_intel reports ioc_value 'http://phish-test.internal/' has is_malicious set to false with source 'Internal Security Awareness Platform'.",
+            "verdict": "verifiable",
+            "reason": "The mock_api_response for query_threat_intel_url_http://phish-test.internal/ explicitly shows ioc_value as 'http://phish-test.internal/', is_malicious as false, and source as 'Internal Security Awareness Platform'."
+          },
+          {
+            "statement": "query_threat_intel raw_intel explicitly states 'URL is part of internal phishing simulation campaign run by Security Awareness team.'",
+            "verdict": "verifiable",
+            "reason": "The mock_api_response for query_threat_intel_url_http://phish-test.internal/ contains raw_intel field with the exact text: 'URL is part of internal phishing simulation campaign run by Security Awareness team. Not a real threat.'"
+          },
+          {
+            "statement": "query_asset_info confirms asset 10.0.3.45 (hr-workstation-12) is a normal workstation, not a scanner, bastion, or honeypot.",
+            "verdict": "verifiable",
+            "reason": "The mock_api_response for query_asset_info_10.0.3.45 shows hostname 'hr-workstation-12', ip '10.0.3.45', and flags is_scanner, is_bastion, and is_honeypot all set to false."
+          }
+        ]
+      },
+      "raw_text": "{\n  \"total_statements\": 4,\n  \"verifiable\": 4,\n  \"hallucinations\": 0,\n  \"uncertain\": 0,\n  \"details\": [\n    {\n      \"statement\": \"query_alert_detail shows source IP 10.0.3.45 clicked URL http://phish-test.internal/ which matched rule 'Phishing Link Clicked - Malicious URL Detected'.\",\n      \"verdict\": \"verifiable\",\n      \"reason\": \"The mock_api_response for query_alert_detail_A06 confirms source_ip is '10.0.3.45', payload_highlights mention the URL matches a phishing signature, and rule_name is 'Phishing Link Clicked - Malicious URL Detected'.\"\n    },\n    {\n      \"statement\": \"query_threat_intel reports ioc_value 'http://phish-test.internal/' has is_malicious set to false with source 'Internal Security Awareness Platform'.\",\n      \"verdict\": \"verifiable\",\n      \"reason\": \"The mock_api_response for query_threat_intel_url_http://phish-test.internal/ explicitly shows ioc_value as 'http://phish-test.internal/', is_malicious as false, and source as 'Internal Security Awareness Platform'.\"\n    },\n    {\n      \"statement\": \"query_threat_intel raw_intel explicitly states 'URL is part of internal phishing simulation campaign run by Security Awareness team.'\",\n      \"verdict\": \"verifiable\",\n      \"reason\": \"The mock_api_response for query_threat_intel_url_http://phish-test.internal/ contains raw_intel field with the exact text: 'URL is part of internal phishing simulation campaign run by Security Awareness team. Not a real threat.'\"\n    },\n    {\n      \"statement\": \"query_asset_info confirms asset 10.0.3.45 (hr-workstation-12) is a normal workstation, not a scanner, bastion, or honeypot.\",\n      \"verdict\": \"verifiable\",\n      \"reason\": \"The mock_api_response for query_asset_info_10.0.3.45 shows hostname 'hr-workstation-12', ip '10.0.3.45', and flags is_scanner, is_bastion, and is_honeypot all set to false.\"\n    }\n  ]\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1232,
+      "output_tokens": 516,
+      "latency_ms": 5057,
+      "attempts": 1
+    }
+  ],
+  "overall_pass": true,
+  "error_type": null,
+  "error_message": null
+}

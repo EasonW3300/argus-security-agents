@@ -1,0 +1,345 @@
+{
+  "test_case_id": "A30",
+  "scenario": "高级供应链勒索：篡改 CI/CD 管道植入勒索软件于镜像中",
+  "difficulty": "expert",
+  "is_positive": true,
+  "expected_severity": "critical",
+  "status": "completed",
+  "agent_output": {
+    "alert_id": "A30",
+    "judgment": {
+      "severity": "critical",
+      "attack_type": "CI/CD Supply Chain Attack & Ransomware Injection",
+      "confidence": 0.95,
+      "summary": "确认 CI/CD 构建管道被攻破，攻击者通过篡改 Git 提交在 Dockerfile 中植入勒索软件脚本，导致生产镜像被污染并推送到仓库，且已部署的 Pod 正在执行加密操作。",
+      "evidence_chain": [
+        "告警详情显示 Git commit 修改 Dockerfile 下载并执行 ransom.sh，镜像 production:v2.5 已推送到 registry。",
+        "资产信息确认源 IP 10.0.7.50 为 Jenkins 构建服务器，目标 IP 10.0.7.10 为容器镜像仓库，均为生产环境关键资产而非安全设备。",
+        "威胁情报确认哈希值 d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6 和 URL http://mal-cdn.top/ransom.sh 确认为恶意勒索软件指标。",
+        "关联告警显示存在上游 Git 仓库篡改行为（A30-REL-01），且下游 Pod 已开始加密共享卷（A30-REL-03）。"
+      ],
+      "iocs": [
+        {
+          "type": "hash",
+          "value": "d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6",
+          "malicious": true,
+          "context": "VirusTotal 标记为勒索软件脚本，嵌入容器镜像中。"
+        },
+        {
+          "type": "url",
+          "value": "http://mal-cdn.top/ransom.sh",
+          "malicious": true,
+          "context": "URLhaus 标记为托管勒索脚本的下载器，用于供应链攻击。"
+        }
+      ]
+    },
+    "remediation": [
+      "立即隔离受影响的 Jenkins 构建服务器 (10.0.7.50) 和容器镜像仓库 (10.0.7.10)，切断网络访问以防止进一步扩散。",
+      "撤销所有近期提交的 Git 凭证及 CI/CD 令牌，强制重置相关服务账户密码。",
+      "回滚受污染的镜像版本 (production:v2.5)，从可信备份恢复源代码并重新构建镜像。",
+      "扫描所有使用该镜像的 Pod 及宿主机，清除残留恶意进程并修复被加密的数据。",
+      "审查 CI/CD 流水线权限配置，启用代码提交强制签名及镜像漏洞扫描策略。"
+    ],
+    "metadata": {
+      "tools_called": [
+        "query_alert_detail",
+        "query_asset_info",
+        "query_threat_intel",
+        "query_related_alerts"
+      ]
+    }
+  },
+  "code_graders": {
+    "tools_called_minimum": {
+      "passed": true,
+      "reason": "required tools present",
+      "expected": [
+        "query_alert_detail",
+        "query_threat_intel",
+        "query_related_alerts"
+      ],
+      "actual": [
+        "query_alert_detail",
+        "query_asset_info",
+        "query_threat_intel",
+        "query_related_alerts"
+      ]
+    },
+    "output_schema": {
+      "passed": true,
+      "reason": "required fields present",
+      "expected": null,
+      "actual": null
+    },
+    "severity_enum": {
+      "passed": true,
+      "reason": "severity is valid",
+      "expected": [
+        "critical",
+        "false_positive",
+        "high",
+        "low",
+        "medium"
+      ],
+      "actual": "critical"
+    },
+    "severity_match": {
+      "passed": true,
+      "reason": "severity matches",
+      "expected": "critical",
+      "actual": "critical"
+    },
+    "confidence_range": {
+      "passed": true,
+      "reason": "confidence in range",
+      "expected": "0..1",
+      "actual": 0.95
+    },
+    "remediation_not_empty": {
+      "passed": true,
+      "reason": "remediation actionable",
+      "expected": "at least one item >=10 chars",
+      "actual": [
+        "立即隔离受影响的 Jenkins 构建服务器 (10.0.7.50) 和容器镜像仓库 (10.0.7.10)，切断网络访问以防止进一步扩散。",
+        "撤销所有近期提交的 Git 凭证及 CI/CD 令牌，强制重置相关服务账户密码。",
+        "回滚受污染的镜像版本 (production:v2.5)，从可信备份恢复源代码并重新构建镜像。",
+        "扫描所有使用该镜像的 Pod 及宿主机，清除残留恶意进程并修复被加密的数据。",
+        "审查 CI/CD 流水线权限配置，启用代码提交强制签名及镜像漏洞扫描策略。"
+      ]
+    }
+  },
+  "quality_scores": {
+    "severity_rationality": {
+      "score": 5,
+      "reason": "Agent 的评估严重度为'critical'，与输入证据高度一致。证据链完整展示了从上游 Git 篡改（A30-REL-01）到 CI/CD 构建注入勒索软件脚本（Dockerfile 修改），再到生产镜像被污染并推送（registry-prod-01），最终导致下游 Pod 执行加密操作（A30-REL-03）的全链路攻击过程。威胁情报确认了哈希值和 URL 均为恶意勒索软件指标，且受影响资产（Jenkins 服务器、容器镜像仓库）均被标记为关键或高价值资产。这种导致数据被加密和供应链被破坏的攻击属于最高级别的安全事件。",
+      "evidence_quotes": [
+        "Git commit 9f8e7d... modified Dockerfile to download and execute ransom.sh during build. Image tagged production:v2.5 pushed to registry.",
+        "Pods using the newly deployed image started encrypting shared volumes.",
+        "Bash script that encrypts /data and posts ransom note, embedded in container image.",
+        "URL hosting ransomware script, used in CI/CD supply chain attacks.",
+        "asset_level: critical (registry-prod-01)",
+        "asset_level: high (jenkins-build-01)"
+      ]
+    },
+    "remediation_actionability": {
+      "score": 5,
+      "reason": "处置建议非常具体、可执行且逻辑严密地按优先级排列。建议首先针对关键资产（Jenkins 和镜像仓库）进行网络隔离以阻断攻击链，随后立即撤销凭证防止横向移动，接着回滚受污染镜像并修复数据，最后进行深度扫描和策略加固。每一步都直接对应输入证据中确认的攻击阶段（供应链篡改、镜像推送、加密执行）。",
+      "evidence_quotes": [
+        "立即隔离受影响的 Jenkins 构建服务器 (10.0.7.50) 和容器镜像仓库 (10.0.7.10)，切断网络访问以防止进一步扩散。",
+        "撤销所有近期提交的 Git 凭证及 CI/CD 令牌，强制重置相关服务账户密码。",
+        "回滚受污染的镜像版本 (production:v2.5)，从可信备份恢复源代码并重新构建镜像。",
+        "扫描所有使用该镜像的 Pod 及宿主机，清除残留恶意进程并修复被加密的数据。",
+        "审查 CI/CD 流水线权限配置，启用代码提交强制签名及镜像漏洞扫描策略。"
+      ]
+    },
+    "evidence_completeness": {
+      "score": 5,
+      "reason": "证据链完整且逻辑严密，成功覆盖了攻击的关键阶段：1. 初始入侵（Git 仓库篡改 A30-REL-01）；2. 供应链投毒（Dockerfile 修改并下载恶意脚本 ransom.sh，关联 IOC hash 和 URL）；3. 资产确认（Jenkins 构建服务器与镜像仓库均为生产关键资产）；4. 威胁情报验证（VT 和 URLhaus 确认恶意性）；5. 实际危害（下游 Pod 执行加密操作 A30-REL-03）。所有关键行为特征与 IOC 均有明确的 API 响应数据支撑。",
+      "evidence_quotes": [
+        "Git commit 9f8e7d... modified Dockerfile to download and execute ransom.sh during build.",
+        "Image tagged production:v2.5 pushed to registry.",
+        "Asset info confirms source IP 10.0.7.50 is Jenkins build server and target IP 10.0.7.10 is container image registry (critical assets).",
+        "Threat intel: Hash d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6 is 'Bash script that encrypts /data' (ransomware) from VirusTotal.",
+        "Threat intel: URL http://mal-cdn.top/ransom.sh is 'hosting ransomware script' from URLhaus.",
+        "Related alert A30-REL-01 shows 'Unauthorized commit to main branch modifying Dockerfile'.",
+        "Related alert A30-REL-03 shows 'Pods using the newly deployed image started encrypting shared volumes'."
+      ]
+    }
+  },
+  "hallucination": {
+    "total_statements": 4,
+    "verifiable": 4,
+    "hallucinations": 0,
+    "uncertain": 0,
+    "details": [
+      {
+        "statement": "告警详情显示 Git commit 修改 Dockerfile 下载并执行 ransom.sh，镜像 production:v2.5 已推送到 registry。",
+        "verdict": "verifiable",
+        "reason": "证据 'query_alert_detail_A30' 的 raw_log 字段明确包含 'Git commit ... modified Dockerfile to download and execute ransom.sh during build. Image tagged production:v2.5 pushed to registry.'，与陈述完全一致。"
+      },
+      {
+        "statement": "资产信息确认源 IP 10.0.7.50 为 Jenkins 构建服务器，目标 IP 10.0.7.10 为容器镜像仓库，均为生产环境关键资产而非安全设备。",
+        "verdict": "verifiable",
+        "reason": "证据 'query_asset_info_10.0.7.50' 确认该 IP 为 'CI/CD Jenkins 构建服务器' (hostname: jenkins-build-01)，'query_asset_info_10.0.7.10' 确认为 '容器镜像仓库' (hostname: registry-prod-01)。两者 is_bastion、is_honeypot、is_scanner 均为 false，且业务系统标签显示为生产环境关键资产。"
+      },
+      {
+        "statement": "威胁情报确认哈希值 d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6 和 URL http://mal-cdn.top/ransom.sh 确认为恶意勒索软件指标。",
+        "verdict": "verifiable",
+        "reason": "证据 'query_threat_intel_hash_...' 显示 is_malicious 为 true，threat_tags 包含 'ransomware'；'query_threat_intel_url_...' 同样显示 is_malicious 为 true，threat_tags 包含 'ransomware' 和 'downloader'，且 raw_intel 描述符合勒索软件特征。"
+      },
+      {
+        "statement": "关联告警显示存在上游 Git 仓库篡改行为（A30-REL-01），且下游 Pod 已开始加密共享卷（A30-REL-03）。",
+        "verdict": "verifiable",
+        "reason": "证据 'query_related_alerts_10.0.7.50_48h' 中，alert_id A30-REL-01 的 summary 为 'Unauthorized commit to main branch modifying Dockerfile'，alert_id A30-REL-03 的 summary 为 'Pods using the newly deployed image started encrypting shared volumes.'，与陈述内容吻合。"
+      }
+    ]
+  },
+  "calls": [
+    {
+      "label": "agent",
+      "parsed": {
+        "alert_id": "A30",
+        "judgment": {
+          "severity": "critical",
+          "attack_type": "CI/CD Supply Chain Attack & Ransomware Injection",
+          "confidence": 0.95,
+          "summary": "确认 CI/CD 构建管道被攻破，攻击者通过篡改 Git 提交在 Dockerfile 中植入勒索软件脚本，导致生产镜像被污染并推送到仓库，且已部署的 Pod 正在执行加密操作。",
+          "evidence_chain": [
+            "告警详情显示 Git commit 修改 Dockerfile 下载并执行 ransom.sh，镜像 production:v2.5 已推送到 registry。",
+            "资产信息确认源 IP 10.0.7.50 为 Jenkins 构建服务器，目标 IP 10.0.7.10 为容器镜像仓库，均为生产环境关键资产而非安全设备。",
+            "威胁情报确认哈希值 d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6 和 URL http://mal-cdn.top/ransom.sh 确认为恶意勒索软件指标。",
+            "关联告警显示存在上游 Git 仓库篡改行为（A30-REL-01），且下游 Pod 已开始加密共享卷（A30-REL-03）。"
+          ],
+          "iocs": [
+            {
+              "type": "hash",
+              "value": "d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6",
+              "malicious": true,
+              "context": "VirusTotal 标记为勒索软件脚本，嵌入容器镜像中。"
+            },
+            {
+              "type": "url",
+              "value": "http://mal-cdn.top/ransom.sh",
+              "malicious": true,
+              "context": "URLhaus 标记为托管勒索脚本的下载器，用于供应链攻击。"
+            }
+          ]
+        },
+        "remediation": [
+          "立即隔离受影响的 Jenkins 构建服务器 (10.0.7.50) 和容器镜像仓库 (10.0.7.10)，切断网络访问以防止进一步扩散。",
+          "撤销所有近期提交的 Git 凭证及 CI/CD 令牌，强制重置相关服务账户密码。",
+          "回滚受污染的镜像版本 (production:v2.5)，从可信备份恢复源代码并重新构建镜像。",
+          "扫描所有使用该镜像的 Pod 及宿主机，清除残留恶意进程并修复被加密的数据。",
+          "审查 CI/CD 流水线权限配置，启用代码提交强制签名及镜像漏洞扫描策略。"
+        ],
+        "metadata": {
+          "tools_called": [
+            "query_alert_detail",
+            "query_asset_info",
+            "query_threat_intel",
+            "query_related_alerts"
+          ]
+        }
+      },
+      "raw_text": "{\"alert_id\":\"A30\",\"judgment\":{\"severity\":\"critical\",\"attack_type\":\"CI/CD Supply Chain Attack & Ransomware Injection\",\"confidence\":0.95,\"summary\":\"确认 CI/CD 构建管道被攻破，攻击者通过篡改 Git 提交在 Dockerfile 中植入勒索软件脚本，导致生产镜像被污染并推送到仓库，且已部署的 Pod 正在执行加密操作。\",\"evidence_chain\":[\"告警详情显示 Git commit 修改 Dockerfile 下载并执行 ransom.sh，镜像 production:v2.5 已推送到 registry。\",\"资产信息确认源 IP 10.0.7.50 为 Jenkins 构建服务器，目标 IP 10.0.7.10 为容器镜像仓库，均为生产环境关键资产而非安全设备。\",\"威胁情报确认哈希值 d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6 和 URL http://mal-cdn.top/ransom.sh 确认为恶意勒索软件指标。\",\"关联告警显示存在上游 Git 仓库篡改行为（A30-REL-01），且下游 Pod 已开始加密共享卷（A30-REL-03）。\"],\"iocs\":[{\"type\":\"hash\",\"value\":\"d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6\",\"malicious\":true,\"context\":\"VirusTotal 标记为勒索软件脚本，嵌入容器镜像中。\"},{\"type\":\"url\",\"value\":\"http://mal-cdn.top/ransom.sh\",\"malicious\":true,\"context\":\"URLhaus 标记为托管勒索脚本的下载器，用于供应链攻击。\"}]},\"remediation\":[\"立即隔离受影响的 Jenkins 构建服务器 (10.0.7.50) 和容器镜像仓库 (10.0.7.10)，切断网络访问以防止进一步扩散。\",\"撤销所有近期提交的 Git 凭证及 CI/CD 令牌，强制重置相关服务账户密码。\",\"回滚受污染的镜像版本 (production:v2.5)，从可信备份恢复源代码并重新构建镜像。\",\"扫描所有使用该镜像的 Pod 及宿主机，清除残留恶意进程并修复被加密的数据。\",\"审查 CI/CD 流水线权限配置，启用代码提交强制签名及镜像漏洞扫描策略。\"],\"metadata\":{\"tools_called\":[\"query_alert_detail\", \"query_asset_info\", \"query_threat_intel\", \"query_related_alerts\"]}}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1667,
+      "output_tokens": 2446,
+      "latency_ms": 25400,
+      "attempts": 1
+    },
+    {
+      "label": "severity_rationality",
+      "parsed": {
+        "score": 5,
+        "reason": "Agent 的评估严重度为'critical'，与输入证据高度一致。证据链完整展示了从上游 Git 篡改（A30-REL-01）到 CI/CD 构建注入勒索软件脚本（Dockerfile 修改），再到生产镜像被污染并推送（registry-prod-01），最终导致下游 Pod 执行加密操作（A30-REL-03）的全链路攻击过程。威胁情报确认了哈希值和 URL 均为恶意勒索软件指标，且受影响资产（Jenkins 服务器、容器镜像仓库）均被标记为关键或高价值资产。这种导致数据被加密和供应链被破坏的攻击属于最高级别的安全事件。",
+        "evidence_quotes": [
+          "Git commit 9f8e7d... modified Dockerfile to download and execute ransom.sh during build. Image tagged production:v2.5 pushed to registry.",
+          "Pods using the newly deployed image started encrypting shared volumes.",
+          "Bash script that encrypts /data and posts ransom note, embedded in container image.",
+          "URL hosting ransomware script, used in CI/CD supply chain attacks.",
+          "asset_level: critical (registry-prod-01)",
+          "asset_level: high (jenkins-build-01)"
+        ]
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"Agent 的评估严重度为'critical'，与输入证据高度一致。证据链完整展示了从上游 Git 篡改（A30-REL-01）到 CI/CD 构建注入勒索软件脚本（Dockerfile 修改），再到生产镜像被污染并推送（registry-prod-01），最终导致下游 Pod 执行加密操作（A30-REL-03）的全链路攻击过程。威胁情报确认了哈希值和 URL 均为恶意勒索软件指标，且受影响资产（Jenkins 服务器、容器镜像仓库）均被标记为关键或高价值资产。这种导致数据被加密和供应链被破坏的攻击属于最高级别的安全事件。\",\n  \"evidence_quotes\": [\n    \"Git commit 9f8e7d... modified Dockerfile to download and execute ransom.sh during build. Image tagged production:v2.5 pushed to registry.\",\n    \"Pods using the newly deployed image started encrypting shared volumes.\",\n    \"Bash script that encrypts /data and posts ransom note, embedded in container image.\",\n    \"URL hosting ransomware script, used in CI/CD supply chain attacks.\",\n    \"asset_level: critical (registry-prod-01)\",\n    \"asset_level: high (jenkins-build-01)\"\n  ]\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 2200,
+      "output_tokens": 293,
+      "latency_ms": 5093,
+      "attempts": 1
+    },
+    {
+      "label": "remediation_actionability",
+      "parsed": {
+        "score": 5,
+        "reason": "处置建议非常具体、可执行且逻辑严密地按优先级排列。建议首先针对关键资产（Jenkins 和镜像仓库）进行网络隔离以阻断攻击链，随后立即撤销凭证防止横向移动，接着回滚受污染镜像并修复数据，最后进行深度扫描和策略加固。每一步都直接对应输入证据中确认的攻击阶段（供应链篡改、镜像推送、加密执行）。",
+        "evidence_quotes": [
+          "立即隔离受影响的 Jenkins 构建服务器 (10.0.7.50) 和容器镜像仓库 (10.0.7.10)，切断网络访问以防止进一步扩散。",
+          "撤销所有近期提交的 Git 凭证及 CI/CD 令牌，强制重置相关服务账户密码。",
+          "回滚受污染的镜像版本 (production:v2.5)，从可信备份恢复源代码并重新构建镜像。",
+          "扫描所有使用该镜像的 Pod 及宿主机，清除残留恶意进程并修复被加密的数据。",
+          "审查 CI/CD 流水线权限配置，启用代码提交强制签名及镜像漏洞扫描策略。"
+        ]
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"处置建议非常具体、可执行且逻辑严密地按优先级排列。建议首先针对关键资产（Jenkins 和镜像仓库）进行网络隔离以阻断攻击链，随后立即撤销凭证防止横向移动，接着回滚受污染镜像并修复数据，最后进行深度扫描和策略加固。每一步都直接对应输入证据中确认的攻击阶段（供应链篡改、镜像推送、加密执行）。\",\n  \"evidence_quotes\": [\n    \"立即隔离受影响的 Jenkins 构建服务器 (10.0.7.50) 和容器镜像仓库 (10.0.7.10)，切断网络访问以防止进一步扩散。\",\n    \"撤销所有近期提交的 Git 凭证及 CI/CD 令牌，强制重置相关服务账户密码。\",\n    \"回滚受污染的镜像版本 (production:v2.5)，从可信备份恢复源代码并重新构建镜像。\",\n    \"扫描所有使用该镜像的 Pod 及宿主机，清除残留恶意进程并修复被加密的数据。\",\n    \"审查 CI/CD 流水线权限配置，启用代码提交强制签名及镜像漏洞扫描策略。\"\n  ]\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 2203,
+      "output_tokens": 258,
+      "latency_ms": 3000,
+      "attempts": 1
+    },
+    {
+      "label": "evidence_completeness",
+      "parsed": {
+        "score": 5,
+        "reason": "证据链完整且逻辑严密，成功覆盖了攻击的关键阶段：1. 初始入侵（Git 仓库篡改 A30-REL-01）；2. 供应链投毒（Dockerfile 修改并下载恶意脚本 ransom.sh，关联 IOC hash 和 URL）；3. 资产确认（Jenkins 构建服务器与镜像仓库均为生产关键资产）；4. 威胁情报验证（VT 和 URLhaus 确认恶意性）；5. 实际危害（下游 Pod 执行加密操作 A30-REL-03）。所有关键行为特征与 IOC 均有明确的 API 响应数据支撑。",
+        "evidence_quotes": [
+          "Git commit 9f8e7d... modified Dockerfile to download and execute ransom.sh during build.",
+          "Image tagged production:v2.5 pushed to registry.",
+          "Asset info confirms source IP 10.0.7.50 is Jenkins build server and target IP 10.0.7.10 is container image registry (critical assets).",
+          "Threat intel: Hash d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6 is 'Bash script that encrypts /data' (ransomware) from VirusTotal.",
+          "Threat intel: URL http://mal-cdn.top/ransom.sh is 'hosting ransomware script' from URLhaus.",
+          "Related alert A30-REL-01 shows 'Unauthorized commit to main branch modifying Dockerfile'.",
+          "Related alert A30-REL-03 shows 'Pods using the newly deployed image started encrypting shared volumes'."
+        ]
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"证据链完整且逻辑严密，成功覆盖了攻击的关键阶段：1. 初始入侵（Git 仓库篡改 A30-REL-01）；2. 供应链投毒（Dockerfile 修改并下载恶意脚本 ransom.sh，关联 IOC hash 和 URL）；3. 资产确认（Jenkins 构建服务器与镜像仓库均为生产关键资产）；4. 威胁情报验证（VT 和 URLhaus 确认恶意性）；5. 实际危害（下游 Pod 执行加密操作 A30-REL-03）。所有关键行为特征与 IOC 均有明确的 API 响应数据支撑。\",\n  \"evidence_quotes\": [\n    \"Git commit 9f8e7d... modified Dockerfile to download and execute ransom.sh during build.\",\n    \"Image tagged production:v2.5 pushed to registry.\",\n    \"Asset info confirms source IP 10.0.7.50 is Jenkins build server and target IP 10.0.7.10 is container image registry (critical assets).\",\n    \"Threat intel: Hash d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6 is 'Bash script that encrypts /data' (ransomware) from VirusTotal.\",\n    \"Threat intel: URL http://mal-cdn.top/ransom.sh is 'hosting ransomware script' from URLhaus.\",\n    \"Related alert A30-REL-01 shows 'Unauthorized commit to main branch modifying Dockerfile'.\",\n    \"Related alert A30-REL-03 shows 'Pods using the newly deployed image started encrypting shared volumes'.\"\n  ]\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 2203,
+      "output_tokens": 388,
+      "latency_ms": 4589,
+      "attempts": 1
+    },
+    {
+      "label": "hallucination_check",
+      "parsed": {
+        "total_statements": 4,
+        "verifiable": 4,
+        "hallucinations": 0,
+        "uncertain": 0,
+        "details": [
+          {
+            "statement": "告警详情显示 Git commit 修改 Dockerfile 下载并执行 ransom.sh，镜像 production:v2.5 已推送到 registry。",
+            "verdict": "verifiable",
+            "reason": "证据 'query_alert_detail_A30' 的 raw_log 字段明确包含 'Git commit ... modified Dockerfile to download and execute ransom.sh during build. Image tagged production:v2.5 pushed to registry.'，与陈述完全一致。"
+          },
+          {
+            "statement": "资产信息确认源 IP 10.0.7.50 为 Jenkins 构建服务器，目标 IP 10.0.7.10 为容器镜像仓库，均为生产环境关键资产而非安全设备。",
+            "verdict": "verifiable",
+            "reason": "证据 'query_asset_info_10.0.7.50' 确认该 IP 为 'CI/CD Jenkins 构建服务器' (hostname: jenkins-build-01)，'query_asset_info_10.0.7.10' 确认为 '容器镜像仓库' (hostname: registry-prod-01)。两者 is_bastion、is_honeypot、is_scanner 均为 false，且业务系统标签显示为生产环境关键资产。"
+          },
+          {
+            "statement": "威胁情报确认哈希值 d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6 和 URL http://mal-cdn.top/ransom.sh 确认为恶意勒索软件指标。",
+            "verdict": "verifiable",
+            "reason": "证据 'query_threat_intel_hash_...' 显示 is_malicious 为 true，threat_tags 包含 'ransomware'；'query_threat_intel_url_...' 同样显示 is_malicious 为 true，threat_tags 包含 'ransomware' 和 'downloader'，且 raw_intel 描述符合勒索软件特征。"
+          },
+          {
+            "statement": "关联告警显示存在上游 Git 仓库篡改行为（A30-REL-01），且下游 Pod 已开始加密共享卷（A30-REL-03）。",
+            "verdict": "verifiable",
+            "reason": "证据 'query_related_alerts_10.0.7.50_48h' 中，alert_id A30-REL-01 的 summary 为 'Unauthorized commit to main branch modifying Dockerfile'，alert_id A30-REL-03 的 summary 为 'Pods using the newly deployed image started encrypting shared volumes.'，与陈述内容吻合。"
+          }
+        ]
+      },
+      "raw_text": "{\n  \"total_statements\": 4,\n  \"verifiable\": 4,\n  \"hallucinations\": 0,\n  \"uncertain\": 0,\n  \"details\": [\n    {\n      \"statement\": \"告警详情显示 Git commit 修改 Dockerfile 下载并执行 ransom.sh，镜像 production:v2.5 已推送到 registry。\",\n      \"verdict\": \"verifiable\",\n      \"reason\": \"证据 'query_alert_detail_A30' 的 raw_log 字段明确包含 'Git commit ... modified Dockerfile to download and execute ransom.sh during build. Image tagged production:v2.5 pushed to registry.'，与陈述完全一致。\"\n    },\n    {\n      \"statement\": \"资产信息确认源 IP 10.0.7.50 为 Jenkins 构建服务器，目标 IP 10.0.7.10 为容器镜像仓库，均为生产环境关键资产而非安全设备。\",\n      \"verdict\": \"verifiable\",\n      \"reason\": \"证据 'query_asset_info_10.0.7.50' 确认该 IP 为 'CI/CD Jenkins 构建服务器' (hostname: jenkins-build-01)，'query_asset_info_10.0.7.10' 确认为 '容器镜像仓库' (hostname: registry-prod-01)。两者 is_bastion、is_honeypot、is_scanner 均为 false，且业务系统标签显示为生产环境关键资产。\"\n    },\n    {\n      \"statement\": \"威胁情报确认哈希值 d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6 和 URL http://mal-cdn.top/ransom.sh 确认为恶意勒索软件指标。\",\n      \"verdict\": \"verifiable\",\n      \"reason\": \"证据 'query_threat_intel_hash_...' 显示 is_malicious 为 true，threat_tags 包含 'ransomware'；'query_threat_intel_url_...' 同样显示 is_malicious 为 true，threat_tags 包含 'ransomware' 和 'downloader'，且 raw_intel 描述符合勒索软件特征。\"\n    },\n    {\n      \"statement\": \"关联告警显示存在上游 Git 仓库篡改行为（A30-REL-01），且下游 Pod 已开始加密共享卷（A30-REL-03）。\",\n      \"verdict\": \"verifiable\",\n      \"reason\": \"证据 'query_related_alerts_10.0.7.50_48h' 中，alert_id A30-REL-01 的 summary 为 'Unauthorized commit to main branch modifying Dockerfile'，alert_id A30-REL-03 的 summary 为 'Pods using the newly deployed image started encrypting shared volumes.'，与陈述内容吻合。\"\n    }\n  ]\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 2234,
+      "output_tokens": 659,
+      "latency_ms": 6776,
+      "attempts": 1
+    }
+  ],
+  "overall_pass": true,
+  "error_type": null,
+  "error_message": null
+}

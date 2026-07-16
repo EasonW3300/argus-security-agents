@@ -1,0 +1,312 @@
+{
+  "test_case_id": "A08",
+  "scenario": "堡垒机管理员正常登录操作被误判为横向移动（误报）",
+  "difficulty": "easy",
+  "is_positive": false,
+  "expected_severity": "false_positive",
+  "status": "completed",
+  "agent_output": {
+    "alert_id": "A08",
+    "judgment": {
+      "severity": "false_positive",
+      "attack_type": "Lateral Movement (Benign Bastion Activity)",
+      "confidence": 0.95,
+      "summary": "告警源 IP 10.0.5.10 被确认为生产环境堡垒机，其短时间内连接多台服务器属于正常运维行为。威胁情报显示该 IP 信誉良好且无恶意标签，关联告警为空，判定为误报。",
+      "evidence_chain": [
+        "query_alert_detail 显示源 IP 10.0.5.10 在 5 分钟内对多个目标建立 RDP/SSH 会话，触发横向移动规则",
+        "query_asset_info 确认 10.0.5.10 主机名为 bastion-prod-01，资产类型为堡垒机 (is_bastion: true)，部门为运维部",
+        "query_threat_intel 显示 10.0.5.10 信誉评分 100，is_malicious 为 false，来源为内部资产库",
+        "query_related_alerts 在 48 小时窗口内未发现其他关联告警"
+      ],
+      "iocs": [
+        {
+          "type": "ip",
+          "value": "10.0.5.10",
+          "malicious": false,
+          "context": "内部授权堡垒机 IP，非攻击源"
+        }
+      ]
+    },
+    "remediation": [
+      "将告警标记为误报并归档，避免重复通知",
+      "检查堡垒机审计日志，确认登录操作是否由授权运维人员发起",
+      "优化检测规则，将已知堡垒机 IP 段加入白名单或调整阈值以排除正常运维流量"
+    ],
+    "metadata": {
+      "tools_called": [
+        "query_alert_detail",
+        "query_asset_info",
+        "query_threat_intel",
+        "query_related_alerts"
+      ]
+    }
+  },
+  "code_graders": {
+    "tools_called_minimum": {
+      "passed": true,
+      "reason": "required tools present",
+      "expected": [
+        "query_alert_detail",
+        "query_asset_info"
+      ],
+      "actual": [
+        "query_alert_detail",
+        "query_asset_info",
+        "query_threat_intel",
+        "query_related_alerts"
+      ]
+    },
+    "output_schema": {
+      "passed": true,
+      "reason": "required fields present",
+      "expected": null,
+      "actual": null
+    },
+    "severity_enum": {
+      "passed": true,
+      "reason": "severity is valid",
+      "expected": [
+        "critical",
+        "false_positive",
+        "high",
+        "low",
+        "medium"
+      ],
+      "actual": "false_positive"
+    },
+    "severity_match": {
+      "passed": true,
+      "reason": "severity matches",
+      "expected": "false_positive",
+      "actual": "false_positive"
+    },
+    "confidence_range": {
+      "passed": true,
+      "reason": "confidence in range",
+      "expected": "0..1",
+      "actual": 0.95
+    },
+    "remediation_not_empty": {
+      "passed": true,
+      "reason": "remediation actionable",
+      "expected": "at least one item >=10 chars",
+      "actual": [
+        "将告警标记为误报并归档，避免重复通知",
+        "检查堡垒机审计日志，确认登录操作是否由授权运维人员发起",
+        "优化检测规则，将已知堡垒机 IP 段加入白名单或调整阈值以排除正常运维流量"
+      ]
+    }
+  },
+  "quality_scores": {
+    "severity_rationality": {
+      "score": 5,
+      "reason": "Agent 的评估逻辑严密且结论准确。输入证据（mock_api_responses）明确显示源 IP 10.0.5.10 是标记为 'is_bastion: true' 的生产环境堡垒机，且威胁情报确认其信誉良好（reputation_score: 100, is_malicious: false）。Agent 正确识别出虽然触发了‘横向移动’规则（短时间内连接多台服务器），但这属于堡垒机的正常运维行为，因此将严重度判定为误报（false_positive）是完全合理的，与证据高度一致。",
+      "evidence_quotes": [
+        "query_asset_info 确认 10.0.5.10 主机名为 bastion-prod-01，资产类型为堡垒机 (is_bastion: true)",
+        "query_threat_intel 显示 10.0.5.10 信誉评分 100，is_malicious 为 false",
+        "raw_log: Source 10.0.5.10 established RDP session to 10.0.1.5, then SSH to 10.0.1.6, 10.0.1.7 within 5 minutes",
+        "summary: 告警源 IP 10.0.5.10 被确认为生产环境堡垒机，其短时间内连接多台服务器属于正常运维行为"
+      ]
+    },
+    "remediation_actionability": {
+      "score": 5,
+      "reason": "处置建议具体、可执行且逻辑清晰。首先提出立即标记误报以阻断噪音（优先级最高），其次建议核查审计日志以验证业务合规性，最后提出优化检测规则从源头解决误报问题。这三条建议涵盖了即时响应、验证和长期预防三个层面，完全符合安全运营最佳实践。",
+      "evidence_quotes": [
+        "将告警标记为误报并归档，避免重复通知",
+        "检查堡垒机审计日志，确认登录操作是否由授权运维人员发起",
+        "优化检测规则，将已知堡垒机 IP 段加入白名单或调整阈值以排除正常运维流量"
+      ]
+    },
+    "evidence_completeness": {
+      "score": 5,
+      "reason": "证据链完整覆盖了关键 IOC（10.0.5.10）及其行为特征。通过 query_alert_detail 确认了横向移动的行为模式（5 分钟内多次 RDP/SSH），随后利用 query_asset_info 证实该 IP 为授权的堡垒机（is_bastion: true），并结合 query_threat_intel 排除了恶意属性（reputation_score: 100, is_malicious: false）。最后通过 query_related_alerts 确认无其他关联威胁，形成了从‘异常行为’到‘资产身份确认’再到‘威胁情报排除’的闭环逻辑，足以支撑误报判定。",
+      "evidence_quotes": [
+        "Source 10.0.5.10 established RDP session to 10.0.1.5, then SSH to 10.0.1.6, 10.0.1.7 within 5 minutes",
+        "hostname: bastion-prod-01, is_bastion: true, tags: [bastion, jump-server, authorized]",
+        "reputation_score: 100, is_malicious: false, source: Internal Asset DB",
+        "related_alerts: [], total_related: 0"
+      ]
+    }
+  },
+  "hallucination": {
+    "total_statements": 4,
+    "verifiable": 4,
+    "hallucinations": 0,
+    "uncertain": 0,
+    "details": [
+      {
+        "statement": "query_alert_detail 显示源 IP 10.0.5.10 在 5 分钟内对多个目标建立 RDP/SSH 会话，触发横向移动规则",
+        "verdict": "verifiable",
+        "reason": "mock_api_responses 中的 query_alert_detail_A08 明确包含 raw_log: 'Source 10.0.5.10 established RDP session to 10.0.1.5, then SSH to 10.0.1.6, 10.0.1.7 within 5 minutes'，且 rule_name 为 'Lateral Movement - Multiple RDP/SSH Logins from Single Source'，与陈述完全一致。"
+      },
+      {
+        "statement": "query_asset_info 确认 10.0.5.10 主机名为 bastion-prod-01，资产类型为堡垒机 (is_bastion: true)，部门为运维部",
+        "verdict": "verifiable",
+        "reason": "mock_api_responses 中的 query_asset_info_10.0.5.10 返回 hostname 为 'bastion-prod-01'，is_bastion 为 true，department 为 '运维部'，与陈述完全匹配。"
+      },
+      {
+        "statement": "query_threat_intel 显示 10.0.5.10 信誉评分 100，is_malicious 为 false，来源为内部资产库",
+        "verdict": "verifiable",
+        "reason": "mock_api_responses 中的 query_threat_intel_ip_10.0.5.10 返回 reputation_score 为 100，is_malicious 为 false，source 为 'Internal Asset DB'，与陈述一致。"
+      },
+      {
+        "statement": "query_related_alerts 在 48 小时窗口内未发现其他关联告警",
+        "verdict": "verifiable",
+        "reason": "mock_api_responses 中的 query_related_alerts_10.0.5.10_48h 返回 related_alerts 为空数组，total_related 为 0，且查询参数 time_window_hours 为 48，与陈述一致。"
+      }
+    ]
+  },
+  "calls": [
+    {
+      "label": "agent",
+      "parsed": {
+        "alert_id": "A08",
+        "judgment": {
+          "severity": "false_positive",
+          "attack_type": "Lateral Movement (Benign Bastion Activity)",
+          "confidence": 0.95,
+          "summary": "告警源 IP 10.0.5.10 被确认为生产环境堡垒机，其短时间内连接多台服务器属于正常运维行为。威胁情报显示该 IP 信誉良好且无恶意标签，关联告警为空，判定为误报。",
+          "evidence_chain": [
+            "query_alert_detail 显示源 IP 10.0.5.10 在 5 分钟内对多个目标建立 RDP/SSH 会话，触发横向移动规则",
+            "query_asset_info 确认 10.0.5.10 主机名为 bastion-prod-01，资产类型为堡垒机 (is_bastion: true)，部门为运维部",
+            "query_threat_intel 显示 10.0.5.10 信誉评分 100，is_malicious 为 false，来源为内部资产库",
+            "query_related_alerts 在 48 小时窗口内未发现其他关联告警"
+          ],
+          "iocs": [
+            {
+              "type": "ip",
+              "value": "10.0.5.10",
+              "malicious": false,
+              "context": "内部授权堡垒机 IP，非攻击源"
+            }
+          ]
+        },
+        "remediation": [
+          "将告警标记为误报并归档，避免重复通知",
+          "检查堡垒机审计日志，确认登录操作是否由授权运维人员发起",
+          "优化检测规则，将已知堡垒机 IP 段加入白名单或调整阈值以排除正常运维流量"
+        ],
+        "metadata": {
+          "tools_called": [
+            "query_alert_detail",
+            "query_asset_info",
+            "query_threat_intel",
+            "query_related_alerts"
+          ]
+        }
+      },
+      "raw_text": "{\n  \"alert_id\": \"A08\",\n  \"judgment\": {\n    \"severity\": \"false_positive\",\n    \"attack_type\": \"Lateral Movement (Benign Bastion Activity)\",\n    \"confidence\": 0.95,\n    \"summary\": \"告警源 IP 10.0.5.10 被确认为生产环境堡垒机，其短时间内连接多台服务器属于正常运维行为。威胁情报显示该 IP 信誉良好且无恶意标签，关联告警为空，判定为误报。\",\n    \"evidence_chain\": [\n      \"query_alert_detail 显示源 IP 10.0.5.10 在 5 分钟内对多个目标建立 RDP/SSH 会话，触发横向移动规则\",\n      \"query_asset_info 确认 10.0.5.10 主机名为 bastion-prod-01，资产类型为堡垒机 (is_bastion: true)，部门为运维部\",\n      \"query_threat_intel 显示 10.0.5.10 信誉评分 100，is_malicious 为 false，来源为内部资产库\",\n      \"query_related_alerts 在 48 小时窗口内未发现其他关联告警\"\n    ],\n    \"iocs\": [\n      {\n        \"type\": \"ip\",\n        \"value\": \"10.0.5.10\",\n        \"malicious\": false,\n        \"context\": \"内部授权堡垒机 IP，非攻击源\"\n      }\n    ]\n  },\n  \"remediation\": [\n    \"将告警标记为误报并归档，避免重复通知\",\n    \"检查堡垒机审计日志，确认登录操作是否由授权运维人员发起\",\n    \"优化检测规则，将已知堡垒机 IP 段加入白名单或调整阈值以排除正常运维流量\"\n  ],\n  \"metadata\": {\n    \"tools_called\": [\n      \"query_alert_detail\",\n      \"query_asset_info\",\n      \"query_threat_intel\",\n      \"query_related_alerts\"\n    ]\n  }\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 946,
+      "output_tokens": 2795,
+      "latency_ms": 29175,
+      "attempts": 1
+    },
+    {
+      "label": "severity_rationality",
+      "parsed": {
+        "score": 5,
+        "reason": "Agent 的评估逻辑严密且结论准确。输入证据（mock_api_responses）明确显示源 IP 10.0.5.10 是标记为 'is_bastion: true' 的生产环境堡垒机，且威胁情报确认其信誉良好（reputation_score: 100, is_malicious: false）。Agent 正确识别出虽然触发了‘横向移动’规则（短时间内连接多台服务器），但这属于堡垒机的正常运维行为，因此将严重度判定为误报（false_positive）是完全合理的，与证据高度一致。",
+        "evidence_quotes": [
+          "query_asset_info 确认 10.0.5.10 主机名为 bastion-prod-01，资产类型为堡垒机 (is_bastion: true)",
+          "query_threat_intel 显示 10.0.5.10 信誉评分 100，is_malicious 为 false",
+          "raw_log: Source 10.0.5.10 established RDP session to 10.0.1.5, then SSH to 10.0.1.6, 10.0.1.7 within 5 minutes",
+          "summary: 告警源 IP 10.0.5.10 被确认为生产环境堡垒机，其短时间内连接多台服务器属于正常运维行为"
+        ]
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"Agent 的评估逻辑严密且结论准确。输入证据（mock_api_responses）明确显示源 IP 10.0.5.10 是标记为 'is_bastion: true' 的生产环境堡垒机，且威胁情报确认其信誉良好（reputation_score: 100, is_malicious: false）。Agent 正确识别出虽然触发了‘横向移动’规则（短时间内连接多台服务器），但这属于堡垒机的正常运维行为，因此将严重度判定为误报（false_positive）是完全合理的，与证据高度一致。\",\n  \"evidence_quotes\": [\n    \"query_asset_info 确认 10.0.5.10 主机名为 bastion-prod-01，资产类型为堡垒机 (is_bastion: true)\",\n    \"query_threat_intel 显示 10.0.5.10 信誉评分 100，is_malicious 为 false\",\n    \"raw_log: Source 10.0.5.10 established RDP session to 10.0.1.5, then SSH to 10.0.1.6, 10.0.1.7 within 5 minutes\",\n    \"summary: 告警源 IP 10.0.5.10 被确认为生产环境堡垒机，其短时间内连接多台服务器属于正常运维行为\"\n  ]\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1269,
+      "output_tokens": 324,
+      "latency_ms": 3609,
+      "attempts": 1
+    },
+    {
+      "label": "remediation_actionability",
+      "parsed": {
+        "score": 5,
+        "reason": "处置建议具体、可执行且逻辑清晰。首先提出立即标记误报以阻断噪音（优先级最高），其次建议核查审计日志以验证业务合规性，最后提出优化检测规则从源头解决误报问题。这三条建议涵盖了即时响应、验证和长期预防三个层面，完全符合安全运营最佳实践。",
+        "evidence_quotes": [
+          "将告警标记为误报并归档，避免重复通知",
+          "检查堡垒机审计日志，确认登录操作是否由授权运维人员发起",
+          "优化检测规则，将已知堡垒机 IP 段加入白名单或调整阈值以排除正常运维流量"
+        ]
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"处置建议具体、可执行且逻辑清晰。首先提出立即标记误报以阻断噪音（优先级最高），其次建议核查审计日志以验证业务合规性，最后提出优化检测规则从源头解决误报问题。这三条建议涵盖了即时响应、验证和长期预防三个层面，完全符合安全运营最佳实践。\",\n  \"evidence_quotes\": [\n    \"将告警标记为误报并归档，避免重复通知\",\n    \"检查堡垒机审计日志，确认登录操作是否由授权运维人员发起\",\n    \"优化检测规则，将已知堡垒机 IP 段加入白名单或调整阈值以排除正常运维流量\"\n  ]\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1272,
+      "output_tokens": 158,
+      "latency_ms": 1619,
+      "attempts": 1
+    },
+    {
+      "label": "evidence_completeness",
+      "parsed": {
+        "score": 5,
+        "reason": "证据链完整覆盖了关键 IOC（10.0.5.10）及其行为特征。通过 query_alert_detail 确认了横向移动的行为模式（5 分钟内多次 RDP/SSH），随后利用 query_asset_info 证实该 IP 为授权的堡垒机（is_bastion: true），并结合 query_threat_intel 排除了恶意属性（reputation_score: 100, is_malicious: false）。最后通过 query_related_alerts 确认无其他关联威胁，形成了从‘异常行为’到‘资产身份确认’再到‘威胁情报排除’的闭环逻辑，足以支撑误报判定。",
+        "evidence_quotes": [
+          "Source 10.0.5.10 established RDP session to 10.0.1.5, then SSH to 10.0.1.6, 10.0.1.7 within 5 minutes",
+          "hostname: bastion-prod-01, is_bastion: true, tags: [bastion, jump-server, authorized]",
+          "reputation_score: 100, is_malicious: false, source: Internal Asset DB",
+          "related_alerts: [], total_related: 0"
+        ]
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"证据链完整覆盖了关键 IOC（10.0.5.10）及其行为特征。通过 query_alert_detail 确认了横向移动的行为模式（5 分钟内多次 RDP/SSH），随后利用 query_asset_info 证实该 IP 为授权的堡垒机（is_bastion: true），并结合 query_threat_intel 排除了恶意属性（reputation_score: 100, is_malicious: false）。最后通过 query_related_alerts 确认无其他关联威胁，形成了从‘异常行为’到‘资产身份确认’再到‘威胁情报排除’的闭环逻辑，足以支撑误报判定。\",\n  \"evidence_quotes\": [\n    \"Source 10.0.5.10 established RDP session to 10.0.1.5, then SSH to 10.0.1.6, 10.0.1.7 within 5 minutes\",\n    \"hostname: bastion-prod-01, is_bastion: true, tags: [bastion, jump-server, authorized]\",\n    \"reputation_score: 100, is_malicious: false, source: Internal Asset DB\",\n    \"related_alerts: [], total_related: 0\"\n  ]\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1272,
+      "output_tokens": 288,
+      "latency_ms": 3991,
+      "attempts": 1
+    },
+    {
+      "label": "hallucination_check",
+      "parsed": {
+        "total_statements": 4,
+        "verifiable": 4,
+        "hallucinations": 0,
+        "uncertain": 0,
+        "details": [
+          {
+            "statement": "query_alert_detail 显示源 IP 10.0.5.10 在 5 分钟内对多个目标建立 RDP/SSH 会话，触发横向移动规则",
+            "verdict": "verifiable",
+            "reason": "mock_api_responses 中的 query_alert_detail_A08 明确包含 raw_log: 'Source 10.0.5.10 established RDP session to 10.0.1.5, then SSH to 10.0.1.6, 10.0.1.7 within 5 minutes'，且 rule_name 为 'Lateral Movement - Multiple RDP/SSH Logins from Single Source'，与陈述完全一致。"
+          },
+          {
+            "statement": "query_asset_info 确认 10.0.5.10 主机名为 bastion-prod-01，资产类型为堡垒机 (is_bastion: true)，部门为运维部",
+            "verdict": "verifiable",
+            "reason": "mock_api_responses 中的 query_asset_info_10.0.5.10 返回 hostname 为 'bastion-prod-01'，is_bastion 为 true，department 为 '运维部'，与陈述完全匹配。"
+          },
+          {
+            "statement": "query_threat_intel 显示 10.0.5.10 信誉评分 100，is_malicious 为 false，来源为内部资产库",
+            "verdict": "verifiable",
+            "reason": "mock_api_responses 中的 query_threat_intel_ip_10.0.5.10 返回 reputation_score 为 100，is_malicious 为 false，source 为 'Internal Asset DB'，与陈述一致。"
+          },
+          {
+            "statement": "query_related_alerts 在 48 小时窗口内未发现其他关联告警",
+            "verdict": "verifiable",
+            "reason": "mock_api_responses 中的 query_related_alerts_10.0.5.10_48h 返回 related_alerts 为空数组，total_related 为 0，且查询参数 time_window_hours 为 48，与陈述一致。"
+          }
+        ]
+      },
+      "raw_text": "{\n  \"total_statements\": 4,\n  \"verifiable\": 4,\n  \"hallucinations\": 0,\n  \"uncertain\": 0,\n  \"details\": [\n    {\n      \"statement\": \"query_alert_detail 显示源 IP 10.0.5.10 在 5 分钟内对多个目标建立 RDP/SSH 会话，触发横向移动规则\",\n      \"verdict\": \"verifiable\",\n      \"reason\": \"mock_api_responses 中的 query_alert_detail_A08 明确包含 raw_log: 'Source 10.0.5.10 established RDP session to 10.0.1.5, then SSH to 10.0.1.6, 10.0.1.7 within 5 minutes'，且 rule_name 为 'Lateral Movement - Multiple RDP/SSH Logins from Single Source'，与陈述完全一致。\"\n    },\n    {\n      \"statement\": \"query_asset_info 确认 10.0.5.10 主机名为 bastion-prod-01，资产类型为堡垒机 (is_bastion: true)，部门为运维部\",\n      \"verdict\": \"verifiable\",\n      \"reason\": \"mock_api_responses 中的 query_asset_info_10.0.5.10 返回 hostname 为 'bastion-prod-01'，is_bastion 为 true，department 为 '运维部'，与陈述完全匹配。\"\n    },\n    {\n      \"statement\": \"query_threat_intel 显示 10.0.5.10 信誉评分 100，is_malicious 为 false，来源为内部资产库\",\n      \"verdict\": \"verifiable\",\n      \"reason\": \"mock_api_responses 中的 query_threat_intel_ip_10.0.5.10 返回 reputation_score 为 100，is_malicious 为 false，source 为 'Internal Asset DB'，与陈述一致。\"\n    },\n    {\n      \"statement\": \"query_related_alerts 在 48 小时窗口内未发现其他关联告警\",\n      \"verdict\": \"verifiable\",\n      \"reason\": \"mock_api_responses 中的 query_related_alerts_10.0.5.10_48h 返回 related_alerts 为空数组，total_related 为 0，且查询参数 time_window_hours 为 48，与陈述一致。\"\n    }\n  ]\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1303,
+      "output_tokens": 567,
+      "latency_ms": 6334,
+      "attempts": 1
+    }
+  ],
+  "overall_pass": true,
+  "error_type": null,
+  "error_message": null
+}

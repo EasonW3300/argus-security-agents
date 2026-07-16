@@ -1,0 +1,361 @@
+{
+  "test_case_id": "A27",
+  "scenario": "完整攻击链：钓鱼→宏执行→下载器→C2→横向→数据外传",
+  "difficulty": "hard",
+  "is_positive": true,
+  "expected_severity": "critical",
+  "status": "completed",
+  "agent_output": {
+    "alert_id": "A27",
+    "judgment": {
+      "severity": "critical",
+      "attack_type": "Multi-Stage Attack - Phishing to Exfiltration",
+      "confidence": 0.95,
+      "summary": "Confirmed FIN7 APT campaign targeting finance department. User clicked phishing link leading to macro execution, Cobalt Strike beacon establishment, lateral movement to critical ERP database, and successful data exfiltration.",
+      "evidence_chain": [
+        "query_alert_detail raw_log confirms correlation of events: 'Phish link clicked -> Macro execution -> PowerShell downloader -> Cobalt Strike beacon -> PsExec lateral -> SQL dump -> exfil via HTTPS.'",
+        "query_threat_intel confirms domain 'evil-c2.net' is malicious C2 associated with FIN7 (reputation_score: 2).",
+        "query_threat_intel confirms IP '192.0.2.210' is malicious exfiltration endpoint used by FIN7 (reputation_score: 10).",
+        "query_asset_info identifies target host '10.0.1.60' as critical ERP database in production core network zone.",
+        "query_related_alerts validates complete kill chain timeline with 5 sequential alerts from click to exfiltration within 48h."
+      ],
+      "iocs": [
+        {
+          "type": "domain",
+          "value": "evil-c2.net",
+          "malicious": true,
+          "context": "Cobalt Strike C2 domain used by FIN7"
+        },
+        {
+          "type": "ip",
+          "value": "192.0.2.210",
+          "malicious": true,
+          "context": "FIN7 exfiltration endpoint"
+        },
+        {
+          "type": "url",
+          "value": "http://phish-delivery.cn/doc/invoice.docm",
+          "malicious": true,
+          "context": "Weaponized document delivering FIN7 macro dropper"
+        }
+      ]
+    },
+    "remediation": [
+      "Immediately isolate compromised hosts 10.0.3.110 (finance-ws-01) and 10.0.1.60 (erp-db-01) from the network to prevent further lateral movement.",
+      "Block all identified IOCs (evil-c2.net, 192.0.2.210, phish-delivery.cn) at firewall and proxy levels.",
+      "Force password reset for user cf.li@company.com and all service accounts on erp-db-01.",
+      "Conduct forensic analysis on compromised systems to determine full scope of compromise and malware persistence mechanisms.",
+      "Verify integrity of ERP database and restore from clean backup if data tampering or loss is confirmed."
+    ],
+    "metadata": {
+      "tools_called": [
+        "query_alert_detail",
+        "query_asset_info",
+        "query_threat_intel",
+        "query_related_alerts"
+      ]
+    }
+  },
+  "code_graders": {
+    "tools_called_minimum": {
+      "passed": true,
+      "reason": "required tools present",
+      "expected": [
+        "query_alert_detail",
+        "query_threat_intel",
+        "query_related_alerts"
+      ],
+      "actual": [
+        "query_alert_detail",
+        "query_asset_info",
+        "query_threat_intel",
+        "query_related_alerts"
+      ]
+    },
+    "output_schema": {
+      "passed": true,
+      "reason": "required fields present",
+      "expected": null,
+      "actual": null
+    },
+    "severity_enum": {
+      "passed": true,
+      "reason": "severity is valid",
+      "expected": [
+        "critical",
+        "false_positive",
+        "high",
+        "low",
+        "medium"
+      ],
+      "actual": "critical"
+    },
+    "severity_match": {
+      "passed": true,
+      "reason": "severity matches",
+      "expected": "critical",
+      "actual": "critical"
+    },
+    "confidence_range": {
+      "passed": true,
+      "reason": "confidence in range",
+      "expected": "0..1",
+      "actual": 0.95
+    },
+    "remediation_not_empty": {
+      "passed": true,
+      "reason": "remediation actionable",
+      "expected": "at least one item >=10 chars",
+      "actual": [
+        "Immediately isolate compromised hosts 10.0.3.110 (finance-ws-01) and 10.0.1.60 (erp-db-01) from the network to prevent further lateral movement.",
+        "Block all identified IOCs (evil-c2.net, 192.0.2.210, phish-delivery.cn) at firewall and proxy levels.",
+        "Force password reset for user cf.li@company.com and all service accounts on erp-db-01.",
+        "Conduct forensic analysis on compromised systems to determine full scope of compromise and malware persistence mechanisms.",
+        "Verify integrity of ERP database and restore from clean backup if data tampering or loss is confirmed."
+      ]
+    }
+  },
+  "quality_scores": {
+    "severity_rationality": {
+      "score": 5,
+      "reason": "Agent output correctly identifies a critical multi-stage APT attack (FIN7) with high confidence. The severity rating of 'critical' is fully supported by the evidence chain which details a complete kill chain from phishing to data exfiltration involving a critical ERP database. All specific IOCs (domain, IP, URL), asset criticality, and timeline correlations cited in the agent's judgment are explicitly confirmed by the provided mock API responses.",
+      "evidence_quotes": [
+        "query_alert_detail raw_log confirms correlation of events: 'Phish link clicked -> Macro execution -> PowerShell downloader -> Cobalt Strike beacon -> PsExec lateral -> SQL dump -> exfil via HTTPS.'",
+        "query_threat_intel confirms domain 'evil-c2.net' is malicious C2 associated with FIN7 (reputation_score: 2).",
+        "query_asset_info identifies target host '10.0.1.60' as critical ERP database in production core network zone.",
+        "query_related_alerts validates complete kill chain timeline with 5 sequential alerts from click to exfiltration within 48h."
+      ]
+    },
+    "remediation_actionability": {
+      "score": 5,
+      "reason": "处置建议非常具体、可执行且逻辑严密地按优先级排列。首先针对已确认的受感染主机（10.0.3.110 和 10.0.1.60）提出立即隔离，这是遏制攻击扩散的关键第一步；其次列出所有具体的 IOC（域名、IP、URL）进行网络层阻断；随后针对受影响的用户和服务账户强制重置密码以恢复访问控制；最后安排取证分析和数据完整性验证以完成闭环。建议内容直接对应证据链中的攻击阶段（横向移动、C2通信、数据泄露），无模糊描述。",
+      "evidence_quotes": [
+        "Immediately isolate compromised hosts 10.0.3.110 (finance-ws-01) and 10.0.1.60 (erp-db-01) from the network to prevent further lateral movement.",
+        "Block all identified IOCs (evil-c2.net, 192.0.2.210, phish-delivery.cn) at firewall and proxy levels.",
+        "Force password reset for user cf.li@company.com and all service accounts on erp-db-01.",
+        "Conduct forensic analysis on compromised systems to determine full scope of compromise and malware persistence mechanisms.",
+        "Verify integrity of ERP database and restore from clean backup if data tampering or loss is confirmed."
+      ]
+    },
+    "evidence_completeness": {
+      "score": 5,
+      "reason": "证据链完整覆盖了攻击的关键阶段（IOC 与行为特征）。输入明确引用了原始日志中的 kill chain 序列（'Phish link clicked -> Macro execution...'），并通过威胁情报确认了所有关键 IOC（evil-c2.net, 192.0.2.210, phish-delivery.cn）的恶意属性及关联组织（FIN7）。同时，资产信息证实了目标为关键 ERP 数据库，相关告警验证了从初始访问到数据外泄的完整时间线。",
+      "evidence_quotes": [
+        "query_alert_detail raw_log confirms correlation of events: 'Phish link clicked -> Macro execution -> PowerShell downloader -> Cobalt Strike beacon -> PsExec lateral -> SQL dump -> exfil via HTTPS.'",
+        "query_threat_intel confirms domain 'evil-c2.net' is malicious C2 associated with FIN7 (reputation_score: 2).",
+        "query_threat_intel confirms IP '192.0.2.210' is malicious exfiltration endpoint used by FIN7 (reputation_score: 10).",
+        "query_asset_info identifies target host '10.0.1.60' as critical ERP database in production core network zone.",
+        "query_related_alerts validates complete kill chain timeline with 5 sequential alerts from click to exfiltration within 48h."
+      ]
+    }
+  },
+  "hallucination": {
+    "total_statements": 5,
+    "verifiable": 5,
+    "hallucinations": 0,
+    "uncertain": 0,
+    "details": [
+      {
+        "statement": "query_alert_detail raw_log confirms correlation of events: 'Phish link clicked -> Macro execution -> PowerShell downloader -> Cobalt Strike beacon -> PsExec lateral -> SQL dump -> exfil via HTTPS.'",
+        "verdict": "verifiable",
+        "reason": "The mock_api_response for query_alert_detail_A27 contains a field 'raw_log' with the exact text: 'Correlation of events: Phish link clicked -> Macro execution -> PowerShell downloader -> Cobalt Strike beacon -> PsExec lateral -> SQL dump -> exfil via HTTPS.'"
+      },
+      {
+        "statement": "query_threat_intel confirms domain 'evil-c2.net' is malicious C2 associated with FIN7 (reputation_score: 2).",
+        "verdict": "verifiable",
+        "reason": "The mock_api_response for query_threat_intel_domain_evil-c2.net shows 'is_malicious': true, 'associated_apt': 'FIN7', and 'reputation_score': 2."
+      },
+      {
+        "statement": "query_threat_intel confirms IP '192.0.2.210' is malicious exfiltration endpoint used by FIN7 (reputation_score: 10).",
+        "verdict": "verifiable",
+        "reason": "The mock_api_response for query_threat_intel_ip_192.0.2.210 shows 'is_malicious': true, 'associated_apt': 'FIN7', 'raw_intel' mentions 'exfiltration endpoint', and 'reputation_score': 10."
+      },
+      {
+        "statement": "query_asset_info identifies target host '10.0.1.60' as critical ERP database in production core network zone.",
+        "verdict": "verifiable",
+        "reason": "The mock_api_response for query_asset_info_10.0.1.60 shows 'ip': '10.0.1.60', 'asset_level': 'critical', 'business_system': 'ERP 数据库', and 'network_zone': '生产-核心'."
+      },
+      {
+        "statement": "query_related_alerts validates complete kill chain timeline with 5 sequential alerts from click to exfiltration within 48h.",
+        "verdict": "verifiable",
+        "reason": "The mock_api_response for query_related_alerts_10.0.3.110_48h returns 'total_related': 5, lists 5 distinct alerts covering the kill chain steps (Phishing, Macro, C2, Lateral, Exfil), and the time window parameter was set to 48 hours."
+      }
+    ]
+  },
+  "calls": [
+    {
+      "label": "agent",
+      "parsed": {
+        "alert_id": "A27",
+        "judgment": {
+          "severity": "critical",
+          "attack_type": "Multi-Stage Attack - Phishing to Exfiltration",
+          "confidence": 0.95,
+          "summary": "Confirmed FIN7 APT campaign targeting finance department. User clicked phishing link leading to macro execution, Cobalt Strike beacon establishment, lateral movement to critical ERP database, and successful data exfiltration.",
+          "evidence_chain": [
+            "query_alert_detail raw_log confirms correlation of events: 'Phish link clicked -> Macro execution -> PowerShell downloader -> Cobalt Strike beacon -> PsExec lateral -> SQL dump -> exfil via HTTPS.'",
+            "query_threat_intel confirms domain 'evil-c2.net' is malicious C2 associated with FIN7 (reputation_score: 2).",
+            "query_threat_intel confirms IP '192.0.2.210' is malicious exfiltration endpoint used by FIN7 (reputation_score: 10).",
+            "query_asset_info identifies target host '10.0.1.60' as critical ERP database in production core network zone.",
+            "query_related_alerts validates complete kill chain timeline with 5 sequential alerts from click to exfiltration within 48h."
+          ],
+          "iocs": [
+            {
+              "type": "domain",
+              "value": "evil-c2.net",
+              "malicious": true,
+              "context": "Cobalt Strike C2 domain used by FIN7"
+            },
+            {
+              "type": "ip",
+              "value": "192.0.2.210",
+              "malicious": true,
+              "context": "FIN7 exfiltration endpoint"
+            },
+            {
+              "type": "url",
+              "value": "http://phish-delivery.cn/doc/invoice.docm",
+              "malicious": true,
+              "context": "Weaponized document delivering FIN7 macro dropper"
+            }
+          ]
+        },
+        "remediation": [
+          "Immediately isolate compromised hosts 10.0.3.110 (finance-ws-01) and 10.0.1.60 (erp-db-01) from the network to prevent further lateral movement.",
+          "Block all identified IOCs (evil-c2.net, 192.0.2.210, phish-delivery.cn) at firewall and proxy levels.",
+          "Force password reset for user cf.li@company.com and all service accounts on erp-db-01.",
+          "Conduct forensic analysis on compromised systems to determine full scope of compromise and malware persistence mechanisms.",
+          "Verify integrity of ERP database and restore from clean backup if data tampering or loss is confirmed."
+        ],
+        "metadata": {
+          "tools_called": [
+            "query_alert_detail",
+            "query_asset_info",
+            "query_threat_intel",
+            "query_related_alerts"
+          ]
+        }
+      },
+      "raw_text": "{\n  \"alert_id\": \"A27\",\n  \"judgment\": {\n    \"severity\": \"critical\",\n    \"attack_type\": \"Multi-Stage Attack - Phishing to Exfiltration\",\n    \"confidence\": 0.95,\n    \"summary\": \"Confirmed FIN7 APT campaign targeting finance department. User clicked phishing link leading to macro execution, Cobalt Strike beacon establishment, lateral movement to critical ERP database, and successful data exfiltration.\",\n    \"evidence_chain\": [\n      \"query_alert_detail raw_log confirms correlation of events: 'Phish link clicked -> Macro execution -> PowerShell downloader -> Cobalt Strike beacon -> PsExec lateral -> SQL dump -> exfil via HTTPS.'\",\n      \"query_threat_intel confirms domain 'evil-c2.net' is malicious C2 associated with FIN7 (reputation_score: 2).\",\n      \"query_threat_intel confirms IP '192.0.2.210' is malicious exfiltration endpoint used by FIN7 (reputation_score: 10).\",\n      \"query_asset_info identifies target host '10.0.1.60' as critical ERP database in production core network zone.\",\n      \"query_related_alerts validates complete kill chain timeline with 5 sequential alerts from click to exfiltration within 48h.\"\n    ],\n    \"iocs\": [\n      {\n        \"type\": \"domain\",\n        \"value\": \"evil-c2.net\",\n        \"malicious\": true,\n        \"context\": \"Cobalt Strike C2 domain used by FIN7\"\n      },\n      {\n        \"type\": \"ip\",\n        \"value\": \"192.0.2.210\",\n        \"malicious\": true,\n        \"context\": \"FIN7 exfiltration endpoint\"\n      },\n      {\n        \"type\": \"url\",\n        \"value\": \"http://phish-delivery.cn/doc/invoice.docm\",\n        \"malicious\": true,\n        \"context\": \"Weaponized document delivering FIN7 macro dropper\"\n      }\n    ]\n  },\n  \"remediation\": [\n    \"Immediately isolate compromised hosts 10.0.3.110 (finance-ws-01) and 10.0.1.60 (erp-db-01) from the network to prevent further lateral movement.\",\n    \"Block all identified IOCs (evil-c2.net, 192.0.2.210, phish-delivery.cn) at firewall and proxy levels.\",\n    \"Force password reset for user cf.li@company.com and all service accounts on erp-db-01.\",\n    \"Conduct forensic analysis on compromised systems to determine full scope of compromise and malware persistence mechanisms.\",\n    \"Verify integrity of ERP database and restore from clean backup if data tampering or loss is confirmed.\"\n  ],\n  \"metadata\": {\n    \"tools_called\": [\n      \"query_alert_detail\",\n      \"query_asset_info\",\n      \"query_threat_intel\",\n      \"query_related_alerts\"\n    ]\n  }\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 2059,
+      "output_tokens": 3075,
+      "latency_ms": 35023,
+      "attempts": 1
+    },
+    {
+      "label": "severity_rationality",
+      "parsed": {
+        "score": 5,
+        "reason": "Agent output correctly identifies a critical multi-stage APT attack (FIN7) with high confidence. The severity rating of 'critical' is fully supported by the evidence chain which details a complete kill chain from phishing to data exfiltration involving a critical ERP database. All specific IOCs (domain, IP, URL), asset criticality, and timeline correlations cited in the agent's judgment are explicitly confirmed by the provided mock API responses.",
+        "evidence_quotes": [
+          "query_alert_detail raw_log confirms correlation of events: 'Phish link clicked -> Macro execution -> PowerShell downloader -> Cobalt Strike beacon -> PsExec lateral -> SQL dump -> exfil via HTTPS.'",
+          "query_threat_intel confirms domain 'evil-c2.net' is malicious C2 associated with FIN7 (reputation_score: 2).",
+          "query_asset_info identifies target host '10.0.1.60' as critical ERP database in production core network zone.",
+          "query_related_alerts validates complete kill chain timeline with 5 sequential alerts from click to exfiltration within 48h."
+        ]
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"Agent output correctly identifies a critical multi-stage APT attack (FIN7) with high confidence. The severity rating of 'critical' is fully supported by the evidence chain which details a complete kill chain from phishing to data exfiltration involving a critical ERP database. All specific IOCs (domain, IP, URL), asset criticality, and timeline correlations cited in the agent's judgment are explicitly confirmed by the provided mock API responses.\",\n  \"evidence_quotes\": [\n    \"query_alert_detail raw_log confirms correlation of events: 'Phish link clicked -> Macro execution -> PowerShell downloader -> Cobalt Strike beacon -> PsExec lateral -> SQL dump -> exfil via HTTPS.'\",\n    \"query_threat_intel confirms domain 'evil-c2.net' is malicious C2 associated with FIN7 (reputation_score: 2).\",\n    \"query_asset_info identifies target host '10.0.1.60' as critical ERP database in production core network zone.\",\n    \"query_related_alerts validates complete kill chain timeline with 5 sequential alerts from click to exfiltration within 48h.\"\n  ]\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 2599,
+      "output_tokens": 249,
+      "latency_ms": 3749,
+      "attempts": 1
+    },
+    {
+      "label": "remediation_actionability",
+      "parsed": {
+        "score": 5,
+        "reason": "处置建议非常具体、可执行且逻辑严密地按优先级排列。首先针对已确认的受感染主机（10.0.3.110 和 10.0.1.60）提出立即隔离，这是遏制攻击扩散的关键第一步；其次列出所有具体的 IOC（域名、IP、URL）进行网络层阻断；随后针对受影响的用户和服务账户强制重置密码以恢复访问控制；最后安排取证分析和数据完整性验证以完成闭环。建议内容直接对应证据链中的攻击阶段（横向移动、C2通信、数据泄露），无模糊描述。",
+        "evidence_quotes": [
+          "Immediately isolate compromised hosts 10.0.3.110 (finance-ws-01) and 10.0.1.60 (erp-db-01) from the network to prevent further lateral movement.",
+          "Block all identified IOCs (evil-c2.net, 192.0.2.210, phish-delivery.cn) at firewall and proxy levels.",
+          "Force password reset for user cf.li@company.com and all service accounts on erp-db-01.",
+          "Conduct forensic analysis on compromised systems to determine full scope of compromise and malware persistence mechanisms.",
+          "Verify integrity of ERP database and restore from clean backup if data tampering or loss is confirmed."
+        ]
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"处置建议非常具体、可执行且逻辑严密地按优先级排列。首先针对已确认的受感染主机（10.0.3.110 和 10.0.1.60）提出立即隔离，这是遏制攻击扩散的关键第一步；其次列出所有具体的 IOC（域名、IP、URL）进行网络层阻断；随后针对受影响的用户和服务账户强制重置密码以恢复访问控制；最后安排取证分析和数据完整性验证以完成闭环。建议内容直接对应证据链中的攻击阶段（横向移动、C2通信、数据泄露），无模糊描述。\",\n  \"evidence_quotes\": [\n    \"Immediately isolate compromised hosts 10.0.3.110 (finance-ws-01) and 10.0.1.60 (erp-db-01) from the network to prevent further lateral movement.\",\n    \"Block all identified IOCs (evil-c2.net, 192.0.2.210, phish-delivery.cn) at firewall and proxy levels.\",\n    \"Force password reset for user cf.li@company.com and all service accounts on erp-db-01.\",\n    \"Conduct forensic analysis on compromised systems to determine full scope of compromise and malware persistence mechanisms.\",\n    \"Verify integrity of ERP database and restore from clean backup if data tampering or loss is confirmed.\"\n  ]\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 2602,
+      "output_tokens": 313,
+      "latency_ms": 3721,
+      "attempts": 1
+    },
+    {
+      "label": "evidence_completeness",
+      "parsed": {
+        "score": 5,
+        "reason": "证据链完整覆盖了攻击的关键阶段（IOC 与行为特征）。输入明确引用了原始日志中的 kill chain 序列（'Phish link clicked -> Macro execution...'），并通过威胁情报确认了所有关键 IOC（evil-c2.net, 192.0.2.210, phish-delivery.cn）的恶意属性及关联组织（FIN7）。同时，资产信息证实了目标为关键 ERP 数据库，相关告警验证了从初始访问到数据外泄的完整时间线。",
+        "evidence_quotes": [
+          "query_alert_detail raw_log confirms correlation of events: 'Phish link clicked -> Macro execution -> PowerShell downloader -> Cobalt Strike beacon -> PsExec lateral -> SQL dump -> exfil via HTTPS.'",
+          "query_threat_intel confirms domain 'evil-c2.net' is malicious C2 associated with FIN7 (reputation_score: 2).",
+          "query_threat_intel confirms IP '192.0.2.210' is malicious exfiltration endpoint used by FIN7 (reputation_score: 10).",
+          "query_asset_info identifies target host '10.0.1.60' as critical ERP database in production core network zone.",
+          "query_related_alerts validates complete kill chain timeline with 5 sequential alerts from click to exfiltration within 48h."
+        ]
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"证据链完整覆盖了攻击的关键阶段（IOC 与行为特征）。输入明确引用了原始日志中的 kill chain 序列（'Phish link clicked -> Macro execution...'），并通过威胁情报确认了所有关键 IOC（evil-c2.net, 192.0.2.210, phish-delivery.cn）的恶意属性及关联组织（FIN7）。同时，资产信息证实了目标为关键 ERP 数据库，相关告警验证了从初始访问到数据外泄的完整时间线。\",\n  \"evidence_quotes\": [\n    \"query_alert_detail raw_log confirms correlation of events: 'Phish link clicked -> Macro execution -> PowerShell downloader -> Cobalt Strike beacon -> PsExec lateral -> SQL dump -> exfil via HTTPS.'\",\n    \"query_threat_intel confirms domain 'evil-c2.net' is malicious C2 associated with FIN7 (reputation_score: 2).\",\n    \"query_threat_intel confirms IP '192.0.2.210' is malicious exfiltration endpoint used by FIN7 (reputation_score: 10).\",\n    \"query_asset_info identifies target host '10.0.1.60' as critical ERP database in production core network zone.\",\n    \"query_related_alerts validates complete kill chain timeline with 5 sequential alerts from click to exfiltration within 48h.\"\n  ]\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 2602,
+      "output_tokens": 316,
+      "latency_ms": 4426,
+      "attempts": 1
+    },
+    {
+      "label": "hallucination_check",
+      "parsed": {
+        "total_statements": 5,
+        "verifiable": 5,
+        "hallucinations": 0,
+        "uncertain": 0,
+        "details": [
+          {
+            "statement": "query_alert_detail raw_log confirms correlation of events: 'Phish link clicked -> Macro execution -> PowerShell downloader -> Cobalt Strike beacon -> PsExec lateral -> SQL dump -> exfil via HTTPS.'",
+            "verdict": "verifiable",
+            "reason": "The mock_api_response for query_alert_detail_A27 contains a field 'raw_log' with the exact text: 'Correlation of events: Phish link clicked -> Macro execution -> PowerShell downloader -> Cobalt Strike beacon -> PsExec lateral -> SQL dump -> exfil via HTTPS.'"
+          },
+          {
+            "statement": "query_threat_intel confirms domain 'evil-c2.net' is malicious C2 associated with FIN7 (reputation_score: 2).",
+            "verdict": "verifiable",
+            "reason": "The mock_api_response for query_threat_intel_domain_evil-c2.net shows 'is_malicious': true, 'associated_apt': 'FIN7', and 'reputation_score': 2."
+          },
+          {
+            "statement": "query_threat_intel confirms IP '192.0.2.210' is malicious exfiltration endpoint used by FIN7 (reputation_score: 10).",
+            "verdict": "verifiable",
+            "reason": "The mock_api_response for query_threat_intel_ip_192.0.2.210 shows 'is_malicious': true, 'associated_apt': 'FIN7', 'raw_intel' mentions 'exfiltration endpoint', and 'reputation_score': 10."
+          },
+          {
+            "statement": "query_asset_info identifies target host '10.0.1.60' as critical ERP database in production core network zone.",
+            "verdict": "verifiable",
+            "reason": "The mock_api_response for query_asset_info_10.0.1.60 shows 'ip': '10.0.1.60', 'asset_level': 'critical', 'business_system': 'ERP 数据库', and 'network_zone': '生产-核心'."
+          },
+          {
+            "statement": "query_related_alerts validates complete kill chain timeline with 5 sequential alerts from click to exfiltration within 48h.",
+            "verdict": "verifiable",
+            "reason": "The mock_api_response for query_related_alerts_10.0.3.110_48h returns 'total_related': 5, lists 5 distinct alerts covering the kill chain steps (Phishing, Macro, C2, Lateral, Exfil), and the time window parameter was set to 48 hours."
+          }
+        ]
+      },
+      "raw_text": "{\n  \"total_statements\": 5,\n  \"verifiable\": 5,\n  \"hallucinations\": 0,\n  \"uncertain\": 0,\n  \"details\": [\n    {\n      \"statement\": \"query_alert_detail raw_log confirms correlation of events: 'Phish link clicked -> Macro execution -> PowerShell downloader -> Cobalt Strike beacon -> PsExec lateral -> SQL dump -> exfil via HTTPS.'\",\n      \"verdict\": \"verifiable\",\n      \"reason\": \"The mock_api_response for query_alert_detail_A27 contains a field 'raw_log' with the exact text: 'Correlation of events: Phish link clicked -> Macro execution -> PowerShell downloader -> Cobalt Strike beacon -> PsExec lateral -> SQL dump -> exfil via HTTPS.'\"\n    },\n    {\n      \"statement\": \"query_threat_intel confirms domain 'evil-c2.net' is malicious C2 associated with FIN7 (reputation_score: 2).\",\n      \"verdict\": \"verifiable\",\n      \"reason\": \"The mock_api_response for query_threat_intel_domain_evil-c2.net shows 'is_malicious': true, 'associated_apt': 'FIN7', and 'reputation_score': 2.\"\n    },\n    {\n      \"statement\": \"query_threat_intel confirms IP '192.0.2.210' is malicious exfiltration endpoint used by FIN7 (reputation_score: 10).\",\n      \"verdict\": \"verifiable\",\n      \"reason\": \"The mock_api_response for query_threat_intel_ip_192.0.2.210 shows 'is_malicious': true, 'associated_apt': 'FIN7', 'raw_intel' mentions 'exfiltration endpoint', and 'reputation_score': 10.\"\n    },\n    {\n      \"statement\": \"query_asset_info identifies target host '10.0.1.60' as critical ERP database in production core network zone.\",\n      \"verdict\": \"verifiable\",\n      \"reason\": \"The mock_api_response for query_asset_info_10.0.1.60 shows 'ip': '10.0.1.60', 'asset_level': 'critical', 'business_system': 'ERP 数据库', and 'network_zone': '生产-核心'.\"\n    },\n    {\n      \"statement\": \"query_related_alerts validates complete kill chain timeline with 5 sequential alerts from click to exfiltration within 48h.\",\n      \"verdict\": \"verifiable\",\n      \"reason\": \"The mock_api_response for query_related_alerts_10.0.3.110_48h returns 'total_related': 5, lists 5 distinct alerts covering the kill chain steps (Phishing, Macro, C2, Lateral, Exfil), and the time window parameter was set to 48 hours.\"\n    }\n  ]\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 2633,
+      "output_tokens": 646,
+      "latency_ms": 7608,
+      "attempts": 1
+    }
+  ],
+  "overall_pass": true,
+  "error_type": null,
+  "error_message": null
+}

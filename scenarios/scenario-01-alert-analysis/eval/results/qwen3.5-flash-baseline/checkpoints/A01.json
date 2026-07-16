@@ -1,0 +1,317 @@
+{
+  "test_case_id": "A01",
+  "scenario": "外部 IP 对 SSH 服务进行暴力破解并成功登录",
+  "difficulty": "easy",
+  "is_positive": true,
+  "expected_severity": "critical",
+  "status": "completed",
+  "agent_output": {
+    "alert_id": "A01",
+    "judgment": {
+      "severity": "critical",
+      "attack_type": "SSH Brute Force & Account Compromise",
+      "confidence": 0.95,
+      "summary": "Confirmed successful SSH brute force attack resulting in root access on a critical production asset by a known malicious IP.",
+      "evidence_chain": [
+        "SIEM alert A01 shows 15 failed attempts followed by accepted root password login from 192.0.2.35 to 10.0.1.12 (query_alert_detail)",
+        "Target asset 10.0.1.12 (prod-web-01) is classified as 'critical' asset level belonging to core business online transaction system (query_asset_info)",
+        "Source IP 192.0.2.35 has malicious reputation score 12 with tags 'brute_force' and 'scanning' confirmed by threat intel sources (query_threat_intel)",
+        "No other related alerts found in 48h window indicating isolated incident but immediate response required due to success (query_related_alerts)"
+      ],
+      "iocs": [
+        {
+          "type": "ip",
+          "value": "192.0.2.35",
+          "malicious": true,
+          "context": "Known brute force attacker infrastructure, last seen active on 2026-07-11"
+        }
+      ]
+    },
+    "remediation": [
+      "Immediately block IP 192.0.2.35 at perimeter firewall and host-based firewall (iptables/firewalld)",
+      "Force password reset for 'root' account on 10.0.1.12 and audit all sessions initiated during the compromise window",
+      "Review authentication logs on 10.0.1.12 for lateral movement or privilege escalation post-login",
+      "Disable direct root SSH login and enforce key-based authentication on prod-web-01"
+    ],
+    "metadata": {
+      "tools_called": [
+        "query_alert_detail",
+        "query_asset_info",
+        "query_threat_intel",
+        "query_related_alerts"
+      ]
+    }
+  },
+  "code_graders": {
+    "tools_called_minimum": {
+      "passed": true,
+      "reason": "required tools present",
+      "expected": [
+        "query_alert_detail",
+        "query_threat_intel"
+      ],
+      "actual": [
+        "query_alert_detail",
+        "query_asset_info",
+        "query_threat_intel",
+        "query_related_alerts"
+      ]
+    },
+    "output_schema": {
+      "passed": true,
+      "reason": "required fields present",
+      "expected": null,
+      "actual": null
+    },
+    "severity_enum": {
+      "passed": true,
+      "reason": "severity is valid",
+      "expected": [
+        "critical",
+        "false_positive",
+        "high",
+        "low",
+        "medium"
+      ],
+      "actual": "critical"
+    },
+    "severity_match": {
+      "passed": true,
+      "reason": "severity matches",
+      "expected": "critical",
+      "actual": "critical"
+    },
+    "confidence_range": {
+      "passed": true,
+      "reason": "confidence in range",
+      "expected": "0..1",
+      "actual": 0.95
+    },
+    "remediation_not_empty": {
+      "passed": true,
+      "reason": "remediation actionable",
+      "expected": "at least one item >=10 chars",
+      "actual": [
+        "Immediately block IP 192.0.2.35 at perimeter firewall and host-based firewall (iptables/firewalld)",
+        "Force password reset for 'root' account on 10.0.1.12 and audit all sessions initiated during the compromise window",
+        "Review authentication logs on 10.0.1.12 for lateral movement or privilege escalation post-login",
+        "Disable direct root SSH login and enforce key-based authentication on prod-web-01"
+      ]
+    }
+  },
+  "quality_scores": {
+    "severity_rationality": {
+      "score": 5,
+      "reason": "Agent correctly identified a critical security incident based on comprehensive evidence. The agent successfully correlated the SIEM alert showing brute force followed by successful root login (evidence: '15 failed attempts followed by accepted root password login'), verified the target asset's critical business value ('classified as critical asset level belonging to core business online transaction system'), and confirmed the source IP's malicious reputation via threat intelligence ('malicious reputation score 12 with tags brute_force'). The severity rating of 'critical' is fully justified by the combination of a successful compromise on a high-value asset by a known attacker.",
+      "evidence_quotes": [
+        "SIEM alert A01 shows 15 failed attempts followed by accepted root password login from 192.0.2.35 to 10.0.1.12",
+        "Target asset 10.0.1.12 (prod-web-01) is classified as 'critical' asset level belonging to core business online transaction system",
+        "Source IP 192.0.2.35 has malicious reputation score 12 with tags 'brute_force' and 'scanning'",
+        "Confirmed successful SSH brute force attack resulting in root access on a critical production asset"
+      ]
+    },
+    "remediation_actionability": {
+      "score": 5,
+      "reason": "处置建议非常具体、可执行且逻辑清晰。建议按优先级排列：首先阻断攻击源（IP 192.0.2.35），其次处理已受损资产（重置 root 密码并审计会话），最后进行加固（禁用 root SSH 登录）。所有建议均直接引用了输入证据中的关键信息，如具体的 IP 地址、主机名 (prod-web-01) 和攻击类型。",
+      "evidence_quotes": [
+        "Immediately block IP 192.0.2.35 at perimeter firewall and host-based firewall (iptables/firewalld)",
+        "Force password reset for 'root' account on 10.0.1.12 and audit all sessions initiated during the compromise window",
+        "Review authentication logs on 10.0.1.12 for lateral movement or privilege escalation post-login",
+        "Disable direct root SSH login and enforce key-based authentication on prod-web-01"
+      ]
+    },
+    "evidence_completeness": {
+      "score": 5,
+      "reason": "证据链完整覆盖了攻击行为的关键 IOC（恶意 IP 192.0.2.35）与核心行为特征（SSH 暴力破解失败后成功登录 root）。输入中的 mock_api_responses 提供了原始日志（raw_log）直接证实了 'Failed password' 到 'Accepted password' 的转换，query_threat_intel 确认了源 IP 的恶意属性及标签，query_asset_info 锁定了目标为关键资产。所有结论均有明确的 API 响应数据支撑，逻辑闭环且无缺失。",
+      "evidence_quotes": [
+        "raw_log: sshd[28901]: Failed password for root from 192.0.2.35 port 52341 ssh2 ... Accepted password for root from 192.0.2.35 port 52341 ssh2",
+        "payload_highlights: 15 failed login attempts in 5 minutes followed by 1 successful root login",
+        "is_malicious: true, threat_tags: brute_force, scanning (from query_threat_intel_ip_192.0.2.35)",
+        "asset_level: critical, business_system: 在线交易系统 (from query_asset_info_10.0.1.12)"
+      ]
+    }
+  },
+  "hallucination": {
+    "total_statements": 4,
+    "verifiable": 4,
+    "hallucinations": 0,
+    "uncertain": 0,
+    "details": [
+      {
+        "statement": "SIEM alert A01 shows 15 failed attempts followed by accepted root password login from 192.0.2.35 to 10.0.1.12",
+        "verdict": "verifiable",
+        "reason": "Confirmed by mock_api_responses 'query_alert_detail_A01' which lists payload_highlights as '15 failed login attempts in 5 minutes' and 'followed by 1 successful root login', with raw_log showing 'Failed password for root from 192.0.2.35' followed by 'Accepted password for root from 192.0.2.35'."
+      },
+      {
+        "statement": "Target asset 10.0.1.12 (prod-web-01) is classified as 'critical' asset level belonging to core business online transaction system",
+        "verdict": "verifiable",
+        "reason": "Confirmed by mock_api_responses 'query_asset_info_10.0.1.12' where asset_level is 'critical', hostname is 'prod-web-01', and business_system is '在线交易系统' (Online Transaction System)."
+      },
+      {
+        "statement": "Source IP 192.0.2.35 has malicious reputation score 12 with tags 'brute_force' and 'scanning' confirmed by threat intel sources",
+        "verdict": "verifiable",
+        "reason": "Confirmed by mock_api_responses 'query_threat_intel_ip_192.0.2.35' which shows reputation_score as 12, is_malicious as true, and threat_tags as ['brute_force', 'scanning']."
+      },
+      {
+        "statement": "No other related alerts found in 48h window indicating isolated incident but immediate response required due to success",
+        "verdict": "verifiable",
+        "reason": "Confirmed by mock_api_responses 'query_related_alerts_192.0.2.35_48h' which returns total_related as 0 and related_alerts as an empty list within the specified 48-hour window."
+      }
+    ]
+  },
+  "calls": [
+    {
+      "label": "agent",
+      "parsed": {
+        "alert_id": "A01",
+        "judgment": {
+          "severity": "critical",
+          "attack_type": "SSH Brute Force & Account Compromise",
+          "confidence": 0.95,
+          "summary": "Confirmed successful SSH brute force attack resulting in root access on a critical production asset by a known malicious IP.",
+          "evidence_chain": [
+            "SIEM alert A01 shows 15 failed attempts followed by accepted root password login from 192.0.2.35 to 10.0.1.12 (query_alert_detail)",
+            "Target asset 10.0.1.12 (prod-web-01) is classified as 'critical' asset level belonging to core business online transaction system (query_asset_info)",
+            "Source IP 192.0.2.35 has malicious reputation score 12 with tags 'brute_force' and 'scanning' confirmed by threat intel sources (query_threat_intel)",
+            "No other related alerts found in 48h window indicating isolated incident but immediate response required due to success (query_related_alerts)"
+          ],
+          "iocs": [
+            {
+              "type": "ip",
+              "value": "192.0.2.35",
+              "malicious": true,
+              "context": "Known brute force attacker infrastructure, last seen active on 2026-07-11"
+            }
+          ]
+        },
+        "remediation": [
+          "Immediately block IP 192.0.2.35 at perimeter firewall and host-based firewall (iptables/firewalld)",
+          "Force password reset for 'root' account on 10.0.1.12 and audit all sessions initiated during the compromise window",
+          "Review authentication logs on 10.0.1.12 for lateral movement or privilege escalation post-login",
+          "Disable direct root SSH login and enforce key-based authentication on prod-web-01"
+        ],
+        "metadata": {
+          "tools_called": [
+            "query_alert_detail",
+            "query_asset_info",
+            "query_threat_intel",
+            "query_related_alerts"
+          ]
+        }
+      },
+      "raw_text": "{\n  \"alert_id\": \"A01\",\n  \"judgment\": {\n    \"severity\": \"critical\",\n    \"attack_type\": \"SSH Brute Force & Account Compromise\",\n    \"confidence\": 0.95,\n    \"summary\": \"Confirmed successful SSH brute force attack resulting in root access on a critical production asset by a known malicious IP.\",\n    \"evidence_chain\": [\n      \"SIEM alert A01 shows 15 failed attempts followed by accepted root password login from 192.0.2.35 to 10.0.1.12 (query_alert_detail)\",\n      \"Target asset 10.0.1.12 (prod-web-01) is classified as 'critical' asset level belonging to core business online transaction system (query_asset_info)\",\n      \"Source IP 192.0.2.35 has malicious reputation score 12 with tags 'brute_force' and 'scanning' confirmed by threat intel sources (query_threat_intel)\",\n      \"No other related alerts found in 48h window indicating isolated incident but immediate response required due to success (query_related_alerts)\"\n    ],\n    \"iocs\": [\n      {\n        \"type\": \"ip\",\n        \"value\": \"192.0.2.35\",\n        \"malicious\": true,\n        \"context\": \"Known brute force attacker infrastructure, last seen active on 2026-07-11\"\n      }\n    ]\n  },\n  \"remediation\": [\n    \"Immediately block IP 192.0.2.35 at perimeter firewall and host-based firewall (iptables/firewalld)\",\n    \"Force password reset for 'root' account on 10.0.1.12 and audit all sessions initiated during the compromise window\",\n    \"Review authentication logs on 10.0.1.12 for lateral movement or privilege escalation post-login\",\n    \"Disable direct root SSH login and enforce key-based authentication on prod-web-01\"\n  ],\n  \"metadata\": {\n    \"tools_called\": [\n      \"query_alert_detail\",\n      \"query_asset_info\",\n      \"query_threat_intel\",\n      \"query_related_alerts\"\n    ]\n  }\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1004,
+      "output_tokens": 2523,
+      "latency_ms": 25771,
+      "attempts": 1
+    },
+    {
+      "label": "severity_rationality",
+      "parsed": {
+        "score": 5,
+        "reason": "Agent correctly identified a critical security incident based on comprehensive evidence. The agent successfully correlated the SIEM alert showing brute force followed by successful root login (evidence: '15 failed attempts followed by accepted root password login'), verified the target asset's critical business value ('classified as critical asset level belonging to core business online transaction system'), and confirmed the source IP's malicious reputation via threat intelligence ('malicious reputation score 12 with tags brute_force'). The severity rating of 'critical' is fully justified by the combination of a successful compromise on a high-value asset by a known attacker.",
+        "evidence_quotes": [
+          "SIEM alert A01 shows 15 failed attempts followed by accepted root password login from 192.0.2.35 to 10.0.1.12",
+          "Target asset 10.0.1.12 (prod-web-01) is classified as 'critical' asset level belonging to core business online transaction system",
+          "Source IP 192.0.2.35 has malicious reputation score 12 with tags 'brute_force' and 'scanning'",
+          "Confirmed successful SSH brute force attack resulting in root access on a critical production asset"
+        ]
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"Agent correctly identified a critical security incident based on comprehensive evidence. The agent successfully correlated the SIEM alert showing brute force followed by successful root login (evidence: '15 failed attempts followed by accepted root password login'), verified the target asset's critical business value ('classified as critical asset level belonging to core business online transaction system'), and confirmed the source IP's malicious reputation via threat intelligence ('malicious reputation score 12 with tags brute_force'). The severity rating of 'critical' is fully justified by the combination of a successful compromise on a high-value asset by a known attacker.\",\n  \"evidence_quotes\": [\n    \"SIEM alert A01 shows 15 failed attempts followed by accepted root password login from 192.0.2.35 to 10.0.1.12\",\n    \"Target asset 10.0.1.12 (prod-web-01) is classified as 'critical' asset level belonging to core business online transaction system\",\n    \"Source IP 192.0.2.35 has malicious reputation score 12 with tags 'brute_force' and 'scanning'\",\n    \"Confirmed successful SSH brute force attack resulting in root access on a critical production asset\"\n  ]\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1362,
+      "output_tokens": 282,
+      "latency_ms": 3421,
+      "attempts": 1
+    },
+    {
+      "label": "remediation_actionability",
+      "parsed": {
+        "score": 5,
+        "reason": "处置建议非常具体、可执行且逻辑清晰。建议按优先级排列：首先阻断攻击源（IP 192.0.2.35），其次处理已受损资产（重置 root 密码并审计会话），最后进行加固（禁用 root SSH 登录）。所有建议均直接引用了输入证据中的关键信息，如具体的 IP 地址、主机名 (prod-web-01) 和攻击类型。",
+        "evidence_quotes": [
+          "Immediately block IP 192.0.2.35 at perimeter firewall and host-based firewall (iptables/firewalld)",
+          "Force password reset for 'root' account on 10.0.1.12 and audit all sessions initiated during the compromise window",
+          "Review authentication logs on 10.0.1.12 for lateral movement or privilege escalation post-login",
+          "Disable direct root SSH login and enforce key-based authentication on prod-web-01"
+        ]
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"处置建议非常具体、可执行且逻辑清晰。建议按优先级排列：首先阻断攻击源（IP 192.0.2.35），其次处理已受损资产（重置 root 密码并审计会话），最后进行加固（禁用 root SSH 登录）。所有建议均直接引用了输入证据中的关键信息，如具体的 IP 地址、主机名 (prod-web-01) 和攻击类型。\",\n  \"evidence_quotes\": [\n    \"Immediately block IP 192.0.2.35 at perimeter firewall and host-based firewall (iptables/firewalld)\",\n    \"Force password reset for 'root' account on 10.0.1.12 and audit all sessions initiated during the compromise window\",\n    \"Review authentication logs on 10.0.1.12 for lateral movement or privilege escalation post-login\",\n    \"Disable direct root SSH login and enforce key-based authentication on prod-web-01\"\n  ]\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1365,
+      "output_tokens": 227,
+      "latency_ms": 2587,
+      "attempts": 1
+    },
+    {
+      "label": "evidence_completeness",
+      "parsed": {
+        "score": 5,
+        "reason": "证据链完整覆盖了攻击行为的关键 IOC（恶意 IP 192.0.2.35）与核心行为特征（SSH 暴力破解失败后成功登录 root）。输入中的 mock_api_responses 提供了原始日志（raw_log）直接证实了 'Failed password' 到 'Accepted password' 的转换，query_threat_intel 确认了源 IP 的恶意属性及标签，query_asset_info 锁定了目标为关键资产。所有结论均有明确的 API 响应数据支撑，逻辑闭环且无缺失。",
+        "evidence_quotes": [
+          "raw_log: sshd[28901]: Failed password for root from 192.0.2.35 port 52341 ssh2 ... Accepted password for root from 192.0.2.35 port 52341 ssh2",
+          "payload_highlights: 15 failed login attempts in 5 minutes followed by 1 successful root login",
+          "is_malicious: true, threat_tags: brute_force, scanning (from query_threat_intel_ip_192.0.2.35)",
+          "asset_level: critical, business_system: 在线交易系统 (from query_asset_info_10.0.1.12)"
+        ]
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"证据链完整覆盖了攻击行为的关键 IOC（恶意 IP 192.0.2.35）与核心行为特征（SSH 暴力破解失败后成功登录 root）。输入中的 mock_api_responses 提供了原始日志（raw_log）直接证实了 'Failed password' 到 'Accepted password' 的转换，query_threat_intel 确认了源 IP 的恶意属性及标签，query_asset_info 锁定了目标为关键资产。所有结论均有明确的 API 响应数据支撑，逻辑闭环且无缺失。\",\n  \"evidence_quotes\": [\n    \"raw_log: sshd[28901]: Failed password for root from 192.0.2.35 port 52341 ssh2 ... Accepted password for root from 192.0.2.35 port 52341 ssh2\",\n    \"payload_highlights: 15 failed login attempts in 5 minutes followed by 1 successful root login\",\n    \"is_malicious: true, threat_tags: brute_force, scanning (from query_threat_intel_ip_192.0.2.35)\",\n    \"asset_level: critical, business_system: 在线交易系统 (from query_asset_info_10.0.1.12)\"\n  ]\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1365,
+      "output_tokens": 300,
+      "latency_ms": 3361,
+      "attempts": 1
+    },
+    {
+      "label": "hallucination_check",
+      "parsed": {
+        "total_statements": 4,
+        "verifiable": 4,
+        "hallucinations": 0,
+        "uncertain": 0,
+        "details": [
+          {
+            "statement": "SIEM alert A01 shows 15 failed attempts followed by accepted root password login from 192.0.2.35 to 10.0.1.12",
+            "verdict": "verifiable",
+            "reason": "Confirmed by mock_api_responses 'query_alert_detail_A01' which lists payload_highlights as '15 failed login attempts in 5 minutes' and 'followed by 1 successful root login', with raw_log showing 'Failed password for root from 192.0.2.35' followed by 'Accepted password for root from 192.0.2.35'."
+          },
+          {
+            "statement": "Target asset 10.0.1.12 (prod-web-01) is classified as 'critical' asset level belonging to core business online transaction system",
+            "verdict": "verifiable",
+            "reason": "Confirmed by mock_api_responses 'query_asset_info_10.0.1.12' where asset_level is 'critical', hostname is 'prod-web-01', and business_system is '在线交易系统' (Online Transaction System)."
+          },
+          {
+            "statement": "Source IP 192.0.2.35 has malicious reputation score 12 with tags 'brute_force' and 'scanning' confirmed by threat intel sources",
+            "verdict": "verifiable",
+            "reason": "Confirmed by mock_api_responses 'query_threat_intel_ip_192.0.2.35' which shows reputation_score as 12, is_malicious as true, and threat_tags as ['brute_force', 'scanning']."
+          },
+          {
+            "statement": "No other related alerts found in 48h window indicating isolated incident but immediate response required due to success",
+            "verdict": "verifiable",
+            "reason": "Confirmed by mock_api_responses 'query_related_alerts_192.0.2.35_48h' which returns total_related as 0 and related_alerts as an empty list within the specified 48-hour window."
+          }
+        ]
+      },
+      "raw_text": "{\n  \"total_statements\": 4,\n  \"verifiable\": 4,\n  \"hallucinations\": 0,\n  \"uncertain\": 0,\n  \"details\": [\n    {\n      \"statement\": \"SIEM alert A01 shows 15 failed attempts followed by accepted root password login from 192.0.2.35 to 10.0.1.12\",\n      \"verdict\": \"verifiable\",\n      \"reason\": \"Confirmed by mock_api_responses 'query_alert_detail_A01' which lists payload_highlights as '15 failed login attempts in 5 minutes' and 'followed by 1 successful root login', with raw_log showing 'Failed password for root from 192.0.2.35' followed by 'Accepted password for root from 192.0.2.35'.\"\n    },\n    {\n      \"statement\": \"Target asset 10.0.1.12 (prod-web-01) is classified as 'critical' asset level belonging to core business online transaction system\",\n      \"verdict\": \"verifiable\",\n      \"reason\": \"Confirmed by mock_api_responses 'query_asset_info_10.0.1.12' where asset_level is 'critical', hostname is 'prod-web-01', and business_system is '在线交易系统' (Online Transaction System).\"\n    },\n    {\n      \"statement\": \"Source IP 192.0.2.35 has malicious reputation score 12 with tags 'brute_force' and 'scanning' confirmed by threat intel sources\",\n      \"verdict\": \"verifiable\",\n      \"reason\": \"Confirmed by mock_api_responses 'query_threat_intel_ip_192.0.2.35' which shows reputation_score as 12, is_malicious as true, and threat_tags as ['brute_force', 'scanning'].\"\n    },\n    {\n      \"statement\": \"No other related alerts found in 48h window indicating isolated incident but immediate response required due to success\",\n      \"verdict\": \"verifiable\",\n      \"reason\": \"Confirmed by mock_api_responses 'query_related_alerts_192.0.2.35_48h' which returns total_related as 0 and related_alerts as an empty list within the specified 48-hour window.\"\n    }\n  ]\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1396,
+      "output_tokens": 535,
+      "latency_ms": 5643,
+      "attempts": 1
+    }
+  ],
+  "overall_pass": true,
+  "error_type": null,
+  "error_message": null
+}

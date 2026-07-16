@@ -1,0 +1,32 @@
+{
+  "run_id": "qwen35-v2-full30",
+  "started_at": "2026-07-16T06:18:06.452666+00:00",
+  "dataset_sha256": "c4002a393508107e198264130598dadbf994dd384e85b0bb4bde5f77156050d2",
+  "prompt_version": "route-a-v2-tool-ids",
+  "agent": {
+    "provider": "qwen",
+    "model": "qwen3.5-flash",
+    "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1",
+    "response_mode": "json_object",
+    "temperature": 0.0,
+    "max_tokens": null,
+    "enable_thinking": null,
+    "extra_body": {}
+  },
+  "judge": {
+    "provider": "qwen",
+    "model": "qwen3.5-flash",
+    "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1",
+    "response_mode": "json_object",
+    "temperature": 0.0,
+    "max_tokens": null,
+    "enable_thinking": false,
+    "extra_body": {}
+  },
+  "options": {
+    "case_id": null,
+    "limit": null,
+    "skip_model_graders": false
+  },
+  "fingerprint": "5476c16700f202052376b4e0d76a9a784ea9eecd81916c9d778040215b9e99ac"
+}

@@ -1,0 +1,344 @@
+{
+  "test_case_id": "A11",
+  "scenario": "Mimikatz 凭证转储检测，关联异常登录告警",
+  "difficulty": "medium",
+  "is_positive": true,
+  "expected_severity": "high",
+  "status": "completed",
+  "agent_output": {
+    "alert_id": "A11",
+    "judgment": {
+      "severity": "critical",
+      "attack_type": "凭证转储与持久化",
+      "confidence": 0.95,
+      "summary": "主机 10.0.1.30（核心域控备份）被确认遭受 Mimikatz 凭证转储攻击。威胁情报确认恶意哈希，关联告警显示存在异常登录及持久化任务创建，确认为真实攻击事件。",
+      "evidence_chain": [
+        "EDR 原始日志显示进程 mimikatz.exe (PID 9102) 以 PROCESS_VM_READ 权限访问 lsass.exe 并执行 sekurlsa::logonpasswords 命令",
+        "威胁情报确认文件哈希 f1e2d3c4b5a6079889706f5e4d3c2b10 为已知恶意 Mimikatz 二进制文件，关联 APT28 组织",
+        "资产信息确认目标主机 10.0.1.30 为生产核心区的备份域控制器，非测试或蜜罐环境",
+        "关联告警显示攻击前 10 分钟创建了执行 mimikatz.exe 的计划任务，且存在域管账号从非 IT 工作站的异常登录记录"
+      ],
+      "iocs": [
+        {
+          "type": "hash",
+          "value": "f1e2d3c4b5a6079889706f5e4d3c2b10",
+          "malicious": true,
+          "context": "Mimikatz 恶意程序哈希"
+        },
+        {
+          "type": "ip",
+          "value": "10.0.1.30",
+          "malicious": true,
+          "context": "受感染的主机"
+        },
+        {
+          "type": "ip",
+          "value": "10.0.3.99",
+          "malicious": true,
+          "context": "异常登录来源 IP"
+        }
+      ]
+    },
+    "remediation": [
+      "立即隔离主机 10.0.1.30 的网络连接，防止横向移动",
+      "强制重置所有域管理员账户密码，特别是近期登录过该主机的账户",
+      "终止 PID 9102 进程并删除计划任务 'UpdateCheck'",
+      "调查源 IP 10.0.3.99 的入侵路径并排查其他潜在失陷主机"
+    ],
+    "metadata": {
+      "tools_called": [
+        "query_alert_detail",
+        "query_asset_info",
+        "query_threat_intel",
+        "query_related_alerts"
+      ]
+    }
+  },
+  "code_graders": {
+    "tools_called_minimum": {
+      "passed": true,
+      "reason": "required tools present",
+      "expected": [
+        "query_alert_detail",
+        "query_threat_intel",
+        "query_related_alerts"
+      ],
+      "actual": [
+        "query_alert_detail",
+        "query_asset_info",
+        "query_threat_intel",
+        "query_related_alerts"
+      ]
+    },
+    "output_schema": {
+      "passed": true,
+      "reason": "required fields present",
+      "expected": null,
+      "actual": null
+    },
+    "severity_enum": {
+      "passed": true,
+      "reason": "severity is valid",
+      "expected": [
+        "critical",
+        "false_positive",
+        "high",
+        "low",
+        "medium"
+      ],
+      "actual": "critical"
+    },
+    "severity_match": {
+      "passed": false,
+      "reason": "severity mismatch",
+      "expected": "high",
+      "actual": "critical"
+    },
+    "confidence_range": {
+      "passed": true,
+      "reason": "confidence in range",
+      "expected": "0..1",
+      "actual": 0.95
+    },
+    "remediation_not_empty": {
+      "passed": true,
+      "reason": "remediation actionable",
+      "expected": "at least one item >=10 chars",
+      "actual": [
+        "立即隔离主机 10.0.1.30 的网络连接，防止横向移动",
+        "强制重置所有域管理员账户密码，特别是近期登录过该主机的账户",
+        "终止 PID 9102 进程并删除计划任务 'UpdateCheck'",
+        "调查源 IP 10.0.3.99 的入侵路径并排查其他潜在失陷主机"
+      ]
+    }
+  },
+  "quality_scores": {
+    "severity_rationality": {
+      "score": 5,
+      "reason": "Agent 输出的严重度评级为'critical'（严重），这与输入证据完全一致。证据链显示：1) 攻击针对的是'生产核心区的备份域控制器'（资产信息确认）；2) 使用了已知恶意软件 Mimikatz 进行凭证转储（威胁情报与 EDR 日志确认）；3) 存在持久化行为（计划任务创建）和异常登录（关联告警）。针对核心基础设施的凭证窃取通常构成最高级别的安全风险，因此'critical'评级准确反映了证据所揭示的威胁等级。",
+      "evidence_quotes": [
+        "EDR 原始日志显示进程 mimikatz.exe (PID 9102) 以 PROCESS_VM_READ 权限访问 lsass.exe 并执行 sekurlsa::logonpasswords 命令",
+        "威胁情报确认文件哈希 f1e2d3c4b5a6079889706f5e4d3c2b10 为已知恶意 Mimikatz 二进制文件",
+        "资产信息确认目标主机 10.0.1.30 为生产核心区的备份域控制器，非测试或蜜罐环境",
+        "关联告警显示攻击前 10 分钟创建了执行 mimikatz.exe 的计划任务，且存在域管账号从非 IT 工作站的异常登录记录"
+      ]
+    },
+    "remediation_actionability": {
+      "score": 5,
+      "reason": "处置建议非常具体、可执行且逻辑清晰。建议按优先级排列：首先隔离网络（防止横向移动），其次重置凭证（应对凭证泄露），接着终止进程并删除持久化任务（清除威胁源），最后进行溯源调查。所有建议均直接引用了输入证据中的关键信息，如主机 IP (10.0.1.30)、进程 PID (9102)、计划任务名称 ('UpdateCheck') 和异常登录源 IP (10.0.3.99)。",
+      "evidence_quotes": [
+        "立即隔离主机 10.0.1.30 的网络连接",
+        "强制重置所有域管理员账户密码",
+        "终止 PID 9102 进程并删除计划任务 'UpdateCheck'",
+        "调查源 IP 10.0.3.99 的入侵路径"
+      ]
+    },
+    "evidence_completeness": {
+      "score": 5,
+      "reason": "证据链完整且逻辑严密，成功覆盖了攻击行为（凭证转储）、恶意载荷确认（哈希情报）、资产价值评估（核心域控）及持久化/横向移动迹象（计划任务与异常登录）。所有关键 IOC（恶意哈希、受感染主机 IP、攻击源 IP）均有对应的原始日志或情报数据支撑，形成了闭环。",
+      "evidence_quotes": [
+        "Process mimikatz.exe (PID 9102) accessed lsass.exe handle with PROCESS_VM_READ rights. Command line: sekurlsa::logonpasswords",
+        "is_malicious: true, associated_apt: APT28, ioc_value: f1e2d3c4b5a6079889706f5e4d3c2b10",
+        "asset_level: critical, business_system: 备份域控制器, network_zone: 生产-核心, is_honeypot: false",
+        "Scheduled task 'UpdateCheck' created on 10.0.1.30 to execute mimikatz.exe.",
+        "Successful login to 10.0.1.30 with domain admin account from non-IT workstation 10.0.3.99."
+      ]
+    }
+  },
+  "hallucination": {
+    "total_statements": 4,
+    "verifiable": 4,
+    "hallucinations": 0,
+    "uncertain": 0,
+    "details": [
+      {
+        "statement": "EDR 原始日志显示进程 mimikatz.exe (PID 9102) 以 PROCESS_VM_READ 权限访问 lsass.exe 并执行 sekurlsa::logonpasswords 命令",
+        "verdict": "verifiable",
+        "reason": "证据 'query_alert_detail_A11' 中的 raw_log 字段明确包含 'Process mimikatz.exe (PID 9102) accessed lsass.exe handle with PROCESS_VM_READ rights. Command line: sekurlsa::logonpasswords'，与陈述完全一致。"
+      },
+      {
+        "statement": "威胁情报确认文件哈希 f1e2d3c4b5a6079889706f5e4d3c2b10 为已知恶意 Mimikatz 二进制文件，关联 APT28 组织",
+        "verdict": "verifiable",
+        "reason": "证据 'query_threat_intel_hash_f1e2d3c4b5a6079889706f5e4d3c2b10' 中 ioc_value 匹配该哈希，is_malicious 为 true，raw_intel 提到 'Mimikatz binary'，且 associated_apt 为 'APT28'，证实了陈述内容。"
+      },
+      {
+        "statement": "资产信息确认目标主机 10.0.1.30 为生产核心区的备份域控制器，非测试或蜜罐环境",
+        "verdict": "verifiable",
+        "reason": "证据 'query_asset_info_10.0.1.30' 显示 ip 为 '10.0.1.30'，business_system 为 '备份域控制器'，network_zone 为 '生产-核心'，且 is_honeypot 和 is_scanner 均为 false，支持陈述中的所有细节。"
+      },
+      {
+        "statement": "关联告警显示攻击前 10 分钟创建了执行 mimikatz.exe 的计划任务，且存在域管账号从非 IT 工作站的异常登录记录",
+        "verdict": "verifiable",
+        "reason": "证据 'query_related_alerts_10.0.1.30_48h' 包含两条相关告警：A11-REL-02 显示在 08:45:00Z 创建了执行 mimikatz.exe 的任务（主告警时间为 08:55:20Z，相差约 10 分钟）；A11-REL-01 显示在 07:30:00Z 有域管理员从非 IT 工作站 10.0.3.99 的登录记录。时间线和事件描述均被证据支持。"
+      }
+    ]
+  },
+  "calls": [
+    {
+      "label": "agent",
+      "parsed": {
+        "alert_id": "A11",
+        "judgment": {
+          "severity": "critical",
+          "attack_type": "凭证转储与持久化",
+          "confidence": 0.95,
+          "summary": "主机 10.0.1.30（核心域控备份）被确认遭受 Mimikatz 凭证转储攻击。威胁情报确认恶意哈希，关联告警显示存在异常登录及持久化任务创建，确认为真实攻击事件。",
+          "evidence_chain": [
+            "EDR 原始日志显示进程 mimikatz.exe (PID 9102) 以 PROCESS_VM_READ 权限访问 lsass.exe 并执行 sekurlsa::logonpasswords 命令",
+            "威胁情报确认文件哈希 f1e2d3c4b5a6079889706f5e4d3c2b10 为已知恶意 Mimikatz 二进制文件，关联 APT28 组织",
+            "资产信息确认目标主机 10.0.1.30 为生产核心区的备份域控制器，非测试或蜜罐环境",
+            "关联告警显示攻击前 10 分钟创建了执行 mimikatz.exe 的计划任务，且存在域管账号从非 IT 工作站的异常登录记录"
+          ],
+          "iocs": [
+            {
+              "type": "hash",
+              "value": "f1e2d3c4b5a6079889706f5e4d3c2b10",
+              "malicious": true,
+              "context": "Mimikatz 恶意程序哈希"
+            },
+            {
+              "type": "ip",
+              "value": "10.0.1.30",
+              "malicious": true,
+              "context": "受感染的主机"
+            },
+            {
+              "type": "ip",
+              "value": "10.0.3.99",
+              "malicious": true,
+              "context": "异常登录来源 IP"
+            }
+          ]
+        },
+        "remediation": [
+          "立即隔离主机 10.0.1.30 的网络连接，防止横向移动",
+          "强制重置所有域管理员账户密码，特别是近期登录过该主机的账户",
+          "终止 PID 9102 进程并删除计划任务 'UpdateCheck'",
+          "调查源 IP 10.0.3.99 的入侵路径并排查其他潜在失陷主机"
+        ],
+        "metadata": {
+          "tools_called": [
+            "query_alert_detail",
+            "query_asset_info",
+            "query_threat_intel",
+            "query_related_alerts"
+          ]
+        }
+      },
+      "raw_text": "{\n  \"alert_id\": \"A11\",\n  \"judgment\": {\n    \"severity\": \"critical\",\n    \"attack_type\": \"凭证转储与持久化\",\n    \"confidence\": 0.95,\n    \"summary\": \"主机 10.0.1.30（核心域控备份）被确认遭受 Mimikatz 凭证转储攻击。威胁情报确认恶意哈希，关联告警显示存在异常登录及持久化任务创建，确认为真实攻击事件。\",\n    \"evidence_chain\": [\n      \"EDR 原始日志显示进程 mimikatz.exe (PID 9102) 以 PROCESS_VM_READ 权限访问 lsass.exe 并执行 sekurlsa::logonpasswords 命令\",\n      \"威胁情报确认文件哈希 f1e2d3c4b5a6079889706f5e4d3c2b10 为已知恶意 Mimikatz 二进制文件，关联 APT28 组织\",\n      \"资产信息确认目标主机 10.0.1.30 为生产核心区的备份域控制器，非测试或蜜罐环境\",\n      \"关联告警显示攻击前 10 分钟创建了执行 mimikatz.exe 的计划任务，且存在域管账号从非 IT 工作站的异常登录记录\"\n    ],\n    \"iocs\": [\n      {\n        \"type\": \"hash\",\n        \"value\": \"f1e2d3c4b5a6079889706f5e4d3c2b10\",\n        \"malicious\": true,\n        \"context\": \"Mimikatz 恶意程序哈希\"\n      },\n      {\n        \"type\": \"ip\",\n        \"value\": \"10.0.1.30\",\n        \"malicious\": true,\n        \"context\": \"受感染的主机\"\n      },\n      {\n        \"type\": \"ip\",\n        \"value\": \"10.0.3.99\",\n        \"malicious\": true,\n        \"context\": \"异常登录来源 IP\"\n      }\n    ]\n  },\n  \"remediation\": [\n    \"立即隔离主机 10.0.1.30 的网络连接，防止横向移动\",\n    \"强制重置所有域管理员账户密码，特别是近期登录过该主机的账户\",\n    \"终止 PID 9102 进程并删除计划任务 'UpdateCheck'\",\n    \"调查源 IP 10.0.3.99 的入侵路径并排查其他潜在失陷主机\"\n  ],\n  \"metadata\": {\n    \"tools_called\": [\n      \"query_alert_detail\",\n      \"query_asset_info\",\n      \"query_threat_intel\",\n      \"query_related_alerts\"\n    ]\n  }\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1275,
+      "output_tokens": 4024,
+      "latency_ms": 41125,
+      "attempts": 1
+    },
+    {
+      "label": "severity_rationality",
+      "parsed": {
+        "score": 5,
+        "reason": "Agent 输出的严重度评级为'critical'（严重），这与输入证据完全一致。证据链显示：1) 攻击针对的是'生产核心区的备份域控制器'（资产信息确认）；2) 使用了已知恶意软件 Mimikatz 进行凭证转储（威胁情报与 EDR 日志确认）；3) 存在持久化行为（计划任务创建）和异常登录（关联告警）。针对核心基础设施的凭证窃取通常构成最高级别的安全风险，因此'critical'评级准确反映了证据所揭示的威胁等级。",
+        "evidence_quotes": [
+          "EDR 原始日志显示进程 mimikatz.exe (PID 9102) 以 PROCESS_VM_READ 权限访问 lsass.exe 并执行 sekurlsa::logonpasswords 命令",
+          "威胁情报确认文件哈希 f1e2d3c4b5a6079889706f5e4d3c2b10 为已知恶意 Mimikatz 二进制文件",
+          "资产信息确认目标主机 10.0.1.30 为生产核心区的备份域控制器，非测试或蜜罐环境",
+          "关联告警显示攻击前 10 分钟创建了执行 mimikatz.exe 的计划任务，且存在域管账号从非 IT 工作站的异常登录记录"
+        ]
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"Agent 输出的严重度评级为'critical'（严重），这与输入证据完全一致。证据链显示：1) 攻击针对的是'生产核心区的备份域控制器'（资产信息确认）；2) 使用了已知恶意软件 Mimikatz 进行凭证转储（威胁情报与 EDR 日志确认）；3) 存在持久化行为（计划任务创建）和异常登录（关联告警）。针对核心基础设施的凭证窃取通常构成最高级别的安全风险，因此'critical'评级准确反映了证据所揭示的威胁等级。\",\n  \"evidence_quotes\": [\n    \"EDR 原始日志显示进程 mimikatz.exe (PID 9102) 以 PROCESS_VM_READ 权限访问 lsass.exe 并执行 sekurlsa::logonpasswords 命令\",\n    \"威胁情报确认文件哈希 f1e2d3c4b5a6079889706f5e4d3c2b10 为已知恶意 Mimikatz 二进制文件\",\n    \"资产信息确认目标主机 10.0.1.30 为生产核心区的备份域控制器，非测试或蜜罐环境\",\n    \"关联告警显示攻击前 10 分钟创建了执行 mimikatz.exe 的计划任务，且存在域管账号从非 IT 工作站的异常登录记录\"\n  ]\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1726,
+      "output_tokens": 316,
+      "latency_ms": 3916,
+      "attempts": 1
+    },
+    {
+      "label": "remediation_actionability",
+      "parsed": {
+        "score": 5,
+        "reason": "处置建议非常具体、可执行且逻辑清晰。建议按优先级排列：首先隔离网络（防止横向移动），其次重置凭证（应对凭证泄露），接着终止进程并删除持久化任务（清除威胁源），最后进行溯源调查。所有建议均直接引用了输入证据中的关键信息，如主机 IP (10.0.1.30)、进程 PID (9102)、计划任务名称 ('UpdateCheck') 和异常登录源 IP (10.0.3.99)。",
+        "evidence_quotes": [
+          "立即隔离主机 10.0.1.30 的网络连接",
+          "强制重置所有域管理员账户密码",
+          "终止 PID 9102 进程并删除计划任务 'UpdateCheck'",
+          "调查源 IP 10.0.3.99 的入侵路径"
+        ]
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"处置建议非常具体、可执行且逻辑清晰。建议按优先级排列：首先隔离网络（防止横向移动），其次重置凭证（应对凭证泄露），接着终止进程并删除持久化任务（清除威胁源），最后进行溯源调查。所有建议均直接引用了输入证据中的关键信息，如主机 IP (10.0.1.30)、进程 PID (9102)、计划任务名称 ('UpdateCheck') 和异常登录源 IP (10.0.3.99)。\",\n  \"evidence_quotes\": [\n    \"立即隔离主机 10.0.1.30 的网络连接\",\n    \"强制重置所有域管理员账户密码\",\n    \"终止 PID 9102 进程并删除计划任务 'UpdateCheck'\",\n    \"调查源 IP 10.0.3.99 的入侵路径\"\n  ]\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1729,
+      "output_tokens": 209,
+      "latency_ms": 2556,
+      "attempts": 1
+    },
+    {
+      "label": "evidence_completeness",
+      "parsed": {
+        "score": 5,
+        "reason": "证据链完整且逻辑严密，成功覆盖了攻击行为（凭证转储）、恶意载荷确认（哈希情报）、资产价值评估（核心域控）及持久化/横向移动迹象（计划任务与异常登录）。所有关键 IOC（恶意哈希、受感染主机 IP、攻击源 IP）均有对应的原始日志或情报数据支撑，形成了闭环。",
+        "evidence_quotes": [
+          "Process mimikatz.exe (PID 9102) accessed lsass.exe handle with PROCESS_VM_READ rights. Command line: sekurlsa::logonpasswords",
+          "is_malicious: true, associated_apt: APT28, ioc_value: f1e2d3c4b5a6079889706f5e4d3c2b10",
+          "asset_level: critical, business_system: 备份域控制器, network_zone: 生产-核心, is_honeypot: false",
+          "Scheduled task 'UpdateCheck' created on 10.0.1.30 to execute mimikatz.exe.",
+          "Successful login to 10.0.1.30 with domain admin account from non-IT workstation 10.0.3.99."
+        ]
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"证据链完整且逻辑严密，成功覆盖了攻击行为（凭证转储）、恶意载荷确认（哈希情报）、资产价值评估（核心域控）及持久化/横向移动迹象（计划任务与异常登录）。所有关键 IOC（恶意哈希、受感染主机 IP、攻击源 IP）均有对应的原始日志或情报数据支撑，形成了闭环。\",\n  \"evidence_quotes\": [\n    \"Process mimikatz.exe (PID 9102) accessed lsass.exe handle with PROCESS_VM_READ rights. Command line: sekurlsa::logonpasswords\",\n    \"is_malicious: true, associated_apt: APT28, ioc_value: f1e2d3c4b5a6079889706f5e4d3c2b10\",\n    \"asset_level: critical, business_system: 备份域控制器, network_zone: 生产-核心, is_honeypot: false\",\n    \"Scheduled task 'UpdateCheck' created on 10.0.1.30 to execute mimikatz.exe.\",\n    \"Successful login to 10.0.1.30 with domain admin account from non-IT workstation 10.0.3.99.\"\n  ]\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1729,
+      "output_tokens": 293,
+      "latency_ms": 3886,
+      "attempts": 1
+    },
+    {
+      "label": "hallucination_check",
+      "parsed": {
+        "total_statements": 4,
+        "verifiable": 4,
+        "hallucinations": 0,
+        "uncertain": 0,
+        "details": [
+          {
+            "statement": "EDR 原始日志显示进程 mimikatz.exe (PID 9102) 以 PROCESS_VM_READ 权限访问 lsass.exe 并执行 sekurlsa::logonpasswords 命令",
+            "verdict": "verifiable",
+            "reason": "证据 'query_alert_detail_A11' 中的 raw_log 字段明确包含 'Process mimikatz.exe (PID 9102) accessed lsass.exe handle with PROCESS_VM_READ rights. Command line: sekurlsa::logonpasswords'，与陈述完全一致。"
+          },
+          {
+            "statement": "威胁情报确认文件哈希 f1e2d3c4b5a6079889706f5e4d3c2b10 为已知恶意 Mimikatz 二进制文件，关联 APT28 组织",
+            "verdict": "verifiable",
+            "reason": "证据 'query_threat_intel_hash_f1e2d3c4b5a6079889706f5e4d3c2b10' 中 ioc_value 匹配该哈希，is_malicious 为 true，raw_intel 提到 'Mimikatz binary'，且 associated_apt 为 'APT28'，证实了陈述内容。"
+          },
+          {
+            "statement": "资产信息确认目标主机 10.0.1.30 为生产核心区的备份域控制器，非测试或蜜罐环境",
+            "verdict": "verifiable",
+            "reason": "证据 'query_asset_info_10.0.1.30' 显示 ip 为 '10.0.1.30'，business_system 为 '备份域控制器'，network_zone 为 '生产-核心'，且 is_honeypot 和 is_scanner 均为 false，支持陈述中的所有细节。"
+          },
+          {
+            "statement": "关联告警显示攻击前 10 分钟创建了执行 mimikatz.exe 的计划任务，且存在域管账号从非 IT 工作站的异常登录记录",
+            "verdict": "verifiable",
+            "reason": "证据 'query_related_alerts_10.0.1.30_48h' 包含两条相关告警：A11-REL-02 显示在 08:45:00Z 创建了执行 mimikatz.exe 的任务（主告警时间为 08:55:20Z，相差约 10 分钟）；A11-REL-01 显示在 07:30:00Z 有域管理员从非 IT 工作站 10.0.3.99 的登录记录。时间线和事件描述均被证据支持。"
+          }
+        ]
+      },
+      "raw_text": "{\n  \"total_statements\": 4,\n  \"verifiable\": 4,\n  \"hallucinations\": 0,\n  \"uncertain\": 0,\n  \"details\": [\n    {\n      \"statement\": \"EDR 原始日志显示进程 mimikatz.exe (PID 9102) 以 PROCESS_VM_READ 权限访问 lsass.exe 并执行 sekurlsa::logonpasswords 命令\",\n      \"verdict\": \"verifiable\",\n      \"reason\": \"证据 'query_alert_detail_A11' 中的 raw_log 字段明确包含 'Process mimikatz.exe (PID 9102) accessed lsass.exe handle with PROCESS_VM_READ rights. Command line: sekurlsa::logonpasswords'，与陈述完全一致。\"\n    },\n    {\n      \"statement\": \"威胁情报确认文件哈希 f1e2d3c4b5a6079889706f5e4d3c2b10 为已知恶意 Mimikatz 二进制文件，关联 APT28 组织\",\n      \"verdict\": \"verifiable\",\n      \"reason\": \"证据 'query_threat_intel_hash_f1e2d3c4b5a6079889706f5e4d3c2b10' 中 ioc_value 匹配该哈希，is_malicious 为 true，raw_intel 提到 'Mimikatz binary'，且 associated_apt 为 'APT28'，证实了陈述内容。\"\n    },\n    {\n      \"statement\": \"资产信息确认目标主机 10.0.1.30 为生产核心区的备份域控制器，非测试或蜜罐环境\",\n      \"verdict\": \"verifiable\",\n      \"reason\": \"证据 'query_asset_info_10.0.1.30' 显示 ip 为 '10.0.1.30'，business_system 为 '备份域控制器'，network_zone 为 '生产-核心'，且 is_honeypot 和 is_scanner 均为 false，支持陈述中的所有细节。\"\n    },\n    {\n      \"statement\": \"关联告警显示攻击前 10 分钟创建了执行 mimikatz.exe 的计划任务，且存在域管账号从非 IT 工作站的异常登录记录\",\n      \"verdict\": \"verifiable\",\n      \"reason\": \"证据 'query_related_alerts_10.0.1.30_48h' 包含两条相关告警：A11-REL-02 显示在 08:45:00Z 创建了执行 mimikatz.exe 的任务（主告警时间为 08:55:20Z，相差约 10 分钟）；A11-REL-01 显示在 07:30:00Z 有域管理员从非 IT 工作站 10.0.3.99 的登录记录。时间线和事件描述均被证据支持。\"\n    }\n  ]\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1760,
+      "output_tokens": 692,
+      "latency_ms": 7313,
+      "attempts": 1
+    }
+  ],
+  "overall_pass": false,
+  "error_type": null,
+  "error_message": null
+}

@@ -1,0 +1,305 @@
+{
+  "test_case_id": "A20",
+  "scenario": "ARP 欺骗攻击，内部主机冒充网关 MAC 地址",
+  "difficulty": "medium",
+  "is_positive": true,
+  "expected_severity": "high",
+  "status": "completed",
+  "agent_output": {
+    "alert_id": "A20",
+    "judgment": {
+      "severity": "high",
+      "attack_type": "ARP Spoofing / Man-in-the-Middle",
+      "confidence": 0.95,
+      "summary": "Rogue unregistered device 10.0.5.50 detected performing ARP spoofing to impersonate default gateway 10.0.5.1, confirmed by asset inventory and recent connection logs.",
+      "evidence_chain": [
+        "query_alert_detail shows ARP reply from 10.0.5.50 claiming gateway MAC 00:11:22:33:44:66 which mismatches real gateway MAC 00:aa:bb:cc:dd:ee.",
+        "query_asset_info classifies 10.0.5.50 as '未注册设备' (Unregistered Device) with tags including 'rogue-device'.",
+        "query_related_alerts reveals alert A20-REL-01 showing the same MAC connected to switch port 12 17 minutes prior to the attack."
+      ],
+      "iocs": [
+        {
+          "type": "ip",
+          "value": "10.0.5.50",
+          "malicious": true,
+          "context": "Source IP executing ARP cache poisoning"
+        }
+      ]
+    },
+    "remediation": [
+      "Isolate the device immediately by disabling switch port 12 identified in related alerts.",
+      "Physically locate the device associated with MAC 00:11:22:33:44:66 in the office network zone.",
+      "Clear ARP caches on all hosts in subnet 10.0.5.x to prevent continued traffic redirection.",
+      "Update asset management system to flag MAC 00:11:22:33:44:66 as unauthorized."
+    ],
+    "metadata": {
+      "tools_called": [
+        "query_alert_detail",
+        "query_asset_info",
+        "query_threat_intel",
+        "query_related_alerts"
+      ]
+    }
+  },
+  "code_graders": {
+    "tools_called_minimum": {
+      "passed": true,
+      "reason": "required tools present",
+      "expected": [
+        "query_alert_detail",
+        "query_related_alerts"
+      ],
+      "actual": [
+        "query_alert_detail",
+        "query_asset_info",
+        "query_threat_intel",
+        "query_related_alerts"
+      ]
+    },
+    "output_schema": {
+      "passed": true,
+      "reason": "required fields present",
+      "expected": null,
+      "actual": null
+    },
+    "severity_enum": {
+      "passed": true,
+      "reason": "severity is valid",
+      "expected": [
+        "critical",
+        "false_positive",
+        "high",
+        "low",
+        "medium"
+      ],
+      "actual": "high"
+    },
+    "severity_match": {
+      "passed": true,
+      "reason": "severity matches",
+      "expected": "high",
+      "actual": "high"
+    },
+    "confidence_range": {
+      "passed": true,
+      "reason": "confidence in range",
+      "expected": "0..1",
+      "actual": 0.95
+    },
+    "remediation_not_empty": {
+      "passed": true,
+      "reason": "remediation actionable",
+      "expected": "at least one item >=10 chars",
+      "actual": [
+        "Isolate the device immediately by disabling switch port 12 identified in related alerts.",
+        "Physically locate the device associated with MAC 00:11:22:33:44:66 in the office network zone.",
+        "Clear ARP caches on all hosts in subnet 10.0.5.x to prevent continued traffic redirection.",
+        "Update asset management system to flag MAC 00:11:22:33:44:66 as unauthorized."
+      ]
+    }
+  },
+  "quality_scores": {
+    "severity_rationality": {
+      "score": 5,
+      "reason": "The agent's judgment of 'high' severity is fully supported by the evidence. The raw log confirms active ARP cache poisoning and gateway impersonation (critical network attack), while asset info identifies the source as an unregistered/rogue device. The related alerts provide a timeline showing the device connected shortly before the attack, confirming the malicious intent and immediate threat to network integrity.",
+      "evidence_quotes": [
+        "ARP reply from 10.0.5.50 claiming 10.0.5.1 has MAC 00:11:22:33:44:66, real gateway MAC is 00:aa:bb:cc:dd:ee. Traffic redirected.",
+        "business_system: '未注册设备' (Unregistered Device)",
+        "tags: ['rogue-device', 'unmanaged']",
+        "summary: 'Unmanaged device with MAC 00:11:22:33:44:66 connected to office switch port 12.'",
+        "rule_name: 'ARP Spoofing Detected - Gateway MAC Mismatch'"
+      ]
+    },
+    "remediation_actionability": {
+      "score": 5,
+      "reason": "处置建议非常具体、可执行且逻辑清晰。建议按优先级排列：首先通过禁用交换机端口（switch port 12）进行即时隔离，这是阻断攻击最直接有效的手段；其次定位物理设备以消除隐患；随后清除ARP缓存以恢复网络正常状态；最后更新资产管理系统以防止未来误判。所有建议均直接引用了输入证据中的关键信息（如IP地址、MAC地址、端口号）。",
+      "evidence_quotes": [
+        "Isolate the device immediately by disabling switch port 12 identified in related alerts.",
+        "Physically locate the device associated with MAC 00:11:22:33:44:66 in the office network zone.",
+        "Clear ARP caches on all hosts in subnet 10.0.5.x to prevent continued traffic redirection.",
+        "Update asset management system to flag MAC 00:11:22:33:44:66 as unauthorized."
+      ]
+    },
+    "evidence_completeness": {
+      "score": 5,
+      "reason": "证据链完整覆盖了攻击的关键 IOC（IP 10.0.5.50、MAC 00:11:22:33:44:66）与核心行为特征。具体包括：1) 原始日志直接证实 ARP 欺骗行为及 MAC 地址不匹配；2) 资产信息确认该设备为未注册/恶意设备；3) 关联告警提供了时间线上的物理连接证据，形成了从发现到定位的闭环。",
+      "evidence_quotes": [
+        "ARP reply from 10.0.5.50 claiming 10.0.5.1 has MAC 00:11:22:33:44:66, real gateway MAC is 00:aa:bb:cc:dd:ee.",
+        "business_system: '未注册设备', tags: ['rogue-device', 'unmanaged']",
+        "Unmanaged device with MAC 00:11:22:33:44:66 connected to office switch port 12."
+      ]
+    }
+  },
+  "hallucination": {
+    "total_statements": 3,
+    "verifiable": 3,
+    "hallucinations": 0,
+    "uncertain": 0,
+    "details": [
+      {
+        "statement": "query_alert_detail shows ARP reply from 10.0.5.50 claiming gateway MAC 00:11:22:33:44:66 which mismatches real gateway MAC 00:aa:bb:cc:dd:ee.",
+        "verdict": "verifiable",
+        "reason": "The mock API response 'query_alert_detail_A20' contains raw_log: 'ARP reply from 10.0.5.50 claiming 10.0.5.1 has MAC 00:11:22:33:44:66, real gateway MAC is 00:aa:bb:cc:dd:ee.' and payload_highlights confirming the attacker MAC."
+      },
+      {
+        "statement": "query_asset_info classifies 10.0.5.50 as '未注册设备' (Unregistered Device) with tags including 'rogue-device'.",
+        "verdict": "verifiable",
+        "reason": "The mock API response 'query_asset_info_10.0.5.50' lists business_system as '未注册设备' and tags as ['rogue-device', 'unmanaged']."
+      },
+      {
+        "statement": "query_related_alerts reveals alert A20-REL-01 showing the same MAC connected to switch port 12 17 minutes prior to the attack.",
+        "verdict": "verifiable",
+        "reason": "The mock API response 'query_related_alerts_10.0.5.50_48h' shows alert A20-REL-01 with summary 'Unmanaged device with MAC 00:11:22:33:44:66 connected to office switch port 12.' The timestamp is 2026-07-14T08:55:00Z, while the main alert A20 timestamp is 2026-07-14T09:12:44Z, a difference of exactly 17 minutes and 44 seconds."
+      }
+    ]
+  },
+  "calls": [
+    {
+      "label": "agent",
+      "parsed": {
+        "alert_id": "A20",
+        "judgment": {
+          "severity": "high",
+          "attack_type": "ARP Spoofing / Man-in-the-Middle",
+          "confidence": 0.95,
+          "summary": "Rogue unregistered device 10.0.5.50 detected performing ARP spoofing to impersonate default gateway 10.0.5.1, confirmed by asset inventory and recent connection logs.",
+          "evidence_chain": [
+            "query_alert_detail shows ARP reply from 10.0.5.50 claiming gateway MAC 00:11:22:33:44:66 which mismatches real gateway MAC 00:aa:bb:cc:dd:ee.",
+            "query_asset_info classifies 10.0.5.50 as '未注册设备' (Unregistered Device) with tags including 'rogue-device'.",
+            "query_related_alerts reveals alert A20-REL-01 showing the same MAC connected to switch port 12 17 minutes prior to the attack."
+          ],
+          "iocs": [
+            {
+              "type": "ip",
+              "value": "10.0.5.50",
+              "malicious": true,
+              "context": "Source IP executing ARP cache poisoning"
+            }
+          ]
+        },
+        "remediation": [
+          "Isolate the device immediately by disabling switch port 12 identified in related alerts.",
+          "Physically locate the device associated with MAC 00:11:22:33:44:66 in the office network zone.",
+          "Clear ARP caches on all hosts in subnet 10.0.5.x to prevent continued traffic redirection.",
+          "Update asset management system to flag MAC 00:11:22:33:44:66 as unauthorized."
+        ],
+        "metadata": {
+          "tools_called": [
+            "query_alert_detail",
+            "query_asset_info",
+            "query_threat_intel",
+            "query_related_alerts"
+          ]
+        }
+      },
+      "raw_text": "{\n  \"alert_id\": \"A20\",\n  \"judgment\": {\n    \"severity\": \"high\",\n    \"attack_type\": \"ARP Spoofing / Man-in-the-Middle\",\n    \"confidence\": 0.95,\n    \"summary\": \"Rogue unregistered device 10.0.5.50 detected performing ARP spoofing to impersonate default gateway 10.0.5.1, confirmed by asset inventory and recent connection logs.\",\n    \"evidence_chain\": [\n      \"query_alert_detail shows ARP reply from 10.0.5.50 claiming gateway MAC 00:11:22:33:44:66 which mismatches real gateway MAC 00:aa:bb:cc:dd:ee.\",\n      \"query_asset_info classifies 10.0.5.50 as '未注册设备' (Unregistered Device) with tags including 'rogue-device'.\",\n      \"query_related_alerts reveals alert A20-REL-01 showing the same MAC connected to switch port 12 17 minutes prior to the attack.\"\n    ],\n    \"iocs\": [\n      {\n        \"type\": \"ip\",\n        \"value\": \"10.0.5.50\",\n        \"malicious\": true,\n        \"context\": \"Source IP executing ARP cache poisoning\"\n      }\n    ]\n  },\n  \"remediation\": [\n    \"Isolate the device immediately by disabling switch port 12 identified in related alerts.\",\n    \"Physically locate the device associated with MAC 00:11:22:33:44:66 in the office network zone.\",\n    \"Clear ARP caches on all hosts in subnet 10.0.5.x to prevent continued traffic redirection.\",\n    \"Update asset management system to flag MAC 00:11:22:33:44:66 as unauthorized.\"\n  ],\n  \"metadata\": {\n    \"tools_called\": [\n      \"query_alert_detail\",\n      \"query_asset_info\",\n      \"query_threat_intel\",\n      \"query_related_alerts\"\n    ]\n  }\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1119,
+      "output_tokens": 3591,
+      "latency_ms": 38003,
+      "attempts": 1
+    },
+    {
+      "label": "severity_rationality",
+      "parsed": {
+        "score": 5,
+        "reason": "The agent's judgment of 'high' severity is fully supported by the evidence. The raw log confirms active ARP cache poisoning and gateway impersonation (critical network attack), while asset info identifies the source as an unregistered/rogue device. The related alerts provide a timeline showing the device connected shortly before the attack, confirming the malicious intent and immediate threat to network integrity.",
+        "evidence_quotes": [
+          "ARP reply from 10.0.5.50 claiming 10.0.5.1 has MAC 00:11:22:33:44:66, real gateway MAC is 00:aa:bb:cc:dd:ee. Traffic redirected.",
+          "business_system: '未注册设备' (Unregistered Device)",
+          "tags: ['rogue-device', 'unmanaged']",
+          "summary: 'Unmanaged device with MAC 00:11:22:33:44:66 connected to office switch port 12.'",
+          "rule_name: 'ARP Spoofing Detected - Gateway MAC Mismatch'"
+        ]
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"The agent's judgment of 'high' severity is fully supported by the evidence. The raw log confirms active ARP cache poisoning and gateway impersonation (critical network attack), while asset info identifies the source as an unregistered/rogue device. The related alerts provide a timeline showing the device connected shortly before the attack, confirming the malicious intent and immediate threat to network integrity.\",\n  \"evidence_quotes\": [\n    \"ARP reply from 10.0.5.50 claiming 10.0.5.1 has MAC 00:11:22:33:44:66, real gateway MAC is 00:aa:bb:cc:dd:ee. Traffic redirected.\",\n    \"business_system: '未注册设备' (Unregistered Device)\",\n    \"tags: ['rogue-device', 'unmanaged']\",\n    \"summary: 'Unmanaged device with MAC 00:11:22:33:44:66 connected to office switch port 12.'\",\n    \"rule_name: 'ARP Spoofing Detected - Gateway MAC Mismatch'\"\n  ]\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1391,
+      "output_tokens": 257,
+      "latency_ms": 3152,
+      "attempts": 1
+    },
+    {
+      "label": "remediation_actionability",
+      "parsed": {
+        "score": 5,
+        "reason": "处置建议非常具体、可执行且逻辑清晰。建议按优先级排列：首先通过禁用交换机端口（switch port 12）进行即时隔离，这是阻断攻击最直接有效的手段；其次定位物理设备以消除隐患；随后清除ARP缓存以恢复网络正常状态；最后更新资产管理系统以防止未来误判。所有建议均直接引用了输入证据中的关键信息（如IP地址、MAC地址、端口号）。",
+        "evidence_quotes": [
+          "Isolate the device immediately by disabling switch port 12 identified in related alerts.",
+          "Physically locate the device associated with MAC 00:11:22:33:44:66 in the office network zone.",
+          "Clear ARP caches on all hosts in subnet 10.0.5.x to prevent continued traffic redirection.",
+          "Update asset management system to flag MAC 00:11:22:33:44:66 as unauthorized."
+        ]
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"处置建议非常具体、可执行且逻辑清晰。建议按优先级排列：首先通过禁用交换机端口（switch port 12）进行即时隔离，这是阻断攻击最直接有效的手段；其次定位物理设备以消除隐患；随后清除ARP缓存以恢复网络正常状态；最后更新资产管理系统以防止未来误判。所有建议均直接引用了输入证据中的关键信息（如IP地址、MAC地址、端口号）。\",\n  \"evidence_quotes\": [\n    \"Isolate the device immediately by disabling switch port 12 identified in related alerts.\",\n    \"Physically locate the device associated with MAC 00:11:22:33:44:66 in the office network zone.\",\n    \"Clear ARP caches on all hosts in subnet 10.0.5.x to prevent continued traffic redirection.\",\n    \"Update asset management system to flag MAC 00:11:22:33:44:66 as unauthorized.\"\n  ]\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1394,
+      "output_tokens": 228,
+      "latency_ms": 2355,
+      "attempts": 1
+    },
+    {
+      "label": "evidence_completeness",
+      "parsed": {
+        "score": 5,
+        "reason": "证据链完整覆盖了攻击的关键 IOC（IP 10.0.5.50、MAC 00:11:22:33:44:66）与核心行为特征。具体包括：1) 原始日志直接证实 ARP 欺骗行为及 MAC 地址不匹配；2) 资产信息确认该设备为未注册/恶意设备；3) 关联告警提供了时间线上的物理连接证据，形成了从发现到定位的闭环。",
+        "evidence_quotes": [
+          "ARP reply from 10.0.5.50 claiming 10.0.5.1 has MAC 00:11:22:33:44:66, real gateway MAC is 00:aa:bb:cc:dd:ee.",
+          "business_system: '未注册设备', tags: ['rogue-device', 'unmanaged']",
+          "Unmanaged device with MAC 00:11:22:33:44:66 connected to office switch port 12."
+        ]
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"证据链完整覆盖了攻击的关键 IOC（IP 10.0.5.50、MAC 00:11:22:33:44:66）与核心行为特征。具体包括：1) 原始日志直接证实 ARP 欺骗行为及 MAC 地址不匹配；2) 资产信息确认该设备为未注册/恶意设备；3) 关联告警提供了时间线上的物理连接证据，形成了从发现到定位的闭环。\",\n  \"evidence_quotes\": [\n    \"ARP reply from 10.0.5.50 claiming 10.0.5.1 has MAC 00:11:22:33:44:66, real gateway MAC is 00:aa:bb:cc:dd:ee.\",\n    \"business_system: '未注册设备', tags: ['rogue-device', 'unmanaged']\",\n    \"Unmanaged device with MAC 00:11:22:33:44:66 connected to office switch port 12.\"\n  ]\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1394,
+      "output_tokens": 253,
+      "latency_ms": 2863,
+      "attempts": 1
+    },
+    {
+      "label": "hallucination_check",
+      "parsed": {
+        "total_statements": 3,
+        "verifiable": 3,
+        "hallucinations": 0,
+        "uncertain": 0,
+        "details": [
+          {
+            "statement": "query_alert_detail shows ARP reply from 10.0.5.50 claiming gateway MAC 00:11:22:33:44:66 which mismatches real gateway MAC 00:aa:bb:cc:dd:ee.",
+            "verdict": "verifiable",
+            "reason": "The mock API response 'query_alert_detail_A20' contains raw_log: 'ARP reply from 10.0.5.50 claiming 10.0.5.1 has MAC 00:11:22:33:44:66, real gateway MAC is 00:aa:bb:cc:dd:ee.' and payload_highlights confirming the attacker MAC."
+          },
+          {
+            "statement": "query_asset_info classifies 10.0.5.50 as '未注册设备' (Unregistered Device) with tags including 'rogue-device'.",
+            "verdict": "verifiable",
+            "reason": "The mock API response 'query_asset_info_10.0.5.50' lists business_system as '未注册设备' and tags as ['rogue-device', 'unmanaged']."
+          },
+          {
+            "statement": "query_related_alerts reveals alert A20-REL-01 showing the same MAC connected to switch port 12 17 minutes prior to the attack.",
+            "verdict": "verifiable",
+            "reason": "The mock API response 'query_related_alerts_10.0.5.50_48h' shows alert A20-REL-01 with summary 'Unmanaged device with MAC 00:11:22:33:44:66 connected to office switch port 12.' The timestamp is 2026-07-14T08:55:00Z, while the main alert A20 timestamp is 2026-07-14T09:12:44Z, a difference of exactly 17 minutes and 44 seconds."
+          }
+        ]
+      },
+      "raw_text": "{\n  \"total_statements\": 3,\n  \"verifiable\": 3,\n  \"hallucinations\": 0,\n  \"uncertain\": 0,\n  \"details\": [\n    {\n      \"statement\": \"query_alert_detail shows ARP reply from 10.0.5.50 claiming gateway MAC 00:11:22:33:44:66 which mismatches real gateway MAC 00:aa:bb:cc:dd:ee.\",\n      \"verdict\": \"verifiable\",\n      \"reason\": \"The mock API response 'query_alert_detail_A20' contains raw_log: 'ARP reply from 10.0.5.50 claiming 10.0.5.1 has MAC 00:11:22:33:44:66, real gateway MAC is 00:aa:bb:cc:dd:ee.' and payload_highlights confirming the attacker MAC.\"\n    },\n    {\n      \"statement\": \"query_asset_info classifies 10.0.5.50 as '未注册设备' (Unregistered Device) with tags including 'rogue-device'.\",\n      \"verdict\": \"verifiable\",\n      \"reason\": \"The mock API response 'query_asset_info_10.0.5.50' lists business_system as '未注册设备' and tags as ['rogue-device', 'unmanaged'].\"\n    },\n    {\n      \"statement\": \"query_related_alerts reveals alert A20-REL-01 showing the same MAC connected to switch port 12 17 minutes prior to the attack.\"\n      ,\n      \"verdict\": \"verifiable\",\n      \"reason\": \"The mock API response 'query_related_alerts_10.0.5.50_48h' shows alert A20-REL-01 with summary 'Unmanaged device with MAC 00:11:22:33:44:66 connected to office switch port 12.' The timestamp is 2026-07-14T08:55:00Z, while the main alert A20 timestamp is 2026-07-14T09:12:44Z, a difference of exactly 17 minutes and 44 seconds.\"\n    }\n  ]\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1425,
+      "output_tokens": 531,
+      "latency_ms": 5620,
+      "attempts": 1
+    }
+  ],
+  "overall_pass": true,
+  "error_type": null,
+  "error_message": null
+}

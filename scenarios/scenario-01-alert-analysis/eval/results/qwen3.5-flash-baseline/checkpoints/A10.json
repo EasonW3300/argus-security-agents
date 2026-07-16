@@ -1,0 +1,375 @@
+{
+  "test_case_id": "A10",
+  "scenario": "勒索软件加密文件行为，关联扫描与横向移动",
+  "difficulty": "hard",
+  "is_positive": true,
+  "expected_severity": "critical",
+  "status": "completed",
+  "agent_output": {
+    "alert_id": "A10",
+    "judgment": {
+      "severity": "critical",
+      "attack_type": "Ransomware (LockBit 3.0)",
+      "confidence": 0.95,
+      "summary": "确认为针对核心业务文件服务器的 LockBit 勒索软件攻击，加密活动正在进行中，且已发现横向移动痕迹。",
+      "evidence_chain": [
+        "EDR 原始日志显示进程 encryptor.exe 重命名了 5000+ 个文件为.lockbit 扩展并删除了卷影副本 (query_alert_detail)",
+        "威胁情报确认哈希值 a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0 为 LockBit 3.0 勒索软件加密器 (query_threat_intel)",
+        "威胁情报确认域名 lockbit-payment.onion 为 LockBit 团伙使用的恶意 C2 节点 (query_threat_intel)",
+        "关联告警显示该主机在 48 小时内存在 PsExec 部署加密器及端口扫描行为，表明攻击链完整 (query_related_alerts)",
+        "资产信息确认主机 10.0.4.20 为核心业务部生产环境关键资产 (query_asset_info)"
+      ],
+      "iocs": [
+        {
+          "type": "ip",
+          "value": "10.0.4.20",
+          "malicious": true,
+          "context": "受感染的主机源地址，执行了加密和横向移动操作"
+        },
+        {
+          "type": "hash",
+          "value": "a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0",
+          "malicious": true,
+          "context": "LockBit 3.0 勒索软件可执行文件哈希，VT/MalwareBazaar 标记为恶意"
+        },
+        {
+          "type": "domain",
+          "value": "lockbit-payment.onion",
+          "malicious": true,
+          "context": "LockBit 勒索团伙用于赎金谈判的 Tor 隐藏服务 C2"
+        }
+      ]
+    },
+    "remediation": [
+      "立即在网络层隔离主机 10.0.4.20，切断其与内网其他系统的连接以防止进一步横向扩散",
+      "在防火墙和 EDR 端阻断 IOC 列表中的 IP、域名及恶意哈希，防止通信与传播",
+      "调查 PsExec 相关告警涉及的凭证，强制重置受影响账户密码并检查权限滥用情况",
+      "保留主机内存镜像和磁盘快照作为取证证据，避免直接重启导致数据丢失",
+      "验证备份系统完整性，制定核心业务数据恢复计划并通知业务部门负责人",
+      "全面排查内网其他主机是否存在类似加密行为或异常网络连接",
+      "更新 EDR 规则库以增强对 LockBit 变种及类似加密行为的检测能力"
+    ],
+    "metadata": {
+      "tools_called": [
+        "query_alert_detail",
+        "query_asset_info",
+        "query_threat_intel",
+        "query_related_alerts"
+      ]
+    }
+  },
+  "code_graders": {
+    "tools_called_minimum": {
+      "passed": true,
+      "reason": "required tools present",
+      "expected": [
+        "query_alert_detail",
+        "query_threat_intel",
+        "query_related_alerts"
+      ],
+      "actual": [
+        "query_alert_detail",
+        "query_asset_info",
+        "query_threat_intel",
+        "query_related_alerts"
+      ]
+    },
+    "output_schema": {
+      "passed": true,
+      "reason": "required fields present",
+      "expected": null,
+      "actual": null
+    },
+    "severity_enum": {
+      "passed": true,
+      "reason": "severity is valid",
+      "expected": [
+        "critical",
+        "false_positive",
+        "high",
+        "low",
+        "medium"
+      ],
+      "actual": "critical"
+    },
+    "severity_match": {
+      "passed": true,
+      "reason": "severity matches",
+      "expected": "critical",
+      "actual": "critical"
+    },
+    "confidence_range": {
+      "passed": true,
+      "reason": "confidence in range",
+      "expected": "0..1",
+      "actual": 0.95
+    },
+    "remediation_not_empty": {
+      "passed": true,
+      "reason": "remediation actionable",
+      "expected": "at least one item >=10 chars",
+      "actual": [
+        "立即在网络层隔离主机 10.0.4.20，切断其与内网其他系统的连接以防止进一步横向扩散",
+        "在防火墙和 EDR 端阻断 IOC 列表中的 IP、域名及恶意哈希，防止通信与传播",
+        "调查 PsExec 相关告警涉及的凭证，强制重置受影响账户密码并检查权限滥用情况",
+        "保留主机内存镜像和磁盘快照作为取证证据，避免直接重启导致数据丢失",
+        "验证备份系统完整性，制定核心业务数据恢复计划并通知业务部门负责人",
+        "全面排查内网其他主机是否存在类似加密行为或异常网络连接",
+        "更新 EDR 规则库以增强对 LockBit 变种及类似加密行为的检测能力"
+      ]
+    }
+  },
+  "quality_scores": {
+    "severity_rationality": {
+      "score": 5,
+      "reason": "Agent 的评估结论（LockBit 3.0 勒索软件攻击，严重度 Critical）与输入证据高度一致。原始日志明确记录了文件重命名、卷影副本删除及勒索信生成；威胁情报确认了恶意哈希和 C2 域名；关联告警证实了横向移动行为；资产信息确认了受害主机为核心业务关键资产。所有证据链完整且逻辑严密，支持最高严重度评级。",
+      "evidence_quotes": [
+        "Process encryptor.exe (PID 5678) renamed 5000+ files to .lockbit extension in /srv/shared. Shadow copies deleted.",
+        "ransom note README.txt dropped",
+        "LockBit 3.0 ransomware encryptor. Uses RSA-2048 and AES encryption.",
+        "Tor hidden service used by LockBit gang for ransom negotiation.",
+        "PsExec executed from 10.0.4.20 to 10.0.4.21 to deploy encryptor.",
+        "asset_level: critical",
+        "business_system: 共享文件服务器"
+      ]
+    },
+    "remediation_actionability": {
+      "score": 5,
+      "reason": "处置建议非常具体、可执行且逻辑严密地按优先级排列。首先针对核心业务资产（10.0.4.20）进行网络隔离以阻断横向移动，其次立即阻断已知 IOC（IP、域名、哈希），随后处理凭证安全与取证保留，最后制定恢复计划并排查全网。该顺序严格遵循‘遏制-根除-恢复’的应急响应原则，且每一步都直接引用了输入证据中的具体资产信息、IOC 值和攻击行为。",
+      "evidence_quotes": [
+        "立即在网络层隔离主机 10.0.4.20，切断其与内网其他系统的连接以防止进一步横向扩散",
+        "在防火墙和 EDR 端阻断 IOC 列表中的 IP、域名及恶意哈希，防止通信与传播",
+        "调查 PsExec 相关告警涉及的凭证，强制重置受影响账户密码并检查权限滥用情况",
+        "保留主机内存镜像和磁盘快照作为取证证据，避免直接重启导致数据丢失",
+        "验证备份系统完整性，制定核心业务数据恢复计划并通知业务部门负责人"
+      ]
+    },
+    "evidence_completeness": {
+      "score": 5,
+      "reason": "证据链完整且逻辑严密，成功覆盖了勒索软件攻击的关键 IOC（恶意哈希、C2 域名、受感染主机 IP）及核心行为特征（文件加密重命名、卷影副本删除、横向移动 PsExec/端口扫描）。威胁情报与原始日志相互印证，资产信息确认了业务影响等级，形成了从入侵到破坏的完整闭环。",
+      "evidence_quotes": [
+        "EDR 原始日志显示进程 encryptor.exe 重命名了 5000+ 个文件为.lockbit 扩展并删除了卷影副本 (query_alert_detail)",
+        "威胁情报确认哈希值 a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0 为 LockBit 3.0 勒索软件加密器 (query_threat_intel)",
+        "威胁情报确认域名 lockbit-payment.onion 为 LockBit 团伙使用的恶意 C2 节点 (query_threat_intel)",
+        "关联告警显示该主机在 48 小时内存在 PsExec 部署加密器及端口扫描行为，表明攻击链完整 (query_related_alerts)",
+        "Process encryptor.exe (PID 5678) renamed 5000+ files to .lockbit extension in /srv/shared. Shadow copies deleted.",
+        "LockBit 3.0 ransomware encryptor. Uses RSA-2048 and AES encryption."
+      ]
+    }
+  },
+  "hallucination": {
+    "total_statements": 5,
+    "verifiable": 5,
+    "hallucinations": 0,
+    "uncertain": 0,
+    "details": [
+      {
+        "statement": "EDR 原始日志显示进程 encryptor.exe 重命名了 5000+ 个文件为.lockbit 扩展并删除了卷影副本",
+        "verdict": "verifiable",
+        "reason": "证据 query_alert_detail_A10 的 raw_log 字段明确记录：'Process encryptor.exe (PID 5678) renamed 5000+ files to .lockbit extension in /srv/shared. Shadow copies deleted.'，与陈述完全一致。"
+      },
+      {
+        "statement": "威胁情报确认哈希值 a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0 为 LockBit 3.0 勒索软件加密器",
+        "verdict": "verifiable",
+        "reason": "证据 query_threat_intel_hash_a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0 的 raw_intel 字段指出该哈希是 'LockBit 3.0 ransomware encryptor'，且 is_malicious 为 true，来源包括 VirusTotal 和 MalwareBazaar。"
+      },
+      {
+        "statement": "威胁情报确认域名 lockbit-payment.onion 为 LockBit 团伙使用的恶意 C2 节点",
+        "verdict": "verifiable",
+        "reason": "证据 query_threat_intel_domain_lockbit-payment.onion 的 raw_intel 字段描述为 'Tor hidden service used by LockBit gang for ransom negotiation'，threat_tags 包含 'C2'，且 is_malicious 为 true。"
+      },
+      {
+        "statement": "关联告警显示该主机在 48 小时内存在 PsExec 部署加密器及端口扫描行为，表明攻击链完整",
+        "verdict": "verifiable",
+        "reason": "证据 query_related_alerts_10.0.4.20_48h 返回了两个相关告警：A10-REL-01 显示 'Internal host 10.0.4.20 scanned port 445'（端口扫描），A10-REL-02 显示 'PsExec executed from 10.0.4.20 to 10.0.4.21 to deploy encryptor'（PsExec 部署加密器），时间窗口均为 48 小时内。"
+      },
+      {
+        "statement": "资产信息确认主机 10.0.4.20 为核心业务部生产环境关键资产",
+        "verdict": "verifiable",
+        "reason": "证据 query_asset_info_10.0.4.20 显示 ip 为 '10.0.4.20'，department 为 '核心业务部'，business_system 为 '共享文件服务器'，asset_level 为 'critical'，network_zone 为 '生产-核心'，符合陈述描述。"
+      }
+    ]
+  },
+  "calls": [
+    {
+      "label": "agent",
+      "parsed": {
+        "alert_id": "A10",
+        "judgment": {
+          "severity": "critical",
+          "attack_type": "Ransomware (LockBit 3.0)",
+          "confidence": 0.95,
+          "summary": "确认为针对核心业务文件服务器的 LockBit 勒索软件攻击，加密活动正在进行中，且已发现横向移动痕迹。",
+          "evidence_chain": [
+            "EDR 原始日志显示进程 encryptor.exe 重命名了 5000+ 个文件为.lockbit 扩展并删除了卷影副本 (query_alert_detail)",
+            "威胁情报确认哈希值 a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0 为 LockBit 3.0 勒索软件加密器 (query_threat_intel)",
+            "威胁情报确认域名 lockbit-payment.onion 为 LockBit 团伙使用的恶意 C2 节点 (query_threat_intel)",
+            "关联告警显示该主机在 48 小时内存在 PsExec 部署加密器及端口扫描行为，表明攻击链完整 (query_related_alerts)",
+            "资产信息确认主机 10.0.4.20 为核心业务部生产环境关键资产 (query_asset_info)"
+          ],
+          "iocs": [
+            {
+              "type": "ip",
+              "value": "10.0.4.20",
+              "malicious": true,
+              "context": "受感染的主机源地址，执行了加密和横向移动操作"
+            },
+            {
+              "type": "hash",
+              "value": "a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0",
+              "malicious": true,
+              "context": "LockBit 3.0 勒索软件可执行文件哈希，VT/MalwareBazaar 标记为恶意"
+            },
+            {
+              "type": "domain",
+              "value": "lockbit-payment.onion",
+              "malicious": true,
+              "context": "LockBit 勒索团伙用于赎金谈判的 Tor 隐藏服务 C2"
+            }
+          ]
+        },
+        "remediation": [
+          "立即在网络层隔离主机 10.0.4.20，切断其与内网其他系统的连接以防止进一步横向扩散",
+          "在防火墙和 EDR 端阻断 IOC 列表中的 IP、域名及恶意哈希，防止通信与传播",
+          "调查 PsExec 相关告警涉及的凭证，强制重置受影响账户密码并检查权限滥用情况",
+          "保留主机内存镜像和磁盘快照作为取证证据，避免直接重启导致数据丢失",
+          "验证备份系统完整性，制定核心业务数据恢复计划并通知业务部门负责人",
+          "全面排查内网其他主机是否存在类似加密行为或异常网络连接",
+          "更新 EDR 规则库以增强对 LockBit 变种及类似加密行为的检测能力"
+        ],
+        "metadata": {
+          "tools_called": [
+            "query_alert_detail",
+            "query_asset_info",
+            "query_threat_intel",
+            "query_related_alerts"
+          ]
+        }
+      },
+      "raw_text": "{\"alert_id\":\"A10\",\"judgment\":{\"severity\":\"critical\",\"attack_type\":\"Ransomware (LockBit 3.0)\",\"confidence\":0.95,\"summary\":\"确认为针对核心业务文件服务器的 LockBit 勒索软件攻击，加密活动正在进行中，且已发现横向移动痕迹。\",\"evidence_chain\":[\"EDR 原始日志显示进程 encryptor.exe 重命名了 5000+ 个文件为.lockbit 扩展并删除了卷影副本 (query_alert_detail)\",\"威胁情报确认哈希值 a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0 为 LockBit 3.0 勒索软件加密器 (query_threat_intel)\",\"威胁情报确认域名 lockbit-payment.onion 为 LockBit 团伙使用的恶意 C2 节点 (query_threat_intel)\",\"关联告警显示该主机在 48 小时内存在 PsExec 部署加密器及端口扫描行为，表明攻击链完整 (query_related_alerts)\",\"资产信息确认主机 10.0.4.20 为核心业务部生产环境关键资产 (query_asset_info)\"],\"iocs\":[{\"type\":\"ip\",\"value\":\"10.0.4.20\",\"malicious\":true,\"context\":\"受感染的主机源地址，执行了加密和横向移动操作\"},{\"type\":\"hash\",\"value\":\"a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0\",\"malicious\":true,\"context\":\"LockBit 3.0 勒索软件可执行文件哈希，VT/MalwareBazaar 标记为恶意\"},{\"type\":\"domain\",\"value\":\"lockbit-payment.onion\",\"malicious\":true,\"context\":\"LockBit 勒索团伙用于赎金谈判的 Tor 隐藏服务 C2\"}]},\"remediation\":[\"立即在网络层隔离主机 10.0.4.20，切断其与内网其他系统的连接以防止进一步横向扩散\",\"在防火墙和 EDR 端阻断 IOC 列表中的 IP、域名及恶意哈希，防止通信与传播\",\"调查 PsExec 相关告警涉及的凭证，强制重置受影响账户密码并检查权限滥用情况\",\"保留主机内存镜像和磁盘快照作为取证证据，避免直接重启导致数据丢失\",\"验证备份系统完整性，制定核心业务数据恢复计划并通知业务部门负责人\",\"全面排查内网其他主机是否存在类似加密行为或异常网络连接\",\"更新 EDR 规则库以增强对 LockBit 变种及类似加密行为的检测能力\"],\"metadata\":{\"tools_called\":[\"query_alert_detail\", \"query_asset_info\", \"query_threat_intel\", \"query_related_alerts\"]}}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1479,
+      "output_tokens": 3147,
+      "latency_ms": 31732,
+      "attempts": 1
+    },
+    {
+      "label": "severity_rationality",
+      "parsed": {
+        "score": 5,
+        "reason": "Agent 的评估结论（LockBit 3.0 勒索软件攻击，严重度 Critical）与输入证据高度一致。原始日志明确记录了文件重命名、卷影副本删除及勒索信生成；威胁情报确认了恶意哈希和 C2 域名；关联告警证实了横向移动行为；资产信息确认了受害主机为核心业务关键资产。所有证据链完整且逻辑严密，支持最高严重度评级。",
+        "evidence_quotes": [
+          "Process encryptor.exe (PID 5678) renamed 5000+ files to .lockbit extension in /srv/shared. Shadow copies deleted.",
+          "ransom note README.txt dropped",
+          "LockBit 3.0 ransomware encryptor. Uses RSA-2048 and AES encryption.",
+          "Tor hidden service used by LockBit gang for ransom negotiation.",
+          "PsExec executed from 10.0.4.20 to 10.0.4.21 to deploy encryptor.",
+          "asset_level: critical",
+          "business_system: 共享文件服务器"
+        ]
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"Agent 的评估结论（LockBit 3.0 勒索软件攻击，严重度 Critical）与输入证据高度一致。原始日志明确记录了文件重命名、卷影副本删除及勒索信生成；威胁情报确认了恶意哈希和 C2 域名；关联告警证实了横向移动行为；资产信息确认了受害主机为核心业务关键资产。所有证据链完整且逻辑严密，支持最高严重度评级。\",\n  \"evidence_quotes\": [\n    \"Process encryptor.exe (PID 5678) renamed 5000+ files to .lockbit extension in /srv/shared. Shadow copies deleted.\",\n    \"ransom note README.txt dropped\",\n    \"LockBit 3.0 ransomware encryptor. Uses RSA-2048 and AES encryption.\",\n    \"Tor hidden service used by LockBit gang for ransom negotiation.\",\n    \"PsExec executed from 10.0.4.20 to 10.0.4.21 to deploy encryptor.\",\n    \"asset_level: critical\",\n    \"business_system: 共享文件服务器\"\n  ]\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 2071,
+      "output_tokens": 258,
+      "latency_ms": 2931,
+      "attempts": 1
+    },
+    {
+      "label": "remediation_actionability",
+      "parsed": {
+        "score": 5,
+        "reason": "处置建议非常具体、可执行且逻辑严密地按优先级排列。首先针对核心业务资产（10.0.4.20）进行网络隔离以阻断横向移动，其次立即阻断已知 IOC（IP、域名、哈希），随后处理凭证安全与取证保留，最后制定恢复计划并排查全网。该顺序严格遵循‘遏制-根除-恢复’的应急响应原则，且每一步都直接引用了输入证据中的具体资产信息、IOC 值和攻击行为。",
+        "evidence_quotes": [
+          "立即在网络层隔离主机 10.0.4.20，切断其与内网其他系统的连接以防止进一步横向扩散",
+          "在防火墙和 EDR 端阻断 IOC 列表中的 IP、域名及恶意哈希，防止通信与传播",
+          "调查 PsExec 相关告警涉及的凭证，强制重置受影响账户密码并检查权限滥用情况",
+          "保留主机内存镜像和磁盘快照作为取证证据，避免直接重启导致数据丢失",
+          "验证备份系统完整性，制定核心业务数据恢复计划并通知业务部门负责人"
+        ]
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"处置建议非常具体、可执行且逻辑严密地按优先级排列。首先针对核心业务资产（10.0.4.20）进行网络隔离以阻断横向移动，其次立即阻断已知 IOC（IP、域名、哈希），随后处理凭证安全与取证保留，最后制定恢复计划并排查全网。该顺序严格遵循‘遏制-根除-恢复’的应急响应原则，且每一步都直接引用了输入证据中的具体资产信息、IOC 值和攻击行为。\",\n  \"evidence_quotes\": [\n    \"立即在网络层隔离主机 10.0.4.20，切断其与内网其他系统的连接以防止进一步横向扩散\",\n    \"在防火墙和 EDR 端阻断 IOC 列表中的 IP、域名及恶意哈希，防止通信与传播\",\n    \"调查 PsExec 相关告警涉及的凭证，强制重置受影响账户密码并检查权限滥用情况\",\n    \"保留主机内存镜像和磁盘快照作为取证证据，避免直接重启导致数据丢失\",\n    \"验证备份系统完整性，制定核心业务数据恢复计划并通知业务部门负责人\"\n  ]\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 2074,
+      "output_tokens": 253,
+      "latency_ms": 3037,
+      "attempts": 1
+    },
+    {
+      "label": "evidence_completeness",
+      "parsed": {
+        "score": 5,
+        "reason": "证据链完整且逻辑严密，成功覆盖了勒索软件攻击的关键 IOC（恶意哈希、C2 域名、受感染主机 IP）及核心行为特征（文件加密重命名、卷影副本删除、横向移动 PsExec/端口扫描）。威胁情报与原始日志相互印证，资产信息确认了业务影响等级，形成了从入侵到破坏的完整闭环。",
+        "evidence_quotes": [
+          "EDR 原始日志显示进程 encryptor.exe 重命名了 5000+ 个文件为.lockbit 扩展并删除了卷影副本 (query_alert_detail)",
+          "威胁情报确认哈希值 a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0 为 LockBit 3.0 勒索软件加密器 (query_threat_intel)",
+          "威胁情报确认域名 lockbit-payment.onion 为 LockBit 团伙使用的恶意 C2 节点 (query_threat_intel)",
+          "关联告警显示该主机在 48 小时内存在 PsExec 部署加密器及端口扫描行为，表明攻击链完整 (query_related_alerts)",
+          "Process encryptor.exe (PID 5678) renamed 5000+ files to .lockbit extension in /srv/shared. Shadow copies deleted.",
+          "LockBit 3.0 ransomware encryptor. Uses RSA-2048 and AES encryption."
+        ]
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"证据链完整且逻辑严密，成功覆盖了勒索软件攻击的关键 IOC（恶意哈希、C2 域名、受感染主机 IP）及核心行为特征（文件加密重命名、卷影副本删除、横向移动 PsExec/端口扫描）。威胁情报与原始日志相互印证，资产信息确认了业务影响等级，形成了从入侵到破坏的完整闭环。\",\n  \"evidence_quotes\": [\n    \"EDR 原始日志显示进程 encryptor.exe 重命名了 5000+ 个文件为.lockbit 扩展并删除了卷影副本 (query_alert_detail)\",\n    \"威胁情报确认哈希值 a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0 为 LockBit 3.0 勒索软件加密器 (query_threat_intel)\",\n    \"威胁情报确认域名 lockbit-payment.onion 为 LockBit 团伙使用的恶意 C2 节点 (query_threat_intel)\",\n    \"关联告警显示该主机在 48 小时内存在 PsExec 部署加密器及端口扫描行为，表明攻击链完整 (query_related_alerts)\",\n    \"Process encryptor.exe (PID 5678) renamed 5000+ files to .lockbit extension in /srv/shared. Shadow copies deleted.\",\n    \"LockBit 3.0 ransomware encryptor. Uses RSA-2048 and AES encryption.\"\n  ]\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 2074,
+      "output_tokens": 345,
+      "latency_ms": 3758,
+      "attempts": 1
+    },
+    {
+      "label": "hallucination_check",
+      "parsed": {
+        "total_statements": 5,
+        "verifiable": 5,
+        "hallucinations": 0,
+        "uncertain": 0,
+        "details": [
+          {
+            "statement": "EDR 原始日志显示进程 encryptor.exe 重命名了 5000+ 个文件为.lockbit 扩展并删除了卷影副本",
+            "verdict": "verifiable",
+            "reason": "证据 query_alert_detail_A10 的 raw_log 字段明确记录：'Process encryptor.exe (PID 5678) renamed 5000+ files to .lockbit extension in /srv/shared. Shadow copies deleted.'，与陈述完全一致。"
+          },
+          {
+            "statement": "威胁情报确认哈希值 a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0 为 LockBit 3.0 勒索软件加密器",
+            "verdict": "verifiable",
+            "reason": "证据 query_threat_intel_hash_a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0 的 raw_intel 字段指出该哈希是 'LockBit 3.0 ransomware encryptor'，且 is_malicious 为 true，来源包括 VirusTotal 和 MalwareBazaar。"
+          },
+          {
+            "statement": "威胁情报确认域名 lockbit-payment.onion 为 LockBit 团伙使用的恶意 C2 节点",
+            "verdict": "verifiable",
+            "reason": "证据 query_threat_intel_domain_lockbit-payment.onion 的 raw_intel 字段描述为 'Tor hidden service used by LockBit gang for ransom negotiation'，threat_tags 包含 'C2'，且 is_malicious 为 true。"
+          },
+          {
+            "statement": "关联告警显示该主机在 48 小时内存在 PsExec 部署加密器及端口扫描行为，表明攻击链完整",
+            "verdict": "verifiable",
+            "reason": "证据 query_related_alerts_10.0.4.20_48h 返回了两个相关告警：A10-REL-01 显示 'Internal host 10.0.4.20 scanned port 445'（端口扫描），A10-REL-02 显示 'PsExec executed from 10.0.4.20 to 10.0.4.21 to deploy encryptor'（PsExec 部署加密器），时间窗口均为 48 小时内。"
+          },
+          {
+            "statement": "资产信息确认主机 10.0.4.20 为核心业务部生产环境关键资产",
+            "verdict": "verifiable",
+            "reason": "证据 query_asset_info_10.0.4.20 显示 ip 为 '10.0.4.20'，department 为 '核心业务部'，business_system 为 '共享文件服务器'，asset_level 为 'critical'，network_zone 为 '生产-核心'，符合陈述描述。"
+          }
+        ]
+      },
+      "raw_text": "{\n  \"total_statements\": 5,\n  \"verifiable\": 5,\n  \"hallucinations\": 0,\n  \"uncertain\": 0,\n  \"details\": [\n    {\n      \"statement\": \"EDR 原始日志显示进程 encryptor.exe 重命名了 5000+ 个文件为.lockbit 扩展并删除了卷影副本\",\n      \"verdict\": \"verifiable\",\n      \"reason\": \"证据 query_alert_detail_A10 的 raw_log 字段明确记录：'Process encryptor.exe (PID 5678) renamed 5000+ files to .lockbit extension in /srv/shared. Shadow copies deleted.'，与陈述完全一致。\"\n    },\n    {\n      \"statement\": \"威胁情报确认哈希值 a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0 为 LockBit 3.0 勒索软件加密器\",\n      \"verdict\": \"verifiable\",\n      \"reason\": \"证据 query_threat_intel_hash_a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0 的 raw_intel 字段指出该哈希是 'LockBit 3.0 ransomware encryptor'，且 is_malicious 为 true，来源包括 VirusTotal 和 MalwareBazaar。\"\n    },\n    {\n      \"statement\": \"威胁情报确认域名 lockbit-payment.onion 为 LockBit 团伙使用的恶意 C2 节点\",\n      \"verdict\": \"verifiable\",\n      \"reason\": \"证据 query_threat_intel_domain_lockbit-payment.onion 的 raw_intel 字段描述为 'Tor hidden service used by LockBit gang for ransom negotiation'，threat_tags 包含 'C2'，且 is_malicious 为 true。\"\n    },\n    {\n      \"statement\": \"关联告警显示该主机在 48 小时内存在 PsExec 部署加密器及端口扫描行为，表明攻击链完整\",\n      \"verdict\": \"verifiable\",\n      \"reason\": \"证据 query_related_alerts_10.0.4.20_48h 返回了两个相关告警：A10-REL-01 显示 'Internal host 10.0.4.20 scanned port 445'（端口扫描），A10-REL-02 显示 'PsExec executed from 10.0.4.20 to 10.0.4.21 to deploy encryptor'（PsExec 部署加密器），时间窗口均为 48 小时内。\"\n    },\n    {\n      \"statement\": \"资产信息确认主机 10.0.4.20 为核心业务部生产环境关键资产\",\n      \"verdict\": \"verifiable\",\n      \"reason\": \"证据 query_asset_info_10.0.4.20 显示 ip 为 '10.0.4.20'，department 为 '核心业务部'，business_system 为 '共享文件服务器'，asset_level 为 'critical'，network_zone 为 '生产-核心'，符合陈述描述。\"\n    }\n  ]\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 2105,
+      "output_tokens": 754,
+      "latency_ms": 8203,
+      "attempts": 1
+    }
+  ],
+  "overall_pass": true,
+  "error_type": null,
+  "error_message": null
+}

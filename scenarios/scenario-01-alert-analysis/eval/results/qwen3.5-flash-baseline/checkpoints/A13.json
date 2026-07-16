@@ -1,0 +1,317 @@
+{
+  "test_case_id": "A13",
+  "scenario": "员工大量下载文件触发 DLP 告警，实为定期备份任务（误报）",
+  "difficulty": "medium",
+  "is_positive": false,
+  "expected_severity": "false_positive",
+  "status": "completed",
+  "agent_output": {
+    "alert_id": "A13",
+    "judgment": {
+      "severity": "false_positive",
+      "attack_type": "False Positive - Legitimate Backup Operation",
+      "confidence": 0.95,
+      "summary": "告警确认为正常运维活动。源IP 10.0.3.67 为内部备份服务器，威胁情报确认其每日 18:00 定时拉取归档文件，关联告警显示备份任务启动时间与下载时间吻合，无恶意特征。",
+      "evidence_chain": [
+        "DLP 告警详情显示用户 zhang.san 在 2026-07-14T18:00:45Z 从 \\10.0.4.20\finance_archive 下载 15GB 数据 (query_alert_detail)",
+        "资产信息确认源 IP 10.0.3.67 属于运维部数据备份服务器 backup-srv-02，标签包含 automated-job (query_asset_info)",
+        "威胁情报显示 IP 10.0.3.67 信誉分 100，备注明确说明该服务器每日 18:00 定时拉取归档 (query_threat_intel)",
+        "关联告警显示同一 IP 在 18:00:05Z 启动了名为 NightlyFinanceBackup 的计划任务，与 DLP 告警时间高度一致 (query_related_alerts)"
+      ],
+      "iocs": [
+        {
+          "type": "ip",
+          "value": "10.0.3.67",
+          "malicious": false,
+          "context": "Internal CMDB 标记为内部备份服务器，威胁情报评分 100"
+        }
+      ]
+    },
+    "remediation": [
+      "将 IP 10.0.3.67 加入 DLP 策略白名单，排除备份服务器的大流量传输告警",
+      "调整 DLP 规则逻辑，对资产标签为'automated-job'的服务器在计划时间段内的流量降低检测阈值或忽略",
+      "核实服务账号 'zhang.san' 是否为备份任务专用账号，确保非个人账号被误用",
+      "定期审查备份服务器的计划任务配置，确保仅允许预期的备份目标地址访问"
+    ],
+    "metadata": {
+      "tools_called": [
+        "query_alert_detail",
+        "query_asset_info",
+        "query_threat_intel",
+        "query_related_alerts"
+      ]
+    }
+  },
+  "code_graders": {
+    "tools_called_minimum": {
+      "passed": true,
+      "reason": "required tools present",
+      "expected": [
+        "query_alert_detail",
+        "query_asset_info"
+      ],
+      "actual": [
+        "query_alert_detail",
+        "query_asset_info",
+        "query_threat_intel",
+        "query_related_alerts"
+      ]
+    },
+    "output_schema": {
+      "passed": true,
+      "reason": "required fields present",
+      "expected": null,
+      "actual": null
+    },
+    "severity_enum": {
+      "passed": true,
+      "reason": "severity is valid",
+      "expected": [
+        "critical",
+        "false_positive",
+        "high",
+        "low",
+        "medium"
+      ],
+      "actual": "false_positive"
+    },
+    "severity_match": {
+      "passed": true,
+      "reason": "severity matches",
+      "expected": "false_positive",
+      "actual": "false_positive"
+    },
+    "confidence_range": {
+      "passed": true,
+      "reason": "confidence in range",
+      "expected": "0..1",
+      "actual": 0.95
+    },
+    "remediation_not_empty": {
+      "passed": true,
+      "reason": "remediation actionable",
+      "expected": "at least one item >=10 chars",
+      "actual": [
+        "将 IP 10.0.3.67 加入 DLP 策略白名单，排除备份服务器的大流量传输告警",
+        "调整 DLP 规则逻辑，对资产标签为'automated-job'的服务器在计划时间段内的流量降低检测阈值或忽略",
+        "核实服务账号 'zhang.san' 是否为备份任务专用账号，确保非个人账号被误用",
+        "定期审查备份服务器的计划任务配置，确保仅允许预期的备份目标地址访问"
+      ]
+    }
+  },
+  "quality_scores": {
+    "severity_rationality": {
+      "score": 5,
+      "reason": "Agent 的评估结论（误报/合法备份操作）与提供的输入证据高度一致。证据链完整：资产信息确认源 IP 为内部备份服务器且带有'automated-job'标签；威胁情报明确说明该 IP 信誉分 100 且每日 18:00 定时拉取归档；关联告警显示备份任务启动时间与 DLP 告警时间吻合（相差仅 40 秒）。所有证据均支持'False Positive'的判定，逻辑严密。",
+      "evidence_quotes": [
+        "query_asset_info_10.0.3.67: 'business_system': '数据备份服务器', 'tags': ['backup', 'automated-job']",
+        "query_threat_intel_ip_10.0.3.67: 'reputation_score': 100, 'raw_intel': 'Internal backup server, scheduled to pull archives from file shares daily at 18:00.'",
+        "query_related_alerts_10.0.3.67_48h: 'Scheduled task 'NightlyFinanceBackup' started on backup-srv-02.', 'timestamp': '2026-07-14T18:00:05Z'",
+        "mock_api_responses.query_alert_detail_A13: 'timestamp': '2026-07-14T18:00:45Z'"
+      ]
+    },
+    "remediation_actionability": {
+      "score": 5,
+      "reason": "处置建议非常具体、可执行且逻辑清晰。建议涵盖了从策略配置（白名单、规则调整）到账号审计和定期审查的多个层面，并直接引用了输入证据中的关键信息（如IP地址10.0.3.67、标签'automated-job'、计划任务名称等），完全符合安全运营的最佳实践。",
+      "evidence_quotes": [
+        "将 IP 10.0.3.67 加入 DLP 策略白名单...",
+        "对资产标签为'automated-job'的服务器...",
+        "核实服务账号 'zhang.san' 是否为备份任务专用账号...",
+        "关联告警显示同一 IP 在 18:00:05Z 启动了名为 NightlyFinanceBackup 的计划任务"
+      ]
+    },
+    "evidence_completeness": {
+      "score": 5,
+      "reason": "证据链完整且逻辑严密，成功覆盖了关键 IOC（IP 10.0.3.67）与行为特征（大流量下载、计划任务启动）。通过资产信息确认了服务器身份及标签（automated-job），威胁情报提供了明确的业务背景（每日 18:00 定时拉取），关联告警在时间戳上（18:00:05Z vs 18:00:45Z）形成了完美的因果闭环，充分证明了该活动为合法备份操作，排除了误报。",
+      "evidence_quotes": [
+        "DLP 告警详情显示用户 zhang.san 在 2026-07-14T18:00:45Z 从 \\10.0.4.20\\finance_archive 下载 15GB 数据 (query_alert_detail)",
+        "资产信息确认源 IP 10.0.3.67 属于运维部数据备份服务器 backup-srv-02，标签包含 automated-job (query_asset_info)",
+        "威胁情报显示 IP 10.0.3.67 信誉分 100，备注明确说明该服务器每日 18:00 定时拉取归档 (query_threat_intel)",
+        "关联告警显示同一 IP 在 18:00:05Z 启动了名为 NightlyFinanceBackup 的计划任务，与 DLP 告警时间高度一致 (query_related_alerts)"
+      ]
+    }
+  },
+  "hallucination": {
+    "total_statements": 4,
+    "verifiable": 4,
+    "hallucinations": 0,
+    "uncertain": 0,
+    "details": [
+      {
+        "statement": "DLP 告警详情显示用户 zhang.san 在 2026-07-14T18:00:45Z 从 \\10.0.4.20\finance_archive 下载 15GB 数据",
+        "verdict": "verifiable",
+        "reason": "证据 query_alert_detail_A13 中的 raw_log 字段明确记录 'User zhang.san from 10.0.3.67 downloaded 15GB from share \\10.0.4.20\finance_archive'，且 timestamp 为 '2026-07-14T18:00:45Z'，与陈述完全一致。"
+      },
+      {
+        "statement": "资产信息确认源 IP 10.0.3.67 属于运维部数据备份服务器 backup-srv-02，标签包含 automated-job",
+        "verdict": "verifiable",
+        "reason": "证据 query_asset_info_10.0.3.67 中 ip 为 '10.0.3.67'，hostname 为 'backup-srv-02'，department 为 '运维部'，business_system 为 '数据备份服务器'，tags 数组包含 'automated-job'，与陈述完全一致。"
+      },
+      {
+        "statement": "威胁情报显示 IP 10.0.3.67 信誉分 100，备注明确说明该服务器每日 18:00 定时拉取归档",
+        "verdict": "verifiable",
+        "reason": "证据 query_threat_intel_ip_10.0.3.67 中 reputation_score 为 100，raw_intel 内容为 'Internal backup server, scheduled to pull archives from file shares daily at 18:00.'，与陈述完全一致。"
+      },
+      {
+        "statement": "关联告警显示同一 IP 在 18:00:05Z 启动了名为 NightlyFinanceBackup 的计划任务，与 DLP 告警时间高度一致",
+        "verdict": "verifiable",
+        "reason": "证据 query_related_alerts_10.0.3.67_48h 中 related_alerts 列表包含 alert_id 'A13-REL-01'，summary 为 "
+      }
+    ]
+  },
+  "calls": [
+    {
+      "label": "agent",
+      "parsed": {
+        "alert_id": "A13",
+        "judgment": {
+          "severity": "false_positive",
+          "attack_type": "False Positive - Legitimate Backup Operation",
+          "confidence": 0.95,
+          "summary": "告警确认为正常运维活动。源IP 10.0.3.67 为内部备份服务器，威胁情报确认其每日 18:00 定时拉取归档文件，关联告警显示备份任务启动时间与下载时间吻合，无恶意特征。",
+          "evidence_chain": [
+            "DLP 告警详情显示用户 zhang.san 在 2026-07-14T18:00:45Z 从 \\10.0.4.20\finance_archive 下载 15GB 数据 (query_alert_detail)",
+            "资产信息确认源 IP 10.0.3.67 属于运维部数据备份服务器 backup-srv-02，标签包含 automated-job (query_asset_info)",
+            "威胁情报显示 IP 10.0.3.67 信誉分 100，备注明确说明该服务器每日 18:00 定时拉取归档 (query_threat_intel)",
+            "关联告警显示同一 IP 在 18:00:05Z 启动了名为 NightlyFinanceBackup 的计划任务，与 DLP 告警时间高度一致 (query_related_alerts)"
+          ],
+          "iocs": [
+            {
+              "type": "ip",
+              "value": "10.0.3.67",
+              "malicious": false,
+              "context": "Internal CMDB 标记为内部备份服务器，威胁情报评分 100"
+            }
+          ]
+        },
+        "remediation": [
+          "将 IP 10.0.3.67 加入 DLP 策略白名单，排除备份服务器的大流量传输告警",
+          "调整 DLP 规则逻辑，对资产标签为'automated-job'的服务器在计划时间段内的流量降低检测阈值或忽略",
+          "核实服务账号 'zhang.san' 是否为备份任务专用账号，确保非个人账号被误用",
+          "定期审查备份服务器的计划任务配置，确保仅允许预期的备份目标地址访问"
+        ],
+        "metadata": {
+          "tools_called": [
+            "query_alert_detail",
+            "query_asset_info",
+            "query_threat_intel",
+            "query_related_alerts"
+          ]
+        }
+      },
+      "raw_text": "{\"alert_id\":\"A13\",\"judgment\":{\"severity\":\"false_positive\",\"attack_type\":\"False Positive - Legitimate Backup Operation\",\"confidence\":0.95,\"summary\":\"告警确认为正常运维活动。源IP 10.0.3.67 为内部备份服务器，威胁情报确认其每日 18:00 定时拉取归档文件，关联告警显示备份任务启动时间与下载时间吻合，无恶意特征。\",\"evidence_chain\":[\"DLP 告警详情显示用户 zhang.san 在 2026-07-14T18:00:45Z 从 \\\\10.0.4.20\\finance_archive 下载 15GB 数据 (query_alert_detail)\",\"资产信息确认源 IP 10.0.3.67 属于运维部数据备份服务器 backup-srv-02，标签包含 automated-job (query_asset_info)\",\"威胁情报显示 IP 10.0.3.67 信誉分 100，备注明确说明该服务器每日 18:00 定时拉取归档 (query_threat_intel)\",\"关联告警显示同一 IP 在 18:00:05Z 启动了名为 NightlyFinanceBackup 的计划任务，与 DLP 告警时间高度一致 (query_related_alerts)\"],\"iocs\":[{\"type\":\"ip\",\"value\":\"10.0.3.67\",\"malicious\":false,\"context\":\"Internal CMDB 标记为内部备份服务器，威胁情报评分 100\"}]},\"remediation\":[\"将 IP 10.0.3.67 加入 DLP 策略白名单，排除备份服务器的大流量传输告警\",\"调整 DLP 规则逻辑，对资产标签为'automated-job'的服务器在计划时间段内的流量降低检测阈值或忽略\",\"核实服务账号 'zhang.san' 是否为备份任务专用账号，确保非个人账号被误用\",\"定期审查备份服务器的计划任务配置，确保仅允许预期的备份目标地址访问\"], \"metadata\":{\"tools_called\":[\"query_alert_detail\", \"query_asset_info\", \"query_threat_intel\", \"query_related_alerts\"]}}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1057,
+      "output_tokens": 3403,
+      "latency_ms": 38289,
+      "attempts": 1
+    },
+    {
+      "label": "severity_rationality",
+      "parsed": {
+        "score": 5,
+        "reason": "Agent 的评估结论（误报/合法备份操作）与提供的输入证据高度一致。证据链完整：资产信息确认源 IP 为内部备份服务器且带有'automated-job'标签；威胁情报明确说明该 IP 信誉分 100 且每日 18:00 定时拉取归档；关联告警显示备份任务启动时间与 DLP 告警时间吻合（相差仅 40 秒）。所有证据均支持'False Positive'的判定，逻辑严密。",
+        "evidence_quotes": [
+          "query_asset_info_10.0.3.67: 'business_system': '数据备份服务器', 'tags': ['backup', 'automated-job']",
+          "query_threat_intel_ip_10.0.3.67: 'reputation_score': 100, 'raw_intel': 'Internal backup server, scheduled to pull archives from file shares daily at 18:00.'",
+          "query_related_alerts_10.0.3.67_48h: 'Scheduled task 'NightlyFinanceBackup' started on backup-srv-02.', 'timestamp': '2026-07-14T18:00:05Z'",
+          "mock_api_responses.query_alert_detail_A13: 'timestamp': '2026-07-14T18:00:45Z'"
+        ]
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"Agent 的评估结论（误报/合法备份操作）与提供的输入证据高度一致。证据链完整：资产信息确认源 IP 为内部备份服务器且带有'automated-job'标签；威胁情报明确说明该 IP 信誉分 100 且每日 18:00 定时拉取归档；关联告警显示备份任务启动时间与 DLP 告警时间吻合（相差仅 40 秒）。所有证据均支持'False Positive'的判定，逻辑严密。\",\n  \"evidence_quotes\": [\n    \"query_asset_info_10.0.3.67: 'business_system': '数据备份服务器', 'tags': ['backup', 'automated-job']\",\n    \"query_threat_intel_ip_10.0.3.67: 'reputation_score': 100, 'raw_intel': 'Internal backup server, scheduled to pull archives from file shares daily at 18:00.'\",\n    \"query_related_alerts_10.0.3.67_48h: 'Scheduled task 'NightlyFinanceBackup' started on backup-srv-02.', 'timestamp': '2026-07-14T18:00:05Z'\",\n    \"mock_api_responses.query_alert_detail_A13: 'timestamp': '2026-07-14T18:00:45Z'\"\n  ]\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1432,
+      "output_tokens": 335,
+      "latency_ms": 3050,
+      "attempts": 1
+    },
+    {
+      "label": "remediation_actionability",
+      "parsed": {
+        "score": 5,
+        "reason": "处置建议非常具体、可执行且逻辑清晰。建议涵盖了从策略配置（白名单、规则调整）到账号审计和定期审查的多个层面，并直接引用了输入证据中的关键信息（如IP地址10.0.3.67、标签'automated-job'、计划任务名称等），完全符合安全运营的最佳实践。",
+        "evidence_quotes": [
+          "将 IP 10.0.3.67 加入 DLP 策略白名单...",
+          "对资产标签为'automated-job'的服务器...",
+          "核实服务账号 'zhang.san' 是否为备份任务专用账号...",
+          "关联告警显示同一 IP 在 18:00:05Z 启动了名为 NightlyFinanceBackup 的计划任务"
+        ]
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"处置建议非常具体、可执行且逻辑清晰。建议涵盖了从策略配置（白名单、规则调整）到账号审计和定期审查的多个层面，并直接引用了输入证据中的关键信息（如IP地址10.0.3.67、标签'automated-job'、计划任务名称等），完全符合安全运营的最佳实践。\",\n  \"evidence_quotes\": [\n    \"将 IP 10.0.3.67 加入 DLP 策略白名单...\",\n    \"对资产标签为'automated-job'的服务器...\",\n    \"核实服务账号 'zhang.san' 是否为备份任务专用账号...\",\n    \"关联告警显示同一 IP 在 18:00:05Z 启动了名为 NightlyFinanceBackup 的计划任务\"\n  ]\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1435,
+      "output_tokens": 194,
+      "latency_ms": 2219,
+      "attempts": 1
+    },
+    {
+      "label": "evidence_completeness",
+      "parsed": {
+        "score": 5,
+        "reason": "证据链完整且逻辑严密，成功覆盖了关键 IOC（IP 10.0.3.67）与行为特征（大流量下载、计划任务启动）。通过资产信息确认了服务器身份及标签（automated-job），威胁情报提供了明确的业务背景（每日 18:00 定时拉取），关联告警在时间戳上（18:00:05Z vs 18:00:45Z）形成了完美的因果闭环，充分证明了该活动为合法备份操作，排除了误报。",
+        "evidence_quotes": [
+          "DLP 告警详情显示用户 zhang.san 在 2026-07-14T18:00:45Z 从 \\10.0.4.20\\finance_archive 下载 15GB 数据 (query_alert_detail)",
+          "资产信息确认源 IP 10.0.3.67 属于运维部数据备份服务器 backup-srv-02，标签包含 automated-job (query_asset_info)",
+          "威胁情报显示 IP 10.0.3.67 信誉分 100，备注明确说明该服务器每日 18:00 定时拉取归档 (query_threat_intel)",
+          "关联告警显示同一 IP 在 18:00:05Z 启动了名为 NightlyFinanceBackup 的计划任务，与 DLP 告警时间高度一致 (query_related_alerts)"
+        ]
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"证据链完整且逻辑严密，成功覆盖了关键 IOC（IP 10.0.3.67）与行为特征（大流量下载、计划任务启动）。通过资产信息确认了服务器身份及标签（automated-job），威胁情报提供了明确的业务背景（每日 18:00 定时拉取），关联告警在时间戳上（18:00:05Z vs 18:00:45Z）形成了完美的因果闭环，充分证明了该活动为合法备份操作，排除了误报。\",\n  \"evidence_quotes\": [\n    \"DLP 告警详情显示用户 zhang.san 在 2026-07-14T18:00:45Z 从 \\\\10.0.4.20\\\\finance_archive 下载 15GB 数据 (query_alert_detail)\",\n    \"资产信息确认源 IP 10.0.3.67 属于运维部数据备份服务器 backup-srv-02，标签包含 automated-job (query_asset_info)\",\n    \"威胁情报显示 IP 10.0.3.67 信誉分 100，备注明确说明该服务器每日 18:00 定时拉取归档 (query_threat_intel)\",\n    \"关联告警显示同一 IP 在 18:00:05Z 启动了名为 NightlyFinanceBackup 的计划任务，与 DLP 告警时间高度一致 (query_related_alerts)\"\n  ]\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1435,
+      "output_tokens": 349,
+      "latency_ms": 3482,
+      "attempts": 1
+    },
+    {
+      "label": "hallucination_check",
+      "parsed": {
+        "total_statements": 4,
+        "verifiable": 4,
+        "hallucinations": 0,
+        "uncertain": 0,
+        "details": [
+          {
+            "statement": "DLP 告警详情显示用户 zhang.san 在 2026-07-14T18:00:45Z 从 \\10.0.4.20\finance_archive 下载 15GB 数据",
+            "verdict": "verifiable",
+            "reason": "证据 query_alert_detail_A13 中的 raw_log 字段明确记录 'User zhang.san from 10.0.3.67 downloaded 15GB from share \\10.0.4.20\finance_archive'，且 timestamp 为 '2026-07-14T18:00:45Z'，与陈述完全一致。"
+          },
+          {
+            "statement": "资产信息确认源 IP 10.0.3.67 属于运维部数据备份服务器 backup-srv-02，标签包含 automated-job",
+            "verdict": "verifiable",
+            "reason": "证据 query_asset_info_10.0.3.67 中 ip 为 '10.0.3.67'，hostname 为 'backup-srv-02'，department 为 '运维部'，business_system 为 '数据备份服务器'，tags 数组包含 'automated-job'，与陈述完全一致。"
+          },
+          {
+            "statement": "威胁情报显示 IP 10.0.3.67 信誉分 100，备注明确说明该服务器每日 18:00 定时拉取归档",
+            "verdict": "verifiable",
+            "reason": "证据 query_threat_intel_ip_10.0.3.67 中 reputation_score 为 100，raw_intel 内容为 'Internal backup server, scheduled to pull archives from file shares daily at 18:00.'，与陈述完全一致。"
+          },
+          {
+            "statement": "关联告警显示同一 IP 在 18:00:05Z 启动了名为 NightlyFinanceBackup 的计划任务，与 DLP 告警时间高度一致",
+            "verdict": "verifiable",
+            "reason": "证据 query_related_alerts_10.0.3.67_48h 中 related_alerts 列表包含 alert_id 'A13-REL-01'，summary 为 "
+          }
+        ]
+      },
+      "raw_text": "{\n  \"total_statements\": 4,\n  \"verifiable\": 4,\n  \"hallucinations\": 0,\n  \"uncertain\": 0,\n  \"details\": [\n    {\n      \"statement\": \"DLP 告警详情显示用户 zhang.san 在 2026-07-14T18:00:45Z 从 \\\\10.0.4.20\\finance_archive 下载 15GB 数据\",\n      \"verdict\": \"verifiable\",\n      \"reason\": \"证据 query_alert_detail_A13 中的 raw_log 字段明确记录 'User zhang.san from 10.0.3.67 downloaded 15GB from share \\\\10.0.4.20\\finance_archive'，且 timestamp 为 '2026-07-14T18:00:45Z'，与陈述完全一致。\"\n    },\n    {\n      \"statement\": \"资产信息确认源 IP 10.0.3.67 属于运维部数据备份服务器 backup-srv-02，标签包含 automated-job\",\n      \"verdict\": \"verifiable\",\n      \"reason\": \"证据 query_asset_info_10.0.3.67 中 ip 为 '10.0.3.67'，hostname 为 'backup-srv-02'，department 为 '运维部'，business_system 为 '数据备份服务器'，tags 数组包含 'automated-job'，与陈述完全一致。\"\n    },\n    {\n      \"statement\": \"威胁情报显示 IP 10.0.3.67 信誉分 100，备注明确说明该服务器每日 18:00 定时拉取归档\",\n      \"verdict\": \"verifiable\",\n      \"reason\": \"证据 query_threat_intel_ip_10.0.3.67 中 reputation_score 为 100，raw_intel 内容为 'Internal backup server, scheduled to pull archives from file shares daily at 18:00.'，与陈述完全一致。\"\n    },\n    {\n      \"statement\": \"关联告警显示同一 IP 在 18:00:05Z 启动了名为 NightlyFinanceBackup 的计划任务，与 DLP 告警时间高度一致\",\n      \"verdict\": \"verifiable\",\n      \"reason\": \"证据 query_related_alerts_10.0.3.67_48h 中 related_alerts 列表包含 alert_id 'A13-REL-01'，summary 为 \"  \t}\n    ]\n  }",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1466,
+      "output_tokens": 605,
+      "latency_ms": 6051,
+      "attempts": 1
+    }
+  ],
+  "overall_pass": true,
+  "error_type": null,
+  "error_message": null
+}

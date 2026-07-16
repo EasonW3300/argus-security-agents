@@ -1,0 +1,312 @@
+{
+  "test_case_id": "A22",
+  "scenario": "Web 应用安全扫描器触发大量探测告警（误报）",
+  "difficulty": "medium",
+  "is_positive": false,
+  "expected_severity": "false_positive",
+  "status": "completed",
+  "agent_output": {
+    "alert_id": "A22",
+    "judgment": {
+      "severity": "false_positive",
+      "attack_type": "Authorized Vulnerability Scanning",
+      "confidence": 0.95,
+      "summary": "Detected SQLi/XSS signatures originate from authorized internal AppScan scanner (10.0.5.110). Asset info and threat intelligence confirm this is legitimate security operations activity, not malicious attack.",
+      "evidence_chain": [
+        "WAF alert details show SQL injection and XSS vectors from source IP 10.0.5.110 (query_alert_detail)",
+        "Asset information confirms 10.0.5.110 is hostname appsec-scanner-01, department InfoSec, tagged as scanner and authorized (query_asset_info)",
+        "Threat intelligence indicates IP 10.0.5.110 is not malicious with reputation score 100 and source Internal (query_threat_intel)",
+        "No related malicious alerts found in 48h window indicating isolated scanning activity (query_related_alerts)"
+      ],
+      "iocs": [
+        {
+          "type": "ip",
+          "value": "10.0.5.110",
+          "malicious": false,
+          "context": "Authorized internal AppScan scanner confirmed by asset and threat intel"
+        }
+      ]
+    },
+    "remediation": [
+      "Add IP 10.0.5.110 to WAF whitelist or create exclusion rule for vulnerability scanning signatures to suppress future alerts.",
+      "Verify current scan scope and schedule with InfoSec department owner (appsec@company.com) to ensure alignment with business policy.",
+      "Update asset inventory tags to automatically classify traffic from this IP as trusted in SIEM/WAF correlation rules."
+    ],
+    "metadata": {
+      "tools_called": [
+        "query_alert_detail",
+        "query_asset_info",
+        "query_threat_intel",
+        "query_related_alerts"
+      ]
+    }
+  },
+  "code_graders": {
+    "tools_called_minimum": {
+      "passed": true,
+      "reason": "required tools present",
+      "expected": [
+        "query_alert_detail",
+        "query_asset_info"
+      ],
+      "actual": [
+        "query_alert_detail",
+        "query_asset_info",
+        "query_threat_intel",
+        "query_related_alerts"
+      ]
+    },
+    "output_schema": {
+      "passed": true,
+      "reason": "required fields present",
+      "expected": null,
+      "actual": null
+    },
+    "severity_enum": {
+      "passed": true,
+      "reason": "severity is valid",
+      "expected": [
+        "critical",
+        "false_positive",
+        "high",
+        "low",
+        "medium"
+      ],
+      "actual": "false_positive"
+    },
+    "severity_match": {
+      "passed": true,
+      "reason": "severity matches",
+      "expected": "false_positive",
+      "actual": "false_positive"
+    },
+    "confidence_range": {
+      "passed": true,
+      "reason": "confidence in range",
+      "expected": "0..1",
+      "actual": 0.95
+    },
+    "remediation_not_empty": {
+      "passed": true,
+      "reason": "remediation actionable",
+      "expected": "at least one item >=10 chars",
+      "actual": [
+        "Add IP 10.0.5.110 to WAF whitelist or create exclusion rule for vulnerability scanning signatures to suppress future alerts.",
+        "Verify current scan scope and schedule with InfoSec department owner (appsec@company.com) to ensure alignment with business policy.",
+        "Update asset inventory tags to automatically classify traffic from this IP as trusted in SIEM/WAF correlation rules."
+      ]
+    }
+  },
+  "quality_scores": {
+    "severity_rationality": {
+      "score": 5,
+      "reason": "Agent correctly identified the activity as an authorized vulnerability scan by cross-referencing WAF alerts with asset inventory and threat intelligence. The evidence chain logically connects the malicious-looking payloads (SQLi/XSS) to a known internal scanner (10.0.5.110) tagged as 'authorized' and confirmed non-malicious by threat intel, leading to the accurate classification of 'false_positive'.",
+      "evidence_quotes": [
+        "WAF alert details show SQL injection and XSS vectors from source IP 10.0.5.110",
+        "Asset information confirms 10.0.5.110 is hostname appsec-scanner-01, department InfoSec, tagged as scanner and authorized",
+        "Threat intelligence indicates IP 10.0.5.110 is not malicious with reputation score 100 and source Internal",
+        "No related malicious alerts found in 48h window indicating isolated scanning activity"
+      ]
+    },
+    "remediation_actionability": {
+      "score": 5,
+      "reason": "处置建议具体、可执行且逻辑清晰。建议1直接针对误报源（IP 10.0.5.110）提出白名单或排除规则，解决告警噪音；建议2要求与资产所有者（appsec@company.com）确认扫描范围，确保业务合规；建议3提出更新资产标签以优化自动化关联规则，从长期机制上解决问题。所有建议均基于证据链中确认的'authorized scanner'身份和'InfoSec department'归属，优先级排列合理（先抑制当前告警，再验证策略，最后优化系统）。",
+      "evidence_quotes": [
+        "Add IP 10.0.5.110 to WAF whitelist or create exclusion rule for vulnerability scanning signatures to suppress future alerts.",
+        "Verify current scan scope and schedule with InfoSec department owner (appsec@company.com) to ensure alignment with business policy.",
+        "Update asset inventory tags to automatically classify traffic from this IP as trusted in SIEM/WAF correlation rules."
+      ]
+    },
+    "evidence_completeness": {
+      "score": 5,
+      "reason": "证据链完整覆盖了关键 IOC（IP 10.0.5.110）及其行为特征。通过 query_alert_detail 确认了攻击载荷（SQLi/XSS），通过 query_asset_info 和 query_threat_intel 证实了该 IP 为内部授权扫描器且信誉良好，最后通过 query_related_alerts 排除了持续性恶意活动。所有结论均有明确的 API 响应数据支撑，逻辑闭环。",
+      "evidence_quotes": [
+        "From 10.0.5.110: numerous requests with SQLi and XSS payloads to various .com domains.",
+        "hostname: appsec-scanner-01, department: 信息安全部, tags: [scanner, authorized]",
+        "is_malicious: false, reputation_score: 100, source: Internal",
+        "related_alerts: [], total_related: 0"
+      ]
+    }
+  },
+  "hallucination": {
+    "total_statements": 4,
+    "verifiable": 4,
+    "hallucinations": 0,
+    "uncertain": 0,
+    "details": [
+      {
+        "statement": "WAF alert details show SQL injection and XSS vectors from source IP 10.0.5.110",
+        "verdict": "verifiable",
+        "reason": "Supported by mock_api_responses.query_alert_detail_A22 which lists 'SQL injection attempt', 'XSS vectors' in payload_highlights and 'source_ip': '10.0.5.110'."
+      },
+      {
+        "statement": "Asset information confirms 10.0.5.110 is hostname appsec-scanner-01, department InfoSec, tagged as scanner and authorized",
+        "verdict": "verifiable",
+        "reason": "Supported by mock_api_responses.query_asset_info_10.0.5.110 which shows 'hostname': 'appsec-scanner-01', 'department': '信息安全部' (InfoSec), 'is_scanner': true, and 'tags': ['scanner', 'appsec', 'authorized']."
+      },
+      {
+        "statement": "Threat intelligence indicates IP 10.0.5.110 is not malicious with reputation score 100 and source Internal",
+        "verdict": "verifiable",
+        "reason": "Supported by mock_api_responses.query_threat_intel_ip_10.0.5.110 which shows 'is_malicious': false, 'reputation_score': 100, and 'source': 'Internal'."
+      },
+      {
+        "statement": "No related malicious alerts found in 48h window indicating isolated scanning activity",
+        "verdict": "verifiable",
+        "reason": "Supported by mock_api_responses.query_related_alerts_10.0.5.110_48h which returns 'related_alerts': [] and 'total_related': 0 for the specified time window."
+      }
+    ]
+  },
+  "calls": [
+    {
+      "label": "agent",
+      "parsed": {
+        "alert_id": "A22",
+        "judgment": {
+          "severity": "false_positive",
+          "attack_type": "Authorized Vulnerability Scanning",
+          "confidence": 0.95,
+          "summary": "Detected SQLi/XSS signatures originate from authorized internal AppScan scanner (10.0.5.110). Asset info and threat intelligence confirm this is legitimate security operations activity, not malicious attack.",
+          "evidence_chain": [
+            "WAF alert details show SQL injection and XSS vectors from source IP 10.0.5.110 (query_alert_detail)",
+            "Asset information confirms 10.0.5.110 is hostname appsec-scanner-01, department InfoSec, tagged as scanner and authorized (query_asset_info)",
+            "Threat intelligence indicates IP 10.0.5.110 is not malicious with reputation score 100 and source Internal (query_threat_intel)",
+            "No related malicious alerts found in 48h window indicating isolated scanning activity (query_related_alerts)"
+          ],
+          "iocs": [
+            {
+              "type": "ip",
+              "value": "10.0.5.110",
+              "malicious": false,
+              "context": "Authorized internal AppScan scanner confirmed by asset and threat intel"
+            }
+          ]
+        },
+        "remediation": [
+          "Add IP 10.0.5.110 to WAF whitelist or create exclusion rule for vulnerability scanning signatures to suppress future alerts.",
+          "Verify current scan scope and schedule with InfoSec department owner (appsec@company.com) to ensure alignment with business policy.",
+          "Update asset inventory tags to automatically classify traffic from this IP as trusted in SIEM/WAF correlation rules."
+        ],
+        "metadata": {
+          "tools_called": [
+            "query_alert_detail",
+            "query_asset_info",
+            "query_threat_intel",
+            "query_related_alerts"
+          ]
+        }
+      },
+      "raw_text": "{\n  \"alert_id\": \"A22\",\n  \"judgment\": {\n    \"severity\": \"false_positive\",\n    \"attack_type\": \"Authorized Vulnerability Scanning\",\n    \"confidence\": 0.95,\n    \"summary\": \"Detected SQLi/XSS signatures originate from authorized internal AppScan scanner (10.0.5.110). Asset info and threat intelligence confirm this is legitimate security operations activity, not malicious attack.\",\n    \"evidence_chain\": [\n      \"WAF alert details show SQL injection and XSS vectors from source IP 10.0.5.110 (query_alert_detail)\",\n      \"Asset information confirms 10.0.5.110 is hostname appsec-scanner-01, department InfoSec, tagged as scanner and authorized (query_asset_info)\",\n      \"Threat intelligence indicates IP 10.0.5.110 is not malicious with reputation score 100 and source Internal (query_threat_intel)\",\n      \"No related malicious alerts found in 48h window indicating isolated scanning activity (query_related_alerts)\"\n    ],\n    \"iocs\": [\n      {\n        \"type\": \"ip\",\n        \"value\": \"10.0.5.110\",\n        \"malicious\": false,\n        \"context\": \"Authorized internal AppScan scanner confirmed by asset and threat intel\"\n      }\n    ]\n  },\n  \"remediation\": [\n    \"Add IP 10.0.5.110 to WAF whitelist or create exclusion rule for vulnerability scanning signatures to suppress future alerts.\",\n    \"Verify current scan scope and schedule with InfoSec department owner (appsec@company.com) to ensure alignment with business policy.\",\n    \"Update asset inventory tags to automatically classify traffic from this IP as trusted in SIEM/WAF correlation rules.\"\n  ],\n  \"metadata\": {\n    \"tools_called\": [\n      \"query_alert_detail\",\n      \"query_asset_info\",\n      \"query_threat_intel\",\n      \"query_related_alerts\"\n    ]\n  }\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 933,
+      "output_tokens": 3323,
+      "latency_ms": 35670,
+      "attempts": 1
+    },
+    {
+      "label": "severity_rationality",
+      "parsed": {
+        "score": 5,
+        "reason": "Agent correctly identified the activity as an authorized vulnerability scan by cross-referencing WAF alerts with asset inventory and threat intelligence. The evidence chain logically connects the malicious-looking payloads (SQLi/XSS) to a known internal scanner (10.0.5.110) tagged as 'authorized' and confirmed non-malicious by threat intel, leading to the accurate classification of 'false_positive'.",
+        "evidence_quotes": [
+          "WAF alert details show SQL injection and XSS vectors from source IP 10.0.5.110",
+          "Asset information confirms 10.0.5.110 is hostname appsec-scanner-01, department InfoSec, tagged as scanner and authorized",
+          "Threat intelligence indicates IP 10.0.5.110 is not malicious with reputation score 100 and source Internal",
+          "No related malicious alerts found in 48h window indicating isolated scanning activity"
+        ]
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"Agent correctly identified the activity as an authorized vulnerability scan by cross-referencing WAF alerts with asset inventory and threat intelligence. The evidence chain logically connects the malicious-looking payloads (SQLi/XSS) to a known internal scanner (10.0.5.110) tagged as 'authorized' and confirmed non-malicious by threat intel, leading to the accurate classification of 'false_positive'.\",\n  \"evidence_quotes\": [\n    \"WAF alert details show SQL injection and XSS vectors from source IP 10.0.5.110\",\n    \"Asset information confirms 10.0.5.110 is hostname appsec-scanner-01, department InfoSec, tagged as scanner and authorized\",\n    \"Threat intelligence indicates IP 10.0.5.110 is not malicious with reputation score 100 and source Internal\",\n    \"No related malicious alerts found in 48h window indicating isolated scanning activity\"\n  ]\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1239,
+      "output_tokens": 228,
+      "latency_ms": 2742,
+      "attempts": 1
+    },
+    {
+      "label": "remediation_actionability",
+      "parsed": {
+        "score": 5,
+        "reason": "处置建议具体、可执行且逻辑清晰。建议1直接针对误报源（IP 10.0.5.110）提出白名单或排除规则，解决告警噪音；建议2要求与资产所有者（appsec@company.com）确认扫描范围，确保业务合规；建议3提出更新资产标签以优化自动化关联规则，从长期机制上解决问题。所有建议均基于证据链中确认的'authorized scanner'身份和'InfoSec department'归属，优先级排列合理（先抑制当前告警，再验证策略，最后优化系统）。",
+        "evidence_quotes": [
+          "Add IP 10.0.5.110 to WAF whitelist or create exclusion rule for vulnerability scanning signatures to suppress future alerts.",
+          "Verify current scan scope and schedule with InfoSec department owner (appsec@company.com) to ensure alignment with business policy.",
+          "Update asset inventory tags to automatically classify traffic from this IP as trusted in SIEM/WAF correlation rules."
+        ]
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"处置建议具体、可执行且逻辑清晰。建议1直接针对误报源（IP 10.0.5.110）提出白名单或排除规则，解决告警噪音；建议2要求与资产所有者（appsec@company.com）确认扫描范围，确保业务合规；建议3提出更新资产标签以优化自动化关联规则，从长期机制上解决问题。所有建议均基于证据链中确认的'authorized scanner'身份和'InfoSec department'归属，优先级排列合理（先抑制当前告警，再验证策略，最后优化系统）。\",\n  \"evidence_quotes\": [\n    \"Add IP 10.0.5.110 to WAF whitelist or create exclusion rule for vulnerability scanning signatures to suppress future alerts.\",\n    \"Verify current scan scope and schedule with InfoSec department owner (appsec@company.com) to ensure alignment with business policy.\",\n    \"Update asset inventory tags to automatically classify traffic from this IP as trusted in SIEM/WAF correlation rules.\"\n  ]\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1242,
+      "output_tokens": 236,
+      "latency_ms": 2973,
+      "attempts": 1
+    },
+    {
+      "label": "evidence_completeness",
+      "parsed": {
+        "score": 5,
+        "reason": "证据链完整覆盖了关键 IOC（IP 10.0.5.110）及其行为特征。通过 query_alert_detail 确认了攻击载荷（SQLi/XSS），通过 query_asset_info 和 query_threat_intel 证实了该 IP 为内部授权扫描器且信誉良好，最后通过 query_related_alerts 排除了持续性恶意活动。所有结论均有明确的 API 响应数据支撑，逻辑闭环。",
+        "evidence_quotes": [
+          "From 10.0.5.110: numerous requests with SQLi and XSS payloads to various .com domains.",
+          "hostname: appsec-scanner-01, department: 信息安全部, tags: [scanner, authorized]",
+          "is_malicious: false, reputation_score: 100, source: Internal",
+          "related_alerts: [], total_related: 0"
+        ]
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"证据链完整覆盖了关键 IOC（IP 10.0.5.110）及其行为特征。通过 query_alert_detail 确认了攻击载荷（SQLi/XSS），通过 query_asset_info 和 query_threat_intel 证实了该 IP 为内部授权扫描器且信誉良好，最后通过 query_related_alerts 排除了持续性恶意活动。所有结论均有明确的 API 响应数据支撑，逻辑闭环。\",\n  \"evidence_quotes\": [\n    \"From 10.0.5.110: numerous requests with SQLi and XSS payloads to various .com domains.\",\n    \"hostname: appsec-scanner-01, department: 信息安全部, tags: [scanner, authorized]\",\n    \"is_malicious: false, reputation_score: 100, source: Internal\",\n    \"related_alerts: [], total_related: 0\"\n  ]\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1242,
+      "output_tokens": 212,
+      "latency_ms": 3214,
+      "attempts": 1
+    },
+    {
+      "label": "hallucination_check",
+      "parsed": {
+        "total_statements": 4,
+        "verifiable": 4,
+        "hallucinations": 0,
+        "uncertain": 0,
+        "details": [
+          {
+            "statement": "WAF alert details show SQL injection and XSS vectors from source IP 10.0.5.110",
+            "verdict": "verifiable",
+            "reason": "Supported by mock_api_responses.query_alert_detail_A22 which lists 'SQL injection attempt', 'XSS vectors' in payload_highlights and 'source_ip': '10.0.5.110'."
+          },
+          {
+            "statement": "Asset information confirms 10.0.5.110 is hostname appsec-scanner-01, department InfoSec, tagged as scanner and authorized",
+            "verdict": "verifiable",
+            "reason": "Supported by mock_api_responses.query_asset_info_10.0.5.110 which shows 'hostname': 'appsec-scanner-01', 'department': '信息安全部' (InfoSec), 'is_scanner': true, and 'tags': ['scanner', 'appsec', 'authorized']."
+          },
+          {
+            "statement": "Threat intelligence indicates IP 10.0.5.110 is not malicious with reputation score 100 and source Internal",
+            "verdict": "verifiable",
+            "reason": "Supported by mock_api_responses.query_threat_intel_ip_10.0.5.110 which shows 'is_malicious': false, 'reputation_score': 100, and 'source': 'Internal'."
+          },
+          {
+            "statement": "No related malicious alerts found in 48h window indicating isolated scanning activity",
+            "verdict": "verifiable",
+            "reason": "Supported by mock_api_responses.query_related_alerts_10.0.5.110_48h which returns 'related_alerts': [] and 'total_related': 0 for the specified time window."
+          }
+        ]
+      },
+      "raw_text": "{\n  \"total_statements\": 4,\n  \"verifiable\": 4,\n  \"hallucinations\": 0,\n  \"uncertain\": 0,\n  \"details\": [\n    {\n      \"statement\": \"WAF alert details show SQL injection and XSS vectors from source IP 10.0.5.110\",\n      \"verdict\": \"verifiable\",\n      \"reason\": \"Supported by mock_api_responses.query_alert_detail_A22 which lists 'SQL injection attempt', 'XSS vectors' in payload_highlights and 'source_ip': '10.0.5.110'.\"\n    },\n    {\n      \"statement\": \"Asset information confirms 10.0.5.110 is hostname appsec-scanner-01, department InfoSec, tagged as scanner and authorized\",\n      \"verdict\": \"verifiable\",\n      \"reason\": \"Supported by mock_api_responses.query_asset_info_10.0.5.110 which shows 'hostname': 'appsec-scanner-01', 'department': '信息安全部' (InfoSec), 'is_scanner': true, and 'tags': ['scanner', 'appsec', 'authorized'].\"\n    },\n    {\n      \"statement\": \"Threat intelligence indicates IP 10.0.5.110 is not malicious with reputation score 100 and source Internal\",\n      \"verdict\": \"verifiable\",\n      \"reason\": \"Supported by mock_api_responses.query_threat_intel_ip_10.0.5.110 which shows 'is_malicious': false, 'reputation_score': 100, and 'source': 'Internal'.\"\n    },\n    {\n      \"statement\": \"No related malicious alerts found in 48h window indicating isolated scanning activity\",\n      \"verdict\": \"verifiable\",\n      \"reason\": \"Supported by mock_api_responses.query_related_alerts_10.0.5.110_48h which returns 'related_alerts': [] and 'total_related': 0 for the specified time window.\"\n    }\n  ]\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1273,
+      "output_tokens": 472,
+      "latency_ms": 4888,
+      "attempts": 1
+    }
+  ],
+  "overall_pass": true,
+  "error_type": null,
+  "error_message": null
+}

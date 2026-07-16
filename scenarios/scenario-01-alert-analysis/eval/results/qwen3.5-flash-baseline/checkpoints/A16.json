@@ -1,0 +1,314 @@
+{
+  "test_case_id": "A16",
+  "scenario": "VPN 登录地点异常，但为员工出差使用个人设备（误报）",
+  "difficulty": "medium",
+  "is_positive": false,
+  "expected_severity": "false_positive",
+  "status": "completed",
+  "agent_output": {
+    "alert_id": "A16",
+    "judgment": {
+      "severity": "false_positive",
+      "attack_type": "False Positive - Authorized Business Travel",
+      "confidence": 0.9,
+      "summary": "VPN login triggered Impossible Travel rule, but Threat Intel confirms IP belongs to a hotel in Singapore where employee alice is on an authorized business trip per HR records.",
+      "evidence_chain": [
+        "Alert raw_log shows VPN user alice authenticated from 203.0.113.55 (SG) while previous login was 2 hours ago from office.",
+        "Threat Intel source 'Internal Travel Notification' states IP is known hotel Wi-Fi in Singapore where employee alice is on business trip.",
+        "Threat Intel field 'is_malicious' is false with reputation_score 90.",
+        "Query related alerts returned empty list within 48h window."
+      ],
+      "iocs": [
+        {
+          "type": "ip",
+          "value": "203.0.113.55",
+          "malicious": false,
+          "context": "Known hotel Wi-Fi in Singapore, authorized business trip per HR"
+        }
+      ]
+    },
+    "remediation": [
+      "Close alert as false positive based on HR travel confirmation in threat intelligence.",
+      "Notify user alice to ensure future travel notifications are updated in HR system to prevent recurrence.",
+      "Review SIEM rule thresholds for impossible travel to account for verified business travel scenarios."
+    ],
+    "metadata": {
+      "tools_called": [
+        "query_alert_detail",
+        "query_asset_info",
+        "query_threat_intel",
+        "query_related_alerts"
+      ]
+    }
+  },
+  "code_graders": {
+    "tools_called_minimum": {
+      "passed": true,
+      "reason": "required tools present",
+      "expected": [
+        "query_alert_detail",
+        "query_threat_intel"
+      ],
+      "actual": [
+        "query_alert_detail",
+        "query_asset_info",
+        "query_threat_intel",
+        "query_related_alerts"
+      ]
+    },
+    "output_schema": {
+      "passed": true,
+      "reason": "required fields present",
+      "expected": null,
+      "actual": null
+    },
+    "severity_enum": {
+      "passed": true,
+      "reason": "severity is valid",
+      "expected": [
+        "critical",
+        "false_positive",
+        "high",
+        "low",
+        "medium"
+      ],
+      "actual": "false_positive"
+    },
+    "severity_match": {
+      "passed": true,
+      "reason": "severity matches",
+      "expected": "false_positive",
+      "actual": "false_positive"
+    },
+    "confidence_range": {
+      "passed": true,
+      "reason": "confidence in range",
+      "expected": "0..1",
+      "actual": 0.9
+    },
+    "remediation_not_empty": {
+      "passed": true,
+      "reason": "remediation actionable",
+      "expected": "at least one item >=10 chars",
+      "actual": [
+        "Close alert as false positive based on HR travel confirmation in threat intelligence.",
+        "Notify user alice to ensure future travel notifications are updated in HR system to prevent recurrence.",
+        "Review SIEM rule thresholds for impossible travel to account for verified business travel scenarios."
+      ]
+    }
+  },
+  "quality_scores": {
+    "severity_rationality": {
+      "score": 5,
+      "reason": "Agent correctly identified the alert as a false positive. The evidence chain logically connects the 'Impossible Travel' trigger (2 hours between office and Singapore) with external validation from Threat Intel ('Internal Travel Notification') confirming the IP belongs to a hotel where the employee is on an authorized business trip. The agent also verified the IP reputation (non-malicious) and lack of related alerts, leading to a justified conclusion supported by specific data points in the mock API responses.",
+      "evidence_quotes": [
+        "Alert raw_log shows VPN user alice authenticated from 203.0.113.55 (SG) while previous login was 2 hours ago from office.",
+        "Threat Intel source 'Internal Travel Notification' states IP is known hotel Wi-Fi in Singapore where employee alice is on business trip.",
+        "Threat Intel field 'is_malicious' is false with reputation_score 90.",
+        "Query related alerts returned empty list within 48h window."
+      ]
+    },
+    "remediation_actionability": {
+      "score": 5,
+      "reason": "处置建议具体、可执行且逻辑清晰。第一条直接基于证据（HR 记录）关闭误报；第二条针对根本原因（员工未更新 HR 系统）提出预防措施；第三条从规则层面优化以平衡安全与业务需求，完全符合优先级排列要求。",
+      "evidence_quotes": [
+        "Close alert as false positive based on HR travel confirmation in threat intelligence.",
+        "Notify user alice to ensure future travel notifications are updated in HR system to prevent recurrence.",
+        "Review SIEM rule thresholds for impossible travel to account for verified business travel scenarios."
+      ]
+    },
+    "evidence_completeness": {
+      "score": 5,
+      "reason": "证据链完整覆盖了关键 IOC（IP 203.0.113.55）与行为特征（Impossible Travel）。原始日志确认了异常登录行为，威胁情报明确将该 IP 关联至授权出差的已知酒店 Wi-Fi 并标记为非恶意，且无相关历史告警佐证攻击性。所有结论均有明确的 API 响应和日志引用支持。",
+      "evidence_quotes": [
+        "raw_log: 'VPN user alice authenticated from 203.0.113.55 (SG) while previous login was 2 hours ago from 10.0.3.0/24 (office).'",
+        "payload_highlights: 'impossible travel: office to Singapore in 2 hours'",
+        "query_threat_intel_ip_203.0.113.55 raw_intel: 'This IP is a known hotel Wi-Fi in Singapore where employee alice is on business trip as per HR record.'",
+        "query_threat_intel_ip_203.0.113.55 is_malicious: false",
+        "query_related_alerts_203.0.113.55_48h related_alerts: []"
+      ]
+    }
+  },
+  "hallucination": {
+    "total_statements": 4,
+    "verifiable": 4,
+    "hallucinations": 0,
+    "uncertain": 0,
+    "details": [
+      {
+        "statement": "Alert raw_log shows VPN user alice authenticated from 203.0.113.55 (SG) while previous login was 2 hours ago from office.",
+        "verdict": "verifiable",
+        "reason": "Supported by mock_api_responses.query_alert_detail_A16.raw_log which states: 'VPN user alice authenticated from 203.0.113.55 (SG) while previous login was 2 hours ago from 10.0.3.0/24 (office).'"
+      },
+      {
+        "statement": "Threat Intel source 'Internal Travel Notification' states IP is known hotel Wi-Fi in Singapore where employee alice is on business trip.",
+        "verdict": "verifiable",
+        "reason": "Supported by mock_api_responses.query_threat_intel_ip_203.0.113.55.source ('Internal Travel Notification') and raw_intel ('This IP is a known hotel Wi-Fi in Singapore where employee alice is on business trip as per HR record.') and geo_location ('SG')."
+      },
+      {
+        "statement": "Threat Intel field 'is_malicious' is false with reputation_score 90.",
+        "verdict": "verifiable",
+        "reason": "Supported by mock_api_responses.query_threat_intel_ip_203.0.113.55.is_malicious (false) and reputation_score (90)."
+      },
+      {
+        "statement": "Query related alerts returned empty list within 48h window.",
+        "verdict": "verifiable",
+        "reason": "Supported by mock_api_responses.query_related_alerts_203.0.113.55_48h.related_alerts ([]), total_related (0), and query_params.time_window_hours (48)."
+      }
+    ]
+  },
+  "calls": [
+    {
+      "label": "agent",
+      "parsed": {
+        "alert_id": "A16",
+        "judgment": {
+          "severity": "false_positive",
+          "attack_type": "False Positive - Authorized Business Travel",
+          "confidence": 0.9,
+          "summary": "VPN login triggered Impossible Travel rule, but Threat Intel confirms IP belongs to a hotel in Singapore where employee alice is on an authorized business trip per HR records.",
+          "evidence_chain": [
+            "Alert raw_log shows VPN user alice authenticated from 203.0.113.55 (SG) while previous login was 2 hours ago from office.",
+            "Threat Intel source 'Internal Travel Notification' states IP is known hotel Wi-Fi in Singapore where employee alice is on business trip.",
+            "Threat Intel field 'is_malicious' is false with reputation_score 90.",
+            "Query related alerts returned empty list within 48h window."
+          ],
+          "iocs": [
+            {
+              "type": "ip",
+              "value": "203.0.113.55",
+              "malicious": false,
+              "context": "Known hotel Wi-Fi in Singapore, authorized business trip per HR"
+            }
+          ]
+        },
+        "remediation": [
+          "Close alert as false positive based on HR travel confirmation in threat intelligence.",
+          "Notify user alice to ensure future travel notifications are updated in HR system to prevent recurrence.",
+          "Review SIEM rule thresholds for impossible travel to account for verified business travel scenarios."
+        ],
+        "metadata": {
+          "tools_called": [
+            "query_alert_detail",
+            "query_asset_info",
+            "query_threat_intel",
+            "query_related_alerts"
+          ]
+        }
+      },
+      "raw_text": "{\n  \"alert_id\": \"A16\",\n  \"judgment\": {\n    \"severity\": \"false_positive\",\n    \"attack_type\": \"False Positive - Authorized Business Travel\",\n    \"confidence\": 0.9,\n    \"summary\": \"VPN login triggered Impossible Travel rule, but Threat Intel confirms IP belongs to a hotel in Singapore where employee alice is on an authorized business trip per HR records.\",\n    \"evidence_chain\": [\n      \"Alert raw_log shows VPN user alice authenticated from 203.0.113.55 (SG) while previous login was 2 hours ago from office.\",\n      \"Threat Intel source 'Internal Travel Notification' states IP is known hotel Wi-Fi in Singapore where employee alice is on business trip.\",\n      \"Threat Intel field 'is_malicious' is false with reputation_score 90.\",\n      \"Query related alerts returned empty list within 48h window.\"\n    ],\n    \"iocs\": [\n      {\n        \"type\": \"ip\",\n        \"value\": \"203.0.113.55\",\n        \"malicious\": false,\n        \"context\": \"Known hotel Wi-Fi in Singapore, authorized business trip per HR\"\n      }\n    ]\n  },\n  \"remediation\": [\n    \"Close alert as false positive based on HR travel confirmation in threat intelligence.\",\n    \"Notify user alice to ensure future travel notifications are updated in HR system to prevent recurrence.\",\n    \"Review SIEM rule thresholds for impossible travel to account for verified business travel scenarios.\"\n  ],\n  \"metadata\": {\n    \"tools_called\": [\n      \"query_alert_detail\",\n      \"query_asset_info\",\n      \"query_threat_intel\",\n      \"query_related_alerts\"\n    ]\n  }\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 953,
+      "output_tokens": 2996,
+      "latency_ms": 32969,
+      "attempts": 1
+    },
+    {
+      "label": "severity_rationality",
+      "parsed": {
+        "score": 5,
+        "reason": "Agent correctly identified the alert as a false positive. The evidence chain logically connects the 'Impossible Travel' trigger (2 hours between office and Singapore) with external validation from Threat Intel ('Internal Travel Notification') confirming the IP belongs to a hotel where the employee is on an authorized business trip. The agent also verified the IP reputation (non-malicious) and lack of related alerts, leading to a justified conclusion supported by specific data points in the mock API responses.",
+        "evidence_quotes": [
+          "Alert raw_log shows VPN user alice authenticated from 203.0.113.55 (SG) while previous login was 2 hours ago from office.",
+          "Threat Intel source 'Internal Travel Notification' states IP is known hotel Wi-Fi in Singapore where employee alice is on business trip.",
+          "Threat Intel field 'is_malicious' is false with reputation_score 90.",
+          "Query related alerts returned empty list within 48h window."
+        ]
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"Agent correctly identified the alert as a false positive. The evidence chain logically connects the 'Impossible Travel' trigger (2 hours between office and Singapore) with external validation from Threat Intel ('Internal Travel Notification') confirming the IP belongs to a hotel where the employee is on an authorized business trip. The agent also verified the IP reputation (non-malicious) and lack of related alerts, leading to a justified conclusion supported by specific data points in the mock API responses.\",\n  \"evidence_quotes\": [\n    \"Alert raw_log shows VPN user alice authenticated from 203.0.113.55 (SG) while previous login was 2 hours ago from office.\",\n    \"Threat Intel source 'Internal Travel Notification' states IP is known hotel Wi-Fi in Singapore where employee alice is on business trip.\",\n    \"Threat Intel field 'is_malicious' is false with reputation_score 90.\",\n    \"Query related alerts returned empty list within 48h window.\"\n  ]\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1203,
+      "output_tokens": 226,
+      "latency_ms": 2750,
+      "attempts": 1
+    },
+    {
+      "label": "remediation_actionability",
+      "parsed": {
+        "score": 5,
+        "reason": "处置建议具体、可执行且逻辑清晰。第一条直接基于证据（HR 记录）关闭误报；第二条针对根本原因（员工未更新 HR 系统）提出预防措施；第三条从规则层面优化以平衡安全与业务需求，完全符合优先级排列要求。",
+        "evidence_quotes": [
+          "Close alert as false positive based on HR travel confirmation in threat intelligence.",
+          "Notify user alice to ensure future travel notifications are updated in HR system to prevent recurrence.",
+          "Review SIEM rule thresholds for impossible travel to account for verified business travel scenarios."
+        ]
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"处置建议具体、可执行且逻辑清晰。第一条直接基于证据（HR 记录）关闭误报；第二条针对根本原因（员工未更新 HR 系统）提出预防措施；第三条从规则层面优化以平衡安全与业务需求，完全符合优先级排列要求。\",\n  \"evidence_quotes\": [\n    \"Close alert as false positive based on HR travel confirmation in threat intelligence.\",\n    \"Notify user alice to ensure future travel notifications are updated in HR system to prevent recurrence.\",\n    \"Review SIEM rule thresholds for impossible travel to account for verified business travel scenarios.\"\n  ]\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1206,
+      "output_tokens": 141,
+      "latency_ms": 1901,
+      "attempts": 1
+    },
+    {
+      "label": "evidence_completeness",
+      "parsed": {
+        "score": 5,
+        "reason": "证据链完整覆盖了关键 IOC（IP 203.0.113.55）与行为特征（Impossible Travel）。原始日志确认了异常登录行为，威胁情报明确将该 IP 关联至授权出差的已知酒店 Wi-Fi 并标记为非恶意，且无相关历史告警佐证攻击性。所有结论均有明确的 API 响应和日志引用支持。",
+        "evidence_quotes": [
+          "raw_log: 'VPN user alice authenticated from 203.0.113.55 (SG) while previous login was 2 hours ago from 10.0.3.0/24 (office).'",
+          "payload_highlights: 'impossible travel: office to Singapore in 2 hours'",
+          "query_threat_intel_ip_203.0.113.55 raw_intel: 'This IP is a known hotel Wi-Fi in Singapore where employee alice is on business trip as per HR record.'",
+          "query_threat_intel_ip_203.0.113.55 is_malicious: false",
+          "query_related_alerts_203.0.113.55_48h related_alerts: []"
+        ]
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"证据链完整覆盖了关键 IOC（IP 203.0.113.55）与行为特征（Impossible Travel）。原始日志确认了异常登录行为，威胁情报明确将该 IP 关联至授权出差的已知酒店 Wi-Fi 并标记为非恶意，且无相关历史告警佐证攻击性。所有结论均有明确的 API 响应和日志引用支持。\",\n  \"evidence_quotes\": [\n    \"raw_log: 'VPN user alice authenticated from 203.0.113.55 (SG) while previous login was 2 hours ago from 10.0.3.0/24 (office).'\",\n    \"payload_highlights: 'impossible travel: office to Singapore in 2 hours'\",\n    \"query_threat_intel_ip_203.0.113.55 raw_intel: 'This IP is a known hotel Wi-Fi in Singapore where employee alice is on business trip as per HR record.'\",\n    \"query_threat_intel_ip_203.0.113.55 is_malicious: false\",\n    \"query_related_alerts_203.0.113.55_48h related_alerts: []\"\n  ]\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1206,
+      "output_tokens": 291,
+      "latency_ms": 3258,
+      "attempts": 1
+    },
+    {
+      "label": "hallucination_check",
+      "parsed": {
+        "total_statements": 4,
+        "verifiable": 4,
+        "hallucinations": 0,
+        "uncertain": 0,
+        "details": [
+          {
+            "statement": "Alert raw_log shows VPN user alice authenticated from 203.0.113.55 (SG) while previous login was 2 hours ago from office.",
+            "verdict": "verifiable",
+            "reason": "Supported by mock_api_responses.query_alert_detail_A16.raw_log which states: 'VPN user alice authenticated from 203.0.113.55 (SG) while previous login was 2 hours ago from 10.0.3.0/24 (office).'"
+          },
+          {
+            "statement": "Threat Intel source 'Internal Travel Notification' states IP is known hotel Wi-Fi in Singapore where employee alice is on business trip.",
+            "verdict": "verifiable",
+            "reason": "Supported by mock_api_responses.query_threat_intel_ip_203.0.113.55.source ('Internal Travel Notification') and raw_intel ('This IP is a known hotel Wi-Fi in Singapore where employee alice is on business trip as per HR record.') and geo_location ('SG')."
+          },
+          {
+            "statement": "Threat Intel field 'is_malicious' is false with reputation_score 90.",
+            "verdict": "verifiable",
+            "reason": "Supported by mock_api_responses.query_threat_intel_ip_203.0.113.55.is_malicious (false) and reputation_score (90)."
+          },
+          {
+            "statement": "Query related alerts returned empty list within 48h window.",
+            "verdict": "verifiable",
+            "reason": "Supported by mock_api_responses.query_related_alerts_203.0.113.55_48h.related_alerts ([]), total_related (0), and query_params.time_window_hours (48)."
+          }
+        ]
+      },
+      "raw_text": "{\n  \"total_statements\": 4,\n  \"verifiable\": 4,\n  \"hallucinations\": 0,\n  \"uncertain\": 0,\n  \"details\": [\n    {\n      \"statement\": \"Alert raw_log shows VPN user alice authenticated from 203.0.113.55 (SG) while previous login was 2 hours ago from office.\",\n      \"verdict\": \"verifiable\",\n      \"reason\": \"Supported by mock_api_responses.query_alert_detail_A16.raw_log which states: 'VPN user alice authenticated from 203.0.113.55 (SG) while previous login was 2 hours ago from 10.0.3.0/24 (office).'\"\n    },\n    {\n      \"statement\": \"Threat Intel source 'Internal Travel Notification' states IP is known hotel Wi-Fi in Singapore where employee alice is on business trip.\",\n      \"verdict\": \"verifiable\",\n      \"reason\": \"Supported by mock_api_responses.query_threat_intel_ip_203.0.113.55.source ('Internal Travel Notification') and raw_intel ('This IP is a known hotel Wi-Fi in Singapore where employee alice is on business trip as per HR record.') and geo_location ('SG').\"\n    },\n    {\n      \"statement\": \"Threat Intel field 'is_malicious' is false with reputation_score 90.\",\n      \"verdict\": \"verifiable\",\n      \"reason\": \"Supported by mock_api_responses.query_threat_intel_ip_203.0.113.55.is_malicious (false) and reputation_score (90).\"\n    },\n    {\n      \"statement\": \"Query related alerts returned empty list within 48h window.\",\n      \"verdict\": \"verifiable\",\n      \"reason\": \"Supported by mock_api_responses.query_related_alerts_203.0.113.55_48h.related_alerts ([]), total_related (0), and query_params.time_window_hours (48).\"\n    }\n  ]\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1237,
+      "output_tokens": 466,
+      "latency_ms": 4948,
+      "attempts": 1
+    }
+  ],
+  "overall_pass": true,
+  "error_type": null,
+  "error_message": null
+}

@@ -1,0 +1,312 @@
+{
+  "test_case_id": "A05",
+  "scenario": "内部授权漏洞扫描器触发端口扫描告警（误报）",
+  "difficulty": "easy",
+  "is_positive": false,
+  "expected_severity": "false_positive",
+  "status": "completed",
+  "agent_output": {
+    "alert_id": "A05",
+    "judgment": {
+      "severity": "false_positive",
+      "attack_type": "Internal Port Scan (Authorized)",
+      "confidence": 0.95,
+      "summary": "经核查，告警源 IP 10.0.5.100 为安全运营部授权的漏洞扫描设备（sec-scanner-01），威胁情报确认其非恶意资产。该端口扫描行为属于正常的授权运维活动，判定为误报。",
+      "evidence_chain": [
+        "告警详情显示源 IP 10.0.5.100 对 10.0.1.0/24 网段进行 TCP 端口扫描。",
+        "资产信息查询确认 10.0.5.100 主机名为 sec-scanner-01，归属信息安全部，业务系统为内部漏洞扫描平台，且标签包含 authorized。",
+        "威胁情报查询显示该 IP 信誉分 100，is_malicious 为 false，备注明确说明是安全运营团队管理的授权漏扫资产。",
+        "关联告警查询在 48 小时内未发现其他相关异常行为。"
+      ],
+      "iocs": [
+        {
+          "type": "ip",
+          "value": "10.0.5.100",
+          "malicious": false,
+          "context": "授权漏洞扫描设备"
+        }
+      ]
+    },
+    "remediation": [
+      "1. 在 SIEM 中将此告警标记为误报并关闭。",
+      "2. 建议将 IP 10.0.5.100 加入检测规则白名单，避免重复告警。",
+      "3. 定期复核该扫描设备的任务计划，确保扫描范围符合授权策略。"
+    ],
+    "metadata": {
+      "tools_called": [
+        "query_alert_detail",
+        "query_asset_info",
+        "query_threat_intel",
+        "query_related_alerts"
+      ]
+    }
+  },
+  "code_graders": {
+    "tools_called_minimum": {
+      "passed": true,
+      "reason": "required tools present",
+      "expected": [
+        "query_alert_detail",
+        "query_asset_info"
+      ],
+      "actual": [
+        "query_alert_detail",
+        "query_asset_info",
+        "query_threat_intel",
+        "query_related_alerts"
+      ]
+    },
+    "output_schema": {
+      "passed": true,
+      "reason": "required fields present",
+      "expected": null,
+      "actual": null
+    },
+    "severity_enum": {
+      "passed": true,
+      "reason": "severity is valid",
+      "expected": [
+        "critical",
+        "false_positive",
+        "high",
+        "low",
+        "medium"
+      ],
+      "actual": "false_positive"
+    },
+    "severity_match": {
+      "passed": true,
+      "reason": "severity matches",
+      "expected": "false_positive",
+      "actual": "false_positive"
+    },
+    "confidence_range": {
+      "passed": true,
+      "reason": "confidence in range",
+      "expected": "0..1",
+      "actual": 0.95
+    },
+    "remediation_not_empty": {
+      "passed": true,
+      "reason": "remediation actionable",
+      "expected": "at least one item >=10 chars",
+      "actual": [
+        "1. 在 SIEM 中将此告警标记为误报并关闭。",
+        "2. 建议将 IP 10.0.5.100 加入检测规则白名单，避免重复告警。",
+        "3. 定期复核该扫描设备的任务计划，确保扫描范围符合授权策略。"
+      ]
+    }
+  },
+  "quality_scores": {
+    "severity_rationality": {
+      "score": 5,
+      "reason": "Agent 的判定逻辑严密，证据链完整且与结论高度一致。Agent 通过查询资产信息确认了源 IP 10.0.5.100 为授权的安全扫描设备（标签包含'authorized'），并通过威胁情报确认其信誉良好且非恶意。结合无关联异常告警的事实，Agent 正确地将原本标记为 'medium' 的端口扫描告警重新定性为 'false_positive'（误报），并给出了合理的处置建议。所有推理步骤均有对应的 API 响应数据作为支撑。",
+      "evidence_quotes": [
+        "asset_info: tags: ['scanner', 'authorized', 'security']",
+        "threat_intel: is_malicious: false, raw_intel: 'This IP is an internal asset managed by Security Operations team, used for authorized vulnerability scanning.'",
+        "related_alerts: total_related: 0",
+        "agent_output judgment: severity: 'false_positive'"
+      ]
+    },
+    "remediation_actionability": {
+      "score": 5,
+      "reason": "处置建议具体、可执行且逻辑清晰。首先针对当前告警进行闭环处理（标记误报），其次通过白名单机制解决重复告警问题，最后提出定期复核的长效管理措施。这三条建议按‘即时响应-规则优化-持续监控’的优先级排列，完全基于输入证据中确认的授权扫描行为。",
+      "evidence_quotes": [
+        "1. 在 SIEM 中将此告警标记为误报并关闭。",
+        "2. 建议将 IP 10.0.5.100 加入检测规则白名单，避免重复告警。",
+        "3. 定期复核该扫描设备的任务计划，确保扫描范围符合授权策略。"
+      ]
+    },
+    "evidence_completeness": {
+      "score": 5,
+      "reason": "证据链完整覆盖了关键 IOC（10.0.5.100）及其行为特征。通过告警详情确认了扫描行为，资产信息证实了该 IP 为授权的安全扫描设备（sec-scanner-01），威胁情报进一步验证了其非恶意属性及白名单状态，且无关联异常告警。所有结论均有明确的 API 响应数据支撑，逻辑闭环。",
+      "evidence_quotes": [
+        "raw_log: internal host 10.0.5.100 scanned 10.0.1.0/24 ports 1-1024",
+        "hostname: sec-scanner-01, business_system: 内部漏洞扫描平台, tags: [scanner, authorized, security]",
+        "is_malicious: false, reputation_score: 100, raw_intel: This IP is an internal asset managed by Security Operations team, used for authorized vulnerability scanning.",
+        "related_alerts: [], total_related: 0"
+      ]
+    }
+  },
+  "hallucination": {
+    "total_statements": 4,
+    "verifiable": 4,
+    "hallucinations": 0,
+    "uncertain": 0,
+    "details": [
+      {
+        "statement": "告警详情显示源 IP 10.0.5.100 对 10.0.1.0/24 网段进行 TCP 端口扫描。",
+        "verdict": "verifiable",
+        "reason": "mock_api_responses.query_alert_detail_A05 中 source_ip 为 10.0.5.100，raw_log 明确记录 'internal host 10.0.5.100 scanned 10.0.1.0/24 ports 1-1024'，protocol 为 TCP，与陈述完全一致。"
+      },
+      {
+        "statement": "资产信息查询确认 10.0.5.100 主机名为 sec-scanner-01，归属信息安全部，业务系统为内部漏洞扫描平台，且标签包含 authorized。",
+        "verdict": "verifiable",
+        "reason": "mock_api_responses.query_asset_info_10.0.5.100 返回 hostname 为 'sec-scanner-01'，department 为 '信息安全部'，business_system 为 '内部漏洞扫描平台'，tags 数组中包含 'authorized'，数据完全匹配。"
+      },
+      {
+        "statement": "威胁情报查询显示该 IP 信誉分 100，is_malicious 为 false，备注明确说明是安全运营团队管理的授权漏扫资产。",
+        "verdict": "verifiable",
+        "reason": "mock_api_responses.query_threat_intel_ip_10.0.5.100 中 reputation_score 为 100，is_malicious 为 false，raw_intel 内容为 'This IP is an internal asset managed by Security Operations team, used for authorized vulnerability scanning.'，与陈述一致。"
+      },
+      {
+        "statement": "关联告警查询在 48 小时内未发现其他相关异常行为。",
+        "verdict": "verifiable",
+        "reason": "mock_api_responses.query_related_alerts_10.0.5.100_48h 返回 related_alerts 为空数组，total_related 为 0，证实 48 小时内无相关告警。"
+      }
+    ]
+  },
+  "calls": [
+    {
+      "label": "agent",
+      "parsed": {
+        "alert_id": "A05",
+        "judgment": {
+          "severity": "false_positive",
+          "attack_type": "Internal Port Scan (Authorized)",
+          "confidence": 0.95,
+          "summary": "经核查，告警源 IP 10.0.5.100 为安全运营部授权的漏洞扫描设备（sec-scanner-01），威胁情报确认其非恶意资产。该端口扫描行为属于正常的授权运维活动，判定为误报。",
+          "evidence_chain": [
+            "告警详情显示源 IP 10.0.5.100 对 10.0.1.0/24 网段进行 TCP 端口扫描。",
+            "资产信息查询确认 10.0.5.100 主机名为 sec-scanner-01，归属信息安全部，业务系统为内部漏洞扫描平台，且标签包含 authorized。",
+            "威胁情报查询显示该 IP 信誉分 100，is_malicious 为 false，备注明确说明是安全运营团队管理的授权漏扫资产。",
+            "关联告警查询在 48 小时内未发现其他相关异常行为。"
+          ],
+          "iocs": [
+            {
+              "type": "ip",
+              "value": "10.0.5.100",
+              "malicious": false,
+              "context": "授权漏洞扫描设备"
+            }
+          ]
+        },
+        "remediation": [
+          "1. 在 SIEM 中将此告警标记为误报并关闭。",
+          "2. 建议将 IP 10.0.5.100 加入检测规则白名单，避免重复告警。",
+          "3. 定期复核该扫描设备的任务计划，确保扫描范围符合授权策略。"
+        ],
+        "metadata": {
+          "tools_called": [
+            "query_alert_detail",
+            "query_asset_info",
+            "query_threat_intel",
+            "query_related_alerts"
+          ]
+        }
+      },
+      "raw_text": "{\n  \"alert_id\": \"A05\",\n  \"judgment\": {\n    \"severity\": \"false_positive\",\n    \"attack_type\": \"Internal Port Scan (Authorized)\",\n    \"confidence\": 0.95,\n    \"summary\": \"经核查，告警源 IP 10.0.5.100 为安全运营部授权的漏洞扫描设备（sec-scanner-01），威胁情报确认其非恶意资产。该端口扫描行为属于正常的授权运维活动，判定为误报。\",\n    \"evidence_chain\": [\n      \"告警详情显示源 IP 10.0.5.100 对 10.0.1.0/24 网段进行 TCP 端口扫描。\",\n      \"资产信息查询确认 10.0.5.100 主机名为 sec-scanner-01，归属信息安全部，业务系统为内部漏洞扫描平台，且标签包含 authorized。\",\n      \"威胁情报查询显示该 IP 信誉分 100，is_malicious 为 false，备注明确说明是安全运营团队管理的授权漏扫资产。\",\n      \"关联告警查询在 48 小时内未发现其他相关异常行为。\"\n    ],\n    \"iocs\": [\n      {\n        \"type\": \"ip\",\n        \"value\": \"10.0.5.100\",\n        \"malicious\": false,\n        \"context\": \"授权漏洞扫描设备\"\n      }\n    ]\n  },\n  \"remediation\": [\n    \"1. 在 SIEM 中将此告警标记为误报并关闭。\",\n    \"2. 建议将 IP 10.0.5.100 加入检测规则白名单，避免重复告警。\",\n    \"3. 定期复核该扫描设备的任务计划，确保扫描范围符合授权策略。\"\n  ],\n  \"metadata\": {\n    \"tools_called\": [\n      \"query_alert_detail\",\n      \"query_asset_info\",\n      \"query_threat_intel\",\n      \"query_related_alerts\"\n    ]\n  }\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 917,
+      "output_tokens": 2775,
+      "latency_ms": 27228,
+      "attempts": 1
+    },
+    {
+      "label": "severity_rationality",
+      "parsed": {
+        "score": 5,
+        "reason": "Agent 的判定逻辑严密，证据链完整且与结论高度一致。Agent 通过查询资产信息确认了源 IP 10.0.5.100 为授权的安全扫描设备（标签包含'authorized'），并通过威胁情报确认其信誉良好且非恶意。结合无关联异常告警的事实，Agent 正确地将原本标记为 'medium' 的端口扫描告警重新定性为 'false_positive'（误报），并给出了合理的处置建议。所有推理步骤均有对应的 API 响应数据作为支撑。",
+        "evidence_quotes": [
+          "asset_info: tags: ['scanner', 'authorized', 'security']",
+          "threat_intel: is_malicious: false, raw_intel: 'This IP is an internal asset managed by Security Operations team, used for authorized vulnerability scanning.'",
+          "related_alerts: total_related: 0",
+          "agent_output judgment: severity: 'false_positive'"
+        ]
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"Agent 的判定逻辑严密，证据链完整且与结论高度一致。Agent 通过查询资产信息确认了源 IP 10.0.5.100 为授权的安全扫描设备（标签包含'authorized'），并通过威胁情报确认其信誉良好且非恶意。结合无关联异常告警的事实，Agent 正确地将原本标记为 'medium' 的端口扫描告警重新定性为 'false_positive'（误报），并给出了合理的处置建议。所有推理步骤均有对应的 API 响应数据作为支撑。\",\n  \"evidence_quotes\": [\n    \"asset_info: tags: ['scanner', 'authorized', 'security']\",\n    \"threat_intel: is_malicious: false, raw_intel: 'This IP is an internal asset managed by Security Operations team, used for authorized vulnerability scanning.'\",\n    \"related_alerts: total_related: 0\",\n    \"agent_output judgment: severity: 'false_positive'\"\n  ]\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1240,
+      "output_tokens": 224,
+      "latency_ms": 2769,
+      "attempts": 1
+    },
+    {
+      "label": "remediation_actionability",
+      "parsed": {
+        "score": 5,
+        "reason": "处置建议具体、可执行且逻辑清晰。首先针对当前告警进行闭环处理（标记误报），其次通过白名单机制解决重复告警问题，最后提出定期复核的长效管理措施。这三条建议按‘即时响应-规则优化-持续监控’的优先级排列，完全基于输入证据中确认的授权扫描行为。",
+        "evidence_quotes": [
+          "1. 在 SIEM 中将此告警标记为误报并关闭。",
+          "2. 建议将 IP 10.0.5.100 加入检测规则白名单，避免重复告警。",
+          "3. 定期复核该扫描设备的任务计划，确保扫描范围符合授权策略。"
+        ]
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"处置建议具体、可执行且逻辑清晰。首先针对当前告警进行闭环处理（标记误报），其次通过白名单机制解决重复告警问题，最后提出定期复核的长效管理措施。这三条建议按‘即时响应-规则优化-持续监控’的优先级排列，完全基于输入证据中确认的授权扫描行为。\",\n  \"evidence_quotes\": [\n    \"1. 在 SIEM 中将此告警标记为误报并关闭。\",\n    \"2. 建议将 IP 10.0.5.100 加入检测规则白名单，避免重复告警。\",\n    \"3. 定期复核该扫描设备的任务计划，确保扫描范围符合授权策略。\"\n  ]\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1243,
+      "output_tokens": 178,
+      "latency_ms": 2151,
+      "attempts": 1
+    },
+    {
+      "label": "evidence_completeness",
+      "parsed": {
+        "score": 5,
+        "reason": "证据链完整覆盖了关键 IOC（10.0.5.100）及其行为特征。通过告警详情确认了扫描行为，资产信息证实了该 IP 为授权的安全扫描设备（sec-scanner-01），威胁情报进一步验证了其非恶意属性及白名单状态，且无关联异常告警。所有结论均有明确的 API 响应数据支撑，逻辑闭环。",
+        "evidence_quotes": [
+          "raw_log: internal host 10.0.5.100 scanned 10.0.1.0/24 ports 1-1024",
+          "hostname: sec-scanner-01, business_system: 内部漏洞扫描平台, tags: [scanner, authorized, security]",
+          "is_malicious: false, reputation_score: 100, raw_intel: This IP is an internal asset managed by Security Operations team, used for authorized vulnerability scanning.",
+          "related_alerts: [], total_related: 0"
+        ]
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"证据链完整覆盖了关键 IOC（10.0.5.100）及其行为特征。通过告警详情确认了扫描行为，资产信息证实了该 IP 为授权的安全扫描设备（sec-scanner-01），威胁情报进一步验证了其非恶意属性及白名单状态，且无关联异常告警。所有结论均有明确的 API 响应数据支撑，逻辑闭环。\",\n  \"evidence_quotes\": [\n    \"raw_log: internal host 10.0.5.100 scanned 10.0.1.0/24 ports 1-1024\",\n    \"hostname: sec-scanner-01, business_system: 内部漏洞扫描平台, tags: [scanner, authorized, security]\",\n    \"is_malicious: false, reputation_score: 100, raw_intel: This IP is an internal asset managed by Security Operations team, used for authorized vulnerability scanning.\",\n    \"related_alerts: [], total_related: 0\"\n  ]\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1243,
+      "output_tokens": 238,
+      "latency_ms": 3141,
+      "attempts": 1
+    },
+    {
+      "label": "hallucination_check",
+      "parsed": {
+        "total_statements": 4,
+        "verifiable": 4,
+        "hallucinations": 0,
+        "uncertain": 0,
+        "details": [
+          {
+            "statement": "告警详情显示源 IP 10.0.5.100 对 10.0.1.0/24 网段进行 TCP 端口扫描。",
+            "verdict": "verifiable",
+            "reason": "mock_api_responses.query_alert_detail_A05 中 source_ip 为 10.0.5.100，raw_log 明确记录 'internal host 10.0.5.100 scanned 10.0.1.0/24 ports 1-1024'，protocol 为 TCP，与陈述完全一致。"
+          },
+          {
+            "statement": "资产信息查询确认 10.0.5.100 主机名为 sec-scanner-01，归属信息安全部，业务系统为内部漏洞扫描平台，且标签包含 authorized。",
+            "verdict": "verifiable",
+            "reason": "mock_api_responses.query_asset_info_10.0.5.100 返回 hostname 为 'sec-scanner-01'，department 为 '信息安全部'，business_system 为 '内部漏洞扫描平台'，tags 数组中包含 'authorized'，数据完全匹配。"
+          },
+          {
+            "statement": "威胁情报查询显示该 IP 信誉分 100，is_malicious 为 false，备注明确说明是安全运营团队管理的授权漏扫资产。",
+            "verdict": "verifiable",
+            "reason": "mock_api_responses.query_threat_intel_ip_10.0.5.100 中 reputation_score 为 100，is_malicious 为 false，raw_intel 内容为 'This IP is an internal asset managed by Security Operations team, used for authorized vulnerability scanning.'，与陈述一致。"
+          },
+          {
+            "statement": "关联告警查询在 48 小时内未发现其他相关异常行为。",
+            "verdict": "verifiable",
+            "reason": "mock_api_responses.query_related_alerts_10.0.5.100_48h 返回 related_alerts 为空数组，total_related 为 0，证实 48 小时内无相关告警。"
+          }
+        ]
+      },
+      "raw_text": "{\n  \"total_statements\": 4,\n  \"verifiable\": 4,\n  \"hallucinations\": 0,\n  \"uncertain\": 0,\n  \"details\": [\n    {\n      \"statement\": \"告警详情显示源 IP 10.0.5.100 对 10.0.1.0/24 网段进行 TCP 端口扫描。\",\n      \"verdict\": \"verifiable\",\n      \"reason\": \"mock_api_responses.query_alert_detail_A05 中 source_ip 为 10.0.5.100，raw_log 明确记录 'internal host 10.0.5.100 scanned 10.0.1.0/24 ports 1-1024'，protocol 为 TCP，与陈述完全一致。\"\n    },\n    {\n      \"statement\": \"资产信息查询确认 10.0.5.100 主机名为 sec-scanner-01，归属信息安全部，业务系统为内部漏洞扫描平台，且标签包含 authorized。\",\n      \"verdict\": \"verifiable\",\n      \"reason\": \"mock_api_responses.query_asset_info_10.0.5.100 返回 hostname 为 'sec-scanner-01'，department 为 '信息安全部'，business_system 为 '内部漏洞扫描平台'，tags 数组中包含 'authorized'，数据完全匹配。\"\n    },\n    {\n      \"statement\": \"威胁情报查询显示该 IP 信誉分 100，is_malicious 为 false，备注明确说明是安全运营团队管理的授权漏扫资产。\",\n      \"verdict\": \"verifiable\",\n      \"reason\": \"mock_api_responses.query_threat_intel_ip_10.0.5.100 中 reputation_score 为 100，is_malicious 为 false，raw_intel 内容为 'This IP is an internal asset managed by Security Operations team, used for authorized vulnerability scanning.'，与陈述一致。\"\n    },\n    {\n      \"statement\": \"关联告警查询在 48 小时内未发现其他相关异常行为。\",\n      \"verdict\": \"verifiable\",\n      \"reason\": \"mock_api_responses.query_related_alerts_10.0.5.100_48h 返回 related_alerts 为空数组，total_related 为 0，证实 48 小时内无相关告警。\"\n    }\n  ]\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1274,
+      "output_tokens": 560,
+      "latency_ms": 5934,
+      "attempts": 1
+    }
+  ],
+  "overall_pass": true,
+  "error_type": null,
+  "error_message": null
+}

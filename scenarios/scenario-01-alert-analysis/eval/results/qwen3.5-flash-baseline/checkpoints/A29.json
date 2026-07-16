@@ -1,0 +1,351 @@
+{
+  "test_case_id": "A29",
+  "scenario": "APT41 多阶段攻击：供应链植入后门 → 横向 → 数据窃取 → 勒索",
+  "difficulty": "expert",
+  "is_positive": true,
+  "expected_severity": "critical",
+  "status": "completed",
+  "agent_output": {
+    "alert_id": "A29",
+    "judgment": {
+      "severity": "critical",
+      "attack_type": "Supply Chain Compromise & Ransomware Deployment (APT41)",
+      "confidence": 0.95,
+      "summary": "Confirmed active APT41 supply chain attack resulting in ransomware deployment across production network. Critical internal repository compromised.",
+      "evidence_chain": [
+        "SIEM alert rule 'Multi-Stage APT Attack - Supply Chain to Ransomware' reports poisoned update on repo-server-01 with Cobalt Strike C2 and GPO-based ransomware distribution.",
+        "Asset inventory confirms repo-server-01 (10.0.1.100) is a critical level asset in the production-core zone, not a scanner or honeypot.",
+        "Threat intelligence validates IOC hash a9b8c7d6e5f4a3b2c1d0e9f8a7b6c5d4, domain apt41-c2.xyz, and IP 192.0.2.222 as malicious APT41 indicators.",
+        "Related alerts confirm kill chain progression: suspicious upload, mass download by 50+ hosts, C2 beacon storm, and ransomware encryption via GPO within 48 hours."
+      ],
+      "iocs": [
+        {
+          "type": "hash",
+          "value": "a9b8c7d6e5f4a3b2c1d0e9f8a7b6c5d4",
+          "malicious": true,
+          "context": "Trojanized installer attributed to APT41 supply chain operation"
+        },
+        {
+          "type": "domain",
+          "value": "apt41-c2.xyz",
+          "malicious": true,
+          "context": "C2 domain used by APT41 for post-exploitation command and control"
+        },
+        {
+          "type": "ip",
+          "value": "192.0.2.222",
+          "malicious": true,
+          "context": "Exfiltration endpoint used in APT41 campaigns"
+        }
+      ]
+    },
+    "remediation": [
+      "Immediately isolate repo-server-01 and all 50+ identified infected hosts from the network to prevent further lateral movement.",
+      "Block outbound connections to apt41-c2.xyz and 192.0.2.222 at the perimeter firewall and DNS resolver.",
+      "Force password reset for the compromised admin account identified in related alert A29-REL-01 and audit all privileged sessions.",
+      "Initiate incident response procedure to identify the root cause of the supply chain injection and patch the vulnerability.",
+      "Restore affected systems from verified clean backups after ensuring malware removal and system integrity validation."
+    ],
+    "metadata": {
+      "tools_called": [
+        "query_alert_detail",
+        "query_asset_info",
+        "query_threat_intel",
+        "query_related_alerts"
+      ]
+    }
+  },
+  "code_graders": {
+    "tools_called_minimum": {
+      "passed": true,
+      "reason": "required tools present",
+      "expected": [
+        "query_alert_detail",
+        "query_threat_intel",
+        "query_related_alerts"
+      ],
+      "actual": [
+        "query_alert_detail",
+        "query_asset_info",
+        "query_threat_intel",
+        "query_related_alerts"
+      ]
+    },
+    "output_schema": {
+      "passed": true,
+      "reason": "required fields present",
+      "expected": null,
+      "actual": null
+    },
+    "severity_enum": {
+      "passed": true,
+      "reason": "severity is valid",
+      "expected": [
+        "critical",
+        "false_positive",
+        "high",
+        "low",
+        "medium"
+      ],
+      "actual": "critical"
+    },
+    "severity_match": {
+      "passed": true,
+      "reason": "severity matches",
+      "expected": "critical",
+      "actual": "critical"
+    },
+    "confidence_range": {
+      "passed": true,
+      "reason": "confidence in range",
+      "expected": "0..1",
+      "actual": 0.95
+    },
+    "remediation_not_empty": {
+      "passed": true,
+      "reason": "remediation actionable",
+      "expected": "at least one item >=10 chars",
+      "actual": [
+        "Immediately isolate repo-server-01 and all 50+ identified infected hosts from the network to prevent further lateral movement.",
+        "Block outbound connections to apt41-c2.xyz and 192.0.2.222 at the perimeter firewall and DNS resolver.",
+        "Force password reset for the compromised admin account identified in related alert A29-REL-01 and audit all privileged sessions.",
+        "Initiate incident response procedure to identify the root cause of the supply chain injection and patch the vulnerability.",
+        "Restore affected systems from verified clean backups after ensuring malware removal and system integrity validation."
+      ]
+    }
+  },
+  "quality_scores": {
+    "severity_rationality": {
+      "score": 5,
+      "reason": "Agent correctly identified a critical supply chain compromise and ransomware deployment by APT41. The judgment is fully supported by the evidence: asset inventory confirmed the target was a critical production server (not a honeypot), threat intelligence validated all IOCs as malicious APT41 indicators, and related alerts established a clear kill chain from trojanized upload to mass infection and GPO-based ransomware encryption.",
+      "evidence_quotes": [
+        "Asset inventory confirms repo-server-01 (10.0.1.100) is a critical level asset in the production-core zone, not a scanner or honeypot.",
+        "Threat intelligence validates IOC hash a9b8c7d6e5f4a3b2c1d0e9f8a7b6c5d4, domain apt41-c2.xyz, and IP 192.0.2.222 as malicious APT41 indicators.",
+        "Related alerts confirm kill chain progression: suspicious upload, mass download by 50+ hosts, C2 beacon storm, and ransomware encryption via GPO within 48 hours."
+      ]
+    },
+    "remediation_actionability": {
+      "score": 5,
+      "reason": "The remediation plan is highly specific, actionable, and logically prioritized based on the severity of the active ransomware attack. It correctly identifies the immediate need for network isolation (Step 1) to stop lateral movement, followed by blocking C2 channels (Step 2), securing compromised credentials (Step 3), investigating root causes (Step 4), and finally restoring from backups (Step 5). Each step directly addresses evidence found in the mock API responses, such as the 'Mass Download' alert requiring host isolation and the 'GPO-based ransomware distribution' necessitating a full restore.",
+      "evidence_quotes": [
+        "Immediately isolate repo-server-01 and all 50+ identified infected hosts from the network to prevent further lateral movement.",
+        "Block outbound connections to apt41-c2.xyz and 192.0.2.222 at the perimeter firewall and DNS resolver.",
+        "Force password reset for the compromised admin account identified in related alert A29-REL-01 and audit all privileged sessions.",
+        "Initiate incident response procedure to identify the root cause of the supply chain injection and patch the vulnerability.",
+        "Restore affected systems from verified clean backups after ensuring malware removal and system integrity validation."
+      ]
+    },
+    "evidence_completeness": {
+      "score": 5,
+      "reason": "证据链完整且逻辑严密，成功覆盖了从初始入侵（供应链投毒）到横向移动、C2通信及最终勒索软件部署的全生命周期行为特征。关键 IOC（哈希、域名、IP）均通过威胁情报工具得到高置信度验证，并明确关联至 APT41 组织。资产信息确认了受害目标的真实性与关键性，相关告警序列清晰展示了攻击的杀伤链（Kill Chain）进展，形成了无可辩驳的闭环证据。",
+      "evidence_quotes": [
+        "SIEM alert rule 'Multi-Stage APT Attack - Supply Chain to Ransomware' reports poisoned update on repo-server-01 with Cobalt Strike C2 and GPO-based ransomware distribution.",
+        "Asset inventory confirms repo-server-01 (10.0.1.100) is a critical level asset in the production-core zone, not a scanner or honeypot.",
+        "Threat intelligence validates IOC hash a9b8c7d6e5f4a3b2c1d0e9f8a7b6c5d4, domain apt41-c2.xyz, and IP 192.0.2.222 as malicious APT41 indicators.",
+        "Related alerts confirm kill chain progression: suspicious upload, mass download by 50+ hosts, C2 beacon storm, and ransomware encryption via GPO within 48 hours.",
+        "raw_intel: Trojanized installer attributed to APT41's supply chain operation. Deploys Cobalt Strike and eventually ransomware.",
+        "raw_intel: C2 domain used by APT41 for post-exploitation command and control.",
+        "raw_intel: Exfiltration endpoint used in APT41 campaigns."
+      ]
+    }
+  },
+  "hallucination": {
+    "total_statements": 4,
+    "verifiable": 4,
+    "hallucinations": 0,
+    "uncertain": 0,
+    "details": [
+      {
+        "statement": "SIEM alert rule 'Multi-Stage APT Attack - Supply Chain to Ransomware' reports poisoned update on repo-server-01 with Cobalt Strike C2 and GPO-based ransomware distribution.",
+        "verdict": "verifiable",
+        "reason": "Confirmed by mock_api_responses.query_alert_detail_A29 which lists rule_name as 'Multi-Stage APT Attack - Supply Chain to Ransomware', payload_highlights including 'Cobalt Strike C2' and 'GPO-based ransomware distribution', and raw_log mentioning 'poisoned update on repo-server-01'."
+      },
+      {
+        "statement": "Asset inventory confirms repo-server-01 (10.0.1.100) is a critical level asset in the production-core zone, not a scanner or honeypot.",
+        "verdict": "verifiable",
+        "reason": "Confirmed by mock_api_responses.query_asset_info_10.0.1.100 which shows hostname 'repo-server-01', ip '10.0.1.100', asset_level 'critical', network_zone '生产 - 核心' (Production-Core), and explicitly sets is_scanner and is_honeypot to false."
+      },
+      {
+        "statement": "Threat intelligence validates IOC hash a9b8c7d6e5f4a3b2c1d0e9f8a7b6c5d4, domain apt41-c2.xyz, and IP 192.0.2.222 as malicious APT41 indicators.",
+        "verdict": "verifiable",
+        "reason": "Confirmed by three separate threat intel queries: query_threat_intel_hash_a9b8c7d6e5f4a3b2c1d0e9f8a7b6c5d4 (is_malicious: true, associated_apt: APT41), query_threat_intel_domain_apt41-c2.xyz (is_malicious: true, associated_apt: APT41), and query_threat_intel_ip_192.0.2.222 (is_malicious: true, associated_apt: APT41)."
+      },
+      {
+        "statement": "Related alerts confirm kill chain progression: suspicious upload, mass download by 50+ hosts, C2 beacon storm, and ransomware encryption via GPO within 48 hours.",
+        "verdict": "verifiable",
+        "reason": "Confirmed by mock_api_responses.query_related_alerts_10.0.1.100_48h which lists four alerts: A29-REL-01 (Suspicious Upload), A29-REL-02 (Mass Download, summary mentions '50+ hosts'), A29-REL-03 (C2 Beacon Storm), and A29-REL-04 (Ransomware via GPO), all occurring within the 48-hour window relative to the main alert timestamp."
+      }
+    ]
+  },
+  "calls": [
+    {
+      "label": "agent",
+      "parsed": {
+        "alert_id": "A29",
+        "judgment": {
+          "severity": "critical",
+          "attack_type": "Supply Chain Compromise & Ransomware Deployment (APT41)",
+          "confidence": 0.95,
+          "summary": "Confirmed active APT41 supply chain attack resulting in ransomware deployment across production network. Critical internal repository compromised.",
+          "evidence_chain": [
+            "SIEM alert rule 'Multi-Stage APT Attack - Supply Chain to Ransomware' reports poisoned update on repo-server-01 with Cobalt Strike C2 and GPO-based ransomware distribution.",
+            "Asset inventory confirms repo-server-01 (10.0.1.100) is a critical level asset in the production-core zone, not a scanner or honeypot.",
+            "Threat intelligence validates IOC hash a9b8c7d6e5f4a3b2c1d0e9f8a7b6c5d4, domain apt41-c2.xyz, and IP 192.0.2.222 as malicious APT41 indicators.",
+            "Related alerts confirm kill chain progression: suspicious upload, mass download by 50+ hosts, C2 beacon storm, and ransomware encryption via GPO within 48 hours."
+          ],
+          "iocs": [
+            {
+              "type": "hash",
+              "value": "a9b8c7d6e5f4a3b2c1d0e9f8a7b6c5d4",
+              "malicious": true,
+              "context": "Trojanized installer attributed to APT41 supply chain operation"
+            },
+            {
+              "type": "domain",
+              "value": "apt41-c2.xyz",
+              "malicious": true,
+              "context": "C2 domain used by APT41 for post-exploitation command and control"
+            },
+            {
+              "type": "ip",
+              "value": "192.0.2.222",
+              "malicious": true,
+              "context": "Exfiltration endpoint used in APT41 campaigns"
+            }
+          ]
+        },
+        "remediation": [
+          "Immediately isolate repo-server-01 and all 50+ identified infected hosts from the network to prevent further lateral movement.",
+          "Block outbound connections to apt41-c2.xyz and 192.0.2.222 at the perimeter firewall and DNS resolver.",
+          "Force password reset for the compromised admin account identified in related alert A29-REL-01 and audit all privileged sessions.",
+          "Initiate incident response procedure to identify the root cause of the supply chain injection and patch the vulnerability.",
+          "Restore affected systems from verified clean backups after ensuring malware removal and system integrity validation."
+        ],
+        "metadata": {
+          "tools_called": [
+            "query_alert_detail",
+            "query_asset_info",
+            "query_threat_intel",
+            "query_related_alerts"
+          ]
+        }
+      },
+      "raw_text": "{\n  \"alert_id\": \"A29\",\n  \"judgment\": {\n    \"severity\": \"critical\",\n    \"attack_type\": \"Supply Chain Compromise & Ransomware Deployment (APT41)\",\n    \"confidence\": 0.95,\n    \"summary\": \"Confirmed active APT41 supply chain attack resulting in ransomware deployment across production network. Critical internal repository compromised.\",\n    \"evidence_chain\": [\n      \"SIEM alert rule 'Multi-Stage APT Attack - Supply Chain to Ransomware' reports poisoned update on repo-server-01 with Cobalt Strike C2 and GPO-based ransomware distribution.\",\n      \"Asset inventory confirms repo-server-01 (10.0.1.100) is a critical level asset in the production-core zone, not a scanner or honeypot.\",\n      \"Threat intelligence validates IOC hash a9b8c7d6e5f4a3b2c1d0e9f8a7b6c5d4, domain apt41-c2.xyz, and IP 192.0.2.222 as malicious APT41 indicators.\",\n      \"Related alerts confirm kill chain progression: suspicious upload, mass download by 50+ hosts, C2 beacon storm, and ransomware encryption via GPO within 48 hours.\"\n    ],\n    \"iocs\": [\n      {\n        \"type\": \"hash\",\n        \"value\": \"a9b8c7d6e5f4a3b2c1d0e9f8a7b6c5d4\",\n        \"malicious\": true,\n        \"context\": \"Trojanized installer attributed to APT41 supply chain operation\"\n      },\n      {\n        \"type\": \"domain\",\n        \"value\": \"apt41-c2.xyz\",\n        \"malicious\": true,\n        \"context\": \"C2 domain used by APT41 for post-exploitation command and control\"\n      },\n      {\n        \"type\": \"ip\",\n        \"value\": \"192.0.2.222\",\n        \"malicious\": true,\n        \"context\": \"Exfiltration endpoint used in APT41 campaigns\"\n      }\n    ]\n  },\n  \"remediation\": [\n    \"Immediately isolate repo-server-01 and all 50+ identified infected hosts from the network to prevent further lateral movement.\",\n    \"Block outbound connections to apt41-c2.xyz and 192.0.2.222 at the perimeter firewall and DNS resolver.\",\n    \"Force password reset for the compromised admin account identified in related alert A29-REL-01 and audit all privileged sessions.\",\n    \"Initiate incident response procedure to identify the root cause of the supply chain injection and patch the vulnerability.\",\n    \"Restore affected systems from verified clean backups after ensuring malware removal and system integrity validation.\"\n  ],\n  \"metadata\": {\n    \"tools_called\": [\n      \"query_alert_detail\",\n      \"query_asset_info\",\n      \"query_threat_intel\",\n      \"query_related_alerts\"\n    ]\n  }\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1834,
+      "output_tokens": 2990,
+      "latency_ms": 33735,
+      "attempts": 1
+    },
+    {
+      "label": "severity_rationality",
+      "parsed": {
+        "score": 5,
+        "reason": "Agent correctly identified a critical supply chain compromise and ransomware deployment by APT41. The judgment is fully supported by the evidence: asset inventory confirmed the target was a critical production server (not a honeypot), threat intelligence validated all IOCs as malicious APT41 indicators, and related alerts established a clear kill chain from trojanized upload to mass infection and GPO-based ransomware encryption.",
+        "evidence_quotes": [
+          "Asset inventory confirms repo-server-01 (10.0.1.100) is a critical level asset in the production-core zone, not a scanner or honeypot.",
+          "Threat intelligence validates IOC hash a9b8c7d6e5f4a3b2c1d0e9f8a7b6c5d4, domain apt41-c2.xyz, and IP 192.0.2.222 as malicious APT41 indicators.",
+          "Related alerts confirm kill chain progression: suspicious upload, mass download by 50+ hosts, C2 beacon storm, and ransomware encryption via GPO within 48 hours."
+        ]
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"Agent correctly identified a critical supply chain compromise and ransomware deployment by APT41. The judgment is fully supported by the evidence: asset inventory confirmed the target was a critical production server (not a honeypot), threat intelligence validated all IOCs as malicious APT41 indicators, and related alerts established a clear kill chain from trojanized upload to mass infection and GPO-based ransomware encryption.\",\n  \"evidence_quotes\": [\n    \"Asset inventory confirms repo-server-01 (10.0.1.100) is a critical level asset in the production-core zone, not a scanner or honeypot.\",\n    \"Threat intelligence validates IOC hash a9b8c7d6e5f4a3b2c1d0e9f8a7b6c5d4, domain apt41-c2.xyz, and IP 192.0.2.222 as malicious APT41 indicators.\",\n    \"Related alerts confirm kill chain progression: suspicious upload, mass download by 50+ hosts, C2 beacon storm, and ransomware encryption via GPO within 48 hours.\"\n  ]\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 2390,
+      "output_tokens": 264,
+      "latency_ms": 3674,
+      "attempts": 1
+    },
+    {
+      "label": "remediation_actionability",
+      "parsed": {
+        "score": 5,
+        "reason": "The remediation plan is highly specific, actionable, and logically prioritized based on the severity of the active ransomware attack. It correctly identifies the immediate need for network isolation (Step 1) to stop lateral movement, followed by blocking C2 channels (Step 2), securing compromised credentials (Step 3), investigating root causes (Step 4), and finally restoring from backups (Step 5). Each step directly addresses evidence found in the mock API responses, such as the 'Mass Download' alert requiring host isolation and the 'GPO-based ransomware distribution' necessitating a full restore.",
+        "evidence_quotes": [
+          "Immediately isolate repo-server-01 and all 50+ identified infected hosts from the network to prevent further lateral movement.",
+          "Block outbound connections to apt41-c2.xyz and 192.0.2.222 at the perimeter firewall and DNS resolver.",
+          "Force password reset for the compromised admin account identified in related alert A29-REL-01 and audit all privileged sessions.",
+          "Initiate incident response procedure to identify the root cause of the supply chain injection and patch the vulnerability.",
+          "Restore affected systems from verified clean backups after ensuring malware removal and system integrity validation."
+        ]
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"The remediation plan is highly specific, actionable, and logically prioritized based on the severity of the active ransomware attack. It correctly identifies the immediate need for network isolation (Step 1) to stop lateral movement, followed by blocking C2 channels (Step 2), securing compromised credentials (Step 3), investigating root causes (Step 4), and finally restoring from backups (Step 5). Each step directly addresses evidence found in the mock API responses, such as the 'Mass Download' alert requiring host isolation and the 'GPO-based ransomware distribution' necessitating a full restore.\",\n  \"evidence_quotes\": [\n    \"Immediately isolate repo-server-01 and all 50+ identified infected hosts from the network to prevent further lateral movement.\",\n    \"Block outbound connections to apt41-c2.xyz and 192.0.2.222 at the perimeter firewall and DNS resolver.\",\n    \"Force password reset for the compromised admin account identified in related alert A29-REL-01 and audit all privileged sessions.\",\n    \"Initiate incident response procedure to identify the root cause of the supply chain injection and patch the vulnerability.\",\n    \"Restore affected systems from verified clean backups after ensuring malware removal and system integrity validation.\"\n  ]\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 2393,
+      "output_tokens": 281,
+      "latency_ms": 3591,
+      "attempts": 1
+    },
+    {
+      "label": "evidence_completeness",
+      "parsed": {
+        "score": 5,
+        "reason": "证据链完整且逻辑严密，成功覆盖了从初始入侵（供应链投毒）到横向移动、C2通信及最终勒索软件部署的全生命周期行为特征。关键 IOC（哈希、域名、IP）均通过威胁情报工具得到高置信度验证，并明确关联至 APT41 组织。资产信息确认了受害目标的真实性与关键性，相关告警序列清晰展示了攻击的杀伤链（Kill Chain）进展，形成了无可辩驳的闭环证据。",
+        "evidence_quotes": [
+          "SIEM alert rule 'Multi-Stage APT Attack - Supply Chain to Ransomware' reports poisoned update on repo-server-01 with Cobalt Strike C2 and GPO-based ransomware distribution.",
+          "Asset inventory confirms repo-server-01 (10.0.1.100) is a critical level asset in the production-core zone, not a scanner or honeypot.",
+          "Threat intelligence validates IOC hash a9b8c7d6e5f4a3b2c1d0e9f8a7b6c5d4, domain apt41-c2.xyz, and IP 192.0.2.222 as malicious APT41 indicators.",
+          "Related alerts confirm kill chain progression: suspicious upload, mass download by 50+ hosts, C2 beacon storm, and ransomware encryption via GPO within 48 hours.",
+          "raw_intel: Trojanized installer attributed to APT41's supply chain operation. Deploys Cobalt Strike and eventually ransomware.",
+          "raw_intel: C2 domain used by APT41 for post-exploitation command and control.",
+          "raw_intel: Exfiltration endpoint used in APT41 campaigns."
+        ]
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"证据链完整且逻辑严密，成功覆盖了从初始入侵（供应链投毒）到横向移动、C2通信及最终勒索软件部署的全生命周期行为特征。关键 IOC（哈希、域名、IP）均通过威胁情报工具得到高置信度验证，并明确关联至 APT41 组织。资产信息确认了受害目标的真实性与关键性，相关告警序列清晰展示了攻击的杀伤链（Kill Chain）进展，形成了无可辩驳的闭环证据。\",\n  \"evidence_quotes\": [\n    \"SIEM alert rule 'Multi-Stage APT Attack - Supply Chain to Ransomware' reports poisoned update on repo-server-01 with Cobalt Strike C2 and GPO-based ransomware distribution.\",\n    \"Asset inventory confirms repo-server-01 (10.0.1.100) is a critical level asset in the production-core zone, not a scanner or honeypot.\",\n    \"Threat intelligence validates IOC hash a9b8c7d6e5f4a3b2c1d0e9f8a7b6c5d4, domain apt41-c2.xyz, and IP 192.0.2.222 as malicious APT41 indicators.\",\n    \"Related alerts confirm kill chain progression: suspicious upload, mass download by 50+ hosts, C2 beacon storm, and ransomware encryption via GPO within 48 hours.\",\n    \"raw_intel: Trojanized installer attributed to APT41's supply chain operation. Deploys Cobalt Strike and eventually ransomware.\",\n    \"raw_intel: C2 domain used by APT41 for post-exploitation command and control.\",\n    \"raw_intel: Exfiltration endpoint used in APT41 campaigns.\"\n  ]\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 2393,
+      "output_tokens": 402,
+      "latency_ms": 4302,
+      "attempts": 1
+    },
+    {
+      "label": "hallucination_check",
+      "parsed": {
+        "total_statements": 4,
+        "verifiable": 4,
+        "hallucinations": 0,
+        "uncertain": 0,
+        "details": [
+          {
+            "statement": "SIEM alert rule 'Multi-Stage APT Attack - Supply Chain to Ransomware' reports poisoned update on repo-server-01 with Cobalt Strike C2 and GPO-based ransomware distribution.",
+            "verdict": "verifiable",
+            "reason": "Confirmed by mock_api_responses.query_alert_detail_A29 which lists rule_name as 'Multi-Stage APT Attack - Supply Chain to Ransomware', payload_highlights including 'Cobalt Strike C2' and 'GPO-based ransomware distribution', and raw_log mentioning 'poisoned update on repo-server-01'."
+          },
+          {
+            "statement": "Asset inventory confirms repo-server-01 (10.0.1.100) is a critical level asset in the production-core zone, not a scanner or honeypot.",
+            "verdict": "verifiable",
+            "reason": "Confirmed by mock_api_responses.query_asset_info_10.0.1.100 which shows hostname 'repo-server-01', ip '10.0.1.100', asset_level 'critical', network_zone '生产 - 核心' (Production-Core), and explicitly sets is_scanner and is_honeypot to false."
+          },
+          {
+            "statement": "Threat intelligence validates IOC hash a9b8c7d6e5f4a3b2c1d0e9f8a7b6c5d4, domain apt41-c2.xyz, and IP 192.0.2.222 as malicious APT41 indicators.",
+            "verdict": "verifiable",
+            "reason": "Confirmed by three separate threat intel queries: query_threat_intel_hash_a9b8c7d6e5f4a3b2c1d0e9f8a7b6c5d4 (is_malicious: true, associated_apt: APT41), query_threat_intel_domain_apt41-c2.xyz (is_malicious: true, associated_apt: APT41), and query_threat_intel_ip_192.0.2.222 (is_malicious: true, associated_apt: APT41)."
+          },
+          {
+            "statement": "Related alerts confirm kill chain progression: suspicious upload, mass download by 50+ hosts, C2 beacon storm, and ransomware encryption via GPO within 48 hours.",
+            "verdict": "verifiable",
+            "reason": "Confirmed by mock_api_responses.query_related_alerts_10.0.1.100_48h which lists four alerts: A29-REL-01 (Suspicious Upload), A29-REL-02 (Mass Download, summary mentions '50+ hosts'), A29-REL-03 (C2 Beacon Storm), and A29-REL-04 (Ransomware via GPO), all occurring within the 48-hour window relative to the main alert timestamp."
+          }
+        ]
+      },
+      "raw_text": "{\n  \"total_statements\": 4,\n  \"verifiable\": 4,\n  \"hallucinations\": 0,\n  \"uncertain\": 0,\n  \"details\": [\n    {\n      \"statement\": \"SIEM alert rule 'Multi-Stage APT Attack - Supply Chain to Ransomware' reports poisoned update on repo-server-01 with Cobalt Strike C2 and GPO-based ransomware distribution.\",\n      \"verdict\": \"verifiable\",\n      \"reason\": \"Confirmed by mock_api_responses.query_alert_detail_A29 which lists rule_name as 'Multi-Stage APT Attack - Supply Chain to Ransomware', payload_highlights including 'Cobalt Strike C2' and 'GPO-based ransomware distribution', and raw_log mentioning 'poisoned update on repo-server-01'.\"\n    },\n    {\n      \"statement\": \"Asset inventory confirms repo-server-01 (10.0.1.100) is a critical level asset in the production-core zone, not a scanner or honeypot.\",\n      \"verdict\": \"verifiable\",\n      \"reason\": \"Confirmed by mock_api_responses.query_asset_info_10.0.1.100 which shows hostname 'repo-server-01', ip '10.0.1.100', asset_level 'critical', network_zone '生产 - 核心' (Production-Core), and explicitly sets is_scanner and is_honeypot to false.\"\n    },\n    {\n      \"statement\": \"Threat intelligence validates IOC hash a9b8c7d6e5f4a3b2c1d0e9f8a7b6c5d4, domain apt41-c2.xyz, and IP 192.0.2.222 as malicious APT41 indicators.\",\n      \"verdict\": \"verifiable\",\n      \"reason\": \"Confirmed by three separate threat intel queries: query_threat_intel_hash_a9b8c7d6e5f4a3b2c1d0e9f8a7b6c5d4 (is_malicious: true, associated_apt: APT41), query_threat_intel_domain_apt41-c2.xyz (is_malicious: true, associated_apt: APT41), and query_threat_intel_ip_192.0.2.222 (is_malicious: true, associated_apt: APT41).\"\n    },\n    {\n      \"statement\": \"Related alerts confirm kill chain progression: suspicious upload, mass download by 50+ hosts, C2 beacon storm, and ransomware encryption via GPO within 48 hours.\",\n      \"verdict\": \"verifiable\",\n      \"reason\": \"Confirmed by mock_api_responses.query_related_alerts_10.0.1.100_48h which lists four alerts: A29-REL-01 (Suspicious Upload), A29-REL-02 (Mass Download, summary mentions '50+ hosts'), A29-REL-03 (C2 Beacon Storm), and A29-REL-04 (Ransomware via GPO), all occurring within the 48-hour window relative to the main alert timestamp.\"\n    }\n  ]\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 2424,
+      "output_tokens": 727,
+      "latency_ms": 8286,
+      "attempts": 1
+    }
+  ],
+  "overall_pass": true,
+  "error_type": null,
+  "error_message": null
+}

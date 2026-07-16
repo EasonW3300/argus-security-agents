@@ -1,0 +1,349 @@
+{
+  "test_case_id": "A25",
+  "scenario": "APT28 横向移动：窃取凭据后计划任务横向",
+  "difficulty": "hard",
+  "is_positive": true,
+  "expected_severity": "critical",
+  "status": "completed",
+  "agent_output": {
+    "alert_id": "A25",
+    "judgment": {
+      "severity": "critical",
+      "attack_type": "Lateral Movement & Persistence (APT28 TTP)",
+      "confidence": 0.95,
+      "summary": "Confirmed active compromise of Domain Controller via credential theft and lateral movement from infected workstation.",
+      "evidence_chain": [
+        "query_alert_detail: EDR alert A25 reports scheduled task 'At1' created on DC 10.0.1.10 using domain admin creds from 10.0.3.90.",
+        "query_asset_info: Target 10.0.1.10 is identified as a critical production Domain Controller (Windows Server 2022).",
+        "query_related_alerts: Alert A25-REL-02 confirms Mimikatz credential dumping on source IP 10.0.3.90 prior to lateral movement.",
+        "query_related_alerts: Alert A25-REL-01 shows initial access via spear-phishing on 10.0.3.90 establishing the attack chain.",
+        "query_threat_intel: Source IP 10.0.3.90 flagged as internal workstation with suspicious behavior consistent with attack progression."
+      ],
+      "iocs": [
+        {
+          "type": "ip",
+          "value": "10.0.3.90",
+          "malicious": true,
+          "context": "Compromised source workstation initiating lateral movement"
+        },
+        {
+          "type": "ip",
+          "value": "10.0.1.10",
+          "malicious": false,
+          "context": "Compromised victim Domain Controller"
+        }
+      ]
+    },
+    "remediation": [
+      "Immediately isolate host 10.0.3.90 from the network to stop ongoing lateral movement and data exfiltration.",
+      "Force password reset for all Domain Admin accounts and privileged service accounts across the domain.",
+      "Delete the malicious scheduled task 'At1' on DC01 (10.0.1.10) and scan for other persistence mechanisms.",
+      "Conduct forensic analysis on 10.0.3.90 to identify initial infection vector and scope of compromise.",
+      "Review firewall rules and segment traffic between workstations and the core production zone to limit future spread."
+    ],
+    "metadata": {
+      "tools_called": [
+        "query_alert_detail",
+        "query_asset_info",
+        "query_threat_intel",
+        "query_related_alerts"
+      ]
+    }
+  },
+  "code_graders": {
+    "tools_called_minimum": {
+      "passed": true,
+      "reason": "required tools present",
+      "expected": [
+        "query_alert_detail",
+        "query_threat_intel",
+        "query_related_alerts"
+      ],
+      "actual": [
+        "query_alert_detail",
+        "query_asset_info",
+        "query_threat_intel",
+        "query_related_alerts"
+      ]
+    },
+    "output_schema": {
+      "passed": true,
+      "reason": "required fields present",
+      "expected": null,
+      "actual": null
+    },
+    "severity_enum": {
+      "passed": true,
+      "reason": "severity is valid",
+      "expected": [
+        "critical",
+        "false_positive",
+        "high",
+        "low",
+        "medium"
+      ],
+      "actual": "critical"
+    },
+    "severity_match": {
+      "passed": true,
+      "reason": "severity matches",
+      "expected": "critical",
+      "actual": "critical"
+    },
+    "confidence_range": {
+      "passed": true,
+      "reason": "confidence in range",
+      "expected": "0..1",
+      "actual": 0.95
+    },
+    "remediation_not_empty": {
+      "passed": true,
+      "reason": "remediation actionable",
+      "expected": "at least one item >=10 chars",
+      "actual": [
+        "Immediately isolate host 10.0.3.90 from the network to stop ongoing lateral movement and data exfiltration.",
+        "Force password reset for all Domain Admin accounts and privileged service accounts across the domain.",
+        "Delete the malicious scheduled task 'At1' on DC01 (10.0.1.10) and scan for other persistence mechanisms.",
+        "Conduct forensic analysis on 10.0.3.90 to identify initial infection vector and scope of compromise.",
+        "Review firewall rules and segment traffic between workstations and the core production zone to limit future spread."
+      ]
+    }
+  },
+  "quality_scores": {
+    "severity_rationality": {
+      "score": 5,
+      "reason": "The agent's judgment is fully supported by the provided evidence. The 'critical' severity rating aligns with the target being a Domain Controller (evidenced by 'asset_level': 'critical' and 'business_system': '主域控制器'). The attack chain described in the 'evidence_chain' (phishing -> Mimikatz -> Lateral Movement) is directly corroborated by the 'query_related_alerts' showing A25-REL-01 (Phishing), A25-REL-02 (Mimikatz), and A25-REL-03 (Reconnaissance). The specific TTP of creating a scheduled task using domain admin credentials is confirmed by the 'raw_log' in 'query_alert_detail_A25'.",
+      "evidence_quotes": [
+        "Target 10.0.1.10 is identified as a critical production Domain Controller (Windows Server 2022).",
+        "Asset Level: critical, Business System: 主域控制器",
+        "Alert A25-REL-02 confirms Mimikatz credential dumping on source IP 10.0.3.90 prior to lateral movement.",
+        "Task 'At1' created on DC01 to execute powershell -enc ... from remote IP 10.0.3.90 using domain admin creds.",
+        "Mimikatz executed on 10.0.3.90 harvesting domain admin credentials."
+      ]
+    },
+    "remediation_actionability": {
+      "score": 5,
+      "reason": "处置建议非常具体、可执行且逻辑清晰。建议按攻击链优先级排列：首先隔离受感染主机（10.0.3.90）以阻断横向移动，其次重置凭据以消除威胁根源，接着清除持久化机制（计划任务），最后进行取证和架构加固。所有建议均直接引用了输入证据中的具体资产IP、任务名称及攻击行为。",
+      "evidence_quotes": [
+        "Immediately isolate host 10.0.3.90 from the network to stop ongoing lateral movement and data exfiltration.",
+        "Force password reset for all Domain Admin accounts and privileged service accounts across the domain.",
+        "Delete the malicious scheduled task 'At1' on DC01 (10.0.1.10) and scan for other persistence mechanisms.",
+        "Conduct forensic analysis on 10.0.3.90 to identify initial infection vector and scope of compromise."
+      ]
+    },
+    "evidence_completeness": {
+      "score": 5,
+      "reason": "证据链完整覆盖了攻击的关键阶段（初始访问、凭证窃取、横向移动、持久化）及核心 IOC。输入明确展示了从 A25-REL-01 (钓鱼) 到 A25-REL-02 (Mimikatz) 再到 A25 (DC 上的计划任务持久化) 的完整杀伤链，且通过 query_asset_info 确认了目标为关键域控，结合 threat_intel 排除了 IP 信誉误报并确认内部异常行为，逻辑严密。",
+      "evidence_quotes": [
+        "query_alert_detail: EDR alert A25 reports scheduled task 'At1' created on DC 10.0.1.10 using domain admin creds from 10.0.3.90.",
+        "query_asset_info: Target 10.0.1.10 is identified as a critical production Domain Controller (Windows Server 2022).",
+        "query_related_alerts: Alert A25-REL-02 confirms Mimikatz credential dumping on source IP 10.0.3.90 prior to lateral movement.",
+        "query_related_alerts: Alert A25-REL-01 shows initial access via spear-phishing on 10.0.3.90 establishing the attack chain.",
+        "query_threat_intel: Source IP 10.0.3.90 flagged as internal workstation with suspicious behavior consistent with attack progression."
+      ]
+    }
+  },
+  "hallucination": {
+    "total_statements": 5,
+    "verifiable": 4,
+    "hallucinations": 0,
+    "uncertain": 1,
+    "details": [
+      {
+        "statement": "query_alert_detail: EDR alert A25 reports scheduled task 'At1' created on DC 10.0.1.10 using domain admin creds from 10.0.3.90.",
+        "verdict": "verifiable",
+        "reason": "Supported by mock_api_responses['query_alert_detail_A25'] which shows raw_log: \"Task 'At1' created on DC01... from remote IP 10.0.3.90 using domain admin creds.\" and payload_highlights including schtasks command."
+      },
+      {
+        "statement": "query_asset_info: Target 10.0.1.10 is identified as a critical production Domain Controller (Windows Server 2022).",
+        "verdict": "verifiable",
+        "reason": "Supported by mock_api_responses['query_asset_info_10.0.1.10'] which lists ip: \"10.0.1.10\", asset_level: \"critical\", business_system: \"主域控制器\" (Domain Controller), and os: \"Windows Server 2022\"."
+      },
+      {
+        "statement": "query_related_alerts: Alert A25-REL-02 confirms Mimikatz credential dumping on source IP 10.0.3.90 prior to lateral movement.",
+        "verdict": "verifiable",
+        "reason": "Supported by mock_api_responses['query_related_alerts_10.0.3.90_48h'] where alert A25-REL-02 has type \"Credential Dump (Mimikatz)\", summary mentions \"Mimikatz executed on 10.0.3.90\", and timestamp (2026-07-12T14:45:00Z) is prior to the main alert A25 (2026-07-13T11:22:33Z)."
+      },
+      {
+        "statement": "query_related_alerts: Alert A25-REL-01 shows initial access via spear-phishing on 10.0.3.90 establishing the attack chain.",
+        "verdict": "verifiable",
+        "reason": "Supported by mock_api_responses['query_related_alerts_10.0.3.90_48h'] where alert A25-REL-01 has type \"Phishing Email Delivered\", summary mentions \"received spear-phishing email\", and timestamp (2026-07-12T09:30:00Z) is the earliest in the sequence."
+      },
+      {
+        "statement": "query_threat_intel: Source IP 10.0.3.90 flagged as internal workstation with suspicious behavior consistent with attack progression.",
+        "verdict": "uncertain",
+        "reason": "The mock_api_responses['query_threat_intel_ip_10.0.3.90'] states \"This is an internal workstation. Suspicious due to behavior, not IP reputation.\" However, it does not explicitly state that the behavior is \"consistent with attack progression\" or link it to the specific APT28 TTPs mentioned in the agent's conclusion. The evidence confirms suspicion but the specific characterization of 'attack progression consistency' is an inference not strictly present in the raw intel text provided."
+      }
+    ]
+  },
+  "calls": [
+    {
+      "label": "agent",
+      "parsed": {
+        "alert_id": "A25",
+        "judgment": {
+          "severity": "critical",
+          "attack_type": "Lateral Movement & Persistence (APT28 TTP)",
+          "confidence": 0.95,
+          "summary": "Confirmed active compromise of Domain Controller via credential theft and lateral movement from infected workstation.",
+          "evidence_chain": [
+            "query_alert_detail: EDR alert A25 reports scheduled task 'At1' created on DC 10.0.1.10 using domain admin creds from 10.0.3.90.",
+            "query_asset_info: Target 10.0.1.10 is identified as a critical production Domain Controller (Windows Server 2022).",
+            "query_related_alerts: Alert A25-REL-02 confirms Mimikatz credential dumping on source IP 10.0.3.90 prior to lateral movement.",
+            "query_related_alerts: Alert A25-REL-01 shows initial access via spear-phishing on 10.0.3.90 establishing the attack chain.",
+            "query_threat_intel: Source IP 10.0.3.90 flagged as internal workstation with suspicious behavior consistent with attack progression."
+          ],
+          "iocs": [
+            {
+              "type": "ip",
+              "value": "10.0.3.90",
+              "malicious": true,
+              "context": "Compromised source workstation initiating lateral movement"
+            },
+            {
+              "type": "ip",
+              "value": "10.0.1.10",
+              "malicious": false,
+              "context": "Compromised victim Domain Controller"
+            }
+          ]
+        },
+        "remediation": [
+          "Immediately isolate host 10.0.3.90 from the network to stop ongoing lateral movement and data exfiltration.",
+          "Force password reset for all Domain Admin accounts and privileged service accounts across the domain.",
+          "Delete the malicious scheduled task 'At1' on DC01 (10.0.1.10) and scan for other persistence mechanisms.",
+          "Conduct forensic analysis on 10.0.3.90 to identify initial infection vector and scope of compromise.",
+          "Review firewall rules and segment traffic between workstations and the core production zone to limit future spread."
+        ],
+        "metadata": {
+          "tools_called": [
+            "query_alert_detail",
+            "query_asset_info",
+            "query_threat_intel",
+            "query_related_alerts"
+          ]
+        }
+      },
+      "raw_text": "{\n  \"alert_id\": \"A25\",\n  \"judgment\": {\n    \"severity\": \"critical\",\n    \"attack_type\": \"Lateral Movement & Persistence (APT28 TTP)\",\n    \"confidence\": 0.95,\n    \"summary\": \"Confirmed active compromise of Domain Controller via credential theft and lateral movement from infected workstation.\",\n    \"evidence_chain\": [\n      \"query_alert_detail: EDR alert A25 reports scheduled task 'At1' created on DC 10.0.1.10 using domain admin creds from 10.0.3.90.\",\n      \"query_asset_info: Target 10.0.1.10 is identified as a critical production Domain Controller (Windows Server 2022).\",\n      \"query_related_alerts: Alert A25-REL-02 confirms Mimikatz credential dumping on source IP 10.0.3.90 prior to lateral movement.\",\n      \"query_related_alerts: Alert A25-REL-01 shows initial access via spear-phishing on 10.0.3.90 establishing the attack chain.\",\n      \"query_threat_intel: Source IP 10.0.3.90 flagged as internal workstation with suspicious behavior consistent with attack progression.\"\n    ],\n    \"iocs\": [\n      {\n        \"type\": \"ip\",\n        \"value\": \"10.0.3.90\",\n        \"malicious\": true,\n        \"context\": \"Compromised source workstation initiating lateral movement\"\n      },\n      {\n        \"type\": \"ip\",\n        \"value\": \"10.0.1.10\",\n        \"malicious\": false,\n        \"context\": \"Compromised victim Domain Controller\"\n      }\n    ]\n  },\n  \"remediation\": [\n    \"Immediately isolate host 10.0.3.90 from the network to stop ongoing lateral movement and data exfiltration.\",\n    \"Force password reset for all Domain Admin accounts and privileged service accounts across the domain.\",\n    \"Delete the malicious scheduled task 'At1' on DC01 (10.0.1.10) and scan for other persistence mechanisms.\",\n    \"Conduct forensic analysis on 10.0.3.90 to identify initial infection vector and scope of compromise.\",\n    \"Review firewall rules and segment traffic between workstations and the core production zone to limit future spread.\"\n  ],\n  \"metadata\": {\n    \"tools_called\": [\n      \"query_alert_detail\",\n      \"query_asset_info\",\n      \"query_threat_intel\",\n      \"query_related_alerts\"\n    ]\n  }\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1288,
+      "output_tokens": 3920,
+      "latency_ms": 39943,
+      "attempts": 1
+    },
+    {
+      "label": "severity_rationality",
+      "parsed": {
+        "score": 5,
+        "reason": "The agent's judgment is fully supported by the provided evidence. The 'critical' severity rating aligns with the target being a Domain Controller (evidenced by 'asset_level': 'critical' and 'business_system': '主域控制器'). The attack chain described in the 'evidence_chain' (phishing -> Mimikatz -> Lateral Movement) is directly corroborated by the 'query_related_alerts' showing A25-REL-01 (Phishing), A25-REL-02 (Mimikatz), and A25-REL-03 (Reconnaissance). The specific TTP of creating a scheduled task using domain admin credentials is confirmed by the 'raw_log' in 'query_alert_detail_A25'.",
+        "evidence_quotes": [
+          "Target 10.0.1.10 is identified as a critical production Domain Controller (Windows Server 2022).",
+          "Asset Level: critical, Business System: 主域控制器",
+          "Alert A25-REL-02 confirms Mimikatz credential dumping on source IP 10.0.3.90 prior to lateral movement.",
+          "Task 'At1' created on DC01 to execute powershell -enc ... from remote IP 10.0.3.90 using domain admin creds.",
+          "Mimikatz executed on 10.0.3.90 harvesting domain admin credentials."
+        ]
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"The agent's judgment is fully supported by the provided evidence. The 'critical' severity rating aligns with the target being a Domain Controller (evidenced by 'asset_level': 'critical' and 'business_system': '主域控制器'). The attack chain described in the 'evidence_chain' (phishing -> Mimikatz -> Lateral Movement) is directly corroborated by the 'query_related_alerts' showing A25-REL-01 (Phishing), A25-REL-02 (Mimikatz), and A25-REL-03 (Reconnaissance). The specific TTP of creating a scheduled task using domain admin credentials is confirmed by the 'raw_log' in 'query_alert_detail_A25'.\",\n  \"evidence_quotes\": [\n    \"Target 10.0.1.10 is identified as a critical production Domain Controller (Windows Server 2022).\",\n    \"Asset Level: critical, Business System: 主域控制器\",\n    \"Alert A25-REL-02 confirms Mimikatz credential dumping on source IP 10.0.3.90 prior to lateral movement.\",\n    \"Task 'At1' created on DC01 to execute powershell -enc ... from remote IP 10.0.3.90 using domain admin creds.\",\n    \"Mimikatz executed on 10.0.3.90 harvesting domain admin credentials.\"\n  ]\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1670,
+      "output_tokens": 330,
+      "latency_ms": 3836,
+      "attempts": 1
+    },
+    {
+      "label": "remediation_actionability",
+      "parsed": {
+        "score": 5,
+        "reason": "处置建议非常具体、可执行且逻辑清晰。建议按攻击链优先级排列：首先隔离受感染主机（10.0.3.90）以阻断横向移动，其次重置凭据以消除威胁根源，接着清除持久化机制（计划任务），最后进行取证和架构加固。所有建议均直接引用了输入证据中的具体资产IP、任务名称及攻击行为。",
+        "evidence_quotes": [
+          "Immediately isolate host 10.0.3.90 from the network to stop ongoing lateral movement and data exfiltration.",
+          "Force password reset for all Domain Admin accounts and privileged service accounts across the domain.",
+          "Delete the malicious scheduled task 'At1' on DC01 (10.0.1.10) and scan for other persistence mechanisms.",
+          "Conduct forensic analysis on 10.0.3.90 to identify initial infection vector and scope of compromise."
+        ]
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"处置建议非常具体、可执行且逻辑清晰。建议按攻击链优先级排列：首先隔离受感染主机（10.0.3.90）以阻断横向移动，其次重置凭据以消除威胁根源，接着清除持久化机制（计划任务），最后进行取证和架构加固。所有建议均直接引用了输入证据中的具体资产IP、任务名称及攻击行为。\",\n  \"evidence_quotes\": [\n    \"Immediately isolate host 10.0.3.90 from the network to stop ongoing lateral movement and data exfiltration.\",\n    \"Force password reset for all Domain Admin accounts and privileged service accounts across the domain.\",\n    \"Delete the malicious scheduled task 'At1' on DC01 (10.0.1.10) and scan for other persistence mechanisms.\",\n    \"Conduct forensic analysis on 10.0.3.90 to identify initial infection vector and scope of compromise.\"\n  ]\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1673,
+      "output_tokens": 223,
+      "latency_ms": 2904,
+      "attempts": 1
+    },
+    {
+      "label": "evidence_completeness",
+      "parsed": {
+        "score": 5,
+        "reason": "证据链完整覆盖了攻击的关键阶段（初始访问、凭证窃取、横向移动、持久化）及核心 IOC。输入明确展示了从 A25-REL-01 (钓鱼) 到 A25-REL-02 (Mimikatz) 再到 A25 (DC 上的计划任务持久化) 的完整杀伤链，且通过 query_asset_info 确认了目标为关键域控，结合 threat_intel 排除了 IP 信誉误报并确认内部异常行为，逻辑严密。",
+        "evidence_quotes": [
+          "query_alert_detail: EDR alert A25 reports scheduled task 'At1' created on DC 10.0.1.10 using domain admin creds from 10.0.3.90.",
+          "query_asset_info: Target 10.0.1.10 is identified as a critical production Domain Controller (Windows Server 2022).",
+          "query_related_alerts: Alert A25-REL-02 confirms Mimikatz credential dumping on source IP 10.0.3.90 prior to lateral movement.",
+          "query_related_alerts: Alert A25-REL-01 shows initial access via spear-phishing on 10.0.3.90 establishing the attack chain.",
+          "query_threat_intel: Source IP 10.0.3.90 flagged as internal workstation with suspicious behavior consistent with attack progression."
+        ]
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"证据链完整覆盖了攻击的关键阶段（初始访问、凭证窃取、横向移动、持久化）及核心 IOC。输入明确展示了从 A25-REL-01 (钓鱼) 到 A25-REL-02 (Mimikatz) 再到 A25 (DC 上的计划任务持久化) 的完整杀伤链，且通过 query_asset_info 确认了目标为关键域控，结合 threat_intel 排除了 IP 信誉误报并确认内部异常行为，逻辑严密。\",\n  \"evidence_quotes\": [\n    \"query_alert_detail: EDR alert A25 reports scheduled task 'At1' created on DC 10.0.1.10 using domain admin creds from 10.0.3.90.\",\n    \"query_asset_info: Target 10.0.1.10 is identified as a critical production Domain Controller (Windows Server 2022).\",\n    \"query_related_alerts: Alert A25-REL-02 confirms Mimikatz credential dumping on source IP 10.0.3.90 prior to lateral movement.\",\n    \"query_related_alerts: Alert A25-REL-01 shows initial access via spear-phishing on 10.0.3.90 establishing the attack chain.\",\n    \"query_threat_intel: Source IP 10.0.3.90 flagged as internal workstation with suspicious behavior consistent with attack progression.\"\n  ]\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1673,
+      "output_tokens": 338,
+      "latency_ms": 3932,
+      "attempts": 1
+    },
+    {
+      "label": "hallucination_check",
+      "parsed": {
+        "total_statements": 5,
+        "verifiable": 4,
+        "hallucinations": 0,
+        "uncertain": 1,
+        "details": [
+          {
+            "statement": "query_alert_detail: EDR alert A25 reports scheduled task 'At1' created on DC 10.0.1.10 using domain admin creds from 10.0.3.90.",
+            "verdict": "verifiable",
+            "reason": "Supported by mock_api_responses['query_alert_detail_A25'] which shows raw_log: \"Task 'At1' created on DC01... from remote IP 10.0.3.90 using domain admin creds.\" and payload_highlights including schtasks command."
+          },
+          {
+            "statement": "query_asset_info: Target 10.0.1.10 is identified as a critical production Domain Controller (Windows Server 2022).",
+            "verdict": "verifiable",
+            "reason": "Supported by mock_api_responses['query_asset_info_10.0.1.10'] which lists ip: \"10.0.1.10\", asset_level: \"critical\", business_system: \"主域控制器\" (Domain Controller), and os: \"Windows Server 2022\"."
+          },
+          {
+            "statement": "query_related_alerts: Alert A25-REL-02 confirms Mimikatz credential dumping on source IP 10.0.3.90 prior to lateral movement.",
+            "verdict": "verifiable",
+            "reason": "Supported by mock_api_responses['query_related_alerts_10.0.3.90_48h'] where alert A25-REL-02 has type \"Credential Dump (Mimikatz)\", summary mentions \"Mimikatz executed on 10.0.3.90\", and timestamp (2026-07-12T14:45:00Z) is prior to the main alert A25 (2026-07-13T11:22:33Z)."
+          },
+          {
+            "statement": "query_related_alerts: Alert A25-REL-01 shows initial access via spear-phishing on 10.0.3.90 establishing the attack chain.",
+            "verdict": "verifiable",
+            "reason": "Supported by mock_api_responses['query_related_alerts_10.0.3.90_48h'] where alert A25-REL-01 has type \"Phishing Email Delivered\", summary mentions \"received spear-phishing email\", and timestamp (2026-07-12T09:30:00Z) is the earliest in the sequence."
+          },
+          {
+            "statement": "query_threat_intel: Source IP 10.0.3.90 flagged as internal workstation with suspicious behavior consistent with attack progression.",
+            "verdict": "uncertain",
+            "reason": "The mock_api_responses['query_threat_intel_ip_10.0.3.90'] states \"This is an internal workstation. Suspicious due to behavior, not IP reputation.\" However, it does not explicitly state that the behavior is \"consistent with attack progression\" or link it to the specific APT28 TTPs mentioned in the agent's conclusion. The evidence confirms suspicion but the specific characterization of 'attack progression consistency' is an inference not strictly present in the raw intel text provided."
+          }
+        ]
+      },
+      "raw_text": "{\n  \"total_statements\": 5,\n  \"verifiable\": 4,\n  \"hallucinations\": 0,\n  \"uncertain\": 1,\n  \"details\": [\n    {\n      \"statement\": \"query_alert_detail: EDR alert A25 reports scheduled task 'At1' created on DC 10.0.1.10 using domain admin creds from 10.0.3.90.\",\n      \"verdict\": \"verifiable\",\n      \"reason\": \"Supported by mock_api_responses['query_alert_detail_A25'] which shows raw_log: \\\"Task 'At1' created on DC01... from remote IP 10.0.3.90 using domain admin creds.\\\" and payload_highlights including schtasks command.\"\n    },\n    {\n      \"statement\": \"query_asset_info: Target 10.0.1.10 is identified as a critical production Domain Controller (Windows Server 2022).\",\n      \"verdict\": \"verifiable\",\n      \"reason\": \"Supported by mock_api_responses['query_asset_info_10.0.1.10'] which lists ip: \\\"10.0.1.10\\\", asset_level: \\\"critical\\\", business_system: \\\"主域控制器\\\" (Domain Controller), and os: \\\"Windows Server 2022\\\".\"\n    },\n    {\n      \"statement\": \"query_related_alerts: Alert A25-REL-02 confirms Mimikatz credential dumping on source IP 10.0.3.90 prior to lateral movement.\",\n      \"verdict\": \"verifiable\",\n      \"reason\": \"Supported by mock_api_responses['query_related_alerts_10.0.3.90_48h'] where alert A25-REL-02 has type \\\"Credential Dump (Mimikatz)\\\", summary mentions \\\"Mimikatz executed on 10.0.3.90\\\", and timestamp (2026-07-12T14:45:00Z) is prior to the main alert A25 (2026-07-13T11:22:33Z).\"\n    },\n    {\n      \"statement\": \"query_related_alerts: Alert A25-REL-01 shows initial access via spear-phishing on 10.0.3.90 establishing the attack chain.\",\n      \"verdict\": \"verifiable\",\n      \"reason\": \"Supported by mock_api_responses['query_related_alerts_10.0.3.90_48h'] where alert A25-REL-01 has type \\\"Phishing Email Delivered\\\", summary mentions \\\"received spear-phishing email\\\", and timestamp (2026-07-12T09:30:00Z) is the earliest in the sequence.\"\n    },\n    {\n      \"statement\": \"query_threat_intel: Source IP 10.0.3.90 flagged as internal workstation with suspicious behavior consistent with attack progression.\",\n      \"verdict\": \"uncertain\",\n      \"reason\": \"The mock_api_responses['query_threat_intel_ip_10.0.3.90'] states \\\"This is an internal workstation. Suspicious due to behavior, not IP reputation.\\\" However, it does not explicitly state that the behavior is \\\"consistent with attack progression\\\" or link it to the specific APT28 TTPs mentioned in the agent's conclusion. The evidence confirms suspicion but the specific characterization of 'attack progression consistency' is an inference not strictly present in the raw intel text provided.\"\n    }\n  ]\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1704,
+      "output_tokens": 807,
+      "latency_ms": 9035,
+      "attempts": 1
+    }
+  ],
+  "overall_pass": true,
+  "error_type": null,
+  "error_message": null
+}

@@ -1,0 +1,363 @@
+{
+  "test_case_id": "A12",
+  "scenario": "用户点击钓鱼邮件链接下载恶意文档并执行宏",
+  "difficulty": "medium",
+  "is_positive": true,
+  "expected_severity": "high",
+  "status": "completed",
+  "agent_output": {
+    "alert_id": "A12",
+    "judgment": {
+      "severity": "critical",
+      "attack_type": "Spear Phishing & APT Payload Delivery",
+      "confidence": 0.95,
+      "summary": "Confirmed FIN7 spear-phishing campaign targeting sales department. User downloaded weaponized macro document, triggered PowerShell execution, and established C2 communication.",
+      "evidence_chain": [
+        "EDR raw_log shows Outlook.exe downloaded malicious docm and WINWORD.EXE executed powershell -enc...",
+        "Threat Intel confirms domain phishing.cn is associated with FIN7 APT and used for C2.",
+        "Threat Intel marks URL http://phishing.cn/doc/sales_report.docm as malicious downloader.",
+        "Related alert A12-REL-01 confirms PowerShell attempting to download payload from c2.phishing.cn shortly after initial execution.",
+        "Asset info confirms target is a real business laptop (sales-laptop-07), not a scanner or honeypot."
+      ],
+      "iocs": [
+        {
+          "type": "domain",
+          "value": "phishing.cn",
+          "malicious": true,
+          "context": "FIN7 C2 and phishing infrastructure"
+        },
+        {
+          "type": "url",
+          "value": "http://phishing.cn/doc/sales_report.docm",
+          "malicious": true,
+          "context": "Weaponized macro document"
+        },
+        {
+          "type": "domain",
+          "value": "c2.phishing.cn",
+          "malicious": true,
+          "context": "C2 endpoint identified in related alert"
+        }
+      ]
+    },
+    "remediation": [
+      "Immediately isolate host 10.0.3.55 from the network to prevent lateral movement.",
+      "Block domain phishing.cn and URL http://phishing.cn/doc/sales_report.docm at firewall/proxy level.",
+      "Force password reset for user li.si@company.com and check for credential theft.",
+      "Perform forensic imaging on sales-laptop-07 to analyze persistence mechanisms and malware artifacts.",
+      "Scan other sales department endpoints for similar macro execution patterns."
+    ],
+    "metadata": {
+      "tools_called": [
+        "query_alert_detail",
+        "query_asset_info",
+        "query_threat_intel",
+        "query_related_alerts"
+      ]
+    }
+  },
+  "code_graders": {
+    "tools_called_minimum": {
+      "passed": true,
+      "reason": "required tools present",
+      "expected": [
+        "query_alert_detail",
+        "query_threat_intel",
+        "query_related_alerts"
+      ],
+      "actual": [
+        "query_alert_detail",
+        "query_asset_info",
+        "query_threat_intel",
+        "query_related_alerts"
+      ]
+    },
+    "output_schema": {
+      "passed": true,
+      "reason": "required fields present",
+      "expected": null,
+      "actual": null
+    },
+    "severity_enum": {
+      "passed": true,
+      "reason": "severity is valid",
+      "expected": [
+        "critical",
+        "false_positive",
+        "high",
+        "low",
+        "medium"
+      ],
+      "actual": "critical"
+    },
+    "severity_match": {
+      "passed": false,
+      "reason": "severity mismatch",
+      "expected": "high",
+      "actual": "critical"
+    },
+    "confidence_range": {
+      "passed": true,
+      "reason": "confidence in range",
+      "expected": "0..1",
+      "actual": 0.95
+    },
+    "remediation_not_empty": {
+      "passed": true,
+      "reason": "remediation actionable",
+      "expected": "at least one item >=10 chars",
+      "actual": [
+        "Immediately isolate host 10.0.3.55 from the network to prevent lateral movement.",
+        "Block domain phishing.cn and URL http://phishing.cn/doc/sales_report.docm at firewall/proxy level.",
+        "Force password reset for user li.si@company.com and check for credential theft.",
+        "Perform forensic imaging on sales-laptop-07 to analyze persistence mechanisms and malware artifacts.",
+        "Scan other sales department endpoints for similar macro execution patterns."
+      ]
+    }
+  },
+  "quality_scores": {
+    "severity_rationality": {
+      "score": 5,
+      "reason": "Agent output correctly identifies a critical FIN7 spear-phishing attack with high confidence. The evidence chain accurately synthesizes raw EDR logs (Outlook.exe downloading malicious docm, WINWORD.EXE executing PowerShell), threat intelligence confirming the domain and URL are associated with FIN7 APT, related alerts showing C2 communication, and asset info verifying the target is a real business laptop. All claims in the judgment are directly supported by the provided mock API responses.",
+      "evidence_quotes": [
+        "EDR raw_log shows Outlook.exe downloaded malicious docm and WINWORD.EXE executed powershell -enc...",
+        "Threat Intel confirms domain phishing.cn is associated with FIN7 APT and used for C2.",
+        "Threat Intel marks URL http://phishing.cn/doc/sales_report.docm as malicious downloader.",
+        "Related alert A12-REL-01 confirms PowerShell attempting to download payload from c2.phishing.cn shortly after initial execution.",
+        "Asset info confirms target is a real business laptop (sales-laptop-07), not a scanner or honeypot."
+      ]
+    },
+    "remediation_actionability": {
+      "score": 5,
+      "reason": "处置建议非常具体、可执行且逻辑清晰。建议按优先级排列：首先隔离主机（防止横向移动），其次阻断 IOC（切断通信），接着重置凭证（处理潜在泄露），最后进行取证和扫描（根除与排查）。所有建议均直接基于输入证据中的资产信息、IOC 列表及攻击链描述。",
+      "evidence_quotes": [
+        "Immediately isolate host 10.0.3.55 from the network to prevent lateral movement.",
+        "Block domain phishing.cn and URL http://phishing.cn/doc/sales_report.docm at firewall/proxy level.",
+        "Force password reset for user li.si@company.com and check for credential theft.",
+        "Perform forensic imaging on sales-laptop-07 to analyze persistence mechanisms and malware artifacts.",
+        "Scan other sales department endpoints for similar macro execution patterns."
+      ]
+    },
+    "evidence_completeness": {
+      "score": 5,
+      "reason": "证据链完整且逻辑严密，成功覆盖了从初始入侵向量（钓鱼邮件/恶意文档）到执行载荷（PowerShell），再到C2通信及威胁情报关联的完整攻击生命周期。关键IOC（域名、URL）均得到EDR日志与威胁情报的双重验证，且资产信息排除了误报可能（非蜜罐/扫描器）。",
+      "evidence_quotes": [
+        "EDR raw_log shows Outlook.exe downloaded malicious docm and WINWORD.EXE executed powershell -enc...",
+        "Threat Intel confirms domain phishing.cn is associated with FIN7 APT and used for C2.",
+        "Threat Intel marks URL http://phishing.cn/doc/sales_report.docm as malicious downloader.",
+        "Related alert A12-REL-01 confirms PowerShell attempting to download payload from c2.phishing.cn shortly after initial execution.",
+        "Asset info confirms target is a real business laptop (sales-laptop-07), not a scanner or honeypot."
+      ]
+    }
+  },
+  "hallucination": {
+    "total_statements": 5,
+    "verifiable": 5,
+    "hallucinations": 0,
+    "uncertain": 0,
+    "details": [
+      {
+        "statement": "EDR raw_log shows Outlook.exe downloaded malicious docm and WINWORD.EXE executed powershell -enc...",
+        "verdict": "verifiable",
+        "reason": "Directly confirmed by mock_api_responses query_alert_detail_A12.raw_log: 'Outlook.exe downloaded http://phishing.cn/doc/sales_report.docm; WINWORD.EXE executed process powershell -enc ...'"
+      },
+      {
+        "statement": "Threat Intel confirms domain phishing.cn is associated with FIN7 APT and used for C2.",
+        "verdict": "verifiable",
+        "reason": "Confirmed by mock_api_responses query_threat_intel_domain_phishing.cn which lists 'associated_apt': 'FIN7' and 'threat_tags': ['phishing', 'C2']"
+      },
+      {
+        "statement": "Threat Intel marks URL http://phishing.cn/doc/sales_report.docm as malicious downloader.",
+        "verdict": "verifiable",
+        "reason": "Confirmed by mock_api_responses query_threat_intel_url_http://phishing.cn/doc/sales_report.docm which has 'is_malicious': true and 'threat_tags': ['phishing', 'downloader']"
+      },
+      {
+        "statement": "Related alert A12-REL-01 confirms PowerShell attempting to download payload from c2.phishing.cn shortly after initial execution.",
+        "verdict": "verifiable",
+        "reason": "Confirmed by mock_api_responses query_related_alerts_10.0.3.55_48h.related_alerts[0] which shows alert_id 'A12-REL-01' with summary 'PowerShell command attempted to download additional payload from c2.phishing.cn.' and timestamp 14:35:00Z (shortly after 14:30:12Z)"
+      },
+      {
+        "statement": "Asset info confirms target is a real business laptop (sales-laptop-07), not a scanner or honeypot.",
+        "verdict": "verifiable",
+        "reason": "Confirmed by mock_api_responses query_asset_info_10.0.3.55 which shows hostname 'sales-laptop-07', tags including 'laptop', and explicitly sets 'is_honeypot': false and 'is_scanner': false"
+      }
+    ]
+  },
+  "calls": [
+    {
+      "label": "agent",
+      "parsed": {
+        "alert_id": "A12",
+        "judgment": {
+          "severity": "critical",
+          "attack_type": "Spear Phishing & APT Payload Delivery",
+          "confidence": 0.95,
+          "summary": "Confirmed FIN7 spear-phishing campaign targeting sales department. User downloaded weaponized macro document, triggered PowerShell execution, and established C2 communication.",
+          "evidence_chain": [
+            "EDR raw_log shows Outlook.exe downloaded malicious docm and WINWORD.EXE executed powershell -enc...",
+            "Threat Intel confirms domain phishing.cn is associated with FIN7 APT and used for C2.",
+            "Threat Intel marks URL http://phishing.cn/doc/sales_report.docm as malicious downloader.",
+            "Related alert A12-REL-01 confirms PowerShell attempting to download payload from c2.phishing.cn shortly after initial execution.",
+            "Asset info confirms target is a real business laptop (sales-laptop-07), not a scanner or honeypot."
+          ],
+          "iocs": [
+            {
+              "type": "domain",
+              "value": "phishing.cn",
+              "malicious": true,
+              "context": "FIN7 C2 and phishing infrastructure"
+            },
+            {
+              "type": "url",
+              "value": "http://phishing.cn/doc/sales_report.docm",
+              "malicious": true,
+              "context": "Weaponized macro document"
+            },
+            {
+              "type": "domain",
+              "value": "c2.phishing.cn",
+              "malicious": true,
+              "context": "C2 endpoint identified in related alert"
+            }
+          ]
+        },
+        "remediation": [
+          "Immediately isolate host 10.0.3.55 from the network to prevent lateral movement.",
+          "Block domain phishing.cn and URL http://phishing.cn/doc/sales_report.docm at firewall/proxy level.",
+          "Force password reset for user li.si@company.com and check for credential theft.",
+          "Perform forensic imaging on sales-laptop-07 to analyze persistence mechanisms and malware artifacts.",
+          "Scan other sales department endpoints for similar macro execution patterns."
+        ],
+        "metadata": {
+          "tools_called": [
+            "query_alert_detail",
+            "query_asset_info",
+            "query_threat_intel",
+            "query_related_alerts"
+          ]
+        }
+      },
+      "raw_text": "{\n  \"alert_id\": \"A12\",\n  \"judgment\": {\n    \"severity\": \"critical\",\n    \"attack_type\": \"Spear Phishing & APT Payload Delivery\",\n    \"confidence\": 0.95,\n    \"summary\": \"Confirmed FIN7 spear-phishing campaign targeting sales department. User downloaded weaponized macro document, triggered PowerShell execution, and established C2 communication.\",\n    \"evidence_chain\": [\n      \"EDR raw_log shows Outlook.exe downloaded malicious docm and WINWORD.EXE executed powershell -enc...\",\n      \"Threat Intel confirms domain phishing.cn is associated with FIN7 APT and used for C2.\",\n      \"Threat Intel marks URL http://phishing.cn/doc/sales_report.docm as malicious downloader.\",\n      \"Related alert A12-REL-01 confirms PowerShell attempting to download payload from c2.phishing.cn shortly after initial execution.\",\n      \"Asset info confirms target is a real business laptop (sales-laptop-07), not a scanner or honeypot.\"\n    ],\n    \"iocs\": [\n      {\n        \"type\": \"domain\",\n        \"value\": \"phishing.cn\",\n        \"malicious\": true,\n        \"context\": \"FIN7 C2 and phishing infrastructure\"\n      },\n      {\n        \"type\": \"url\",\n        \"value\": \"http://phishing.cn/doc/sales_report.docm\",\n        \"malicious\": true,\n        \"context\": \"Weaponized macro document\"\n      },\n      {\n        \"type\": \"domain\",\n        \"value\": \"c2.phishing.cn\",\n        \"malicious\": true,\n        \"context\": \"C2 endpoint identified in related alert\"\n      }\n    ]\n  },\n  \"remediation\": [\n    \"Immediately isolate host 10.0.3.55 from the network to prevent lateral movement.\",\n    \"Block domain phishing.cn and URL http://phishing.cn/doc/sales_report.docm at firewall/proxy level.\",\n    \"Force password reset for user li.si@company.com and check for credential theft.\",\n    \"Perform forensic imaging on sales-laptop-07 to analyze persistence mechanisms and malware artifacts.\",\n    \"Scan other sales department endpoints for similar macro execution patterns.\"\n  ],\n  \"metadata\": {\n    \"tools_called\": [\n      \"query_alert_detail\",\n      \"query_asset_info\",\n      \"query_threat_intel\",\n      \"query_related_alerts\"\n    ]\n  }\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1304,
+      "output_tokens": 4162,
+      "latency_ms": 41127,
+      "attempts": 1
+    },
+    {
+      "label": "severity_rationality",
+      "parsed": {
+        "score": 5,
+        "reason": "Agent output correctly identifies a critical FIN7 spear-phishing attack with high confidence. The evidence chain accurately synthesizes raw EDR logs (Outlook.exe downloading malicious docm, WINWORD.EXE executing PowerShell), threat intelligence confirming the domain and URL are associated with FIN7 APT, related alerts showing C2 communication, and asset info verifying the target is a real business laptop. All claims in the judgment are directly supported by the provided mock API responses.",
+        "evidence_quotes": [
+          "EDR raw_log shows Outlook.exe downloaded malicious docm and WINWORD.EXE executed powershell -enc...",
+          "Threat Intel confirms domain phishing.cn is associated with FIN7 APT and used for C2.",
+          "Threat Intel marks URL http://phishing.cn/doc/sales_report.docm as malicious downloader.",
+          "Related alert A12-REL-01 confirms PowerShell attempting to download payload from c2.phishing.cn shortly after initial execution.",
+          "Asset info confirms target is a real business laptop (sales-laptop-07), not a scanner or honeypot."
+        ]
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"Agent output correctly identifies a critical FIN7 spear-phishing attack with high confidence. The evidence chain accurately synthesizes raw EDR logs (Outlook.exe downloading malicious docm, WINWORD.EXE executing PowerShell), threat intelligence confirming the domain and URL are associated with FIN7 APT, related alerts showing C2 communication, and asset info verifying the target is a real business laptop. All claims in the judgment are directly supported by the provided mock API responses.\",\n  \"evidence_quotes\": [\n    \"EDR raw_log shows Outlook.exe downloaded malicious docm and WINWORD.EXE executed powershell -enc...\",\n    \"Threat Intel confirms domain phishing.cn is associated with FIN7 APT and used for C2.\",\n    \"Threat Intel marks URL http://phishing.cn/doc/sales_report.docm as malicious downloader.\",\n    \"Related alert A12-REL-01 confirms PowerShell attempting to download payload from c2.phishing.cn shortly after initial execution.\",\n    \"Asset info confirms target is a real business laptop (sales-laptop-07), not a scanner or honeypot.\"\n  ]\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1656,
+      "output_tokens": 248,
+      "latency_ms": 3199,
+      "attempts": 1
+    },
+    {
+      "label": "remediation_actionability",
+      "parsed": {
+        "score": 5,
+        "reason": "处置建议非常具体、可执行且逻辑清晰。建议按优先级排列：首先隔离主机（防止横向移动），其次阻断 IOC（切断通信），接着重置凭证（处理潜在泄露），最后进行取证和扫描（根除与排查）。所有建议均直接基于输入证据中的资产信息、IOC 列表及攻击链描述。",
+        "evidence_quotes": [
+          "Immediately isolate host 10.0.3.55 from the network to prevent lateral movement.",
+          "Block domain phishing.cn and URL http://phishing.cn/doc/sales_report.docm at firewall/proxy level.",
+          "Force password reset for user li.si@company.com and check for credential theft.",
+          "Perform forensic imaging on sales-laptop-07 to analyze persistence mechanisms and malware artifacts.",
+          "Scan other sales department endpoints for similar macro execution patterns."
+        ]
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"处置建议非常具体、可执行且逻辑清晰。建议按优先级排列：首先隔离主机（防止横向移动），其次阻断 IOC（切断通信），接着重置凭证（处理潜在泄露），最后进行取证和扫描（根除与排查）。所有建议均直接基于输入证据中的资产信息、IOC 列表及攻击链描述。\",\n  \"evidence_quotes\": [\n    \"Immediately isolate host 10.0.3.55 from the network to prevent lateral movement.\",\n    \"Block domain phishing.cn and URL http://phishing.cn/doc/sales_report.docm at firewall/proxy level.\",\n    \"Force password reset for user li.si@company.com and check for credential theft.\",\n    \"Perform forensic imaging on sales-laptop-07 to analyze persistence mechanisms and malware artifacts.\",\n    \"Scan other sales department endpoints for similar macro execution patterns.\"\n  ]\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1659,
+      "output_tokens": 202,
+      "latency_ms": 3129,
+      "attempts": 1
+    },
+    {
+      "label": "evidence_completeness",
+      "parsed": {
+        "score": 5,
+        "reason": "证据链完整且逻辑严密，成功覆盖了从初始入侵向量（钓鱼邮件/恶意文档）到执行载荷（PowerShell），再到C2通信及威胁情报关联的完整攻击生命周期。关键IOC（域名、URL）均得到EDR日志与威胁情报的双重验证，且资产信息排除了误报可能（非蜜罐/扫描器）。",
+        "evidence_quotes": [
+          "EDR raw_log shows Outlook.exe downloaded malicious docm and WINWORD.EXE executed powershell -enc...",
+          "Threat Intel confirms domain phishing.cn is associated with FIN7 APT and used for C2.",
+          "Threat Intel marks URL http://phishing.cn/doc/sales_report.docm as malicious downloader.",
+          "Related alert A12-REL-01 confirms PowerShell attempting to download payload from c2.phishing.cn shortly after initial execution.",
+          "Asset info confirms target is a real business laptop (sales-laptop-07), not a scanner or honeypot."
+        ]
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"证据链完整且逻辑严密，成功覆盖了从初始入侵向量（钓鱼邮件/恶意文档）到执行载荷（PowerShell），再到C2通信及威胁情报关联的完整攻击生命周期。关键IOC（域名、URL）均得到EDR日志与威胁情报的双重验证，且资产信息排除了误报可能（非蜜罐/扫描器）。\",\n  \"evidence_quotes\": [\n    \"EDR raw_log shows Outlook.exe downloaded malicious docm and WINWORD.EXE executed powershell -enc...\",\n    \"Threat Intel confirms domain phishing.cn is associated with FIN7 APT and used for C2.\",\n    \"Threat Intel marks URL http://phishing.cn/doc/sales_report.docm as malicious downloader.\",\n    \"Related alert A12-REL-01 confirms PowerShell attempting to download payload from c2.phishing.cn shortly after initial execution.\",\n    \"Asset info confirms target is a real business laptop (sales-laptop-07), not a scanner or honeypot.\"\n  ]\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1659,
+      "output_tokens": 232,
+      "latency_ms": 3252,
+      "attempts": 1
+    },
+    {
+      "label": "hallucination_check",
+      "parsed": {
+        "total_statements": 5,
+        "verifiable": 5,
+        "hallucinations": 0,
+        "uncertain": 0,
+        "details": [
+          {
+            "statement": "EDR raw_log shows Outlook.exe downloaded malicious docm and WINWORD.EXE executed powershell -enc...",
+            "verdict": "verifiable",
+            "reason": "Directly confirmed by mock_api_responses query_alert_detail_A12.raw_log: 'Outlook.exe downloaded http://phishing.cn/doc/sales_report.docm; WINWORD.EXE executed process powershell -enc ...'"
+          },
+          {
+            "statement": "Threat Intel confirms domain phishing.cn is associated with FIN7 APT and used for C2.",
+            "verdict": "verifiable",
+            "reason": "Confirmed by mock_api_responses query_threat_intel_domain_phishing.cn which lists 'associated_apt': 'FIN7' and 'threat_tags': ['phishing', 'C2']"
+          },
+          {
+            "statement": "Threat Intel marks URL http://phishing.cn/doc/sales_report.docm as malicious downloader.",
+            "verdict": "verifiable",
+            "reason": "Confirmed by mock_api_responses query_threat_intel_url_http://phishing.cn/doc/sales_report.docm which has 'is_malicious': true and 'threat_tags': ['phishing', 'downloader']"
+          },
+          {
+            "statement": "Related alert A12-REL-01 confirms PowerShell attempting to download payload from c2.phishing.cn shortly after initial execution.",
+            "verdict": "verifiable",
+            "reason": "Confirmed by mock_api_responses query_related_alerts_10.0.3.55_48h.related_alerts[0] which shows alert_id 'A12-REL-01' with summary 'PowerShell command attempted to download additional payload from c2.phishing.cn.' and timestamp 14:35:00Z (shortly after 14:30:12Z)"
+          },
+          {
+            "statement": "Asset info confirms target is a real business laptop (sales-laptop-07), not a scanner or honeypot.",
+            "verdict": "verifiable",
+            "reason": "Confirmed by mock_api_responses query_asset_info_10.0.3.55 which shows hostname 'sales-laptop-07', tags including 'laptop', and explicitly sets 'is_honeypot': false and 'is_scanner': false"
+          }
+        ]
+      },
+      "raw_text": "{\n  \"total_statements\": 5,\n  \"verifiable\": 5,\n  \"hallucinations\": 0,\n  \"uncertain\": 0,\n  \"details\": [\n    {\n      \"statement\": \"EDR raw_log shows Outlook.exe downloaded malicious docm and WINWORD.EXE executed powershell -enc...\",\n      \"verdict\": \"verifiable\",\n      \"reason\": \"Directly confirmed by mock_api_responses query_alert_detail_A12.raw_log: 'Outlook.exe downloaded http://phishing.cn/doc/sales_report.docm; WINWORD.EXE executed process powershell -enc ...'\"\n    },\n    {\n      \"statement\": \"Threat Intel confirms domain phishing.cn is associated with FIN7 APT and used for C2.\",\n      \"verdict\": \"verifiable\",\n      \"reason\": \"Confirmed by mock_api_responses query_threat_intel_domain_phishing.cn which lists 'associated_apt': 'FIN7' and 'threat_tags': ['phishing', 'C2']\"\n    },\n    {\n      \"statement\": \"Threat Intel marks URL http://phishing.cn/doc/sales_report.docm as malicious downloader.\",\n      \"verdict\": \"verifiable\",\n      \"reason\": \"Confirmed by mock_api_responses query_threat_intel_url_http://phishing.cn/doc/sales_report.docm which has 'is_malicious': true and 'threat_tags': ['phishing', 'downloader']\"\n    },\n    {\n      \"statement\": \"Related alert A12-REL-01 confirms PowerShell attempting to download payload from c2.phishing.cn shortly after initial execution.\",\n      \"verdict\": \"verifiable\",\n      \"reason\": \"Confirmed by mock_api_responses query_related_alerts_10.0.3.55_48h.related_alerts[0] which shows alert_id 'A12-REL-01' with summary 'PowerShell command attempted to download additional payload from c2.phishing.cn.' and timestamp 14:35:00Z (shortly after 14:30:12Z)\"\n    },\n    {\n      \"statement\": \"Asset info confirms target is a real business laptop (sales-laptop-07), not a scanner or honeypot.\",\n      \"verdict\": \"verifiable\",\n      \"reason\": \"Confirmed by mock_api_responses query_asset_info_10.0.3.55 which shows hostname 'sales-laptop-07', tags including 'laptop', and explicitly sets 'is_honeypot': false and 'is_scanner': false\"\n    }\n  ]\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1690,
+      "output_tokens": 575,
+      "latency_ms": 5834,
+      "attempts": 1
+    }
+  ],
+  "overall_pass": false,
+  "error_type": null,
+  "error_message": null
+}

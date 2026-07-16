@@ -1,0 +1,351 @@
+{
+  "test_case_id": "A24",
+  "scenario": "勒索软件通过永恒之蓝和 PsExec 横向传播",
+  "difficulty": "hard",
+  "is_positive": true,
+  "expected_severity": "critical",
+  "status": "completed",
+  "agent_output": {
+    "alert_id": "A24",
+    "judgment": {
+      "severity": "critical",
+      "attack_type": "Ransomware & Lateral Movement",
+      "confidence": 0.95,
+      "summary": "Active ransomware outbreak confirmed on critical production assets. Initial compromise via MS17-010 exploitation followed by PsExec lateral movement resulting in file encryption on 3 servers.",
+      "evidence_chain": [
+        "EDR detected Encryptor.exe execution and .crypt file extension on 10.0.1.45, 10.0.1.46, 10.0.1.47 (source: query_alert_detail)",
+        "Asset 10.0.1.45 identified as critical production server 'Order Processing System' in production zone (source: query_asset_info)",
+        "File hash c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9 flagged as ransomware/worm exploiting MS17-010 (source: query_threat_intel)",
+        "Related alerts confirm MS17-010 exploit from 192.0.2.60, PsExec lateral movement to other hosts, and C2 beacon to 198.51.100.250 (source: query_related_alerts)"
+      ],
+      "iocs": [
+        {
+          "type": "hash",
+          "value": "c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9",
+          "malicious": true,
+          "context": "Ransomware payload hash associated with worm capability"
+        },
+        {
+          "type": "ip",
+          "value": "192.0.2.60",
+          "malicious": true,
+          "context": "Source IP of MS17-010 exploitation"
+        },
+        {
+          "type": "ip",
+          "value": "198.51.100.250",
+          "malicious": true,
+          "context": "C2 Beacon destination IP"
+        }
+      ]
+    },
+    "remediation": [
+      "Immediately isolate affected hosts (10.0.1.45, 10.0.1.46, 10.0.1.47) from the network to prevent further lateral movement.",
+      "Block outbound traffic to C2 IP 198.51.100.250 and inbound from 192.0.2.60 at perimeter firewall and EDR policies.",
+      "Apply MS17-010 patch on all Windows systems and disable SMBv1 if not required to close initial vulnerability.",
+      "Reset local administrator passwords and service account credentials used by PsExec across the domain to stop credential-based spread.",
+      "Initiate forensic investigation and restore data from clean backups after ensuring environment is sanitized."
+    ],
+    "metadata": {
+      "tools_called": [
+        "query_alert_detail",
+        "query_asset_info",
+        "query_threat_intel",
+        "query_related_alerts"
+      ]
+    }
+  },
+  "code_graders": {
+    "tools_called_minimum": {
+      "passed": true,
+      "reason": "required tools present",
+      "expected": [
+        "query_alert_detail",
+        "query_threat_intel",
+        "query_related_alerts"
+      ],
+      "actual": [
+        "query_alert_detail",
+        "query_asset_info",
+        "query_threat_intel",
+        "query_related_alerts"
+      ]
+    },
+    "output_schema": {
+      "passed": true,
+      "reason": "required fields present",
+      "expected": null,
+      "actual": null
+    },
+    "severity_enum": {
+      "passed": true,
+      "reason": "severity is valid",
+      "expected": [
+        "critical",
+        "false_positive",
+        "high",
+        "low",
+        "medium"
+      ],
+      "actual": "critical"
+    },
+    "severity_match": {
+      "passed": true,
+      "reason": "severity matches",
+      "expected": "critical",
+      "actual": "critical"
+    },
+    "confidence_range": {
+      "passed": true,
+      "reason": "confidence in range",
+      "expected": "0..1",
+      "actual": 0.95
+    },
+    "remediation_not_empty": {
+      "passed": true,
+      "reason": "remediation actionable",
+      "expected": "at least one item >=10 chars",
+      "actual": [
+        "Immediately isolate affected hosts (10.0.1.45, 10.0.1.46, 10.0.1.47) from the network to prevent further lateral movement.",
+        "Block outbound traffic to C2 IP 198.51.100.250 and inbound from 192.0.2.60 at perimeter firewall and EDR policies.",
+        "Apply MS17-010 patch on all Windows systems and disable SMBv1 if not required to close initial vulnerability.",
+        "Reset local administrator passwords and service account credentials used by PsExec across the domain to stop credential-based spread.",
+        "Initiate forensic investigation and restore data from clean backups after ensuring environment is sanitized."
+      ]
+    }
+  },
+  "quality_scores": {
+    "severity_rationality": {
+      "score": 5,
+      "reason": "The agent's judgment of 'critical' severity and the detailed attack chain (Ransomware & Lateral Movement) are fully supported by the provided evidence. The mock API responses confirm the presence of ransomware indicators (.crypt extension), the exploitation of a critical vulnerability (MS17-010), lateral movement via PsExec, and the targeting of a 'critical' production asset ('Order Processing System'). All specific IOCs and timeline details in the agent's output align perfectly with the raw logs and threat intelligence data.",
+      "evidence_quotes": [
+        "Asset 10.0.1.45 identified as critical production server 'Order Processing System' in production zone",
+        "EDR detected Encryptor.exe execution and .crypt file extension on 10.0.1.45, 10.0.1.46, 10.0.1.47",
+        "File hash c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9 flagged as ransomware/worm exploiting MS17-010",
+        "Related alerts confirm MS17-010 exploit from 192.0.2.60, PsExec lateral movement to other hosts, and C2 beacon to 198.51.100.250",
+        "raw_log: 'Encryptor.exe executed on 10.0.1.45, 10.0.1.46, 10.0.1.47. Files renamed to .crypt extension.'",
+        "summary: 'External host 192.0.2.60 exploited MS17-010 against 10.0.1.45 and delivered ransomware payload.'"
+      ]
+    },
+    "remediation_actionability": {
+      "score": 5,
+      "reason": "处置建议非常具体、可执行且逻辑清晰。建议按优先级排列：首先隔离受感染主机（10.0.1.45-47）以遏制横向移动，其次阻断C2和攻击源IP通信，接着修补初始漏洞（MS17-010），然后重置凭证以阻止基于凭据的传播，最后进行取证和恢复。所有建议均直接引用了输入证据中的具体IP地址、漏洞编号和攻击行为。",
+      "evidence_quotes": [
+        "Immediately isolate affected hosts (10.0.1.45, 10.0.1.46, 10.0.1.47) from the network to prevent further lateral movement.",
+        "Block outbound traffic to C2 IP 198.51.100.250 and inbound from 192.0.2.60 at perimeter firewall and EDR policies.",
+        "Apply MS17-010 patch on all Windows systems and disable SMBv1 if not required to close initial vulnerability.",
+        "Reset local administrator passwords and service account credentials used by PsExec across the domain to stop credential-based spread."
+      ]
+    },
+    "evidence_completeness": {
+      "score": 5,
+      "reason": "证据链完整覆盖了攻击的关键IOC（恶意哈希、C2 IP、攻击源IP）和核心行为特征（MS17-010利用、PsExec横向移动、文件加密）。输入数据中的原始日志、威胁情报关联及资产信息相互印证，形成了从初始入侵到横向扩散再到加密破坏的闭环逻辑。",
+      "evidence_quotes": [
+        "EDR detected Encryptor.exe execution and .crypt file extension on 10.0.1.45, 10.0.1.46, 10.0.1.47",
+        "File hash c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9 flagged as ransomware/worm exploiting MS17-010",
+        "Related alerts confirm MS17-010 exploit from 192.0.2.60, PsExec lateral movement to other hosts, and C2 beacon to 198.51.100.250",
+        "Asset 10.0.1.45 identified as critical production server 'Order Processing System'",
+        "raw_intel: Ransomware sample with worm capability exploiting MS17-010 and using PsExec for lateral movement"
+      ]
+    }
+  },
+  "hallucination": {
+    "total_statements": 4,
+    "verifiable": 4,
+    "hallucinations": 0,
+    "uncertain": 0,
+    "details": [
+      {
+        "statement": "EDR detected Encryptor.exe execution and .crypt file extension on 10.0.1.45, 10.0.1.46, 10.0.1.47",
+        "verdict": "verifiable",
+        "reason": "Confirmed by mock_api_responses query_alert_detail_A24 raw_log: 'Encryptor.exe executed on 10.0.1.45, 10.0.1.46, 10.0.1.47. Files renamed to .crypt extension.' and payload_highlights."
+      },
+      {
+        "statement": "Asset 10.0.1.45 identified as critical production server 'Order Processing System' in production zone",
+        "verdict": "verifiable",
+        "reason": "Confirmed by mock_api_responses query_asset_info_10.0.1.45: asset_level is 'critical', business_system is '订单处理系统' (Order Processing System), and network_zone is '生产 - 核心' (Production-Core)."
+      },
+      {
+        "statement": "File hash c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9 flagged as ransomware/worm exploiting MS17-010",
+        "verdict": "verifiable",
+        "reason": "Confirmed by mock_api_responses query_threat_intel_hash_c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9: is_malicious is true, threat_tags include 'ransomware' and 'worm', and raw_intel states it exploits MS17-010."
+      },
+      {
+        "statement": "Related alerts confirm MS17-010 exploit from 192.0.2.60, PsExec lateral movement to other hosts, and C2 beacon to 198.51.100.250",
+        "verdict": "verifiable",
+        "reason": "Confirmed by mock_api_responses query_related_alerts_10.0.1.45_48h: A24-REL-01 confirms MS17-010 exploit from 192.0.2.60; A24-REL-02 confirms PsExec lateral movement to 10.0.1.46/47; A24-REL-03 confirms C2 beacon to 198.51.100.250."
+      }
+    ]
+  },
+  "calls": [
+    {
+      "label": "agent",
+      "parsed": {
+        "alert_id": "A24",
+        "judgment": {
+          "severity": "critical",
+          "attack_type": "Ransomware & Lateral Movement",
+          "confidence": 0.95,
+          "summary": "Active ransomware outbreak confirmed on critical production assets. Initial compromise via MS17-010 exploitation followed by PsExec lateral movement resulting in file encryption on 3 servers.",
+          "evidence_chain": [
+            "EDR detected Encryptor.exe execution and .crypt file extension on 10.0.1.45, 10.0.1.46, 10.0.1.47 (source: query_alert_detail)",
+            "Asset 10.0.1.45 identified as critical production server 'Order Processing System' in production zone (source: query_asset_info)",
+            "File hash c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9 flagged as ransomware/worm exploiting MS17-010 (source: query_threat_intel)",
+            "Related alerts confirm MS17-010 exploit from 192.0.2.60, PsExec lateral movement to other hosts, and C2 beacon to 198.51.100.250 (source: query_related_alerts)"
+          ],
+          "iocs": [
+            {
+              "type": "hash",
+              "value": "c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9",
+              "malicious": true,
+              "context": "Ransomware payload hash associated with worm capability"
+            },
+            {
+              "type": "ip",
+              "value": "192.0.2.60",
+              "malicious": true,
+              "context": "Source IP of MS17-010 exploitation"
+            },
+            {
+              "type": "ip",
+              "value": "198.51.100.250",
+              "malicious": true,
+              "context": "C2 Beacon destination IP"
+            }
+          ]
+        },
+        "remediation": [
+          "Immediately isolate affected hosts (10.0.1.45, 10.0.1.46, 10.0.1.47) from the network to prevent further lateral movement.",
+          "Block outbound traffic to C2 IP 198.51.100.250 and inbound from 192.0.2.60 at perimeter firewall and EDR policies.",
+          "Apply MS17-010 patch on all Windows systems and disable SMBv1 if not required to close initial vulnerability.",
+          "Reset local administrator passwords and service account credentials used by PsExec across the domain to stop credential-based spread.",
+          "Initiate forensic investigation and restore data from clean backups after ensuring environment is sanitized."
+        ],
+        "metadata": {
+          "tools_called": [
+            "query_alert_detail",
+            "query_asset_info",
+            "query_threat_intel",
+            "query_related_alerts"
+          ]
+        }
+      },
+      "raw_text": "{\n  \"alert_id\": \"A24\",\n  \"judgment\": {\n    \"severity\": \"critical\",\n    \"attack_type\": \"Ransomware & Lateral Movement\",\n    \"confidence\": 0.95,\n    \"summary\": \"Active ransomware outbreak confirmed on critical production assets. Initial compromise via MS17-010 exploitation followed by PsExec lateral movement resulting in file encryption on 3 servers.\",\n    \"evidence_chain\": [\n      \"EDR detected Encryptor.exe execution and .crypt file extension on 10.0.1.45, 10.0.1.46, 10.0.1.47 (source: query_alert_detail)\",\n      \"Asset 10.0.1.45 identified as critical production server 'Order Processing System' in production zone (source: query_asset_info)\",\n      \"File hash c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9 flagged as ransomware/worm exploiting MS17-010 (source: query_threat_intel)\",\n      \"Related alerts confirm MS17-010 exploit from 192.0.2.60, PsExec lateral movement to other hosts, and C2 beacon to 198.51.100.250 (source: query_related_alerts)\"\n    ],\n    \"iocs\": [\n      {\n        \"type\": \"hash\",\n        \"value\": \"c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9\",\n        \"malicious\": true,\n        \"context\": \"Ransomware payload hash associated with worm capability\"\n      },\n      {\n        \"type\": \"ip\",\n        \"value\": \"192.0.2.60\",\n        \"malicious\": true,\n        \"context\": \"Source IP of MS17-010 exploitation\"\n      },\n      {\n        \"type\": \"ip\",\n        \"value\": \"198.51.100.250\",\n        \"malicious\": true,\n        \"context\": \"C2 Beacon destination IP\"\n      }\n    ]\n  },\n  \"remediation\": [\n    \"Immediately isolate affected hosts (10.0.1.45, 10.0.1.46, 10.0.1.47) from the network to prevent further lateral movement.\",\n    \"Block outbound traffic to C2 IP 198.51.100.250 and inbound from 192.0.2.60 at perimeter firewall and EDR policies.\",\n    \"Apply MS17-010 patch on all Windows systems and disable SMBv1 if not required to close initial vulnerability.\",\n    \"Reset local administrator passwords and service account credentials used by PsExec across the domain to stop credential-based spread.\",\n    \"Initiate forensic investigation and restore data from clean backups after ensuring environment is sanitized.\"\n  ],\n  \"metadata\": {\n    \"tools_called\": [\n      \"query_alert_detail\",\n      \"query_asset_info\",\n      \"query_threat_intel\",\n      \"query_related_alerts\"\n    ]\n  }\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1415,
+      "output_tokens": 4085,
+      "latency_ms": 50173,
+      "attempts": 1
+    },
+    {
+      "label": "severity_rationality",
+      "parsed": {
+        "score": 5,
+        "reason": "The agent's judgment of 'critical' severity and the detailed attack chain (Ransomware & Lateral Movement) are fully supported by the provided evidence. The mock API responses confirm the presence of ransomware indicators (.crypt extension), the exploitation of a critical vulnerability (MS17-010), lateral movement via PsExec, and the targeting of a 'critical' production asset ('Order Processing System'). All specific IOCs and timeline details in the agent's output align perfectly with the raw logs and threat intelligence data.",
+        "evidence_quotes": [
+          "Asset 10.0.1.45 identified as critical production server 'Order Processing System' in production zone",
+          "EDR detected Encryptor.exe execution and .crypt file extension on 10.0.1.45, 10.0.1.46, 10.0.1.47",
+          "File hash c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9 flagged as ransomware/worm exploiting MS17-010",
+          "Related alerts confirm MS17-010 exploit from 192.0.2.60, PsExec lateral movement to other hosts, and C2 beacon to 198.51.100.250",
+          "raw_log: 'Encryptor.exe executed on 10.0.1.45, 10.0.1.46, 10.0.1.47. Files renamed to .crypt extension.'",
+          "summary: 'External host 192.0.2.60 exploited MS17-010 against 10.0.1.45 and delivered ransomware payload.'"
+        ]
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"The agent's judgment of 'critical' severity and the detailed attack chain (Ransomware & Lateral Movement) are fully supported by the provided evidence. The mock API responses confirm the presence of ransomware indicators (.crypt extension), the exploitation of a critical vulnerability (MS17-010), lateral movement via PsExec, and the targeting of a 'critical' production asset ('Order Processing System'). All specific IOCs and timeline details in the agent's output align perfectly with the raw logs and threat intelligence data.\",\n  \"evidence_quotes\": [\n    \"Asset 10.0.1.45 identified as critical production server 'Order Processing System' in production zone\",\n    \"EDR detected Encryptor.exe execution and .crypt file extension on 10.0.1.45, 10.0.1.46, 10.0.1.47\",\n    \"File hash c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9 flagged as ransomware/worm exploiting MS17-010\",\n    \"Related alerts confirm MS17-010 exploit from 192.0.2.60, PsExec lateral movement to other hosts, and C2 beacon to 198.51.100.250\",\n    \"raw_log: 'Encryptor.exe executed on 10.0.1.45, 10.0.1.46, 10.0.1.47. Files renamed to .crypt extension.'\",\n    \"summary: 'External host 192.0.2.60 exploited MS17-010 against 10.0.1.45 and delivered ransomware payload.'\"\n  ]\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1970,
+      "output_tokens": 414,
+      "latency_ms": 4652,
+      "attempts": 1
+    },
+    {
+      "label": "remediation_actionability",
+      "parsed": {
+        "score": 5,
+        "reason": "处置建议非常具体、可执行且逻辑清晰。建议按优先级排列：首先隔离受感染主机（10.0.1.45-47）以遏制横向移动，其次阻断C2和攻击源IP通信，接着修补初始漏洞（MS17-010），然后重置凭证以阻止基于凭据的传播，最后进行取证和恢复。所有建议均直接引用了输入证据中的具体IP地址、漏洞编号和攻击行为。",
+        "evidence_quotes": [
+          "Immediately isolate affected hosts (10.0.1.45, 10.0.1.46, 10.0.1.47) from the network to prevent further lateral movement.",
+          "Block outbound traffic to C2 IP 198.51.100.250 and inbound from 192.0.2.60 at perimeter firewall and EDR policies.",
+          "Apply MS17-010 patch on all Windows systems and disable SMBv1 if not required to close initial vulnerability.",
+          "Reset local administrator passwords and service account credentials used by PsExec across the domain to stop credential-based spread."
+        ]
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"处置建议非常具体、可执行且逻辑清晰。建议按优先级排列：首先隔离受感染主机（10.0.1.45-47）以遏制横向移动，其次阻断C2和攻击源IP通信，接着修补初始漏洞（MS17-010），然后重置凭证以阻止基于凭据的传播，最后进行取证和恢复。所有建议均直接引用了输入证据中的具体IP地址、漏洞编号和攻击行为。\",\n  \"evidence_quotes\": [\n    \"Immediately isolate affected hosts (10.0.1.45, 10.0.1.46, 10.0.1.47) from the network to prevent further lateral movement.\",\n    \"Block outbound traffic to C2 IP 198.51.100.250 and inbound from 192.0.2.60 at perimeter firewall and EDR policies.\",\n    \"Apply MS17-010 patch on all Windows systems and disable SMBv1 if not required to close initial vulnerability.\",\n    \"Reset local administrator passwords and service account credentials used by PsExec across the domain to stop credential-based spread.\"\n  ]\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1973,
+      "output_tokens": 276,
+      "latency_ms": 3750,
+      "attempts": 1
+    },
+    {
+      "label": "evidence_completeness",
+      "parsed": {
+        "score": 5,
+        "reason": "证据链完整覆盖了攻击的关键IOC（恶意哈希、C2 IP、攻击源IP）和核心行为特征（MS17-010利用、PsExec横向移动、文件加密）。输入数据中的原始日志、威胁情报关联及资产信息相互印证，形成了从初始入侵到横向扩散再到加密破坏的闭环逻辑。",
+        "evidence_quotes": [
+          "EDR detected Encryptor.exe execution and .crypt file extension on 10.0.1.45, 10.0.1.46, 10.0.1.47",
+          "File hash c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9 flagged as ransomware/worm exploiting MS17-010",
+          "Related alerts confirm MS17-010 exploit from 192.0.2.60, PsExec lateral movement to other hosts, and C2 beacon to 198.51.100.250",
+          "Asset 10.0.1.45 identified as critical production server 'Order Processing System'",
+          "raw_intel: Ransomware sample with worm capability exploiting MS17-010 and using PsExec for lateral movement"
+        ]
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"证据链完整覆盖了攻击的关键IOC（恶意哈希、C2 IP、攻击源IP）和核心行为特征（MS17-010利用、PsExec横向移动、文件加密）。输入数据中的原始日志、威胁情报关联及资产信息相互印证，形成了从初始入侵到横向扩散再到加密破坏的闭环逻辑。\",\n  \"evidence_quotes\": [\n    \"EDR detected Encryptor.exe execution and .crypt file extension on 10.0.1.45, 10.0.1.46, 10.0.1.47\",\n    \"File hash c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9 flagged as ransomware/worm exploiting MS17-010\",\n    \"Related alerts confirm MS17-010 exploit from 192.0.2.60, PsExec lateral movement to other hosts, and C2 beacon to 198.51.100.250\",\n    \"Asset 10.0.1.45 identified as critical production server 'Order Processing System'\",\n    \"raw_intel: Ransomware sample with worm capability exploiting MS17-010 and using PsExec for lateral movement\"\n  ]\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1973,
+      "output_tokens": 309,
+      "latency_ms": 3634,
+      "attempts": 1
+    },
+    {
+      "label": "hallucination_check",
+      "parsed": {
+        "total_statements": 4,
+        "verifiable": 4,
+        "hallucinations": 0,
+        "uncertain": 0,
+        "details": [
+          {
+            "statement": "EDR detected Encryptor.exe execution and .crypt file extension on 10.0.1.45, 10.0.1.46, 10.0.1.47",
+            "verdict": "verifiable",
+            "reason": "Confirmed by mock_api_responses query_alert_detail_A24 raw_log: 'Encryptor.exe executed on 10.0.1.45, 10.0.1.46, 10.0.1.47. Files renamed to .crypt extension.' and payload_highlights."
+          },
+          {
+            "statement": "Asset 10.0.1.45 identified as critical production server 'Order Processing System' in production zone",
+            "verdict": "verifiable",
+            "reason": "Confirmed by mock_api_responses query_asset_info_10.0.1.45: asset_level is 'critical', business_system is '订单处理系统' (Order Processing System), and network_zone is '生产 - 核心' (Production-Core)."
+          },
+          {
+            "statement": "File hash c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9 flagged as ransomware/worm exploiting MS17-010",
+            "verdict": "verifiable",
+            "reason": "Confirmed by mock_api_responses query_threat_intel_hash_c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9: is_malicious is true, threat_tags include 'ransomware' and 'worm', and raw_intel states it exploits MS17-010."
+          },
+          {
+            "statement": "Related alerts confirm MS17-010 exploit from 192.0.2.60, PsExec lateral movement to other hosts, and C2 beacon to 198.51.100.250",
+            "verdict": "verifiable",
+            "reason": "Confirmed by mock_api_responses query_related_alerts_10.0.1.45_48h: A24-REL-01 confirms MS17-010 exploit from 192.0.2.60; A24-REL-02 confirms PsExec lateral movement to 10.0.1.46/47; A24-REL-03 confirms C2 beacon to 198.51.100.250."
+          }
+        ]
+      },
+      "raw_text": "{\n  \"total_statements\": 4,\n  \"verifiable\": 4,\n  \"hallucinations\": 0,\n  \"uncertain\": 0,\n  \"details\": [\n    {\n      \"statement\": \"EDR detected Encryptor.exe execution and .crypt file extension on 10.0.1.45, 10.0.1.46, 10.0.1.47\",\n      \"verdict\": \"verifiable\",\n      \"reason\": \"Confirmed by mock_api_responses query_alert_detail_A24 raw_log: 'Encryptor.exe executed on 10.0.1.45, 10.0.1.46, 10.0.1.47. Files renamed to .crypt extension.' and payload_highlights.\"\n    },\n    {\n      \"statement\": \"Asset 10.0.1.45 identified as critical production server 'Order Processing System' in production zone\",\n      \"verdict\": \"verifiable\",\n      \"reason\": \"Confirmed by mock_api_responses query_asset_info_10.0.1.45: asset_level is 'critical', business_system is '订单处理系统' (Order Processing System), and network_zone is '生产 - 核心' (Production-Core).\"\n    },\n    {\n      \"statement\": \"File hash c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9 flagged as ransomware/worm exploiting MS17-010\",\n      \"verdict\": \"verifiable\",\n      \"reason\": \"Confirmed by mock_api_responses query_threat_intel_hash_c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9: is_malicious is true, threat_tags include 'ransomware' and 'worm', and raw_intel states it exploits MS17-010.\"\n    },\n    {\n      \"statement\": \"Related alerts confirm MS17-010 exploit from 192.0.2.60, PsExec lateral movement to other hosts, and C2 beacon to 198.51.100.250\",\n      \"verdict\": \"verifiable\",\n      \"reason\": \"Confirmed by mock_api_responses query_related_alerts_10.0.1.45_48h: A24-REL-01 confirms MS17-010 exploit from 192.0.2.60; A24-REL-02 confirms PsExec lateral movement to 10.0.1.46/47; A24-REL-03 confirms C2 beacon to 198.51.100.250.\"\n    }\n  ]\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 2004,
+      "output_tokens": 641,
+      "latency_ms": 7468,
+      "attempts": 1
+    }
+  ],
+  "overall_pass": true,
+  "error_type": null,
+  "error_message": null
+}

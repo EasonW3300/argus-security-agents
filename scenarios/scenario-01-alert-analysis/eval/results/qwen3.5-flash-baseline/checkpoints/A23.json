@@ -1,0 +1,347 @@
+{
+  "test_case_id": "A23",
+  "scenario": "DNS 隧道数据外泄，关联 Webshell 和命令执行",
+  "difficulty": "hard",
+  "is_positive": true,
+  "expected_severity": "critical",
+  "status": "completed",
+  "agent_output": {
+    "alert_id": "A23",
+    "judgment": {
+      "severity": "critical",
+      "attack_type": "Data Exfiltration via DNS Tunneling",
+      "confidence": 0.95,
+      "summary": "Confirmed active data exfiltration from critical PII database server via DNS tunneling to known APT29 infrastructure, preceded by webshell compromise and database dump.",
+      "evidence_chain": [
+        "Alert detail shows 4500 high-entropy TXT queries with base64 payload sent from 10.0.2.150 to data.exfil.example in 30 minutes.",
+        "Threat intelligence confirms data.exfil.example is malicious (reputation score 8) associated with APT29 data exfiltration campaigns.",
+        "Asset information identifies 10.0.2.150 as a critical production database server containing PII, explicitly not a scanner, bastion, or honeypot.",
+        "Related alerts confirm prior webshell upload and mysqldump command execution on the same host within 48 hours, establishing an attack chain."
+      ],
+      "iocs": [
+        {
+          "type": "domain",
+          "value": "data.exfil.example",
+          "malicious": true,
+          "context": "Known APT29 DNS tunneling C2 domain used for data exfiltration"
+        },
+        {
+          "type": "ip",
+          "value": "192.0.2.77",
+          "malicious": true,
+          "context": "Destination IP receiving DNS tunnel traffic from compromised host"
+        },
+        {
+          "type": "ip",
+          "value": "10.0.2.150",
+          "malicious": false,
+          "context": "Compromised internal critical asset hosting user profile database"
+        }
+      ]
+    },
+    "remediation": [
+      "Immediately isolate host 10.0.2.150 from the network to stop ongoing exfiltration activity.",
+      "Block domain data.exfil.example and IP 192.0.2.77 at perimeter firewall and DNS resolver globally.",
+      "Conduct forensic investigation to remove webshell and identify initial access vector on web-db-03.",
+      "Reset all credentials associated with the compromised database account and OS user immediately.",
+      "Notify data protection officer regarding potential PII breach based on asset tags and business system classification."
+    ],
+    "metadata": {
+      "tools_called": [
+        "query_alert_detail",
+        "query_asset_info",
+        "query_threat_intel",
+        "query_related_alerts"
+      ]
+    }
+  },
+  "code_graders": {
+    "tools_called_minimum": {
+      "passed": true,
+      "reason": "required tools present",
+      "expected": [
+        "query_alert_detail",
+        "query_threat_intel",
+        "query_related_alerts"
+      ],
+      "actual": [
+        "query_alert_detail",
+        "query_asset_info",
+        "query_threat_intel",
+        "query_related_alerts"
+      ]
+    },
+    "output_schema": {
+      "passed": true,
+      "reason": "required fields present",
+      "expected": null,
+      "actual": null
+    },
+    "severity_enum": {
+      "passed": true,
+      "reason": "severity is valid",
+      "expected": [
+        "critical",
+        "false_positive",
+        "high",
+        "low",
+        "medium"
+      ],
+      "actual": "critical"
+    },
+    "severity_match": {
+      "passed": true,
+      "reason": "severity matches",
+      "expected": "critical",
+      "actual": "critical"
+    },
+    "confidence_range": {
+      "passed": true,
+      "reason": "confidence in range",
+      "expected": "0..1",
+      "actual": 0.95
+    },
+    "remediation_not_empty": {
+      "passed": true,
+      "reason": "remediation actionable",
+      "expected": "at least one item >=10 chars",
+      "actual": [
+        "Immediately isolate host 10.0.2.150 from the network to stop ongoing exfiltration activity.",
+        "Block domain data.exfil.example and IP 192.0.2.77 at perimeter firewall and DNS resolver globally.",
+        "Conduct forensic investigation to remove webshell and identify initial access vector on web-db-03.",
+        "Reset all credentials associated with the compromised database account and OS user immediately.",
+        "Notify data protection officer regarding potential PII breach based on asset tags and business system classification."
+      ]
+    }
+  },
+  "quality_scores": {
+    "severity_rationality": {
+      "score": 5,
+      "reason": "The agent's judgment is fully supported by the provided evidence. The alert details confirm high-entropy DNS TXT queries (4500 in 30 mins) matching the 'DNS Tunneling' attack type. Threat intelligence validates the destination domain as malicious and linked to APT29. Asset information confirms the source host is a critical PII database server, not a false positive asset. Related alerts establish a clear attack chain (webshell -> dump -> exfiltration). The severity rating of 'critical' is consistent with the confirmed active data exfiltration from a critical asset containing sensitive data.",
+      "evidence_quotes": [
+        "Alert detail shows 4500 high-entropy TXT queries with base64 payload sent from 10.0.2.150 to data.exfil.example in 30 minutes.",
+        "Threat intelligence confirms data.exfil.example is malicious (reputation score 8) associated with APT29 data exfiltration campaigns.",
+        "Asset information identifies 10.0.2.150 as a critical production database server containing PII, explicitly not a scanner, bastion, or honeypot.",
+        "Related alerts confirm prior webshell upload and mysqldump command execution on the same host within 48 hours, establishing an attack chain."
+      ]
+    },
+    "remediation_actionability": {
+      "score": 5,
+      "reason": "处置建议非常具体、可执行，且逻辑上严格遵循了优先级排序。首先针对正在进行的攻击（DNS隧道）提出了立即隔离主机和阻断IOC的紧急措施；其次针对攻击链的前置环节（Webshell）提出了取证和清除建议；最后针对资产属性（PII数据库）提出了合规通知和凭证重置。所有建议均直接引用了输入证据中的IP、域名、资产标签及关联告警信息。",
+      "evidence_quotes": [
+        "Immediately isolate host 10.0.2.150 from the network to stop ongoing exfiltration activity.",
+        "Block domain data.exfil.example and IP 192.0.2.77 at perimeter firewall and DNS resolver globally.",
+        "Conduct forensic investigation to remove webshell and identify initial access vector on web-db-03.",
+        "Reset all credentials associated with the compromised database account and OS user immediately.",
+        "Notify data protection officer regarding potential PII breach based on asset tags and business system classification."
+      ]
+    },
+    "evidence_completeness": {
+      "score": 5,
+      "reason": "证据链完整覆盖了攻击的关键 IOC（恶意域名、C2 IP、受害主机）及核心行为特征（高熵 DNS TXT 查询、Base64 编码载荷）。情报数据确认了域名的 APT29 关联，资产信息锁定了 PII 敏感目标，相关告警构建了从 Webshell 上传到数据库转储再到 DNS 外泄的完整攻击链条。所有关键要素均有明确的 API 响应支持，逻辑闭环且置信度极高。",
+      "evidence_quotes": [
+        "Alert detail shows 4500 high-entropy TXT queries with base64 payload sent from 10.0.2.150 to data.exfil.example in 30 minutes.",
+        "Threat intelligence confirms data.exfil.example is malicious (reputation score 8) associated with APT29 data exfiltration campaigns.",
+        "Asset information identifies 10.0.2.150 as a critical production database server containing PII, explicitly not a scanner, bastion, or honeypot.",
+        "Related alerts confirm prior webshell upload and mysqldump command execution on the same host within 48 hours, establishing an attack chain."
+      ]
+    }
+  },
+  "hallucination": {
+    "total_statements": 4,
+    "verifiable": 4,
+    "hallucinations": 0,
+    "uncertain": 0,
+    "details": [
+      {
+        "statement": "Alert detail shows 4500 high-entropy TXT queries with base64 payload sent from 10.0.2.150 to data.exfil.example in 30 minutes.",
+        "verdict": "verifiable",
+        "reason": "Confirmed by mock_api_responses query_alert_detail_A23 which lists '4500 TXT queries in 30 min', 'base64 encoded data in queries', 'domain data.exfil.example', and raw_log stating 'Host 10.0.2.150 sent 4500 TXT queries to data.exfil.example in 30 minutes'."
+      },
+      {
+        "statement": "Threat intelligence confirms data.exfil.example is malicious (reputation score 8) associated with APT29 data exfiltration campaigns.",
+        "verdict": "verifiable",
+        "reason": "Confirmed by mock_api_responses query_threat_intel_domain_data.exfil.example which shows 'is_malicious': true, 'reputation_score': 8, 'associated_apt': 'APT29', and threat_tags including 'data_exfiltration' and 'dns_tunnel'."
+      },
+      {
+        "statement": "Asset information identifies 10.0.2.2.150 as a critical production database server containing PII, explicitly not a scanner, bastion, or honeypot.",
+        "verdict": "verifiable",
+        "reason": "Confirmed by mock_api_responses query_asset_info_10.0.2.150 which shows 'asset_level': 'critical', 'business_system': '用户资料数据库' (User Profile Database), tags include 'pii', and boolean flags 'is_scanner': false, 'is_bastion': false, 'is_honeypot': false."
+      },
+      {
+        "statement": "Related alerts confirm prior webshell upload and mysqldump command execution on the same host within 48 hours, establishing an attack chain.",
+        "verdict": "verifiable",
+        "reason": "Confirmed by mock_api_responses query_related_alerts_10.0.2.150_48h which lists alert A23-REL-01 for 'WebShell Upload' at 2026-07-13T20:15:00Z and alert A23-REL-02 for 'mysqldump command' execution at 2026-07-14T01:45:00Z, both within 48 hours of the current alert timestamp (2026-07-14T02:10:33Z)."
+      }
+    ]
+  },
+  "calls": [
+    {
+      "label": "agent",
+      "parsed": {
+        "alert_id": "A23",
+        "judgment": {
+          "severity": "critical",
+          "attack_type": "Data Exfiltration via DNS Tunneling",
+          "confidence": 0.95,
+          "summary": "Confirmed active data exfiltration from critical PII database server via DNS tunneling to known APT29 infrastructure, preceded by webshell compromise and database dump.",
+          "evidence_chain": [
+            "Alert detail shows 4500 high-entropy TXT queries with base64 payload sent from 10.0.2.150 to data.exfil.example in 30 minutes.",
+            "Threat intelligence confirms data.exfil.example is malicious (reputation score 8) associated with APT29 data exfiltration campaigns.",
+            "Asset information identifies 10.0.2.150 as a critical production database server containing PII, explicitly not a scanner, bastion, or honeypot.",
+            "Related alerts confirm prior webshell upload and mysqldump command execution on the same host within 48 hours, establishing an attack chain."
+          ],
+          "iocs": [
+            {
+              "type": "domain",
+              "value": "data.exfil.example",
+              "malicious": true,
+              "context": "Known APT29 DNS tunneling C2 domain used for data exfiltration"
+            },
+            {
+              "type": "ip",
+              "value": "192.0.2.77",
+              "malicious": true,
+              "context": "Destination IP receiving DNS tunnel traffic from compromised host"
+            },
+            {
+              "type": "ip",
+              "value": "10.0.2.150",
+              "malicious": false,
+              "context": "Compromised internal critical asset hosting user profile database"
+            }
+          ]
+        },
+        "remediation": [
+          "Immediately isolate host 10.0.2.150 from the network to stop ongoing exfiltration activity.",
+          "Block domain data.exfil.example and IP 192.0.2.77 at perimeter firewall and DNS resolver globally.",
+          "Conduct forensic investigation to remove webshell and identify initial access vector on web-db-03.",
+          "Reset all credentials associated with the compromised database account and OS user immediately.",
+          "Notify data protection officer regarding potential PII breach based on asset tags and business system classification."
+        ],
+        "metadata": {
+          "tools_called": [
+            "query_alert_detail",
+            "query_asset_info",
+            "query_threat_intel",
+            "query_related_alerts"
+          ]
+        }
+      },
+      "raw_text": "{\"alert_id\":\"A23\",\"judgment\":{\"severity\":\"critical\",\"attack_type\":\"Data Exfiltration via DNS Tunneling\",\"confidence\":0.95,\"summary\":\"Confirmed active data exfiltration from critical PII database server via DNS tunneling to known APT29 infrastructure, preceded by webshell compromise and database dump.\",\"evidence_chain\":[\"Alert detail shows 4500 high-entropy TXT queries with base64 payload sent from 10.0.2.150 to data.exfil.example in 30 minutes.\",\"Threat intelligence confirms data.exfil.example is malicious (reputation score 8) associated with APT29 data exfiltration campaigns.\",\"Asset information identifies 10.0.2.150 as a critical production database server containing PII, explicitly not a scanner, bastion, or honeypot.\",\"Related alerts confirm prior webshell upload and mysqldump command execution on the same host within 48 hours, establishing an attack chain.\"],\"iocs\":[{\"type\":\"domain\",\"value\":\"data.exfil.example\",\"malicious\":true,\"context\":\"Known APT29 DNS tunneling C2 domain used for data exfiltration\"},{\"type\":\"ip\",\"value\":\"192.0.2.77\",\"malicious\":true,\"context\":\"Destination IP receiving DNS tunnel traffic from compromised host\"},{\"type\":\"ip\",\"value\":\"10.0.2.150\",\"malicious\":false,\"context\":\"Compromised internal critical asset hosting user profile database\"}]},\"remediation\":[\"Immediately isolate host 10.0.2.150 from the network to stop ongoing exfiltration activity.\",\"Block domain data.exfil.example and IP 192.0.2.77 at perimeter firewall and DNS resolver globally.\",\"Conduct forensic investigation to remove webshell and identify initial access vector on web-db-03.\",\"Reset all credentials associated with the compromised database account and OS user immediately.\",\"Notify data protection officer regarding potential PII breach based on asset tags and business system classification.\"],\"metadata\":{\"tools_called\":[\"query_alert_detail\", \"query_asset_info\", \"query_threat_intel\", \"query_related_alerts\"]}}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1256,
+      "output_tokens": 2865,
+      "latency_ms": 34129,
+      "attempts": 1
+    },
+    {
+      "label": "severity_rationality",
+      "parsed": {
+        "score": 5,
+        "reason": "The agent's judgment is fully supported by the provided evidence. The alert details confirm high-entropy DNS TXT queries (4500 in 30 mins) matching the 'DNS Tunneling' attack type. Threat intelligence validates the destination domain as malicious and linked to APT29. Asset information confirms the source host is a critical PII database server, not a false positive asset. Related alerts establish a clear attack chain (webshell -> dump -> exfiltration). The severity rating of 'critical' is consistent with the confirmed active data exfiltration from a critical asset containing sensitive data.",
+        "evidence_quotes": [
+          "Alert detail shows 4500 high-entropy TXT queries with base64 payload sent from 10.0.2.150 to data.exfil.example in 30 minutes.",
+          "Threat intelligence confirms data.exfil.example is malicious (reputation score 8) associated with APT29 data exfiltration campaigns.",
+          "Asset information identifies 10.0.2.150 as a critical production database server containing PII, explicitly not a scanner, bastion, or honeypot.",
+          "Related alerts confirm prior webshell upload and mysqldump command execution on the same host within 48 hours, establishing an attack chain."
+        ]
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"The agent's judgment is fully supported by the provided evidence. The alert details confirm high-entropy DNS TXT queries (4500 in 30 mins) matching the 'DNS Tunneling' attack type. Threat intelligence validates the destination domain as malicious and linked to APT29. Asset information confirms the source host is a critical PII database server, not a false positive asset. Related alerts establish a clear attack chain (webshell -> dump -> exfiltration). The severity rating of 'critical' is consistent with the confirmed active data exfiltration from a critical asset containing sensitive data.\",\n  \"evidence_quotes\": [\n    \"Alert detail shows 4500 high-entropy TXT queries with base64 payload sent from 10.0.2.150 to data.exfil.example in 30 minutes.\",\n    \"Threat intelligence confirms data.exfil.example is malicious (reputation score 8) associated with APT29 data exfiltration campaigns.\",\n    \"Asset information identifies 10.0.2.150 as a critical production database server containing PII, explicitly not a scanner, bastion, or honeypot.\",\n    \"Related alerts confirm prior webshell upload and mysqldump command execution on the same host within 48 hours, establishing an attack chain.\"\n  ]\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1662,
+      "output_tokens": 298,
+      "latency_ms": 3678,
+      "attempts": 1
+    },
+    {
+      "label": "remediation_actionability",
+      "parsed": {
+        "score": 5,
+        "reason": "处置建议非常具体、可执行，且逻辑上严格遵循了优先级排序。首先针对正在进行的攻击（DNS隧道）提出了立即隔离主机和阻断IOC的紧急措施；其次针对攻击链的前置环节（Webshell）提出了取证和清除建议；最后针对资产属性（PII数据库）提出了合规通知和凭证重置。所有建议均直接引用了输入证据中的IP、域名、资产标签及关联告警信息。",
+        "evidence_quotes": [
+          "Immediately isolate host 10.0.2.150 from the network to stop ongoing exfiltration activity.",
+          "Block domain data.exfil.example and IP 192.0.2.77 at perimeter firewall and DNS resolver globally.",
+          "Conduct forensic investigation to remove webshell and identify initial access vector on web-db-03.",
+          "Reset all credentials associated with the compromised database account and OS user immediately.",
+          "Notify data protection officer regarding potential PII breach based on asset tags and business system classification."
+        ]
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"处置建议非常具体、可执行，且逻辑上严格遵循了优先级排序。首先针对正在进行的攻击（DNS隧道）提出了立即隔离主机和阻断IOC的紧急措施；其次针对攻击链的前置环节（Webshell）提出了取证和清除建议；最后针对资产属性（PII数据库）提出了合规通知和凭证重置。所有建议均直接引用了输入证据中的IP、域名、资产标签及关联告警信息。\",\n  \"evidence_quotes\": [\n    \"Immediately isolate host 10.0.2.150 from the network to stop ongoing exfiltration activity.\",\n    \"Block domain data.exfil.example and IP 192.0.2.77 at perimeter firewall and DNS resolver globally.\",\n    \"Conduct forensic investigation to remove webshell and identify initial access vector on web-db-03.\",\n    \"Reset all credentials associated with the compromised database account and OS user immediately.\",\n    \"Notify data protection officer regarding potential PII breach based on asset tags and business system classification.\"\n  ]\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1665,
+      "output_tokens": 239,
+      "latency_ms": 3433,
+      "attempts": 1
+    },
+    {
+      "label": "evidence_completeness",
+      "parsed": {
+        "score": 5,
+        "reason": "证据链完整覆盖了攻击的关键 IOC（恶意域名、C2 IP、受害主机）及核心行为特征（高熵 DNS TXT 查询、Base64 编码载荷）。情报数据确认了域名的 APT29 关联，资产信息锁定了 PII 敏感目标，相关告警构建了从 Webshell 上传到数据库转储再到 DNS 外泄的完整攻击链条。所有关键要素均有明确的 API 响应支持，逻辑闭环且置信度极高。",
+        "evidence_quotes": [
+          "Alert detail shows 4500 high-entropy TXT queries with base64 payload sent from 10.0.2.150 to data.exfil.example in 30 minutes.",
+          "Threat intelligence confirms data.exfil.example is malicious (reputation score 8) associated with APT29 data exfiltration campaigns.",
+          "Asset information identifies 10.0.2.150 as a critical production database server containing PII, explicitly not a scanner, bastion, or honeypot.",
+          "Related alerts confirm prior webshell upload and mysqldump command execution on the same host within 48 hours, establishing an attack chain."
+        ]
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"证据链完整覆盖了攻击的关键 IOC（恶意域名、C2 IP、受害主机）及核心行为特征（高熵 DNS TXT 查询、Base64 编码载荷）。情报数据确认了域名的 APT29 关联，资产信息锁定了 PII 敏感目标，相关告警构建了从 Webshell 上传到数据库转储再到 DNS 外泄的完整攻击链条。所有关键要素均有明确的 API 响应支持，逻辑闭环且置信度极高。\",\n  \"evidence_quotes\": [\n    \"Alert detail shows 4500 high-entropy TXT queries with base64 payload sent from 10.0.2.150 to data.exfil.example in 30 minutes.\",\n    \"Threat intelligence confirms data.exfil.example is malicious (reputation score 8) associated with APT29 data exfiltration campaigns.\",\n    \"Asset information identifies 10.0.2.150 as a critical production database server containing PII, explicitly not a scanner, bastion, or honeypot.\",\n    \"Related alerts confirm prior webshell upload and mysqldump command execution on the same host within 48 hours, establishing an attack chain.\"\n  ]\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1665,
+      "output_tokens": 279,
+      "latency_ms": 3639,
+      "attempts": 1
+    },
+    {
+      "label": "hallucination_check",
+      "parsed": {
+        "total_statements": 4,
+        "verifiable": 4,
+        "hallucinations": 0,
+        "uncertain": 0,
+        "details": [
+          {
+            "statement": "Alert detail shows 4500 high-entropy TXT queries with base64 payload sent from 10.0.2.150 to data.exfil.example in 30 minutes.",
+            "verdict": "verifiable",
+            "reason": "Confirmed by mock_api_responses query_alert_detail_A23 which lists '4500 TXT queries in 30 min', 'base64 encoded data in queries', 'domain data.exfil.example', and raw_log stating 'Host 10.0.2.150 sent 4500 TXT queries to data.exfil.example in 30 minutes'."
+          },
+          {
+            "statement": "Threat intelligence confirms data.exfil.example is malicious (reputation score 8) associated with APT29 data exfiltration campaigns.",
+            "verdict": "verifiable",
+            "reason": "Confirmed by mock_api_responses query_threat_intel_domain_data.exfil.example which shows 'is_malicious': true, 'reputation_score': 8, 'associated_apt': 'APT29', and threat_tags including 'data_exfiltration' and 'dns_tunnel'."
+          },
+          {
+            "statement": "Asset information identifies 10.0.2.2.150 as a critical production database server containing PII, explicitly not a scanner, bastion, or honeypot.",
+            "verdict": "verifiable",
+            "reason": "Confirmed by mock_api_responses query_asset_info_10.0.2.150 which shows 'asset_level': 'critical', 'business_system': '用户资料数据库' (User Profile Database), tags include 'pii', and boolean flags 'is_scanner': false, 'is_bastion': false, 'is_honeypot': false."
+          },
+          {
+            "statement": "Related alerts confirm prior webshell upload and mysqldump command execution on the same host within 48 hours, establishing an attack chain.",
+            "verdict": "verifiable",
+            "reason": "Confirmed by mock_api_responses query_related_alerts_10.0.2.150_48h which lists alert A23-REL-01 for 'WebShell Upload' at 2026-07-13T20:15:00Z and alert A23-REL-02 for 'mysqldump command' execution at 2026-07-14T01:45:00Z, both within 48 hours of the current alert timestamp (2026-07-14T02:10:33Z)."
+          }
+        ]
+      },
+      "raw_text": "{\n  \"total_statements\": 4,\n  \"verifiable\": 4,\n  \"hallucinations\": 0,\n  \"uncertain\": 0,\n  \"details\": [\n    {\n      \"statement\": \"Alert detail shows 4500 high-entropy TXT queries with base64 payload sent from 10.0.2.150 to data.exfil.example in 30 minutes.\",\n      \"verdict\": \"verifiable\",\n      \"reason\": \"Confirmed by mock_api_responses query_alert_detail_A23 which lists '4500 TXT queries in 30 min', 'base64 encoded data in queries', 'domain data.exfil.example', and raw_log stating 'Host 10.0.2.150 sent 4500 TXT queries to data.exfil.example in 30 minutes'.\"\n    },\n    {\n      \"statement\": \"Threat intelligence confirms data.exfil.example is malicious (reputation score 8) associated with APT29 data exfiltration campaigns.\",\n      \"verdict\": \"verifiable\",\n      \"reason\": \"Confirmed by mock_api_responses query_threat_intel_domain_data.exfil.example which shows 'is_malicious': true, 'reputation_score': 8, 'associated_apt': 'APT29', and threat_tags including 'data_exfiltration' and 'dns_tunnel'.\"\n    },\n    {\n      \"statement\": \"Asset information identifies 10.0.2.2.150 as a critical production database server containing PII, explicitly not a scanner, bastion, or honeypot.\",\n      \"verdict\": \"verifiable\",\n      \"reason\": \"Confirmed by mock_api_responses query_asset_info_10.0.2.150 which shows 'asset_level': 'critical', 'business_system': '用户资料数据库' (User Profile Database), tags include 'pii', and boolean flags 'is_scanner': false, 'is_bastion': false, 'is_honeypot': false.\"\n    },\n    {\n      \"statement\": \"Related alerts confirm prior webshell upload and mysqldump command execution on the same host within 48 hours, establishing an attack chain.\",\n      \"verdict\": \"verifiable\",\n      \"reason\": \"Confirmed by mock_api_responses query_related_alerts_10.0.2.150_48h which lists alert A23-REL-01 for 'WebShell Upload' at 2026-07-13T20:15:00Z and alert A23-REL-02 for 'mysqldump command' execution at 2026-07-14T01:45:00Z, both within 48 hours of the current alert timestamp (2026-07-14T02:10:33Z).\"\n    }\n  ]\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1696,
+      "output_tokens": 651,
+      "latency_ms": 6668,
+      "attempts": 1
+    }
+  ],
+  "overall_pass": true,
+  "error_type": null,
+  "error_message": null
+}

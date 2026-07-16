@@ -1,0 +1,350 @@
+{
+  "test_case_id": "A03",
+  "scenario": "内网主机向已知 C2 域名发起 DNS 请求",
+  "difficulty": "medium",
+  "is_positive": true,
+  "expected_severity": "high",
+  "status": "completed",
+  "agent_output": {
+    "alert_id": "A03",
+    "judgment": {
+      "severity": "critical",
+      "attack_type": "Command and Control (C2) Beaconing",
+      "confidence": 0.95,
+      "summary": "High-value finance workstation compromised with active beaconing to known Lazarus Group C2 infrastructure.",
+      "evidence_chain": [
+        "EDR raw_log shows svchost.exe (PID 1340) queried evil-c2.xyz returning 198.51.100.55 (query_alert_detail)",
+        "Payload highlights indicate repeated queries every 60 seconds suggesting beaconing behavior (query_alert_detail)",
+        "Threat intel classifies evil-c2.xyz as malicious C2 associated with Lazarus Group (query_threat_intel)",
+        "Threat intel classifies 198.51.100.55 as malicious C2 IP resolving from the domain (query_threat_intel)",
+        "Asset 10.0.3.17 is identified as a high-level finance workstation, not a security device (query_asset_info)"
+      ],
+      "iocs": [
+        {
+          "type": "domain",
+          "value": "evil-c2.xyz",
+          "malicious": true,
+          "context": "Known C2 channel used by Lazarus Group for post-exploitation command and control"
+        },
+        {
+          "type": "ip",
+          "value": "198.51.100.55",
+          "malicious": true,
+          "context": "IP resolves from evil-c2.xyz, used as C2 server for Lazarus group malware"
+        }
+      ]
+    },
+    "remediation": [
+      "Immediately isolate host 10.0.3.17 from the network via EDR or switch port shutdown to prevent lateral movement.",
+      "Terminate process svchost.exe (PID 1340) on the affected host using EDR kill process function.",
+      "Add domains evil-c2.xyz and IPs 198.51.100.55 to global blocklists at DNS/Firewall immediately.",
+      "Initiate forensic imaging and memory dump analysis to identify persistence mechanisms and initial access vector.",
+      "Reset credentials for user zhang.san@company.com and audit recent access logs for data exfiltration."
+    ],
+    "metadata": {
+      "tools_called": [
+        "query_alert_detail",
+        "query_asset_info",
+        "query_threat_intel",
+        "query_related_alerts"
+      ]
+    }
+  },
+  "code_graders": {
+    "tools_called_minimum": {
+      "passed": true,
+      "reason": "required tools present",
+      "expected": [
+        "query_alert_detail",
+        "query_threat_intel"
+      ],
+      "actual": [
+        "query_alert_detail",
+        "query_asset_info",
+        "query_threat_intel",
+        "query_related_alerts"
+      ]
+    },
+    "output_schema": {
+      "passed": true,
+      "reason": "required fields present",
+      "expected": null,
+      "actual": null
+    },
+    "severity_enum": {
+      "passed": true,
+      "reason": "severity is valid",
+      "expected": [
+        "critical",
+        "false_positive",
+        "high",
+        "low",
+        "medium"
+      ],
+      "actual": "critical"
+    },
+    "severity_match": {
+      "passed": false,
+      "reason": "severity mismatch",
+      "expected": "high",
+      "actual": "critical"
+    },
+    "confidence_range": {
+      "passed": true,
+      "reason": "confidence in range",
+      "expected": "0..1",
+      "actual": 0.95
+    },
+    "remediation_not_empty": {
+      "passed": true,
+      "reason": "remediation actionable",
+      "expected": "at least one item >=10 chars",
+      "actual": [
+        "Immediately isolate host 10.0.3.17 from the network via EDR or switch port shutdown to prevent lateral movement.",
+        "Terminate process svchost.exe (PID 1340) on the affected host using EDR kill process function.",
+        "Add domains evil-c2.xyz and IPs 198.51.100.55 to global blocklists at DNS/Firewall immediately.",
+        "Initiate forensic imaging and memory dump analysis to identify persistence mechanisms and initial access vector.",
+        "Reset credentials for user zhang.san@company.com and audit recent access logs for data exfiltration."
+      ]
+    }
+  },
+  "quality_scores": {
+    "severity_rationality": {
+      "score": 5,
+      "reason": "The agent correctly identified a critical severity incident based on robust evidence. The output accurately synthesizes the EDR logs showing beaconing behavior (60s interval), confirms the malicious nature of the domain and IP via threat intelligence (Lazarus Group C2), and appropriately escalates the severity to 'critical' due to the compromise of a high-value finance workstation. The remediation steps are specific and actionable.",
+      "evidence_quotes": [
+        "EDR raw_log shows svchost.exe (PID 1340) queried evil-c2.xyz returning 198.51.100.55",
+        "Payload highlights indicate repeated queries every 60 seconds suggesting beaconing behavior",
+        "Threat intel classifies evil-c2.xyz as malicious C2 associated with Lazarus Group",
+        "Asset 10.0.3.17 is identified as a high-level finance workstation",
+        "High-value finance workstation compromised with active beaconing to known Lazarus Group C2 infrastructure."
+      ]
+    },
+    "remediation_actionability": {
+      "score": 5,
+      "reason": "处置建议非常具体、可执行且逻辑清晰。建议按优先级排列：首先隔离主机（防止横向移动），其次终止恶意进程，接着更新全局阻断列表（DNS/防火墙），随后进行取证分析以定位持久化机制，最后重置凭证并审计日志。所有步骤均直接针对证据中识别的特定资产（10.0.3.17）、进程（svchost.exe PID 1340）和 IOC（evil-c2.xyz, 198.51.100.55）。",
+      "evidence_quotes": [
+        "Immediately isolate host 10.0.3.17 from the network via EDR or switch port shutdown to prevent lateral movement.",
+        "Terminate process svchost.exe (PID 1340) on the affected host using EDR kill process function.",
+        "Add domains evil-c2.xyz and IPs 198.51.100.55 to global blocklists at DNS/Firewall immediately.",
+        "Initiate forensic imaging and memory dump analysis to identify persistence mechanisms and initial access vector.",
+        "Reset credentials for user zhang.san@company.com and audit recent access logs for data exfiltration."
+      ]
+    },
+    "evidence_completeness": {
+      "score": 5,
+      "reason": "证据链完整覆盖了关键 IOC（恶意域名 evil-c2.xyz、恶意 IP 198.51.100.55）与核心行为特征（svchost.exe 周期性 DNS 查询/信标行为）。输入数据通过 EDR 原始日志确认了进程与域名的关联，威胁情报证实了 C2 归属（Lazarus Group），资产信息明确了受害目标的高价值属性，形成了从检测到归因的闭环。",
+      "evidence_quotes": [
+        "EDR raw_log shows svchost.exe (PID 1340) queried evil-c2.xyz returning 198.51.100.55",
+        "Payload highlights indicate repeated queries every 60 seconds suggesting beaconing behavior",
+        "Threat intel classifies evil-c2.xyz as malicious C2 associated with Lazarus Group",
+        "Threat intel classifies 198.51.100.55 as malicious C2 IP resolving from the domain",
+        "Asset 10.0.3.17 is identified as a high-level finance workstation"
+      ]
+    }
+  },
+  "hallucination": {
+    "total_statements": 5,
+    "verifiable": 5,
+    "hallucinations": 0,
+    "uncertain": 0,
+    "details": [
+      {
+        "statement": "EDR raw_log shows svchost.exe (PID 1340) queried evil-c2.xyz returning 198.51.100.55",
+        "verdict": "verifiable",
+        "reason": "Confirmed by mock_api_responses query_alert_detail_A03.raw_log: 'Process svchost.exe (PID 1340) made DNS query for evil-c2.xyz, returned 198.51.100.55'."
+      },
+      {
+        "statement": "Payload highlights indicate repeated queries every 60 seconds suggesting beaconing behavior",
+        "verdict": "verifiable",
+        "reason": "Confirmed by mock_api_responses query_alert_detail_A03.payload_highlights containing 'repeated queries every 60 seconds'."
+      },
+      {
+        "statement": "Threat intel classifies evil-c2.xyz as malicious C2 associated with Lazarus Group",
+        "verdict": "verifiable",
+        "reason": "Confirmed by mock_api_responses query_threat_intel_domain_evil-c2.xyz showing is_malicious: true, associated_apt: 'Lazarus Group', and raw_intel describing it as a known C2 channel."
+      },
+      {
+        "statement": "Threat intel classifies 198.51.100.55 as malicious C2 IP resolving from the domain",
+        "verdict": "verifiable",
+        "reason": "Confirmed by mock_api_responses query_threat_intel_ip_198.51.100.55 showing is_malicious: true, associated_apt: 'Lazarus Group', and raw_intel stating 'IP resolves from evil-c2.xyz, used as C2 server'."
+      },
+      {
+        "statement": "Asset 10.0.3.17 is identified as a high-level finance workstation, not a security device",
+        "verdict": "verifiable",
+        "reason": "Confirmed by mock_api_responses query_asset_info_10.0.3.17 showing ip: '10.0.3.17', business_system: '财务专用终端' (Finance Dedicated Terminal), asset_level: 'high', tags including 'finance' and 'workstation', and is_bastion/is_scanner set to false."
+      }
+    ]
+  },
+  "calls": [
+    {
+      "label": "agent",
+      "parsed": {
+        "alert_id": "A03",
+        "judgment": {
+          "severity": "critical",
+          "attack_type": "Command and Control (C2) Beaconing",
+          "confidence": 0.95,
+          "summary": "High-value finance workstation compromised with active beaconing to known Lazarus Group C2 infrastructure.",
+          "evidence_chain": [
+            "EDR raw_log shows svchost.exe (PID 1340) queried evil-c2.xyz returning 198.51.100.55 (query_alert_detail)",
+            "Payload highlights indicate repeated queries every 60 seconds suggesting beaconing behavior (query_alert_detail)",
+            "Threat intel classifies evil-c2.xyz as malicious C2 associated with Lazarus Group (query_threat_intel)",
+            "Threat intel classifies 198.51.100.55 as malicious C2 IP resolving from the domain (query_threat_intel)",
+            "Asset 10.0.3.17 is identified as a high-level finance workstation, not a security device (query_asset_info)"
+          ],
+          "iocs": [
+            {
+              "type": "domain",
+              "value": "evil-c2.xyz",
+              "malicious": true,
+              "context": "Known C2 channel used by Lazarus Group for post-exploitation command and control"
+            },
+            {
+              "type": "ip",
+              "value": "198.51.100.55",
+              "malicious": true,
+              "context": "IP resolves from evil-c2.xyz, used as C2 server for Lazarus group malware"
+            }
+          ]
+        },
+        "remediation": [
+          "Immediately isolate host 10.0.3.17 from the network via EDR or switch port shutdown to prevent lateral movement.",
+          "Terminate process svchost.exe (PID 1340) on the affected host using EDR kill process function.",
+          "Add domains evil-c2.xyz and IPs 198.51.100.55 to global blocklists at DNS/Firewall immediately.",
+          "Initiate forensic imaging and memory dump analysis to identify persistence mechanisms and initial access vector.",
+          "Reset credentials for user zhang.san@company.com and audit recent access logs for data exfiltration."
+        ],
+        "metadata": {
+          "tools_called": [
+            "query_alert_detail",
+            "query_asset_info",
+            "query_threat_intel",
+            "query_related_alerts"
+          ]
+        }
+      },
+      "raw_text": "{\n  \"alert_id\": \"A03\",\n  \"judgment\": {\n    \"severity\": \"critical\",\n    \"attack_type\": \"Command and Control (C2) Beaconing\",\n    \"confidence\": 0.95,\n    \"summary\": \"High-value finance workstation compromised with active beaconing to known Lazarus Group C2 infrastructure.\",\n    \"evidence_chain\": [\n      \"EDR raw_log shows svchost.exe (PID 1340) queried evil-c2.xyz returning 198.51.100.55 (query_alert_detail)\",\n      \"Payload highlights indicate repeated queries every 60 seconds suggesting beaconing behavior (query_alert_detail)\",\n      \"Threat intel classifies evil-c2.xyz as malicious C2 associated with Lazarus Group (query_threat_intel)\",\n      \"Threat intel classifies 198.51.100.55 as malicious C2 IP resolving from the domain (query_threat_intel)\",\n      \"Asset 10.0.3.17 is identified as a high-level finance workstation, not a security device (query_asset_info)\"\n    ],\n    \"iocs\": [\n      {\n        \"type\": \"domain\",\n        \"value\": \"evil-c2.xyz\",\n        \"malicious\": true,\n        \"context\": \"Known C2 channel used by Lazarus Group for post-exploitation command and control\"\n      },\n      {\n        \"type\": \"ip\",\n        \"value\": \"198.51.100.55\",\n        \"malicious\": true,\n        \"context\": \"IP resolves from evil-c2.xyz, used as C2 server for Lazarus group malware\"\n      }\n    ]\n  },\n  \"remediation\": [\n    \"Immediately isolate host 10.0.3.17 from the network via EDR or switch port shutdown to prevent lateral movement.\",\n    \"Terminate process svchost.exe (PID 1340) on the affected host using EDR kill process function.\",\n    \"Add domains evil-c2.xyz and IPs 198.51.100.55 to global blocklists at DNS/Firewall immediately.\",\n    \"Initiate forensic imaging and memory dump analysis to identify persistence mechanisms and initial access vector.\",\n    \"Reset credentials for user zhang.san@company.com and audit recent access logs for data exfiltration.\"\n  ],\n  \"metadata\": {\n    \"tools_called\": [\n      \"query_alert_detail\",\n      \"query_asset_info\",\n      \"query_threat_intel\",\n      \"query_related_alerts\"\n    ]\n  }\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1191,
+      "output_tokens": 2833,
+      "latency_ms": 28559,
+      "attempts": 1
+    },
+    {
+      "label": "severity_rationality",
+      "parsed": {
+        "score": 5,
+        "reason": "The agent correctly identified a critical severity incident based on robust evidence. The output accurately synthesizes the EDR logs showing beaconing behavior (60s interval), confirms the malicious nature of the domain and IP via threat intelligence (Lazarus Group C2), and appropriately escalates the severity to 'critical' due to the compromise of a high-value finance workstation. The remediation steps are specific and actionable.",
+        "evidence_quotes": [
+          "EDR raw_log shows svchost.exe (PID 1340) queried evil-c2.xyz returning 198.51.100.55",
+          "Payload highlights indicate repeated queries every 60 seconds suggesting beaconing behavior",
+          "Threat intel classifies evil-c2.xyz as malicious C2 associated with Lazarus Group",
+          "Asset 10.0.3.17 is identified as a high-level finance workstation",
+          "High-value finance workstation compromised with active beaconing to known Lazarus Group C2 infrastructure."
+        ]
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"The agent correctly identified a critical severity incident based on robust evidence. The output accurately synthesizes the EDR logs showing beaconing behavior (60s interval), confirms the malicious nature of the domain and IP via threat intelligence (Lazarus Group C2), and appropriately escalates the severity to 'critical' due to the compromise of a high-value finance workstation. The remediation steps are specific and actionable.\",\n  \"evidence_quotes\": [\n    \"EDR raw_log shows svchost.exe (PID 1340) queried evil-c2.xyz returning 198.51.100.55\",\n    \"Payload highlights indicate repeated queries every 60 seconds suggesting beaconing behavior\",\n    \"Threat intel classifies evil-c2.xyz as malicious C2 associated with Lazarus Group\",\n    \"Asset 10.0.3.17 is identified as a high-level finance workstation\",\n    \"High-value finance workstation compromised with active beaconing to known Lazarus Group C2 infrastructure.\"\n  ]\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1653,
+      "output_tokens": 235,
+      "latency_ms": 3119,
+      "attempts": 1
+    },
+    {
+      "label": "remediation_actionability",
+      "parsed": {
+        "score": 5,
+        "reason": "处置建议非常具体、可执行且逻辑清晰。建议按优先级排列：首先隔离主机（防止横向移动），其次终止恶意进程，接着更新全局阻断列表（DNS/防火墙），随后进行取证分析以定位持久化机制，最后重置凭证并审计日志。所有步骤均直接针对证据中识别的特定资产（10.0.3.17）、进程（svchost.exe PID 1340）和 IOC（evil-c2.xyz, 198.51.100.55）。",
+        "evidence_quotes": [
+          "Immediately isolate host 10.0.3.17 from the network via EDR or switch port shutdown to prevent lateral movement.",
+          "Terminate process svchost.exe (PID 1340) on the affected host using EDR kill process function.",
+          "Add domains evil-c2.xyz and IPs 198.51.100.55 to global blocklists at DNS/Firewall immediately.",
+          "Initiate forensic imaging and memory dump analysis to identify persistence mechanisms and initial access vector.",
+          "Reset credentials for user zhang.san@company.com and audit recent access logs for data exfiltration."
+        ]
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"处置建议非常具体、可执行且逻辑清晰。建议按优先级排列：首先隔离主机（防止横向移动），其次终止恶意进程，接着更新全局阻断列表（DNS/防火墙），随后进行取证分析以定位持久化机制，最后重置凭证并审计日志。所有步骤均直接针对证据中识别的特定资产（10.0.3.17）、进程（svchost.exe PID 1340）和 IOC（evil-c2.xyz, 198.51.100.55）。\",\n  \"evidence_quotes\": [\n    \"Immediately isolate host 10.0.3.17 from the network via EDR or switch port shutdown to prevent lateral movement.\",\n    \"Terminate process svchost.exe (PID 1340) on the affected host using EDR kill process function.\",\n    \"Add domains evil-c2.xyz and IPs 198.51.100.55 to global blocklists at DNS/Firewall immediately.\",\n    \"Initiate forensic imaging and memory dump analysis to identify persistence mechanisms and initial access vector.\",\n    \"Reset credentials for user zhang.san@company.com and audit recent access logs for data exfiltration.\"\n  ]\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1656,
+      "output_tokens": 283,
+      "latency_ms": 3418,
+      "attempts": 1
+    },
+    {
+      "label": "evidence_completeness",
+      "parsed": {
+        "score": 5,
+        "reason": "证据链完整覆盖了关键 IOC（恶意域名 evil-c2.xyz、恶意 IP 198.51.100.55）与核心行为特征（svchost.exe 周期性 DNS 查询/信标行为）。输入数据通过 EDR 原始日志确认了进程与域名的关联，威胁情报证实了 C2 归属（Lazarus Group），资产信息明确了受害目标的高价值属性，形成了从检测到归因的闭环。",
+        "evidence_quotes": [
+          "EDR raw_log shows svchost.exe (PID 1340) queried evil-c2.xyz returning 198.51.100.55",
+          "Payload highlights indicate repeated queries every 60 seconds suggesting beaconing behavior",
+          "Threat intel classifies evil-c2.xyz as malicious C2 associated with Lazarus Group",
+          "Threat intel classifies 198.51.100.55 as malicious C2 IP resolving from the domain",
+          "Asset 10.0.3.17 is identified as a high-level finance workstation"
+        ]
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"证据链完整覆盖了关键 IOC（恶意域名 evil-c2.xyz、恶意 IP 198.51.100.55）与核心行为特征（svchost.exe 周期性 DNS 查询/信标行为）。输入数据通过 EDR 原始日志确认了进程与域名的关联，威胁情报证实了 C2 归属（Lazarus Group），资产信息明确了受害目标的高价值属性，形成了从检测到归因的闭环。\",\n  \"evidence_quotes\": [\n    \"EDR raw_log shows svchost.exe (PID 1340) queried evil-c2.xyz returning 198.51.100.55\",\n    \"Payload highlights indicate repeated queries every 60 seconds suggesting beaconing behavior\",\n    \"Threat intel classifies evil-c2.xyz as malicious C2 associated with Lazarus Group\",\n    \"Threat intel classifies 198.51.100.55 as malicious C2 IP resolving from the domain\",\n    \"Asset 10.0.3.17 is identified as a high-level finance workstation\"\n  ]\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1656,
+      "output_tokens": 262,
+      "latency_ms": 3452,
+      "attempts": 1
+    },
+    {
+      "label": "hallucination_check",
+      "parsed": {
+        "total_statements": 5,
+        "verifiable": 5,
+        "hallucinations": 0,
+        "uncertain": 0,
+        "details": [
+          {
+            "statement": "EDR raw_log shows svchost.exe (PID 1340) queried evil-c2.xyz returning 198.51.100.55",
+            "verdict": "verifiable",
+            "reason": "Confirmed by mock_api_responses query_alert_detail_A03.raw_log: 'Process svchost.exe (PID 1340) made DNS query for evil-c2.xyz, returned 198.51.100.55'."
+          },
+          {
+            "statement": "Payload highlights indicate repeated queries every 60 seconds suggesting beaconing behavior",
+            "verdict": "verifiable",
+            "reason": "Confirmed by mock_api_responses query_alert_detail_A03.payload_highlights containing 'repeated queries every 60 seconds'."
+          },
+          {
+            "statement": "Threat intel classifies evil-c2.xyz as malicious C2 associated with Lazarus Group",
+            "verdict": "verifiable",
+            "reason": "Confirmed by mock_api_responses query_threat_intel_domain_evil-c2.xyz showing is_malicious: true, associated_apt: 'Lazarus Group', and raw_intel describing it as a known C2 channel."
+          },
+          {
+            "statement": "Threat intel classifies 198.51.100.55 as malicious C2 IP resolving from the domain",
+            "verdict": "verifiable",
+            "reason": "Confirmed by mock_api_responses query_threat_intel_ip_198.51.100.55 showing is_malicious: true, associated_apt: 'Lazarus Group', and raw_intel stating 'IP resolves from evil-c2.xyz, used as C2 server'."
+          },
+          {
+            "statement": "Asset 10.0.3.17 is identified as a high-level finance workstation, not a security device",
+            "verdict": "verifiable",
+            "reason": "Confirmed by mock_api_responses query_asset_info_10.0.3.17 showing ip: '10.0.3.17', business_system: '财务专用终端' (Finance Dedicated Terminal), asset_level: 'high', tags including 'finance' and 'workstation', and is_bastion/is_scanner set to false."
+          }
+        ]
+      },
+      "raw_text": "{\n  \"total_statements\": 5,\n  \"verifiable\": 5,\n  \"hallucinations\": 0,\n  \"uncertain\": 0,\n  \"details\": [\n    {\n      \"statement\": \"EDR raw_log shows svchost.exe (PID 1340) queried evil-c2.xyz returning 198.51.100.55\",\n      \"verdict\": \"verifiable\",\n      \"reason\": \"Confirmed by mock_api_responses query_alert_detail_A03.raw_log: 'Process svchost.exe (PID 1340) made DNS query for evil-c2.xyz, returned 198.51.100.55'.\"\n    },\n    {\n      \"statement\": \"Payload highlights indicate repeated queries every 60 seconds suggesting beaconing behavior\",\n      \"verdict\": \"verifiable\",\n      \"reason\": \"Confirmed by mock_api_responses query_alert_detail_A03.payload_highlights containing 'repeated queries every 60 seconds'.\"\n    },\n    {\n      \"statement\": \"Threat intel classifies evil-c2.xyz as malicious C2 associated with Lazarus Group\",\n      \"verdict\": \"verifiable\",\n      \"reason\": \"Confirmed by mock_api_responses query_threat_intel_domain_evil-c2.xyz showing is_malicious: true, associated_apt: 'Lazarus Group', and raw_intel describing it as a known C2 channel.\"\n    },\n    {\n      \"statement\": \"Threat intel classifies 198.51.100.55 as malicious C2 IP resolving from the domain\",\n      \"verdict\": \"verifiable\",\n      \"reason\": \"Confirmed by mock_api_responses query_threat_intel_ip_198.51.100.55 showing is_malicious: true, associated_apt: 'Lazarus Group', and raw_intel stating 'IP resolves from evil-c2.xyz, used as C2 server'.\"\n    },\n    {\n      \"statement\": \"Asset 10.0.3.17 is identified as a high-level finance workstation, not a security device\",\n      \"verdict\": \"verifiable\",\n      \"reason\": \"Confirmed by mock_api_responses query_asset_info_10.0.3.17 showing ip: '10.0.3.17', business_system: '财务专用终端' (Finance Dedicated Terminal), asset_level: 'high', tags including 'finance' and 'workstation', and is_bastion/is_scanner set to false.\"\n    }\n  ]\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1687,
+      "output_tokens": 580,
+      "latency_ms": 5833,
+      "attempts": 1
+    }
+  ],
+  "overall_pass": false,
+  "error_type": null,
+  "error_message": null
+}

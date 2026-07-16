@@ -1,0 +1,323 @@
+{
+  "test_case_id": "A14",
+  "scenario": "容器逃逸：特权容器挂载宿主机敏感目录",
+  "difficulty": "hard",
+  "is_positive": true,
+  "expected_severity": "high",
+  "status": "completed",
+  "agent_output": {
+    "alert_id": "A14",
+    "judgment": {
+      "severity": "critical",
+      "attack_type": "Container Escape & Host Compromise",
+      "confidence": 0.95,
+      "summary": "Confirmed container escape attack on production Kubernetes node. Privileged pod with Docker socket mount enabled direct host control, corroborated by related alerts showing compromised CI token usage and active host process execution.",
+      "evidence_chain": [
+        "query_alert_detail raw_log confirms Pod evil-pod created with securityContext privileged: true and hostPath /var/run/docker.sock mounted.",
+        "query_asset_info identifies source_ip 10.0.6.50 as high-level asset 'Kubernetes 生产集群节点' (Production Cluster Node), not a scanner or bastion.",
+        "query_related_alerts A14-REL-01 indicates pod creation via 'compromised CI token' by user jane.doe prior to main alert.",
+        "query_related_alerts A14-REL-02 confirms active exploitation with 'Process 'docker run -it alpine' detected on host via mounted docker socket'."
+      ],
+      "iocs": [
+        {
+          "type": "ip",
+          "value": "10.0.6.50",
+          "malicious": true,
+          "context": "Source IP of compromised Kubernetes worker node executing malicious privileged pod"
+        }
+      ]
+    },
+    "remediation": [
+      "Immediately isolate network traffic for node 10.0.6.50 to prevent lateral movement.",
+      "Force delete pod evil-pod in default namespace to terminate the container escape vector.",
+      "Revoke CI token associated with user jane.doe to stop further unauthorized pod creation.",
+      "Conduct forensic analysis on host 10.0.6.50 to identify persistence mechanisms established via docker socket.",
+      "Audit and rotate all service account tokens within the affected Kubernetes cluster."
+    ],
+    "metadata": {
+      "tools_called": [
+        "query_alert_detail",
+        "query_asset_info",
+        "query_threat_intel",
+        "query_related_alerts"
+      ]
+    }
+  },
+  "code_graders": {
+    "tools_called_minimum": {
+      "passed": true,
+      "reason": "required tools present",
+      "expected": [
+        "query_alert_detail",
+        "query_threat_intel",
+        "query_related_alerts"
+      ],
+      "actual": [
+        "query_alert_detail",
+        "query_asset_info",
+        "query_threat_intel",
+        "query_related_alerts"
+      ]
+    },
+    "output_schema": {
+      "passed": true,
+      "reason": "required fields present",
+      "expected": null,
+      "actual": null
+    },
+    "severity_enum": {
+      "passed": true,
+      "reason": "severity is valid",
+      "expected": [
+        "critical",
+        "false_positive",
+        "high",
+        "low",
+        "medium"
+      ],
+      "actual": "critical"
+    },
+    "severity_match": {
+      "passed": false,
+      "reason": "severity mismatch",
+      "expected": "high",
+      "actual": "critical"
+    },
+    "confidence_range": {
+      "passed": true,
+      "reason": "confidence in range",
+      "expected": "0..1",
+      "actual": 0.95
+    },
+    "remediation_not_empty": {
+      "passed": true,
+      "reason": "remediation actionable",
+      "expected": "at least one item >=10 chars",
+      "actual": [
+        "Immediately isolate network traffic for node 10.0.6.50 to prevent lateral movement.",
+        "Force delete pod evil-pod in default namespace to terminate the container escape vector.",
+        "Revoke CI token associated with user jane.doe to stop further unauthorized pod creation.",
+        "Conduct forensic analysis on host 10.0.6.50 to identify persistence mechanisms established via docker socket.",
+        "Audit and rotate all service account tokens within the affected Kubernetes cluster."
+      ]
+    }
+  },
+  "quality_scores": {
+    "severity_rationality": {
+      "score": 5,
+      "reason": "The agent's assessment of 'critical' severity is fully supported by the evidence chain. The input data confirms a container escape attack on a production asset (10.0.6.50) via a privileged pod with Docker socket access, which directly enables host compromise. This is corroborated by related alerts showing active exploitation ('docker run' detected) and a compromised CI token, justifying the highest severity rating.",
+      "evidence_quotes": [
+        "Pod evil-pod created with securityContext privileged: true and hostPath /var/run/docker.sock mounted.",
+        "identifies source_ip 10.0.6.50 as high-level asset 'Kubernetes 生产集群节点' (Production Cluster Node)",
+        "Process 'docker run -it alpine' detected on host via mounted docker socket",
+        "Confirmed container escape attack on production Kubernetes node."
+      ]
+    },
+    "remediation_actionability": {
+      "score": 5,
+      "reason": "处置建议非常具体、可执行且逻辑清晰。建议按攻击链的紧急程度进行了合理的优先级排列：首先隔离受感染节点（10.0.6.50）以阻断横向移动，其次立即删除恶意Pod终止逃逸向量，接着撤销被利用的CI令牌切断攻击源，随后进行取证分析，最后进行全局审计和凭证轮换。所有建议均直接引用了输入证据中的关键信息（如IP地址、Pod名称、用户身份）。",
+      "evidence_quotes": [
+        "Immediately isolate network traffic for node 10.0.6.50 to prevent lateral movement.",
+        "Force delete pod evil-pod in default namespace to terminate the container escape vector.",
+        "Revoke CI token associated with user jane.doe to stop further unauthorized pod creation.",
+        "Conduct forensic analysis on host 10.0.6.50 to identify persistence mechanisms established via docker socket.",
+        "Audit and rotate all service account tokens within the affected Kubernetes cluster."
+      ]
+    },
+    "evidence_completeness": {
+      "score": 5,
+      "reason": "证据链完整覆盖了容器逃逸攻击的关键IOC与行为特征。首先，原始日志（raw_log）明确证实了特权容器（privileged: true）挂载Docker Socket（hostPath /var/run/docker.sock），这是容器逃逸的核心技术特征。其次，资产信息确认源IP 10.0.6.50为生产环境K8s节点，排除了误报可能。再次，关联告警A14-REL-01和A14-REL-02分别提供了攻击前置条件（CI令牌泄露）和攻击后果（宿主机上执行docker run命令）的直接证据，形成了从入侵入口到横向移动/提权的完整闭环。",
+      "evidence_quotes": [
+        "Pod evil-pod (UID 0) created with securityContext privileged: true, hostPath /var/run/docker.sock mounted to /var/run/docker.sock.",
+        "asset_level: high, business_system: Kubernetes 生产集群节点",
+        "User jane.doe created pod with privileged flag via compromised CI token.",
+        "Process 'docker run -it alpine' detected on host via mounted docker socket."
+      ]
+    }
+  },
+  "hallucination": {
+    "total_statements": 4,
+    "verifiable": 4,
+    "hallucinations": 0,
+    "uncertain": 0,
+    "details": [
+      {
+        "statement": "query_alert_detail raw_log confirms Pod evil-pod created with securityContext privileged: true and hostPath /var/run/docker.sock mounted.",
+        "verdict": "verifiable",
+        "reason": "Input mock_api_responses.query_alert_detail_A14.raw_log explicitly states: 'Pod evil-pod (UID 0) created with securityContext privileged: true, hostPath /var/run/docker.sock mounted to /var/run/docker.sock.' This matches the agent's claim exactly."
+      },
+      {
+        "statement": "query_asset_info identifies source_ip 10.0.6.50 as high-level asset 'Kubernetes 生产集群节点' (Production Cluster Node), not a scanner or bastion.",
+        "verdict": "verifiable",
+        "reason": "Input mock_api_responses.query_asset_info_10.0.6.50 shows ip '10.0.6.50', business_system 'Kubernetes 生产集群节点', is_scanner false, and is_bastion false. The agent's description aligns perfectly with this data."
+      },
+      {
+        "statement": "query_related_alerts A14-REL-01 indicates pod creation via 'compromised CI token' by user jane.doe prior to main alert.",
+        "verdict": "verifiable",
+        "reason": "Input mock_api_responses.query_related_alerts_10.0.6.50_48h contains alert A14-REL-01 with summary 'User jane.doe created pod with privileged flag via compromised CI token.' and timestamp '2026-07-10T11:15:00Z', which is prior to the main alert timestamp of '2026-07-10T11:20:33Z' found in query_alert_detail_A14."
+      },
+      {
+        "statement": "query_related_alerts A14-REL-02 confirms active exploitation with 'Process 'docker run -it alpine' detected on host via mounted docker socket'.",
+        "verdict": "verifiable",
+        "reason": "Input mock_api_responses.query_related_alerts_10.0.6.50_48h contains alert A14-REL-02 with summary 'Process 'docker run -it alpine' detected on host via mounted docker socket.' This directly corroborates the agent's statement."
+      }
+    ]
+  },
+  "calls": [
+    {
+      "label": "agent",
+      "parsed": {
+        "alert_id": "A14",
+        "judgment": {
+          "severity": "critical",
+          "attack_type": "Container Escape & Host Compromise",
+          "confidence": 0.95,
+          "summary": "Confirmed container escape attack on production Kubernetes node. Privileged pod with Docker socket mount enabled direct host control, corroborated by related alerts showing compromised CI token usage and active host process execution.",
+          "evidence_chain": [
+            "query_alert_detail raw_log confirms Pod evil-pod created with securityContext privileged: true and hostPath /var/run/docker.sock mounted.",
+            "query_asset_info identifies source_ip 10.0.6.50 as high-level asset 'Kubernetes 生产集群节点' (Production Cluster Node), not a scanner or bastion.",
+            "query_related_alerts A14-REL-01 indicates pod creation via 'compromised CI token' by user jane.doe prior to main alert.",
+            "query_related_alerts A14-REL-02 confirms active exploitation with 'Process 'docker run -it alpine' detected on host via mounted docker socket'."
+          ],
+          "iocs": [
+            {
+              "type": "ip",
+              "value": "10.0.6.50",
+              "malicious": true,
+              "context": "Source IP of compromised Kubernetes worker node executing malicious privileged pod"
+            }
+          ]
+        },
+        "remediation": [
+          "Immediately isolate network traffic for node 10.0.6.50 to prevent lateral movement.",
+          "Force delete pod evil-pod in default namespace to terminate the container escape vector.",
+          "Revoke CI token associated with user jane.doe to stop further unauthorized pod creation.",
+          "Conduct forensic analysis on host 10.0.6.50 to identify persistence mechanisms established via docker socket.",
+          "Audit and rotate all service account tokens within the affected Kubernetes cluster."
+        ],
+        "metadata": {
+          "tools_called": [
+            "query_alert_detail",
+            "query_asset_info",
+            "query_threat_intel",
+            "query_related_alerts"
+          ]
+        }
+      },
+      "raw_text": "{\n  \"alert_id\": \"A14\",\n  \"judgment\": {\n    \"severity\": \"critical\",\n    \"attack_type\": \"Container Escape & Host Compromise\",\n    \"confidence\": 0.95,\n    \"summary\": \"Confirmed container escape attack on production Kubernetes node. Privileged pod with Docker socket mount enabled direct host control, corroborated by related alerts showing compromised CI token usage and active host process execution.\",\n    \"evidence_chain\": [\n      \"query_alert_detail raw_log confirms Pod evil-pod created with securityContext privileged: true and hostPath /var/run/docker.sock mounted.\",\n      \"query_asset_info identifies source_ip 10.0.6.50 as high-level asset 'Kubernetes 生产集群节点' (Production Cluster Node), not a scanner or bastion.\",\n      \"query_related_alerts A14-REL-01 indicates pod creation via 'compromised CI token' by user jane.doe prior to main alert.\",\n      \"query_related_alerts A14-REL-02 confirms active exploitation with 'Process 'docker run -it alpine' detected on host via mounted docker socket'.\"\n    ],\n    \"iocs\": [\n      {\n        \"type\": \"ip\",\n        \"value\": \"10.0.6.50\",\n        \"malicious\": true,\n        \"context\": \"Source IP of compromised Kubernetes worker node executing malicious privileged pod\"\n      }\n    ]\n  },\n  \"remediation\": [\n    \"Immediately isolate network traffic for node 10.0.6.50 to prevent lateral movement.\",\n    \"Force delete pod evil-pod in default namespace to terminate the container escape vector.\",\n    \"Revoke CI token associated with user jane.doe to stop further unauthorized pod creation.\",\n    \"Conduct forensic analysis on host 10.0.6.50 to identify persistence mechanisms established via docker socket.\",\n    \"Audit and rotate all service account tokens within the affected Kubernetes cluster.\"\n  ],\n  \"metadata\": {\n    \"tools_called\": [\n      \"query_alert_detail\",\n      \"query_asset_info\",\n      \"query_threat_intel\",\n      \"query_related_alerts\"\n    ]\n  }\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1157,
+      "output_tokens": 3900,
+      "latency_ms": 42270,
+      "attempts": 1
+    },
+    {
+      "label": "severity_rationality",
+      "parsed": {
+        "score": 5,
+        "reason": "The agent's assessment of 'critical' severity is fully supported by the evidence chain. The input data confirms a container escape attack on a production asset (10.0.6.50) via a privileged pod with Docker socket access, which directly enables host compromise. This is corroborated by related alerts showing active exploitation ('docker run' detected) and a compromised CI token, justifying the highest severity rating.",
+        "evidence_quotes": [
+          "Pod evil-pod created with securityContext privileged: true and hostPath /var/run/docker.sock mounted.",
+          "identifies source_ip 10.0.6.50 as high-level asset 'Kubernetes 生产集群节点' (Production Cluster Node)",
+          "Process 'docker run -it alpine' detected on host via mounted docker socket",
+          "Confirmed container escape attack on production Kubernetes node."
+        ]
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"The agent's assessment of 'critical' severity is fully supported by the evidence chain. The input data confirms a container escape attack on a production asset (10.0.6.50) via a privileged pod with Docker socket access, which directly enables host compromise. This is corroborated by related alerts showing active exploitation ('docker run' detected) and a compromised CI token, justifying the highest severity rating.\",\n  \"evidence_quotes\": [\n    \"Pod evil-pod created with securityContext privileged: true and hostPath /var/run/docker.sock mounted.\",\n    \"identifies source_ip 10.0.6.50 as high-level asset 'Kubernetes 生产集群节点' (Production Cluster Node)\",\n    \"Process 'docker run -it alpine' detected on host via mounted docker socket\",\n    \"Confirmed container escape attack on production Kubernetes node.\"\n  ]\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1435,
+      "output_tokens": 202,
+      "latency_ms": 2852,
+      "attempts": 1
+    },
+    {
+      "label": "remediation_actionability",
+      "parsed": {
+        "score": 5,
+        "reason": "处置建议非常具体、可执行且逻辑清晰。建议按攻击链的紧急程度进行了合理的优先级排列：首先隔离受感染节点（10.0.6.50）以阻断横向移动，其次立即删除恶意Pod终止逃逸向量，接着撤销被利用的CI令牌切断攻击源，随后进行取证分析，最后进行全局审计和凭证轮换。所有建议均直接引用了输入证据中的关键信息（如IP地址、Pod名称、用户身份）。",
+        "evidence_quotes": [
+          "Immediately isolate network traffic for node 10.0.6.50 to prevent lateral movement.",
+          "Force delete pod evil-pod in default namespace to terminate the container escape vector.",
+          "Revoke CI token associated with user jane.doe to stop further unauthorized pod creation.",
+          "Conduct forensic analysis on host 10.0.6.50 to identify persistence mechanisms established via docker socket.",
+          "Audit and rotate all service account tokens within the affected Kubernetes cluster."
+        ]
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"处置建议非常具体、可执行且逻辑清晰。建议按攻击链的紧急程度进行了合理的优先级排列：首先隔离受感染节点（10.0.6.50）以阻断横向移动，其次立即删除恶意Pod终止逃逸向量，接着撤销被利用的CI令牌切断攻击源，随后进行取证分析，最后进行全局审计和凭证轮换。所有建议均直接引用了输入证据中的关键信息（如IP地址、Pod名称、用户身份）。\",\n  \"evidence_quotes\": [\n    \"Immediately isolate network traffic for node 10.0.6.50 to prevent lateral movement.\",\n    \"Force delete pod evil-pod in default namespace to terminate the container escape vector.\",\n    \"Revoke CI token associated with user jane.doe to stop further unauthorized pod creation.\",\n    \"Conduct forensic analysis on host 10.0.6.50 to identify persistence mechanisms established via docker socket.\",\n    \"Audit and rotate all service account tokens within the affected Kubernetes cluster.\"\n  ]\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1438,
+      "output_tokens": 235,
+      "latency_ms": 2936,
+      "attempts": 1
+    },
+    {
+      "label": "evidence_completeness",
+      "parsed": {
+        "score": 5,
+        "reason": "证据链完整覆盖了容器逃逸攻击的关键IOC与行为特征。首先，原始日志（raw_log）明确证实了特权容器（privileged: true）挂载Docker Socket（hostPath /var/run/docker.sock），这是容器逃逸的核心技术特征。其次，资产信息确认源IP 10.0.6.50为生产环境K8s节点，排除了误报可能。再次，关联告警A14-REL-01和A14-REL-02分别提供了攻击前置条件（CI令牌泄露）和攻击后果（宿主机上执行docker run命令）的直接证据，形成了从入侵入口到横向移动/提权的完整闭环。",
+        "evidence_quotes": [
+          "Pod evil-pod (UID 0) created with securityContext privileged: true, hostPath /var/run/docker.sock mounted to /var/run/docker.sock.",
+          "asset_level: high, business_system: Kubernetes 生产集群节点",
+          "User jane.doe created pod with privileged flag via compromised CI token.",
+          "Process 'docker run -it alpine' detected on host via mounted docker socket."
+        ]
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"证据链完整覆盖了容器逃逸攻击的关键IOC与行为特征。首先，原始日志（raw_log）明确证实了特权容器（privileged: true）挂载Docker Socket（hostPath /var/run/docker.sock），这是容器逃逸的核心技术特征。其次，资产信息确认源IP 10.0.6.50为生产环境K8s节点，排除了误报可能。再次，关联告警A14-REL-01和A14-REL-02分别提供了攻击前置条件（CI令牌泄露）和攻击后果（宿主机上执行docker run命令）的直接证据，形成了从入侵入口到横向移动/提权的完整闭环。\",\n  \"evidence_quotes\": [\n    \"Pod evil-pod (UID 0) created with securityContext privileged: true, hostPath /var/run/docker.sock mounted to /var/run/docker.sock.\",\n    \"asset_level: high, business_system: Kubernetes 生产集群节点\",\n    \"User jane.doe created pod with privileged flag via compromised CI token.\",\n    \"Process 'docker run -it alpine' detected on host via mounted docker socket.\"\n  ]\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1438,
+      "output_tokens": 260,
+      "latency_ms": 3397,
+      "attempts": 1
+    },
+    {
+      "label": "hallucination_check",
+      "parsed": {
+        "total_statements": 4,
+        "verifiable": 4,
+        "hallucinations": 0,
+        "uncertain": 0,
+        "details": [
+          {
+            "statement": "query_alert_detail raw_log confirms Pod evil-pod created with securityContext privileged: true and hostPath /var/run/docker.sock mounted.",
+            "verdict": "verifiable",
+            "reason": "Input mock_api_responses.query_alert_detail_A14.raw_log explicitly states: 'Pod evil-pod (UID 0) created with securityContext privileged: true, hostPath /var/run/docker.sock mounted to /var/run/docker.sock.' This matches the agent's claim exactly."
+          },
+          {
+            "statement": "query_asset_info identifies source_ip 10.0.6.50 as high-level asset 'Kubernetes 生产集群节点' (Production Cluster Node), not a scanner or bastion.",
+            "verdict": "verifiable",
+            "reason": "Input mock_api_responses.query_asset_info_10.0.6.50 shows ip '10.0.6.50', business_system 'Kubernetes 生产集群节点', is_scanner false, and is_bastion false. The agent's description aligns perfectly with this data."
+          },
+          {
+            "statement": "query_related_alerts A14-REL-01 indicates pod creation via 'compromised CI token' by user jane.doe prior to main alert.",
+            "verdict": "verifiable",
+            "reason": "Input mock_api_responses.query_related_alerts_10.0.6.50_48h contains alert A14-REL-01 with summary 'User jane.doe created pod with privileged flag via compromised CI token.' and timestamp '2026-07-10T11:15:00Z', which is prior to the main alert timestamp of '2026-07-10T11:20:33Z' found in query_alert_detail_A14."
+          },
+          {
+            "statement": "query_related_alerts A14-REL-02 confirms active exploitation with 'Process 'docker run -it alpine' detected on host via mounted docker socket'.",
+            "verdict": "verifiable",
+            "reason": "Input mock_api_responses.query_related_alerts_10.0.6.50_48h contains alert A14-REL-02 with summary 'Process 'docker run -it alpine' detected on host via mounted docker socket.' This directly corroborates the agent's statement."
+          }
+        ]
+      },
+      "raw_text": "{\n  \"total_statements\": 4,\n  \"verifiable\": 4,\n  \"hallucinations\": 0,\n  \"uncertain\": 0,\n  \"details\": [\n    {\n      \"statement\": \"query_alert_detail raw_log confirms Pod evil-pod created with securityContext privileged: true and hostPath /var/run/docker.sock mounted.\",\n      \"verdict\": \"verifiable\",\n      \"reason\": \"Input mock_api_responses.query_alert_detail_A14.raw_log explicitly states: 'Pod evil-pod (UID 0) created with securityContext privileged: true, hostPath /var/run/docker.sock mounted to /var/run/docker.sock.' This matches the agent's claim exactly.\"\n    },\n    {\n      \"statement\": \"query_asset_info identifies source_ip 10.0.6.50 as high-level asset 'Kubernetes 生产集群节点' (Production Cluster Node), not a scanner or bastion.\",\n      \"verdict\": \"verifiable\",\n      \"reason\": \"Input mock_api_responses.query_asset_info_10.0.6.50 shows ip '10.0.6.50', business_system 'Kubernetes 生产集群节点', is_scanner false, and is_bastion false. The agent's description aligns perfectly with this data.\"\n    },\n    {\n      \"statement\": \"query_related_alerts A14-REL-01 indicates pod creation via 'compromised CI token' by user jane.doe prior to main alert.\",\n      \"verdict\": \"verifiable\",\n      \"reason\": \"Input mock_api_responses.query_related_alerts_10.0.6.50_48h contains alert A14-REL-01 with summary 'User jane.doe created pod with privileged flag via compromised CI token.' and timestamp '2026-07-10T11:15:00Z', which is prior to the main alert timestamp of '2026-07-10T11:20:33Z' found in query_alert_detail_A14.\"\n    },\n    {\n      \"statement\": \"query_related_alerts A14-REL-02 confirms active exploitation with 'Process 'docker run -it alpine' detected on host via mounted docker socket'.\",\n      \"verdict\": \"verifiable\",\n      \"reason\": \"Input mock_api_responses.query_related_alerts_10.0.6.50_48h contains alert A14-REL-02 with summary 'Process 'docker run -it alpine' detected on host via mounted docker socket.' This directly corroborates the agent's statement.\"\n    }\n  ]\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1469,
+      "output_tokens": 590,
+      "latency_ms": 6374,
+      "attempts": 1
+    }
+  ],
+  "overall_pass": false,
+  "error_type": null,
+  "error_message": null
+}

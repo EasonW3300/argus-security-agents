@@ -1,0 +1,312 @@
+{
+  "test_case_id": "A19",
+  "scenario": "IoT 设备异常流量告警实为固件更新（误报）",
+  "difficulty": "medium",
+  "is_positive": false,
+  "expected_severity": "false_positive",
+  "status": "completed",
+  "agent_output": {
+    "alert_id": "A19",
+    "judgment": {
+      "severity": "false_positive",
+      "attack_type": "Firmware Update",
+      "confidence": 0.95,
+      "summary": "Outbound traffic identified as legitimate scheduled firmware update based on threat intelligence and related alert correlation.",
+      "evidence_chain": [
+        "Alert detail indicates 500MB outbound data from 10.0.8.200 to cdn-update.com at 03:10 (query_alert_detail)",
+        "Threat intelligence confirms cdn-update.com is a legitimate CDN provider for IoT firmware, not malicious (query_threat_intel)",
+        "Related alert A19-REL-01 shows scheduled firmware update check initiated at 03:00, correlating with traffic timing (query_related_alerts)",
+        "Asset info confirms device is a surveillance camera in IoT zone, consistent with firmware update behavior (query_asset_info)"
+      ],
+      "iocs": [
+        {
+          "type": "domain",
+          "value": "cdn-update.com",
+          "malicious": false,
+          "context": "Legitimate CDN provider for IoT firmware updates"
+        }
+      ]
+    },
+    "remediation": [
+      "Close alert A19 as false positive due to confirmed legitimate firmware update activity.",
+      "Verify with asset owner (facility@company.com) that the update schedule aligns with current maintenance windows.",
+      "Update baseline thresholds for this camera to prevent recurrence of similar volume-based alerts during scheduled updates."
+    ],
+    "metadata": {
+      "tools_called": [
+        "query_alert_detail",
+        "query_asset_info",
+        "query_threat_intel",
+        "query_related_alerts"
+      ]
+    }
+  },
+  "code_graders": {
+    "tools_called_minimum": {
+      "passed": true,
+      "reason": "required tools present",
+      "expected": [
+        "query_alert_detail",
+        "query_threat_intel"
+      ],
+      "actual": [
+        "query_alert_detail",
+        "query_asset_info",
+        "query_threat_intel",
+        "query_related_alerts"
+      ]
+    },
+    "output_schema": {
+      "passed": true,
+      "reason": "required fields present",
+      "expected": null,
+      "actual": null
+    },
+    "severity_enum": {
+      "passed": true,
+      "reason": "severity is valid",
+      "expected": [
+        "critical",
+        "false_positive",
+        "high",
+        "low",
+        "medium"
+      ],
+      "actual": "false_positive"
+    },
+    "severity_match": {
+      "passed": true,
+      "reason": "severity matches",
+      "expected": "false_positive",
+      "actual": "false_positive"
+    },
+    "confidence_range": {
+      "passed": true,
+      "reason": "confidence in range",
+      "expected": "0..1",
+      "actual": 0.95
+    },
+    "remediation_not_empty": {
+      "passed": true,
+      "reason": "remediation actionable",
+      "expected": "at least one item >=10 chars",
+      "actual": [
+        "Close alert A19 as false positive due to confirmed legitimate firmware update activity.",
+        "Verify with asset owner (facility@company.com) that the update schedule aligns with current maintenance windows.",
+        "Update baseline thresholds for this camera to prevent recurrence of similar volume-based alerts during scheduled updates."
+      ]
+    }
+  },
+  "quality_scores": {
+    "severity_rationality": {
+      "score": 5,
+      "reason": "Agent correctly identified the alert as a false positive. The evidence chain logically connects the high-volume outbound traffic (500MB) to a scheduled firmware update event (A19-REL-01), confirms the destination domain is legitimate via threat intelligence, and validates the asset type matches expected behavior for IoT devices.",
+      "evidence_quotes": [
+        "Alert detail indicates 500MB outbound data from 10.0.8.200 to cdn-update.com at 03:10",
+        "Threat intelligence confirms cdn-update.com is a legitimate CDN provider for IoT firmware, not malicious",
+        "Related alert A19-REL-01 shows scheduled firmware update check initiated at 03:00, correlating with traffic timing",
+        "Asset info confirms device is a surveillance camera in IoT zone, consistent with firmware update behavior"
+      ]
+    },
+    "remediation_actionability": {
+      "score": 5,
+      "reason": "处置建议具体、可执行且逻辑清晰。首先明确关闭误报（Close alert A19），其次提出与资产所有者确认维护窗口以验证业务合规性，最后建议调整基线阈值以防止未来重复告警。这三步措施按‘立即响应-业务验证-长期优化’的优先级排列，完全基于提供的证据链（如威胁情报确认域名合法、相关告警A19-REL-01确认更新计划、资产信息确认设备类型）。",
+      "evidence_quotes": [
+        "Close alert A19 as false positive due to confirmed legitimate firmware update activity.",
+        "Verify with asset owner (facility@company.com) that the update schedule aligns with current maintenance windows.",
+        "Update baseline thresholds for this camera to prevent recurrence of similar volume-based alerts during scheduled updates."
+      ]
+    },
+    "evidence_completeness": {
+      "score": 5,
+      "reason": "证据链完整覆盖了关键 IOC（cdn-update.com）的信誉验证、异常行为（500MB 流量）的上下文关联（资产类型与更新通知）、以及时间线的一致性。所有关键判断点均有对应的 API 响应数据支持，逻辑闭环清晰，足以确认为误报。",
+      "evidence_quotes": [
+        "Alert detail indicates 500MB outbound data from 10.0.8.200 to cdn-update.com at 03:10 (query_alert_detail)",
+        "Threat intelligence confirms cdn-update.com is a legitimate CDN provider for IoT firmware, not malicious (query_threat_intel)",
+        "Related alert A19-REL-01 shows scheduled firmware update check initiated at 03:00, correlating with traffic timing (query_related_alerts)",
+        "Asset info confirms device is a surveillance camera in IoT zone, consistent with firmware update behavior (query_asset_info)"
+      ]
+    }
+  },
+  "hallucination": {
+    "total_statements": 4,
+    "verifiable": 4,
+    "hallucinations": 0,
+    "uncertain": 0,
+    "details": [
+      {
+        "statement": "Alert detail indicates 500MB outbound data from 10.0.8.200 to cdn-update.com at 03:10 (query_alert_detail)",
+        "verdict": "verifiable",
+        "reason": "The mock_api_response 'query_alert_detail_A19' confirms source_ip '10.0.8.200', payload_highlights mention '500MB outbound', destination domain is 'cdn-update.com', and timestamp is '2026-07-11T03:10:15Z'."
+      },
+      {
+        "statement": "Threat intelligence confirms cdn-update.com is a legitimate CDN provider for IoT firmware, not malicious (query_threat_intel)",
+        "verdict": "verifiable",
+        "reason": "The mock_api_response 'query_threat_intel_domain_cdn-update.com' shows 'is_malicious': false and raw_intel states 'Domain belongs to a legitimate CDN provider used by many IoT manufacturers for firmware updates.'"
+      },
+      {
+        "statement": "Related alert A19-REL-01 shows scheduled firmware update check initiated at 03:00, correlating with traffic timing (query_related_alerts)",
+        "verdict": "verifiable",
+        "reason": "The mock_api_response 'query_related_alerts_10.0.8.200_48h' lists alert_id 'A19-REL-01' with summary 'Camera cam-01 initiated scheduled firmware update check' and timestamp '2026-07-11T03:00:00Z'."
+      },
+      {
+        "statement": "Asset info confirms device is a surveillance camera in IoT zone, consistent with firmware update behavior (query_asset_info)",
+        "verdict": "verifiable",
+        "reason": "The mock_api_response 'query_asset_info_10.0.8.200' confirms hostname 'cam-01', business_system '办公区监控摄像头' (Office Surveillance Camera), network_zone 'IoT网段' (IoT Zone), and tags include 'camera' and 'surveillance'."
+      }
+    ]
+  },
+  "calls": [
+    {
+      "label": "agent",
+      "parsed": {
+        "alert_id": "A19",
+        "judgment": {
+          "severity": "false_positive",
+          "attack_type": "Firmware Update",
+          "confidence": 0.95,
+          "summary": "Outbound traffic identified as legitimate scheduled firmware update based on threat intelligence and related alert correlation.",
+          "evidence_chain": [
+            "Alert detail indicates 500MB outbound data from 10.0.8.200 to cdn-update.com at 03:10 (query_alert_detail)",
+            "Threat intelligence confirms cdn-update.com is a legitimate CDN provider for IoT firmware, not malicious (query_threat_intel)",
+            "Related alert A19-REL-01 shows scheduled firmware update check initiated at 03:00, correlating with traffic timing (query_related_alerts)",
+            "Asset info confirms device is a surveillance camera in IoT zone, consistent with firmware update behavior (query_asset_info)"
+          ],
+          "iocs": [
+            {
+              "type": "domain",
+              "value": "cdn-update.com",
+              "malicious": false,
+              "context": "Legitimate CDN provider for IoT firmware updates"
+            }
+          ]
+        },
+        "remediation": [
+          "Close alert A19 as false positive due to confirmed legitimate firmware update activity.",
+          "Verify with asset owner (facility@company.com) that the update schedule aligns with current maintenance windows.",
+          "Update baseline thresholds for this camera to prevent recurrence of similar volume-based alerts during scheduled updates."
+        ],
+        "metadata": {
+          "tools_called": [
+            "query_alert_detail",
+            "query_asset_info",
+            "query_threat_intel",
+            "query_related_alerts"
+          ]
+        }
+      },
+      "raw_text": "{\n  \"alert_id\": \"A19\",\n  \"judgment\": {\n    \"severity\": \"false_positive\",\n    \"attack_type\": \"Firmware Update\",\n    \"confidence\": 0.95,\n    \"summary\": \"Outbound traffic identified as legitimate scheduled firmware update based on threat intelligence and related alert correlation.\",\n    \"evidence_chain\": [\n      \"Alert detail indicates 500MB outbound data from 10.0.8.200 to cdn-update.com at 03:10 (query_alert_detail)\",\n      \"Threat intelligence confirms cdn-update.com is a legitimate CDN provider for IoT firmware, not malicious (query_threat_intel)\",\n      \"Related alert A19-REL-01 shows scheduled firmware update check initiated at 03:00, correlating with traffic timing (query_related_alerts)\",\n      \"Asset info confirms device is a surveillance camera in IoT zone, consistent with firmware update behavior (query_asset_info)\"\n    ],\n    \"iocs\": [\n      {\n        \"type\": \"domain\",\n        \"value\": \"cdn-update.com\",\n        \"malicious\": false,\n        \"context\": \"Legitimate CDN provider for IoT firmware updates\"\n      }\n    ]\n  },\n  \"remediation\": [\n    \"Close alert A19 as false positive due to confirmed legitimate firmware update activity.\",\n    \"Verify with asset owner (facility@company.com) that the update schedule aligns with current maintenance windows.\",\n    \"Update baseline thresholds for this camera to prevent recurrence of similar volume-based alerts during scheduled updates.\"\n  ],\n  \"metadata\": {\n    \"tools_called\": [\n      \"query_alert_detail\",\n      \"query_asset_info\",\n      \"query_threat_intel\",\n      \"query_related_alerts\"\n    ]\n  }\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1113,
+      "output_tokens": 2977,
+      "latency_ms": 31281,
+      "attempts": 1
+    },
+    {
+      "label": "severity_rationality",
+      "parsed": {
+        "score": 5,
+        "reason": "Agent correctly identified the alert as a false positive. The evidence chain logically connects the high-volume outbound traffic (500MB) to a scheduled firmware update event (A19-REL-01), confirms the destination domain is legitimate via threat intelligence, and validates the asset type matches expected behavior for IoT devices.",
+        "evidence_quotes": [
+          "Alert detail indicates 500MB outbound data from 10.0.8.200 to cdn-update.com at 03:10",
+          "Threat intelligence confirms cdn-update.com is a legitimate CDN provider for IoT firmware, not malicious",
+          "Related alert A19-REL-01 shows scheduled firmware update check initiated at 03:00, correlating with traffic timing",
+          "Asset info confirms device is a surveillance camera in IoT zone, consistent with firmware update behavior"
+        ]
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"Agent correctly identified the alert as a false positive. The evidence chain logically connects the high-volume outbound traffic (500MB) to a scheduled firmware update event (A19-REL-01), confirms the destination domain is legitimate via threat intelligence, and validates the asset type matches expected behavior for IoT devices.\",\n  \"evidence_quotes\": [\n    \"Alert detail indicates 500MB outbound data from 10.0.8.200 to cdn-update.com at 03:10\",\n    \"Threat intelligence confirms cdn-update.com is a legitimate CDN provider for IoT firmware, not malicious\",\n    \"Related alert A19-REL-01 shows scheduled firmware update check initiated at 03:00, correlating with traffic timing\",\n    \"Asset info confirms device is a surveillance camera in IoT zone, consistent with firmware update behavior\"\n  ]\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1292,
+      "output_tokens": 207,
+      "latency_ms": 2332,
+      "attempts": 1
+    },
+    {
+      "label": "remediation_actionability",
+      "parsed": {
+        "score": 5,
+        "reason": "处置建议具体、可执行且逻辑清晰。首先明确关闭误报（Close alert A19），其次提出与资产所有者确认维护窗口以验证业务合规性，最后建议调整基线阈值以防止未来重复告警。这三步措施按‘立即响应-业务验证-长期优化’的优先级排列，完全基于提供的证据链（如威胁情报确认域名合法、相关告警A19-REL-01确认更新计划、资产信息确认设备类型）。",
+        "evidence_quotes": [
+          "Close alert A19 as false positive due to confirmed legitimate firmware update activity.",
+          "Verify with asset owner (facility@company.com) that the update schedule aligns with current maintenance windows.",
+          "Update baseline thresholds for this camera to prevent recurrence of similar volume-based alerts during scheduled updates."
+        ]
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"处置建议具体、可执行且逻辑清晰。首先明确关闭误报（Close alert A19），其次提出与资产所有者确认维护窗口以验证业务合规性，最后建议调整基线阈值以防止未来重复告警。这三步措施按‘立即响应-业务验证-长期优化’的优先级排列，完全基于提供的证据链（如威胁情报确认域名合法、相关告警A19-REL-01确认更新计划、资产信息确认设备类型）。\",\n  \"evidence_quotes\": [\n    \"Close alert A19 as false positive due to confirmed legitimate firmware update activity.\",\n    \"Verify with asset owner (facility@company.com) that the update schedule aligns with current maintenance windows.\",\n    \"Update baseline thresholds for this camera to prevent recurrence of similar volume-based alerts during scheduled updates.\"\n  ]\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1295,
+      "output_tokens": 193,
+      "latency_ms": 2806,
+      "attempts": 1
+    },
+    {
+      "label": "evidence_completeness",
+      "parsed": {
+        "score": 5,
+        "reason": "证据链完整覆盖了关键 IOC（cdn-update.com）的信誉验证、异常行为（500MB 流量）的上下文关联（资产类型与更新通知）、以及时间线的一致性。所有关键判断点均有对应的 API 响应数据支持，逻辑闭环清晰，足以确认为误报。",
+        "evidence_quotes": [
+          "Alert detail indicates 500MB outbound data from 10.0.8.200 to cdn-update.com at 03:10 (query_alert_detail)",
+          "Threat intelligence confirms cdn-update.com is a legitimate CDN provider for IoT firmware, not malicious (query_threat_intel)",
+          "Related alert A19-REL-01 shows scheduled firmware update check initiated at 03:00, correlating with traffic timing (query_related_alerts)",
+          "Asset info confirms device is a surveillance camera in IoT zone, consistent with firmware update behavior (query_asset_info)"
+        ]
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"证据链完整覆盖了关键 IOC（cdn-update.com）的信誉验证、异常行为（500MB 流量）的上下文关联（资产类型与更新通知）、以及时间线的一致性。所有关键判断点均有对应的 API 响应数据支持，逻辑闭环清晰，足以确认为误报。\",\n  \"evidence_quotes\": [\n    \"Alert detail indicates 500MB outbound data from 10.0.8.200 to cdn-update.com at 03:10 (query_alert_detail)\",\n    \"Threat intelligence confirms cdn-update.com is a legitimate CDN provider for IoT firmware, not malicious (query_threat_intel)\",\n    \"Related alert A19-REL-01 shows scheduled firmware update check initiated at 03:00, correlating with traffic timing (query_related_alerts)\",\n    \"Asset info confirms device is a surveillance camera in IoT zone, consistent with firmware update behavior (query_asset_info)\"\n  ]\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1295,
+      "output_tokens": 225,
+      "latency_ms": 3129,
+      "attempts": 1
+    },
+    {
+      "label": "hallucination_check",
+      "parsed": {
+        "total_statements": 4,
+        "verifiable": 4,
+        "hallucinations": 0,
+        "uncertain": 0,
+        "details": [
+          {
+            "statement": "Alert detail indicates 500MB outbound data from 10.0.8.200 to cdn-update.com at 03:10 (query_alert_detail)",
+            "verdict": "verifiable",
+            "reason": "The mock_api_response 'query_alert_detail_A19' confirms source_ip '10.0.8.200', payload_highlights mention '500MB outbound', destination domain is 'cdn-update.com', and timestamp is '2026-07-11T03:10:15Z'."
+          },
+          {
+            "statement": "Threat intelligence confirms cdn-update.com is a legitimate CDN provider for IoT firmware, not malicious (query_threat_intel)",
+            "verdict": "verifiable",
+            "reason": "The mock_api_response 'query_threat_intel_domain_cdn-update.com' shows 'is_malicious': false and raw_intel states 'Domain belongs to a legitimate CDN provider used by many IoT manufacturers for firmware updates.'"
+          },
+          {
+            "statement": "Related alert A19-REL-01 shows scheduled firmware update check initiated at 03:00, correlating with traffic timing (query_related_alerts)",
+            "verdict": "verifiable",
+            "reason": "The mock_api_response 'query_related_alerts_10.0.8.200_48h' lists alert_id 'A19-REL-01' with summary 'Camera cam-01 initiated scheduled firmware update check' and timestamp '2026-07-11T03:00:00Z'."
+          },
+          {
+            "statement": "Asset info confirms device is a surveillance camera in IoT zone, consistent with firmware update behavior (query_asset_info)",
+            "verdict": "verifiable",
+            "reason": "The mock_api_response 'query_asset_info_10.0.8.200' confirms hostname 'cam-01', business_system '办公区监控摄像头' (Office Surveillance Camera), network_zone 'IoT网段' (IoT Zone), and tags include 'camera' and 'surveillance'."
+          }
+        ]
+      },
+      "raw_text": "{\n  \"total_statements\": 4,\n  \"verifiable\": 4,\n  \"hallucinations\": 0,\n  \"uncertain\": 0,\n  \"details\": [\n    {\n      \"statement\": \"Alert detail indicates 500MB outbound data from 10.0.8.200 to cdn-update.com at 03:10 (query_alert_detail)\",\n      \"verdict\": \"verifiable\",\n      \"reason\": \"The mock_api_response 'query_alert_detail_A19' confirms source_ip '10.0.8.200', payload_highlights mention '500MB outbound', destination domain is 'cdn-update.com', and timestamp is '2026-07-11T03:10:15Z'.\"\n    },\n    {\n      \"statement\": \"Threat intelligence confirms cdn-update.com is a legitimate CDN provider for IoT firmware, not malicious (query_threat_intel)\",\n      \"verdict\": \"verifiable\",\n      \"reason\": \"The mock_api_response 'query_threat_intel_domain_cdn-update.com' shows 'is_malicious': false and raw_intel states 'Domain belongs to a legitimate CDN provider used by many IoT manufacturers for firmware updates.'\"\n    },\n    {\n      \"statement\": \"Related alert A19-REL-01 shows scheduled firmware update check initiated at 03:00, correlating with traffic timing (query_related_alerts)\",\n      \"verdict\": \"verifiable\",\n      \"reason\": \"The mock_api_response 'query_related_alerts_10.0.8.200_48h' lists alert_id 'A19-REL-01' with summary 'Camera cam-01 initiated scheduled firmware update check' and timestamp '2026-07-11T03:00:00Z'.\"\n    },\n    {\n      \"statement\": \"Asset info confirms device is a surveillance camera in IoT zone, consistent with firmware update behavior (query_asset_info)\",\n      \"verdict\": \"verifiable\",\n      \"reason\": \"The mock_api_response 'query_asset_info_10.0.8.200' confirms hostname 'cam-01', business_system '办公区监控摄像头' (Office Surveillance Camera), network_zone 'IoT网段' (IoT Zone), and tags include 'camera' and 'surveillance'.\"\n    }\n  ]\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1326,
+      "output_tokens": 543,
+      "latency_ms": 6239,
+      "attempts": 1
+    }
+  ],
+  "overall_pass": true,
+  "error_type": null,
+  "error_message": null
+}

