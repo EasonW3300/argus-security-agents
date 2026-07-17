@@ -1,0 +1,196 @@
+{
+  "test_case_id": "S02-019",
+  "scenario": "用户询问数据安全法中“重要数据”分级标准与等保定级标准的映射关系",
+  "type": "cross_reference",
+  "difficulty": "medium",
+  "is_positive": true,
+  "expected_answer_type": "comparison",
+  "status": "completed",
+  "agent_output": {
+    "answer": "检索结果中未包含国家统一的重要数据与等保定级的直接映射参考表，但提供了基于安全影响的定级指导。根据《信息安全技术 网络安全等级保护定级指南》，当信息系统承载的重要数据遭到破坏，可能对国家安全造成损害时，建议定级不低于三级；对国家安全造成严重损害的，建议定级为四级或五级。部分企业内部制度如《数据分类分级管理办法 v1.2》则规定将重要数据对应到等保三级系统，核心重要数据对应等保四级。",
+    "citations": [
+      {
+        "source_doc": "GB/T 22240-2020 信息安全技术 网络安全等级保护定级指南",
+        "section": "5.1 定级要素",
+        "quote_snippet": "当信息系统承载的重要数据遭到破坏，可能对国家安全造成损害时，建议定级不低于三级；对国家安全造成严重损害的，建议定级为四级或五级。"
+      },
+      {
+        "source_doc": "内部制度《数据分类分级管理办法 v1.2》",
+        "section": "6.1 对应关系",
+        "quote_snippet": "公司内部将重要数据对应到等保三级系统，核心重要数据对应等保四级。"
+      }
+    ],
+    "confidence": 0.7
+  },
+  "code_graders": {
+    "citation_format": {
+      "passed": true,
+      "reason": "citation format valid",
+      "expected": null,
+      "actual": null
+    },
+    "output_schema": {
+      "passed": true,
+      "reason": "output schema valid",
+      "expected": null,
+      "actual": null
+    },
+    "refusal_check": {
+      "passed": true,
+      "reason": "refusal behavior valid",
+      "expected": false,
+      "actual": "检索结果中未包含国家统一的重要数据与等保定级的直接映射参考表，但提供了基于安全影响的定级指导。根据《信息安全技术 网络安全等级保护定级指南》，当信息系统承载的重要数据遭到破坏，可能对国家安全造成损害时，建议定级不低于三级；对国家安全造成严重损害的，建议定级为四级或五级。部分企业内部制度如《数据分类分级管理办法 v1.2》则规定将重要数据对应到等保三级系统，核心重要数据对应等保四级。"
+    },
+    "retrieval_relevance": {
+      "passed": true,
+      "reason": "retrieval mock quality valid",
+      "expected": "sufficient",
+      "actual": [
+        "high",
+        "high",
+        "medium"
+      ]
+    },
+    "citation_grounding": {
+      "passed": true,
+      "reason": "citations grounded",
+      "expected": null,
+      "actual": null
+    },
+    "confidence_check": {
+      "passed": false,
+      "reason": "confidence invalid",
+      "expected": ">= 0.85",
+      "actual": 0.7
+    }
+  },
+  "model_scores": {
+    "faithfulness": {
+      "score": 4,
+      "reason": "Answer correctly cites the national standard (GB/T 22240-2020) and internal policy regarding data classification and security level mapping. However, it fails to include key expected points found in the retrieved chunks, specifically the definition of 'important data' (harming national economy, social stability, etc.) and the fact that important data directories are set by industry authorities. Additionally, the claim about 'five levels' (五级) is not supported by the provided text, which only mentions 'four or five' (四级或五级).",
+      "unsupported_claims": [
+        "建议定级为四级或五级"
+      ],
+      "missing_points": [],
+      "errors": []
+    },
+    "coverage": {
+      "score": 3,
+      "reason": "Answer correctly covers the core mapping between important data and MLPS levels (not lower than Level 3, Level 4/5 for severe damage) and cites the national standard. However, it fails to include two mandatory key points: 1) The definition of important data regarding harm to national security/economy/society/public health, and 2) The fact that important data directories are formulated by industry competent authorities. Additionally, it misses the point about large amounts of personal sensitive information corresponding to Level 3.",
+      "unsupported_claims": [],
+      "missing_points": [
+        "重要数据可能危害国家安全、经济运行等",
+        "重要数据由行业主管部门制定目录",
+        "大量个人敏感信息通常对应等保三级"
+      ],
+      "errors": []
+    },
+    "compliance_accuracy": {
+      "score": 3,
+      "reason": "Agent 回答在定级数值（三级、四级/五级）和标准编号（GB/T 22240-2020）上与检索结果一致，但在关键事实引用上存在偏差。Ground Truth 明确要求包含“重要数据由行业主管部门制定目录”这一关键点，且期望的引用应来自《重要数据识别指南》中关于危害国家安全等定义的描述。Agent 虽然提到了内部制度，但完全遗漏了 Ground Truth 强调的“行业主管部门制定目录”这一核心合规要求，且引用的 snippet 与 mock_retrieved_chunks 中的定义部分（chunk-019a）不匹配，导致关键信息覆盖不全。",
+      "unsupported_claims": [],
+      "missing_points": [],
+      "errors": [
+        "遗漏关键合规点：未提及‘重要数据目录由行业主管部门制定和发布’。",
+        "引用不匹配：Ground Truth 期望引用《重要数据识别指南》中关于‘可能危害国家安全、经济运行...’的定义片段，但 Agent 未引用该部分内容。",
+        "置信度不足：Agent 输出置信度为 0.7，低于 Ground Truth 要求的最低阈值 0.85。"
+      ]
+    }
+  },
+  "calls": [
+    {
+      "label": "agent",
+      "parsed": {
+        "answer": "检索结果中未包含国家统一的重要数据与等保定级的直接映射参考表，但提供了基于安全影响的定级指导。根据《信息安全技术 网络安全等级保护定级指南》，当信息系统承载的重要数据遭到破坏，可能对国家安全造成损害时，建议定级不低于三级；对国家安全造成严重损害的，建议定级为四级或五级。部分企业内部制度如《数据分类分级管理办法 v1.2》则规定将重要数据对应到等保三级系统，核心重要数据对应等保四级。",
+        "citations": [
+          {
+            "source_doc": "GB/T 22240-2020 信息安全技术 网络安全等级保护定级指南",
+            "section": "5.1 定级要素",
+            "quote_snippet": "当信息系统承载的重要数据遭到破坏，可能对国家安全造成损害时，建议定级不低于三级；对国家安全造成严重损害的，建议定级为四级或五级。"
+          },
+          {
+            "source_doc": "内部制度《数据分类分级管理办法 v1.2》",
+            "section": "6.1 对应关系",
+            "quote_snippet": "公司内部将重要数据对应到等保三级系统，核心重要数据对应等保四级。"
+          }
+        ],
+        "confidence": 0.7
+      },
+      "raw_text": "{\n  \"answer\": \"检索结果中未包含国家统一的重要数据与等保定级的直接映射参考表，但提供了基于安全影响的定级指导。根据《信息安全技术 网络安全等级保护定级指南》，当信息系统承载的重要数据遭到破坏，可能对国家安全造成损害时，建议定级不低于三级；对国家安全造成严重损害的，建议定级为四级或五级。部分企业内部制度如《数据分类分级管理办法 v1.2》则规定将重要数据对应到等保三级系统，核心重要数据对应等保四级。\",\n  \"citations\": [\n    {\n      \"source_doc\": \"GB/T 22240-2020 信息安全技术 网络安全等级保护定级指南\",\n      \"section\": \"5.1 定级要素\",\n      \"quote_snippet\": \"当信息系统承载的重要数据遭到破坏，可能对国家安全造成损害时，建议定级不低于三级；对国家安全造成严重损害的，建议定级为四级或五级。\"\n    },\n    {\n      \"source_doc\": \"内部制度《数据分类分级管理办法 v1.2》\",\n      \"section\": \"6.1 对应关系\",\n      \"quote_snippet\": \"公司内部将重要数据对应到等保三级系统，核心重要数据对应等保四级。\"\n    }\n  ],\n  \"confidence\": 0.7\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 556,
+      "output_tokens": 4012,
+      "latency_ms": 37389,
+      "attempts": 1
+    },
+    {
+      "label": "faithfulness",
+      "parsed": {
+        "score": 4,
+        "reason": "Answer correctly cites the national standard (GB/T 22240-2020) and internal policy regarding data classification and security level mapping. However, it fails to include key expected points found in the retrieved chunks, specifically the definition of 'important data' (harming national economy, social stability, etc.) and the fact that important data directories are set by industry authorities. Additionally, the claim about 'five levels' (五级) is not supported by the provided text, which only mentions 'four or five' (四级或五级).",
+        "unsupported_claims": [
+          "建议定级为四级或五级"
+        ],
+        "missing_points": [],
+        "errors": []
+      },
+      "raw_text": "{\n  \"score\": 4,\n  \"reason\": \"Answer correctly cites the national standard (GB/T 22240-2020) and internal policy regarding data classification and security level mapping. However, it fails to include key expected points found in the retrieved chunks, specifically the definition of 'important data' (harming national economy, social stability, etc.) and the fact that important data directories are set by industry authorities. Additionally, the claim about 'five levels' (五级) is not supported by the provided text, which only mentions 'four or five' (四级或五级).\",\n  \"unsupported_claims\": [\n    \"建议定级为四级或五级\"\n  ]\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1081,
+      "output_tokens": 152,
+      "latency_ms": 1918,
+      "attempts": 1
+    },
+    {
+      "label": "coverage",
+      "parsed": {
+        "score": 3,
+        "reason": "Answer correctly covers the core mapping between important data and MLPS levels (not lower than Level 3, Level 4/5 for severe damage) and cites the national standard. However, it fails to include two mandatory key points: 1) The definition of important data regarding harm to national security/economy/society/public health, and 2) The fact that important data directories are formulated by industry competent authorities. Additionally, it misses the point about large amounts of personal sensitive information corresponding to Level 3.",
+        "unsupported_claims": [],
+        "missing_points": [
+          "重要数据可能危害国家安全、经济运行等",
+          "重要数据由行业主管部门制定目录",
+          "大量个人敏感信息通常对应等保三级"
+        ],
+        "errors": []
+      },
+      "raw_text": "{\n  \"score\": 3,\n  \"reason\": \"Answer correctly covers the core mapping between important data and MLPS levels (not lower than Level 3, Level 4/5 for severe damage) and cites the national standard. However, it fails to include two mandatory key points: 1) The definition of important data regarding harm to national security/economy/society/public health, and 2) The fact that important data directories are formulated by industry competent authorities. Additionally, it misses the point about large amounts of personal sensitive information corresponding to Level 3.\",\n  \"missing_points\": [\n    \"重要数据可能危害国家安全、经济运行等\",\n    \"重要数据由行业主管部门制定目录\",\n    \"大量个人敏感信息通常对应等保三级\"\n  ]\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1077,
+      "output_tokens": 166,
+      "latency_ms": 1869,
+      "attempts": 1
+    },
+    {
+      "label": "compliance_accuracy",
+      "parsed": {
+        "score": 3,
+        "reason": "Agent 回答在定级数值（三级、四级/五级）和标准编号（GB/T 22240-2020）上与检索结果一致，但在关键事实引用上存在偏差。Ground Truth 明确要求包含“重要数据由行业主管部门制定目录”这一关键点，且期望的引用应来自《重要数据识别指南》中关于危害国家安全等定义的描述。Agent 虽然提到了内部制度，但完全遗漏了 Ground Truth 强调的“行业主管部门制定目录”这一核心合规要求，且引用的 snippet 与 mock_retrieved_chunks 中的定义部分（chunk-019a）不匹配，导致关键信息覆盖不全。",
+        "unsupported_claims": [],
+        "missing_points": [],
+        "errors": [
+          "遗漏关键合规点：未提及‘重要数据目录由行业主管部门制定和发布’。",
+          "引用不匹配：Ground Truth 期望引用《重要数据识别指南》中关于‘可能危害国家安全、经济运行...’的定义片段，但 Agent 未引用该部分内容。",
+          "置信度不足：Agent 输出置信度为 0.7，低于 Ground Truth 要求的最低阈值 0.85。"
+        ]
+      },
+      "raw_text": "{\n  \"score\": 3,\n  \"reason\": \"Agent 回答在定级数值（三级、四级/五级）和标准编号（GB/T 22240-2020）上与检索结果一致，但在关键事实引用上存在偏差。Ground Truth 明确要求包含“重要数据由行业主管部门制定目录”这一关键点，且期望的引用应来自《重要数据识别指南》中关于危害国家安全等定义的描述。Agent 虽然提到了内部制度，但完全遗漏了 Ground Truth 强调的“行业主管部门制定目录”这一核心合规要求，且引用的 snippet 与 mock_retrieved_chunks 中的定义部分（chunk-019a）不匹配，导致关键信息覆盖不全。\",\n  \"errors\": [\n    \"遗漏关键合规点：未提及‘重要数据目录由行业主管部门制定和发布’。\",\n    \"引用不匹配：Ground Truth 期望引用《重要数据识别指南》中关于‘可能危害国家安全、经济运行...’的定义片段，但 Agent 未引用该部分内容。\",\n    \"置信度不足：Agent 输出置信度为 0.7，低于 Ground Truth 要求的最低阈值 0.85。\"\n  ]\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1078,
+      "output_tokens": 262,
+      "latency_ms": 2521,
+      "attempts": 1
+    }
+  ],
+  "overall_pass": false,
+  "error_type": null,
+  "error_message": null
+}

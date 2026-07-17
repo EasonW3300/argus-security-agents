@@ -1,0 +1,256 @@
+{
+  "test_case_id": "S02-010",
+  "scenario": "用户询问对外提供HTTPS API需要满足的安全基线",
+  "type": "suggestion",
+  "difficulty": "medium",
+  "is_positive": true,
+  "expected_answer_type": "synthesis",
+  "status": "completed",
+  "agent_output": {
+    "answer": "根据检索结果，对外开放的HTTPS API需满足以下安全要求：\n1. 身份认证与鉴别：应具备身份标识与鉴别功能，对用户进行强身份认证。所有对外的API必须启用OAuth 2.0或JWT认证。\n2. 数据传输安全：通信过程中应采用密码技术保证传输数据的完整性和保密性。\n3. 访问控制与授权：应提供访问控制功能，依据安全策略控制用户对资源的访问；API应实施严格的对象级授权检查，验证用户是否拥有对该资源的访问权限。\n4. 安全审计：应具备安全审计功能，记录API调用请求和响应摘要。\n5. 防护机制：应限制非法登录尝试次数，并自动锁定账户；API网关应配置基于客户端的速率限制，每客户端每秒不超过100次调用；关键操作API必须要求二次确认或数字签名。\n6. 输入输出安全：输入参数必须进行严格校验和过滤，防止注入攻击；敏感数据在响应中应脱敏处理，不得返回内部错误堆栈信息。",
+    "citations": [
+      {
+        "source_doc": "GB/T 22239-2019 信息安全技术 网络安全等级保护基本要求",
+        "section": "8.1.5.1 应用安全",
+        "quote_snippet": "身份标识与鉴别功能，对用户进行强身份认证"
+      },
+      {
+        "source_doc": "GB/T 22239-2019 信息安全技术 网络安全等级保护基本要求",
+        "section": "8.1.5.1 应用安全",
+        "quote_snippet": "通信过程中采用密码技术保证传输数据的完整性和保密性"
+      },
+      {
+        "source_doc": "GB/T 22239-2019 信息安全技术 网络安全等级保护基本要求",
+        "section": "8.1.5.1 应用安全",
+        "quote_snippet": "应提供访问控制功能，依据安全策略控制用户对资源的访问"
+      },
+      {
+        "source_doc": "GB/T 22239-2019 信息安全技术 网络安全等级保护基本要求",
+        "section": "8.1.5.1 应用安全",
+        "quote_snippet": "应具备安全审计功能，记录API调用请求和响应摘要"
+      },
+      {
+        "source_doc": "GB/T 22239-2019 信息安全技术 网络安全等级保护基本要求",
+        "section": "8.1.5.1 应用安全",
+        "quote_snippet": "应限制非法登录尝试次数，并自动锁定账户"
+      },
+      {
+        "source_doc": "内部制度《API安全管理规范 v2.0》",
+        "section": "4.3 认证与限流",
+        "quote_snippet": "所有对外的API必须启用OAuth 2.0或JWT认证"
+      },
+      {
+        "source_doc": "内部制度《API安全管理规范 v2.0》",
+        "section": "4.3 认证与限流",
+        "quote_snippet": "API网关应配置基于客户端的速率限制，每客户端每秒不超过100次调用"
+      },
+      {
+        "source_doc": "内部制度《API安全管理规范 v2.0》",
+        "section": "4.3 认证与限流",
+        "quote_snippet": "关键操作API必须要求二次确认或数字签名"
+      },
+      {
+        "source_doc": "OWASP API Security Top 10 2019",
+        "section": "API1:2019 Broken Object Level Authorization",
+        "quote_snippet": "API应实施严格的对象级授权检查，对每一个访问资源的请求验证用户是否拥有对该资源的访问权限"
+      },
+      {
+        "source_doc": "OWASP API Security Top 10 2019",
+        "section": "API1:2019 Broken Object Level Authorization",
+        "quote_snippet": "输入参数必须进行严格校验和过滤，防止注入攻击。敏感数据在响应中应脱敏处理，不得返回内部错误堆栈信息"
+      }
+    ],
+    "confidence": 0.9
+  },
+  "code_graders": {
+    "citation_format": {
+      "passed": true,
+      "reason": "citation format valid",
+      "expected": null,
+      "actual": null
+    },
+    "output_schema": {
+      "passed": true,
+      "reason": "output schema valid",
+      "expected": null,
+      "actual": null
+    },
+    "refusal_check": {
+      "passed": true,
+      "reason": "refusal behavior valid",
+      "expected": false,
+      "actual": "根据检索结果，对外开放的HTTPS API需满足以下安全要求：\n1. 身份认证与鉴别：应具备身份标识与鉴别功能，对用户进行强身份认证。所有对外的API必须启用OAuth 2.0或JWT认证。\n2. 数据传输安全：通信过程中应采用密码技术保证传输数据的完整性和保密性。\n3. 访问控制与授权：应提供访问控制功能，依据安全策略控制用户对资源的访问；API应实施严格的对象级授权检查，验证用户是否拥有对该资源的访问权限。\n4. 安全审计：应具备安全审计功能，记录API调用请求和响应摘要。\n5. 防护机制：应限制非法登录尝试次数，并自动锁定账户；API网关应配置基于客户端的速率限制，每客户端每秒不超过100次调用；关键操作API必须要求二次确认或数字签名。\n6. 输入输出安全：输入参数必须进行严格校验和过滤，防止注入攻击；敏感数据在响应中应脱敏处理，不得返回内部错误堆栈信息。"
+    },
+    "retrieval_relevance": {
+      "passed": true,
+      "reason": "retrieval mock quality valid",
+      "expected": "sufficient",
+      "actual": [
+        "high",
+        "high",
+        "medium"
+      ]
+    },
+    "citation_grounding": {
+      "passed": true,
+      "reason": "citations grounded",
+      "expected": null,
+      "actual": null
+    },
+    "confidence_check": {
+      "passed": true,
+      "reason": "confidence valid",
+      "expected": ">= 0.85",
+      "actual": 0.9
+    }
+  },
+  "model_scores": {
+    "faithfulness": {
+      "score": 5,
+      "reason": "Answer 中的所有声明均能由 mock_retrieved_chunks 原文直接支撑。具体对应关系如下：\n1. '身份标识与鉴别...强身份认证'、'通信过程...密码技术...'、'访问控制功能...'、'安全审计功能...'、'限制非法登录尝试...'均源自 chunk-010a。\n2. '对象级授权检查'、'输入参数校验...防止注入'、'敏感数据脱敏...'均源自 chunk-010b。\n3. '必须启用 OAuth 2.0 或 JWT'、'速率限制...每客户端每秒不超过 100 次'、'关键操作...二次确认或数字签名'均源自 chunk-010c。\n答案准确综合了所有检索片段，无幻觉或过度推断。",
+      "unsupported_claims": [],
+      "missing_points": [],
+      "errors": []
+    },
+    "coverage": {
+      "score": 5,
+      "reason": "Answer comprehensively covers all six mandatory key points specified in the ground truth: strong authentication (OAuth/JWT), data transmission security (integrity/confidentiality), object-level authorization/access control, audit logging, input validation/prevention of injection, and rate limiting. The response is well-structured, accurate, and aligns perfectly with the expected content without including any prohibited information.",
+      "unsupported_claims": [],
+      "missing_points": [],
+      "errors": []
+    },
+    "compliance_accuracy": {
+      "score": 5,
+      "reason": "Agent output accurately synthesizes information from all provided mock_retrieved_chunks. The answer covers all required key points (authentication, transmission security, authorization, auditing, input validation, rate limiting) and correctly cites the specific sections and document names found in the chunks. The specific numerical value '100 calls per second' matches the internal policy chunk exactly. No hallucinations or contradictions with the ground truth constraints were found.",
+      "unsupported_claims": [],
+      "missing_points": [],
+      "errors": []
+    }
+  },
+  "calls": [
+    {
+      "label": "agent",
+      "parsed": {
+        "answer": "根据检索结果，对外开放的HTTPS API需满足以下安全要求：\n1. 身份认证与鉴别：应具备身份标识与鉴别功能，对用户进行强身份认证。所有对外的API必须启用OAuth 2.0或JWT认证。\n2. 数据传输安全：通信过程中应采用密码技术保证传输数据的完整性和保密性。\n3. 访问控制与授权：应提供访问控制功能，依据安全策略控制用户对资源的访问；API应实施严格的对象级授权检查，验证用户是否拥有对该资源的访问权限。\n4. 安全审计：应具备安全审计功能，记录API调用请求和响应摘要。\n5. 防护机制：应限制非法登录尝试次数，并自动锁定账户；API网关应配置基于客户端的速率限制，每客户端每秒不超过100次调用；关键操作API必须要求二次确认或数字签名。\n6. 输入输出安全：输入参数必须进行严格校验和过滤，防止注入攻击；敏感数据在响应中应脱敏处理，不得返回内部错误堆栈信息。",
+        "citations": [
+          {
+            "source_doc": "GB/T 22239-2019 信息安全技术 网络安全等级保护基本要求",
+            "section": "8.1.5.1 应用安全",
+            "quote_snippet": "身份标识与鉴别功能，对用户进行强身份认证"
+          },
+          {
+            "source_doc": "GB/T 22239-2019 信息安全技术 网络安全等级保护基本要求",
+            "section": "8.1.5.1 应用安全",
+            "quote_snippet": "通信过程中采用密码技术保证传输数据的完整性和保密性"
+          },
+          {
+            "source_doc": "GB/T 22239-2019 信息安全技术 网络安全等级保护基本要求",
+            "section": "8.1.5.1 应用安全",
+            "quote_snippet": "应提供访问控制功能，依据安全策略控制用户对资源的访问"
+          },
+          {
+            "source_doc": "GB/T 22239-2019 信息安全技术 网络安全等级保护基本要求",
+            "section": "8.1.5.1 应用安全",
+            "quote_snippet": "应具备安全审计功能，记录API调用请求和响应摘要"
+          },
+          {
+            "source_doc": "GB/T 22239-2019 信息安全技术 网络安全等级保护基本要求",
+            "section": "8.1.5.1 应用安全",
+            "quote_snippet": "应限制非法登录尝试次数，并自动锁定账户"
+          },
+          {
+            "source_doc": "内部制度《API安全管理规范 v2.0》",
+            "section": "4.3 认证与限流",
+            "quote_snippet": "所有对外的API必须启用OAuth 2.0或JWT认证"
+          },
+          {
+            "source_doc": "内部制度《API安全管理规范 v2.0》",
+            "section": "4.3 认证与限流",
+            "quote_snippet": "API网关应配置基于客户端的速率限制，每客户端每秒不超过100次调用"
+          },
+          {
+            "source_doc": "内部制度《API安全管理规范 v2.0》",
+            "section": "4.3 认证与限流",
+            "quote_snippet": "关键操作API必须要求二次确认或数字签名"
+          },
+          {
+            "source_doc": "OWASP API Security Top 10 2019",
+            "section": "API1:2019 Broken Object Level Authorization",
+            "quote_snippet": "API应实施严格的对象级授权检查，对每一个访问资源的请求验证用户是否拥有对该资源的访问权限"
+          },
+          {
+            "source_doc": "OWASP API Security Top 10 2019",
+            "section": "API1:2019 Broken Object Level Authorization",
+            "quote_snippet": "输入参数必须进行严格校验和过滤，防止注入攻击。敏感数据在响应中应脱敏处理，不得返回内部错误堆栈信息"
+          }
+        ],
+        "confidence": 0.9
+      },
+      "raw_text": "{\n  \"answer\": \"根据检索结果，对外开放的HTTPS API需满足以下安全要求：\\n1. 身份认证与鉴别：应具备身份标识与鉴别功能，对用户进行强身份认证。所有对外的API必须启用OAuth 2.0或JWT认证。\\n2. 数据传输安全：通信过程中应采用密码技术保证传输数据的完整性和保密性。\\n3. 访问控制与授权：应提供访问控制功能，依据安全策略控制用户对资源的访问；API应实施严格的对象级授权检查，验证用户是否拥有对该资源的访问权限。\\n4. 安全审计：应具备安全审计功能，记录API调用请求和响应摘要。\\n5. 防护机制：应限制非法登录尝试次数，并自动锁定账户；API网关应配置基于客户端的速率限制，每客户端每秒不超过100次调用；关键操作API必须要求二次确认或数字签名。\\n6. 输入输出安全：输入参数必须进行严格校验和过滤，防止注入攻击；敏感数据在响应中应脱敏处理，不得返回内部错误堆栈信息。\",\n  \"citations\": [\n    {\n      \"source_doc\": \"GB/T 22239-2019 信息安全技术 网络安全等级保护基本要求\",\n      \"section\": \"8.1.5.1 应用安全\",\n      \"quote_snippet\": \"身份标识与鉴别功能，对用户进行强身份认证\"\n    },\n    {\n      \"source_doc\": \"GB/T 22239-2019 信息安全技术 网络安全等级保护基本要求\",\n      \"section\": \"8.1.5.1 应用安全\",\n      \"quote_snippet\": \"通信过程中采用密码技术保证传输数据的完整性和保密性\"\n    },\n    {\n      \"source_doc\": \"GB/T 22239-2019 信息安全技术 网络安全等级保护基本要求\",\n      \"section\": \"8.1.5.1 应用安全\",\n      \"quote_snippet\": \"应提供访问控制功能，依据安全策略控制用户对资源的访问\"\n    },\n    {\n      \"source_doc\": \"GB/T 22239-2019 信息安全技术 网络安全等级保护基本要求\",\n      \"section\": \"8.1.5.1 应用安全\",\n      \"quote_snippet\": \"应具备安全审计功能，记录API调用请求和响应摘要\"\n    },\n    {\n      \"source_doc\": \"GB/T 22239-2019 信息安全技术 网络安全等级保护基本要求\",\n      \"section\": \"8.1.5.1 应用安全\",\n      \"quote_snippet\": \"应限制非法登录尝试次数，并自动锁定账户\"\n    },\n    {\n      \"source_doc\": \"内部制度《API安全管理规范 v2.0》\",\n      \"section\": \"4.3 认证与限流\",\n      \"quote_snippet\": \"所有对外的API必须启用OAuth 2.0或JWT认证\"\n    },\n    {\n      \"source_doc\": \"内部制度《API安全管理规范 v2.0》\",\n      \"section\": \"4.3 认证与限流\",\n      \"quote_snippet\": \"API网关应配置基于客户端的速率限制，每客户端每秒不超过100次调用\"\n    },\n    {\n      \"source_doc\": \"内部制度《API安全管理规范 v2.0》\",\n      \"section\": \"4.3 认证与限流\",\n      \"quote_snippet\": \"关键操作API必须要求二次确认或数字签名\"\n    },\n    {\n      \"source_doc\": \"OWASP API Security Top 10 2019\",\n      \"section\": \"API1:2019 Broken Object Level Authorization\",\n      \"quote_snippet\": \"API应实施严格的对象级授权检查，对每一个访问资源的请求验证用户是否拥有对该资源的访问权限\"\n    },\n    {\n      \"source_doc\": \"OWASP API Security Top 10 2019\",\n      \"section\": \"API1:2019 Broken Object Level Authorization\",\n      \"quote_snippet\": \"输入参数必须进行严格校验和过滤，防止注入攻击。敏感数据在响应中应脱敏处理，不得返回内部错误堆栈信息\"\n    }\n  ],\n  \"confidence\": 0.9\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 593,
+      "output_tokens": 4218,
+      "latency_ms": 40048,
+      "attempts": 1
+    },
+    {
+      "label": "faithfulness",
+      "parsed": {
+        "score": 5,
+        "reason": "Answer 中的所有声明均能由 mock_retrieved_chunks 原文直接支撑。具体对应关系如下：\n1. '身份标识与鉴别...强身份认证'、'通信过程...密码技术...'、'访问控制功能...'、'安全审计功能...'、'限制非法登录尝试...'均源自 chunk-010a。\n2. '对象级授权检查'、'输入参数校验...防止注入'、'敏感数据脱敏...'均源自 chunk-010b。\n3. '必须启用 OAuth 2.0 或 JWT'、'速率限制...每客户端每秒不超过 100 次'、'关键操作...二次确认或数字签名'均源自 chunk-010c。\n答案准确综合了所有检索片段，无幻觉或过度推断。",
+        "unsupported_claims": [],
+        "missing_points": [],
+        "errors": []
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"Answer 中的所有声明均能由 mock_retrieved_chunks 原文直接支撑。具体对应关系如下：\\n1. '身份标识与鉴别...强身份认证'、'通信过程...密码技术...'、'访问控制功能...'、'安全审计功能...'、'限制非法登录尝试...'均源自 chunk-010a。\\n2. '对象级授权检查'、'输入参数校验...防止注入'、'敏感数据脱敏...'均源自 chunk-010b。\\n3. '必须启用 OAuth 2.0 或 JWT'、'速率限制...每客户端每秒不超过 100 次'、'关键操作...二次确认或数字签名'均源自 chunk-010c。\\n答案准确综合了所有检索片段，无幻觉或过度推断。\",\n  \"unsupported_claims\": []\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1804,
+      "output_tokens": 198,
+      "latency_ms": 2687,
+      "attempts": 1
+    },
+    {
+      "label": "coverage",
+      "parsed": {
+        "score": 5,
+        "reason": "Answer comprehensively covers all six mandatory key points specified in the ground truth: strong authentication (OAuth/JWT), data transmission security (integrity/confidentiality), object-level authorization/access control, audit logging, input validation/prevention of injection, and rate limiting. The response is well-structured, accurate, and aligns perfectly with the expected content without including any prohibited information.",
+        "unsupported_claims": [],
+        "missing_points": [],
+        "errors": []
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"Answer comprehensively covers all six mandatory key points specified in the ground truth: strong authentication (OAuth/JWT), data transmission security (integrity/confidentiality), object-level authorization/access control, audit logging, input validation/prevention of injection, and rate limiting. The response is well-structured, accurate, and aligns perfectly with the expected content without including any prohibited information.\",\n  \"missing_points\": []\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1800,
+      "output_tokens": 99,
+      "latency_ms": 1452,
+      "attempts": 1
+    },
+    {
+      "label": "compliance_accuracy",
+      "parsed": {
+        "score": 5,
+        "reason": "Agent output accurately synthesizes information from all provided mock_retrieved_chunks. The answer covers all required key points (authentication, transmission security, authorization, auditing, input validation, rate limiting) and correctly cites the specific sections and document names found in the chunks. The specific numerical value '100 calls per second' matches the internal policy chunk exactly. No hallucinations or contradictions with the ground truth constraints were found.",
+        "unsupported_claims": [],
+        "missing_points": [],
+        "errors": []
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"Agent output accurately synthesizes information from all provided mock_retrieved_chunks. The answer covers all required key points (authentication, transmission security, authorization, auditing, input validation, rate limiting) and correctly cites the specific sections and document names found in the chunks. The specific numerical value '100 calls per second' matches the internal policy chunk exactly. No hallucinations or contradictions with the ground truth constraints were found.\",\n  \"errors\": []\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1801,
+      "output_tokens": 107,
+      "latency_ms": 1505,
+      "attempts": 1
+    }
+  ],
+  "overall_pass": true,
+  "error_type": null,
+  "error_message": null
+}

@@ -1,10 +1,10 @@
 # 网安运营 Agent Eval 与架构设计
 
-## 仓库定位
+## 定位
 
 本仓库用于沉淀四个网安运营场景的 Eval 测试集、Eval Harness、基线实验结果和 Agent 初始架构设计，帮助前场人员按照统一契约实现真实 Agent，并使用同一批测试持续回归。
 
-当前只完成场景一：安全告警分析与处置建议。
+当前已完成场景一：安全告警分析与处置建议；场景二：安全文档 RAG。
 
 职责边界如下：
 
@@ -40,7 +40,25 @@
 │   │       ├── .env.example
 │   │       ├── tests/
 │   │       └── results/qwen3.5-flash-baseline/
-│   ├── scenario-02-document-rag/README.md
+│   ├── scenario-02-document-rag/
+│   │   ├── README.md
+│   │   ├── agent-architecture.md
+│   │   └── eval/
+│   │       ├── Eval_data_1.json
+│   │       ├── run_eval.py
+│   │       ├── config.py
+│   │       ├── schemas.py
+│   │       ├── prompt_builder.py
+│   │       ├── llm_client.py
+│   │       ├── mock_agent.py
+│   │       ├── code_graders.py
+│   │       ├── model_graders.py
+│   │       ├── report.py
+│   │       ├── run_tests.py
+│   │       ├── requirements.txt
+│   │       ├── .env.example
+│   │       ├── tests/
+│   │       └── results/qwen3.5-flash-baseline/
 │   ├── scenario-03-security-tool-calling/README.md
 │   └── scenario-04-security-briefing/README.md
 └── .gitignore
@@ -119,7 +137,6 @@ cp .env.example .env
 python3 run_eval.py --run-id local-a01 --case-id A01 --skip-model-graders
 ```
 
-`.env` 只保留在本机，不得提交到 GitLab。真实模型的 Eval 会把用例中的告警上下文和 mock 工具返回发送给所配置的第三方 Provider，运行前应确认数据发送范围和模型调用成本。
 
 ## 当前基线
 
@@ -134,7 +151,61 @@ python3 run_eval.py --run-id local-a01 --case-id A01 --skip-model-graders
 
 # 场景二：安全文档 RAG
 
+场景二面向安全合规文档问答和分析。当前采用路线 A：不实现真实向量检索、Embedding、Rerank 或知识库构建，而是将 Eval 用例中的 `mock_retrieved_chunks` 直接注入 Prompt，验证“检索结果注入 → 结构化回答 → 引用落地 → Eval 评分”的整体链路。
+
+## 建议阅读顺序
+
+1. [场景二 README](scenarios/scenario-02-document-rag/README.md)：了解目录、运行方法和前场接入方式；
+2. [Agent 架构设计](scenarios/scenario-02-document-rag/agent-architecture.md)：了解安全文档 RAG 原型、输出格式、Grader 设计和模型接入；
+3. [Eval 测试集](scenarios/scenario-02-document-rag/eval/Eval_data_1.json)：查看 25 条测试用例、mock chunks、Ground Truth 和 Grader 配置；
+4. [Qwen 基线结果](scenarios/scenario-02-document-rag/eval/results/qwen3.5-flash-baseline/eval_summary.csv)：查看 25 条真实模型评测结果。
+
+## 场景二文件说明
+
+| 文件 | 作用 |
+|---|---|
+| `scenarios/scenario-02-document-rag/README.md` | 场景二接手指南、运行命令和文件说明 |
+| `scenarios/scenario-02-document-rag/agent-architecture.md` | Agent 原型架构、Prompt 策略、输出格式和 Grader 设计 |
+| `eval/Eval_data_1.json` | 25 条安全文档 RAG Eval 测试集 |
+| `eval/run_eval.py` | 评测入口，负责加载用例、执行 Agent/Judge、checkpoint 和报告生成 |
+| `eval/config.py` | Qwen、DeepSeek、OpenAI-compatible 和 mock Provider 配置 |
+| `eval/mock_agent.py` | 离线 mock Agent，用于验证 Harness 链路 |
+| `eval/code_graders.py` | 6 个确定性 Grader：引用格式、Schema、拒绝行为、检索相关性、引用落地、置信度 |
+| `eval/model_graders.py` | 3 个模型型 Grader：faithfulness、coverage、compliance_accuracy |
+| `eval/results/qwen3.5-flash-baseline/` | Qwen `qwen3.5-flash` 的 25 条完整基线结果 |
+
+## 场景二最短复现路径
+
+```bash
+cd scenarios/scenario-02-document-rag/eval
+python3 -m pip install -r requirements.txt
+python3 run_tests.py
+cp .env.example .env
+python3 run_eval.py --run-id local-smoke --limit 3
+```
+
+如果只验证离线 Harness，不调用第三方模型：
+
+```bash
+GENERATOR_PROVIDER=mock GENERATOR_MODEL=mock-scenario-02-agent GENERATOR_API_KEY=dummy \
+JUDGE_PROVIDER=mock JUDGE_MODEL=mock-scenario-02-judge JUDGE_API_KEY=dummy \
+python3 run_eval.py --run-id mock-full-baseline --mock-agent
+```
+
+## 场景二当前基线
+
+- 25/25 条完成；
+- 输出 Schema、拒绝行为、检索相关性通过率 100%；
+- 引用落地通过率 80%；
+- 置信度检查通过率 92%；
+- Code Grader 全通过用例占比 72%；
+- faithfulness 平均 4.80；
+- coverage 平均 4.64；
+- compliance_accuracy 平均 4.68；
+- Agent 与 Judge 均使用 Qwen `qwen3.5-flash`。
+
+基线说明：场景二 Eval Harness 已能跑通并暴露 RAG 原型的关键问题，尤其是引用必须为原文连续子串、负例置信度需要受控。该结果不代表真实 RAG 检索已经实现。
+
 # 场景三：安全工具调用
 
 # 场景四：任务简报生成及推送
->>>>>>> 1aa99a8 (feat:场景一：对于态感等平台等告警分析处置建议Agent的Evals基线以及Agent架构设计)

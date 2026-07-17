@@ -1,0 +1,176 @@
+{
+  "test_case_id": "S02-002",
+  "scenario": "用户询问等保二级网络安全区域划分要求及与三级的区别",
+  "type": "exact_lookup",
+  "difficulty": "easy",
+  "is_positive": true,
+  "expected_answer_type": "comparison",
+  "status": "completed",
+  "agent_output": {
+    "answer": "根据检索结果，等保二级与三级在网络安全区域划分上的要求及区别如下：\n\n1. 等保二级要求：应划分不同的网络区域，并按照方便管理和控制的原则为各网络区域分配地址。各网络区域之间应采取访问控制措施，如通过ACL或防火墙进行逻辑隔离。对于重要网段应采取技术隔离手段与其他网段隔离，确保重要网段不直接暴露在不安全区域。\n\n2. 等保三级要求：应划分独立的管理网段，管理流量与业务流量分离。应在安全区域边界部署访问控制设备，如下一代防火墙，实现区域间的精细化访问控制策略。应能根据会话状态信息为数据流提供明确的允许/拒绝访问的能力，控制粒度至少为IP地址/端口级。应部署网络入侵检测系统（IDS）或入侵防御系统（IPS）对区域边界进行监控。\n\n3. 主要区别：相比二级，三级明确要求划分独立的管理网段并实现管理流量与业务流量分离；在边界防护上，三级要求部署IDS/IPS进行监控，且访问控制需基于会话状态信息，粒度至少为IP地址/端口级，而二级仅提及通过ACL或防火墙进行逻辑隔离。",
+    "citations": [
+      {
+        "source_doc": "GB/T 22239-2019 信息安全技术 网络安全等级保护基本要求",
+        "section": "7.1.3.1",
+        "quote_snippet": "应划分不同的网络区域，并按照方便管理和控制的原则为各网络区域分配地址。各网络区域之间应采取访问控制措施，如通过ACL或防火墙进行逻辑隔离。对于重要网段应采取技术隔离手段与其他网段隔离，确保重要网段不直接暴露在不安全区域。"
+      },
+      {
+        "source_doc": "GB/T 22239-2019 信息安全技术 网络安全等级保护基本要求",
+        "section": "8.1.3.1",
+        "quote_snippet": "应划分独立的管理网段，管理流量与业务流量分离。应在安全区域边界部署访问控制设备，如下一代防火墙，实现区域间的精细化访问控制策略。应能根据会话状态信息为数据流提供明确的允许/拒绝访问的能力，控制粒度至少为IP地址/端口级。应部署网络入侵检测系统（IDS）或入侵防御系统（IPS）对区域边界进行监控。"
+      }
+    ],
+    "confidence": 0.9
+  },
+  "code_graders": {
+    "citation_format": {
+      "passed": true,
+      "reason": "citation format valid",
+      "expected": null,
+      "actual": null
+    },
+    "output_schema": {
+      "passed": true,
+      "reason": "output schema valid",
+      "expected": null,
+      "actual": null
+    },
+    "refusal_check": {
+      "passed": true,
+      "reason": "refusal behavior valid",
+      "expected": false,
+      "actual": "根据检索结果，等保二级与三级在网络安全区域划分上的要求及区别如下：\n\n1. 等保二级要求：应划分不同的网络区域，并按照方便管理和控制的原则为各网络区域分配地址。各网络区域之间应采取访问控制措施，如通过ACL或防火墙进行逻辑隔离。对于重要网段应采取技术隔离手段与其他网段隔离，确保重要网段不直接暴露在不安全区域。\n\n2. 等保三级要求：应划分独立的管理网段，管理流量与业务流量分离。应在安全区域边界部署访问控制设备，如下一代防火墙，实现区域间的精细化访问控制策略。应能根据会话状态信息为数据流提供明确的允许/拒绝访问的能力，控制粒度至少为IP地址/端口级。应部署网络入侵检测系统（IDS）或入侵防御系统（IPS）对区域边界进行监控。\n\n3. 主要区别：相比二级，三级明确要求划分独立的管理网段并实现管理流量与业务流量分离；在边界防护上，三级要求部署IDS/IPS进行监控，且访问控制需基于会话状态信息，粒度至少为IP地址/端口级，而二级仅提及通过ACL或防火墙进行逻辑隔离。"
+    },
+    "retrieval_relevance": {
+      "passed": true,
+      "reason": "retrieval mock quality valid",
+      "expected": "sufficient",
+      "actual": [
+        "high",
+        "high",
+        "medium"
+      ]
+    },
+    "citation_grounding": {
+      "passed": true,
+      "reason": "citations grounded",
+      "expected": null,
+      "actual": null
+    },
+    "confidence_check": {
+      "passed": true,
+      "reason": "confidence valid",
+      "expected": ">= 0.85",
+      "actual": 0.9
+    }
+  },
+  "model_scores": {
+    "faithfulness": {
+      "score": 5,
+      "reason": "Answer accurately reflects the content of mock_retrieved_chunks. Section 7.1.3.1 (chunk-002a) supports all Level 2 claims regarding network area division, logical isolation via ACL/firewall, and technical isolation for important segments. Section 8.1.3.1 (chunk-002b) supports all Level 3 claims including independent management segments, traffic separation, next-gen firewall deployment, session-state based control at IP/port granularity, and IDS/IPS monitoring. The comparison points are also directly derived from the differences between these two chunks.",
+      "unsupported_claims": [],
+      "missing_points": [],
+      "errors": []
+    },
+    "coverage": {
+      "score": 5,
+      "reason": "模型回答完整覆盖了所有必须包含的关键点：1. 等保二级要求划分不同网络区域并实施访问控制；2. 等保二级要求重要网段技术隔离；3. 等保三级要求独立管理网段及流量分离；4. 等保三级要求部署下一代防火墙且控制粒度为IP/端口级；5. 等保三级要求部署IDS/IPS。同时，回答准确区分了二、三级的差异，未包含任何禁止出现的错误信息（如声称无区别或二级需部署IDS）。引用来源准确，置信度符合要求。",
+      "unsupported_claims": [],
+      "missing_points": [],
+      "errors": []
+    },
+    "compliance_accuracy": {
+      "score": 5,
+      "reason": "Agent 输出的答案准确涵盖了所有关键要点，包括等保二级和三级的具体要求及区别。引用的标准编号（GB/T 22239-2019）、条款号（7.1.3.1 和 8.1.3.1）以及关键数值/描述（如控制粒度至少为 IP 地址/端口级、部署 IDS/IPS 等）均与 mock_retrieved_chunks 中的内容完全一致。引用片段完整且准确对应检索到的原文。",
+      "unsupported_claims": [],
+      "missing_points": [],
+      "errors": []
+    }
+  },
+  "calls": [
+    {
+      "label": "agent",
+      "parsed": {
+        "answer": "根据检索结果，等保二级与三级在网络安全区域划分上的要求及区别如下：\n\n1. 等保二级要求：应划分不同的网络区域，并按照方便管理和控制的原则为各网络区域分配地址。各网络区域之间应采取访问控制措施，如通过ACL或防火墙进行逻辑隔离。对于重要网段应采取技术隔离手段与其他网段隔离，确保重要网段不直接暴露在不安全区域。\n\n2. 等保三级要求：应划分独立的管理网段，管理流量与业务流量分离。应在安全区域边界部署访问控制设备，如下一代防火墙，实现区域间的精细化访问控制策略。应能根据会话状态信息为数据流提供明确的允许/拒绝访问的能力，控制粒度至少为IP地址/端口级。应部署网络入侵检测系统（IDS）或入侵防御系统（IPS）对区域边界进行监控。\n\n3. 主要区别：相比二级，三级明确要求划分独立的管理网段并实现管理流量与业务流量分离；在边界防护上，三级要求部署IDS/IPS进行监控，且访问控制需基于会话状态信息，粒度至少为IP地址/端口级，而二级仅提及通过ACL或防火墙进行逻辑隔离。",
+        "citations": [
+          {
+            "source_doc": "GB/T 22239-2019 信息安全技术 网络安全等级保护基本要求",
+            "section": "7.1.3.1",
+            "quote_snippet": "应划分不同的网络区域，并按照方便管理和控制的原则为各网络区域分配地址。各网络区域之间应采取访问控制措施，如通过ACL或防火墙进行逻辑隔离。对于重要网段应采取技术隔离手段与其他网段隔离，确保重要网段不直接暴露在不安全区域。"
+          },
+          {
+            "source_doc": "GB/T 22239-2019 信息安全技术 网络安全等级保护基本要求",
+            "section": "8.1.3.1",
+            "quote_snippet": "应划分独立的管理网段，管理流量与业务流量分离。应在安全区域边界部署访问控制设备，如下一代防火墙，实现区域间的精细化访问控制策略。应能根据会话状态信息为数据流提供明确的允许/拒绝访问的能力，控制粒度至少为IP地址/端口级。应部署网络入侵检测系统（IDS）或入侵防御系统（IPS）对区域边界进行监控。"
+          }
+        ],
+        "confidence": 0.9
+      },
+      "raw_text": "{\n  \"answer\": \"根据检索结果，等保二级与三级在网络安全区域划分上的要求及区别如下：\\n\\n1. 等保二级要求：应划分不同的网络区域，并按照方便管理和控制的原则为各网络区域分配地址。各网络区域之间应采取访问控制措施，如通过ACL或防火墙进行逻辑隔离。对于重要网段应采取技术隔离手段与其他网段隔离，确保重要网段不直接暴露在不安全区域。\\n\\n2. 等保三级要求：应划分独立的管理网段，管理流量与业务流量分离。应在安全区域边界部署访问控制设备，如下一代防火墙，实现区域间的精细化访问控制策略。应能根据会话状态信息为数据流提供明确的允许/拒绝访问的能力，控制粒度至少为IP地址/端口级。应部署网络入侵检测系统（IDS）或入侵防御系统（IPS）对区域边界进行监控。\\n\\n3. 主要区别：相比二级，三级明确要求划分独立的管理网段并实现管理流量与业务流量分离；在边界防护上，三级要求部署IDS/IPS进行监控，且访问控制需基于会话状态信息，粒度至少为IP地址/端口级，而二级仅提及通过ACL或防火墙进行逻辑隔离。\",\n  \"citations\": [\n    {\n      \"source_doc\": \"GB/T 22239-2019 信息安全技术 网络安全等级保护基本要求\",\n      \"section\": \"7.1.3.1\",\n      \"quote_snippet\": \"应划分不同的网络区域，并按照方便管理和控制的原则为各网络区域分配地址。各网络区域之间应采取访问控制措施，如通过ACL或防火墙进行逻辑隔离。对于重要网段应采取技术隔离手段与其他网段隔离，确保重要网段不直接暴露在不安全区域。\"\n    },\n    {\n      \"source_doc\": \"GB/T 22239-2019 信息安全技术 网络安全等级保护基本要求\",\n      \"section\": \"8.1.3.1\",\n      \"quote_snippet\": \"应划分独立的管理网段，管理流量与业务流量分离。应在安全区域边界部署访问控制设备，如下一代防火墙，实现区域间的精细化访问控制策略。应能根据会话状态信息为数据流提供明确的允许/拒绝访问的能力，控制粒度至少为IP地址/端口级。应部署网络入侵检测系统（IDS）或入侵防御系统（IPS）对区域边界进行监控。\"\n    }\n  ],\n  \"confidence\": 0.9\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 656,
+      "output_tokens": 2956,
+      "latency_ms": 29435,
+      "attempts": 1
+    },
+    {
+      "label": "faithfulness",
+      "parsed": {
+        "score": 5,
+        "reason": "Answer accurately reflects the content of mock_retrieved_chunks. Section 7.1.3.1 (chunk-002a) supports all Level 2 claims regarding network area division, logical isolation via ACL/firewall, and technical isolation for important segments. Section 8.1.3.1 (chunk-002b) supports all Level 3 claims including independent management segments, traffic separation, next-gen firewall deployment, session-state based control at IP/port granularity, and IDS/IPS monitoring. The comparison points are also directly derived from the differences between these two chunks.",
+        "unsupported_claims": [],
+        "missing_points": [],
+        "errors": []
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"Answer accurately reflects the content of mock_retrieved_chunks. Section 7.1.3.1 (chunk-002a) supports all Level 2 claims regarding network area division, logical isolation via ACL/firewall, and technical isolation for important segments. Section 8.1.3.1 (chunk-002b) supports all Level 3 claims including independent management segments, traffic separation, next-gen firewall deployment, session-state based control at IP/port granularity, and IDS/IPS monitoring. The comparison points are also directly derived from the differences between these two chunks.\",\n  \"unsupported_claims\": []\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1471,
+      "output_tokens": 145,
+      "latency_ms": 2236,
+      "attempts": 1
+    },
+    {
+      "label": "coverage",
+      "parsed": {
+        "score": 5,
+        "reason": "模型回答完整覆盖了所有必须包含的关键点：1. 等保二级要求划分不同网络区域并实施访问控制；2. 等保二级要求重要网段技术隔离；3. 等保三级要求独立管理网段及流量分离；4. 等保三级要求部署下一代防火墙且控制粒度为IP/端口级；5. 等保三级要求部署IDS/IPS。同时，回答准确区分了二、三级的差异，未包含任何禁止出现的错误信息（如声称无区别或二级需部署IDS）。引用来源准确，置信度符合要求。",
+        "unsupported_claims": [],
+        "missing_points": [],
+        "errors": []
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"模型回答完整覆盖了所有必须包含的关键点：1. 等保二级要求划分不同网络区域并实施访问控制；2. 等保二级要求重要网段技术隔离；3. 等保三级要求独立管理网段及流量分离；4. 等保三级要求部署下一代防火墙且控制粒度为IP/端口级；5. 等保三级要求部署IDS/IPS。同时，回答准确区分了二、三级的差异，未包含任何禁止出现的错误信息（如声称无区别或二级需部署IDS）。引用来源准确，置信度符合要求。\",\n  \"missing_points\": []\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1467,
+      "output_tokens": 148,
+      "latency_ms": 1894,
+      "attempts": 1
+    },
+    {
+      "label": "compliance_accuracy",
+      "parsed": {
+        "score": 5,
+        "reason": "Agent 输出的答案准确涵盖了所有关键要点，包括等保二级和三级的具体要求及区别。引用的标准编号（GB/T 22239-2019）、条款号（7.1.3.1 和 8.1.3.1）以及关键数值/描述（如控制粒度至少为 IP 地址/端口级、部署 IDS/IPS 等）均与 mock_retrieved_chunks 中的内容完全一致。引用片段完整且准确对应检索到的原文。",
+        "unsupported_claims": [],
+        "missing_points": [],
+        "errors": []
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"Agent 输出的答案准确涵盖了所有关键要点，包括等保二级和三级的具体要求及区别。引用的标准编号（GB/T 22239-2019）、条款号（7.1.3.1 和 8.1.3.1）以及关键数值/描述（如控制粒度至少为 IP 地址/端口级、部署 IDS/IPS 等）均与 mock_retrieved_chunks 中的内容完全一致。引用片段完整且准确对应检索到的原文。\",\n  \"errors\": []\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1468,
+      "output_tokens": 131,
+      "latency_ms": 1604,
+      "attempts": 1
+    }
+  ],
+  "overall_pass": true,
+  "error_type": null,
+  "error_message": null
+}

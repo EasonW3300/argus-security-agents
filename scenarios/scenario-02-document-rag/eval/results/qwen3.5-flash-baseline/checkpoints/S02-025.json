@@ -1,0 +1,186 @@
+{
+  "test_case_id": "S02-025",
+  "scenario": "用户询问知识库外的CMMC 2.0 Level 3控制项，预期Agent告知无法回答",
+  "type": "negative",
+  "difficulty": "medium",
+  "is_positive": false,
+  "expected_answer_type": "refusal",
+  "status": "completed",
+  "agent_output": {
+    "answer": "基于提供的检索结果，无法确认最新的CMMC 2.0 Level 3的具体控制项清单。检索到的内部制度《供应商安全评估指南》明确指出不涉及国际标准如CMMC，而其他检索结果仅包含GB/T 22239-2019和ISO/IEC 27001:2022标准内容，未涵盖CMMC相关要求。",
+    "citations": [
+      {
+        "source_doc": "内部制度《供应商安全评估指南》",
+        "section": "2.1 范围",
+        "quote_snippet": "本指南适用于对国内供应商的网络安全评估，不涉及国际标准如CMMC。"
+      },
+      {
+        "source_doc": "GB/T 22239-2019 信息安全技术 网络安全等级保护基本要求",
+        "section": "8.1.3.2 安全审计",
+        "quote_snippet": "应启用安全审计功能，审计范围应覆盖到每个用户，对重要的用户行为和重要安全事件进行审计。"
+      },
+      {
+        "source_doc": "ISO/IEC 27001:2022",
+        "section": "A.5.1 信息安全策略",
+        "quote_snippet": "管理层应批准一套信息安全策略文件。"
+      }
+    ],
+    "confidence": 0.0
+  },
+  "code_graders": {
+    "citation_format": {
+      "passed": true,
+      "reason": "citation format valid",
+      "expected": null,
+      "actual": null
+    },
+    "output_schema": {
+      "passed": true,
+      "reason": "output schema valid",
+      "expected": null,
+      "actual": null
+    },
+    "refusal_check": {
+      "passed": true,
+      "reason": "refusal behavior valid",
+      "expected": true,
+      "actual": "基于提供的检索结果，无法确认最新的CMMC 2.0 Level 3的具体控制项清单。检索到的内部制度《供应商安全评估指南》明确指出不涉及国际标准如CMMC，而其他检索结果仅包含GB/T 22239-2019和ISO/IEC 27001:2022标准内容，未涵盖CMMC相关要求。"
+    },
+    "retrieval_relevance": {
+      "passed": true,
+      "reason": "retrieval mock quality valid",
+      "expected": "insufficient",
+      "actual": [
+        "low",
+        "low",
+        "low"
+      ]
+    },
+    "citation_grounding": {
+      "passed": true,
+      "reason": "citations grounded",
+      "expected": null,
+      "actual": null
+    },
+    "confidence_check": {
+      "passed": true,
+      "reason": "confidence valid",
+      "expected": "0..0.2",
+      "actual": 0.0
+    }
+  },
+  "model_scores": {
+    "faithfulness": {
+      "score": 5,
+      "reason": "Answer accurately reflects the content of all three retrieved chunks. It correctly identifies that the internal policy excludes CMMC (chunk-025c) and that other documents only cover GB/T 22239 and ISO/IEC 27001 (chunk-025a, chunk-025b), leading to the correct conclusion that CMMC 2.0 Level 3 details cannot be confirmed from the provided context.",
+      "unsupported_claims": [],
+      "missing_points": [],
+      "errors": []
+    },
+    "coverage": {
+      "score": 5,
+      "reason": "模型回答准确识别了检索结果中缺乏CMMC 2.0 Level 3相关信息，并明确声明无法确认具体控制项清单。回答引用了相关文档（如内部制度）来支持其拒绝提供信息的理由，且严格遵守了'key_points_must_not_include'的约束，未编造任何CMMC的具体条款或编号。",
+      "unsupported_claims": [],
+      "missing_points": [],
+      "errors": []
+    },
+    "compliance_accuracy": {
+      "score": 5,
+      "reason": "Agent 输出准确识别了检索结果中缺乏 CMMC 2.0 Level 3 相关信息，并正确引用了 mock_retrieved_chunks 中的三条内容（包括标准编号、条款号和关键数值）来支持其拒绝回答的结论。所有引用内容与检索片段完全一致，未编造任何虚假信息，符合预期行为。",
+      "unsupported_claims": [],
+      "missing_points": [],
+      "errors": []
+    }
+  },
+  "calls": [
+    {
+      "label": "agent",
+      "parsed": {
+        "answer": "基于提供的检索结果，无法确认最新的CMMC 2.0 Level 3的具体控制项清单。检索到的内部制度《供应商安全评估指南》明确指出不涉及国际标准如CMMC，而其他检索结果仅包含GB/T 22239-2019和ISO/IEC 27001:2022标准内容，未涵盖CMMC相关要求。",
+        "citations": [
+          {
+            "source_doc": "内部制度《供应商安全评估指南》",
+            "section": "2.1 范围",
+            "quote_snippet": "本指南适用于对国内供应商的网络安全评估，不涉及国际标准如CMMC。"
+          },
+          {
+            "source_doc": "GB/T 22239-2019 信息安全技术 网络安全等级保护基本要求",
+            "section": "8.1.3.2 安全审计",
+            "quote_snippet": "应启用安全审计功能，审计范围应覆盖到每个用户，对重要的用户行为和重要安全事件进行审计。"
+          },
+          {
+            "source_doc": "ISO/IEC 27001:2022",
+            "section": "A.5.1 信息安全策略",
+            "quote_snippet": "管理层应批准一套信息安全策略文件。"
+          }
+        ],
+        "confidence": 0.0
+      },
+      "raw_text": "{\n\"answer\": \"基于提供的检索结果，无法确认最新的CMMC 2.0 Level 3的具体控制项清单。检索到的内部制度《供应商安全评估指南》明确指出不涉及国际标准如CMMC，而其他检索结果仅包含GB/T 22239-2019和ISO/IEC 27001:2022标准内容，未涵盖CMMC相关要求。\",\n\"citations\": [\n{\n\"source_doc\": \"内部制度《供应商安全评估指南》\",\n\"section\": \"2.1 范围\",\n\"quote_snippet\": \"本指南适用于对国内供应商的网络安全评估，不涉及国际标准如CMMC。\"\n},\n{\n\"source_doc\": \"GB/T 22239-2019 信息安全技术 网络安全等级保护基本要求\",\n\"section\": \"8.1.3.2 安全审计\",\n\"quote_snippet\": \"应启用安全审计功能，审计范围应覆盖到每个用户，对重要的用户行为和重要安全事件进行审计。\"\n},\n{\n\"source_doc\": \"ISO/IEC 27001:2022\",\n\"section\": \"A.5.1 信息安全策略\",\n\"quote_snippet\": \"管理层应批准一套信息安全策略文件。\"\n}\n],\n\"confidence\": 0.0\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 452,
+      "output_tokens": 2967,
+      "latency_ms": 26757,
+      "attempts": 1
+    },
+    {
+      "label": "faithfulness",
+      "parsed": {
+        "score": 5,
+        "reason": "Answer accurately reflects the content of all three retrieved chunks. It correctly identifies that the internal policy excludes CMMC (chunk-025c) and that other documents only cover GB/T 22239 and ISO/IEC 27001 (chunk-025a, chunk-025b), leading to the correct conclusion that CMMC 2.0 Level 3 details cannot be confirmed from the provided context.",
+        "unsupported_claims": [],
+        "missing_points": [],
+        "errors": []
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"Answer accurately reflects the content of all three retrieved chunks. It correctly identifies that the internal policy excludes CMMC (chunk-025c) and that other documents only cover GB/T 22239 and ISO/IEC 27001 (chunk-025a, chunk-025b), leading to the correct conclusion that CMMC 2.0 Level 3 details cannot be confirmed from the provided context.\",\n  \"unsupported_claims\": []\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 822,
+      "output_tokens": 118,
+      "latency_ms": 2557,
+      "attempts": 1
+    },
+    {
+      "label": "coverage",
+      "parsed": {
+        "score": 5,
+        "reason": "模型回答准确识别了检索结果中缺乏CMMC 2.0 Level 3相关信息，并明确声明无法确认具体控制项清单。回答引用了相关文档（如内部制度）来支持其拒绝提供信息的理由，且严格遵守了'key_points_must_not_include'的约束，未编造任何CMMC的具体条款或编号。",
+        "unsupported_claims": [],
+        "missing_points": [],
+        "errors": []
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"模型回答准确识别了检索结果中缺乏CMMC 2.0 Level 3相关信息，并明确声明无法确认具体控制项清单。回答引用了相关文档（如内部制度）来支持其拒绝提供信息的理由，且严格遵守了'key_points_must_not_include'的约束，未编造任何CMMC的具体条款或编号。\",\n  \"missing_points\": []\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 818,
+      "output_tokens": 98,
+      "latency_ms": 1970,
+      "attempts": 1
+    },
+    {
+      "label": "compliance_accuracy",
+      "parsed": {
+        "score": 5,
+        "reason": "Agent 输出准确识别了检索结果中缺乏 CMMC 2.0 Level 3 相关信息，并正确引用了 mock_retrieved_chunks 中的三条内容（包括标准编号、条款号和关键数值）来支持其拒绝回答的结论。所有引用内容与检索片段完全一致，未编造任何虚假信息，符合预期行为。",
+        "unsupported_claims": [],
+        "missing_points": [],
+        "errors": []
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"Agent 输出准确识别了检索结果中缺乏 CMMC 2.0 Level 3 相关信息，并正确引用了 mock_retrieved_chunks 中的三条内容（包括标准编号、条款号和关键数值）来支持其拒绝回答的结论。所有引用内容与检索片段完全一致，未编造任何虚假信息，符合预期行为。\",\n  \"errors\": []\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 819,
+      "output_tokens": 95,
+      "latency_ms": 1497,
+      "attempts": 1
+    }
+  ],
+  "overall_pass": true,
+  "error_type": null,
+  "error_message": null
+}

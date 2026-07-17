@@ -1,0 +1,246 @@
+{
+  "test_case_id": "S02-009",
+  "scenario": "用户询问私有云环境下数据加密策略应遵循的标准",
+  "type": "suggestion",
+  "difficulty": "medium",
+  "is_positive": true,
+  "expected_answer_type": "synthesis",
+  "status": "completed",
+  "agent_output": {
+    "answer": "根据检索结果，私有云业务数据加密需遵循以下标准：\n1. 数据传输安全：依据 GB/T 22239-2019，虚拟机间及与外部系统间应采用加密通道，如 VXLAN 与 IPsec 结合。面向用户传输应启用 TLS 1.2 或更高版本，禁止弱 SSL。跨数据中心复制流量必须使用 SM4 加密。\n2. 存储加密要求：依据内部制度《云安全加密策略 v2.0》，存储须使用 AES-256 或 SM4 加密。密钥由自建 KMS 管理，禁止厂商持主密钥。数据库 TDE 必须启用，备份数据也需加密。\n3. 密码控制与算法：依据 ISO/IEC 27001:2022，对称加密至少 128 位 AES 或同等国密算法，非对称至少 2048 位 RSA 或 ECC。所有密码产品须通过国家密码管理局核准。",
+    "citations": [
+      {
+        "source_doc": "GB/T 22239-2019 信息安全技术 网络安全等级保护基本要求 附录 C 云计算安全扩展要求",
+        "section": "C.2.2.2 数据传输安全",
+        "quote_snippet": "在云计算环境中，应确保虚拟机间及虚拟机与外部系统间的数据传输采用加密通道，如使用VXLAN与IPsec相结合的隔离加密方案。"
+      },
+      {
+        "source_doc": "GB/T 22239-2019 信息安全技术 网络安全等级保护基本要求 附录 C 云计算安全扩展要求",
+        "section": "C.2.2.2 数据传输安全",
+        "quote_snippet": "面向用户的数据传输应启用TLS 1.2或更高版本协议，禁止使用存在已知弱点的SSL及早期TLS版本。"
+      },
+      {
+        "source_doc": "GB/T 22239-2019 信息安全技术 网络安全等级保护基本要求 附录 C 云计算安全扩展要求",
+        "section": "C.2.2.2 数据传输安全",
+        "quote_snippet": "对于跨数据中心的数据复制流量，必须使用国密算法SM4进行加密保护。"
+      },
+      {
+        "source_doc": "内部制度《云安全加密策略 v2.0》",
+        "section": "3.1 存储加密",
+        "quote_snippet": "私有云环境中的业务数据存储须使用AES-256或SM4加密，"
+      },
+      {
+        "source_doc": "内部制度《云安全加密策略 v2.0》",
+        "section": "3.1 存储加密",
+        "quote_snippet": "密钥由公司自建的密钥管理服务（KMS）统一管理，禁止云平台厂商持有主密钥。"
+      },
+      {
+        "source_doc": "内部制度《云安全加密策略 v2.0》",
+        "section": "3.1 存储加密",
+        "quote_snippet": "数据库透明加密（TDE）必须启用，备份数据也必须加密后存储。"
+      },
+      {
+        "source_doc": "ISO/IEC 27001:2022",
+        "section": "A.8.24",
+        "quote_snippet": "对称加密算法应使用至少128位密钥长度的AES或同等强度的国密算法；"
+      },
+      {
+        "source_doc": "ISO/IEC 27001:2022",
+        "section": "A.8.24",
+        "quote_snippet": "非对称加密应至少使用2048位RSA或ECC等同强度算法。"
+      },
+      {
+        "source_doc": "ISO/IEC 27001:2022",
+        "section": "A.8.24",
+        "quote_snippet": "所有密码产品须通过国家密码管理局核准。"
+      }
+    ],
+    "confidence": 0.9
+  },
+  "code_graders": {
+    "citation_format": {
+      "passed": true,
+      "reason": "citation format valid",
+      "expected": null,
+      "actual": null
+    },
+    "output_schema": {
+      "passed": true,
+      "reason": "output schema valid",
+      "expected": null,
+      "actual": null
+    },
+    "refusal_check": {
+      "passed": true,
+      "reason": "refusal behavior valid",
+      "expected": false,
+      "actual": "根据检索结果，私有云业务数据加密需遵循以下标准：\n1. 数据传输安全：依据 GB/T 22239-2019，虚拟机间及与外部系统间应采用加密通道，如 VXLAN 与 IPsec 结合。面向用户传输应启用 TLS 1.2 或更高版本，禁止弱 SSL。跨数据中心复制流量必须使用 SM4 加密。\n2. 存储加密要求：依据内部制度《云安全加密策略 v2.0》，存储须使用 AES-256 或 SM4 加密。密钥由自建 KMS 管理，禁止厂商持主密钥。数据库 TDE 必须启用，备份数据也需加密。\n3. 密码控制与算法：依据 ISO/IEC 27001:2022，对称加密至少 128 位 AES 或同等国密算法，非对称至少 2048 位 RSA 或 ECC。所有密码产品须通过国家密码管理局核准。"
+    },
+    "retrieval_relevance": {
+      "passed": true,
+      "reason": "retrieval mock quality valid",
+      "expected": "sufficient",
+      "actual": [
+        "high",
+        "high",
+        "medium"
+      ]
+    },
+    "citation_grounding": {
+      "passed": false,
+      "reason": "citations not grounded",
+      "expected": null,
+      "actual": null
+    },
+    "confidence_check": {
+      "passed": true,
+      "reason": "confidence valid",
+      "expected": ">= 0.8",
+      "actual": 0.9
+    }
+  },
+  "model_scores": {
+    "faithfulness": {
+      "score": 5,
+      "reason": "Answer 中的所有声明均能由 mock_retrieved_chunks 原文直接支撑。具体对应关系如下：1. 关于数据传输安全（VXLAN+IPsec、TLS 1.2+、SM4）完全源自 chunk-009a；2. 关于存储加密（AES-256/SM4、自建 KMS、TDE）完全源自 chunk-009c；3. 关于密码控制与算法（AES 128 位、RSA 2048 位、国密局核准）完全源自 chunk-009b。答案准确归纳了检索内容，无幻觉或过度推断。",
+      "unsupported_claims": [],
+      "missing_points": [],
+      "errors": []
+    },
+    "coverage": {
+      "score": 5,
+      "reason": "Answer comprehensively covers all six mandatory key points specified in the ground truth. It correctly addresses VM-to-external encryption (VXLAN+IPsec), user-facing TLS requirements (1.2+), cross-datacenter SM4 usage, specific algorithm strength requirements (AES-128/SM4, RSA-2048/ECC), national certification for crypto products, and storage encryption details (AES-256/SM4 with self-managed KMS). The response also strictly avoids any prohibited content.",
+      "unsupported_claims": [],
+      "missing_points": [],
+      "errors": []
+    },
+    "compliance_accuracy": {
+      "score": 5,
+      "reason": "Agent output accurately synthesizes information from all provided mock_retrieved_chunks. It correctly cites standard numbers (GB/T 22239-2019, ISO/IEC 27001:2022), section numbers (C.2.2.2, A.8.24, 3.1), and key numerical values (TLS 1.2, SM4, AES-256, 128-bit, 2048-bit) exactly as they appear in the source chunks. All required key points are included without any hallucinations or contradictions.",
+      "unsupported_claims": [],
+      "missing_points": [],
+      "errors": []
+    }
+  },
+  "calls": [
+    {
+      "label": "agent",
+      "parsed": {
+        "answer": "根据检索结果，私有云业务数据加密需遵循以下标准：\n1. 数据传输安全：依据 GB/T 22239-2019，虚拟机间及与外部系统间应采用加密通道，如 VXLAN 与 IPsec 结合。面向用户传输应启用 TLS 1.2 或更高版本，禁止弱 SSL。跨数据中心复制流量必须使用 SM4 加密。\n2. 存储加密要求：依据内部制度《云安全加密策略 v2.0》，存储须使用 AES-256 或 SM4 加密。密钥由自建 KMS 管理，禁止厂商持主密钥。数据库 TDE 必须启用，备份数据也需加密。\n3. 密码控制与算法：依据 ISO/IEC 27001:2022，对称加密至少 128 位 AES 或同等国密算法，非对称至少 2048 位 RSA 或 ECC。所有密码产品须通过国家密码管理局核准。",
+        "citations": [
+          {
+            "source_doc": "GB/T 22239-2019 信息安全技术 网络安全等级保护基本要求 附录 C 云计算安全扩展要求",
+            "section": "C.2.2.2 数据传输安全",
+            "quote_snippet": "在云计算环境中，应确保虚拟机间及虚拟机与外部系统间的数据传输采用加密通道，如使用VXLAN与IPsec相结合的隔离加密方案。"
+          },
+          {
+            "source_doc": "GB/T 22239-2019 信息安全技术 网络安全等级保护基本要求 附录 C 云计算安全扩展要求",
+            "section": "C.2.2.2 数据传输安全",
+            "quote_snippet": "面向用户的数据传输应启用TLS 1.2或更高版本协议，禁止使用存在已知弱点的SSL及早期TLS版本。"
+          },
+          {
+            "source_doc": "GB/T 22239-2019 信息安全技术 网络安全等级保护基本要求 附录 C 云计算安全扩展要求",
+            "section": "C.2.2.2 数据传输安全",
+            "quote_snippet": "对于跨数据中心的数据复制流量，必须使用国密算法SM4进行加密保护。"
+          },
+          {
+            "source_doc": "内部制度《云安全加密策略 v2.0》",
+            "section": "3.1 存储加密",
+            "quote_snippet": "私有云环境中的业务数据存储须使用AES-256或SM4加密，"
+          },
+          {
+            "source_doc": "内部制度《云安全加密策略 v2.0》",
+            "section": "3.1 存储加密",
+            "quote_snippet": "密钥由公司自建的密钥管理服务（KMS）统一管理，禁止云平台厂商持有主密钥。"
+          },
+          {
+            "source_doc": "内部制度《云安全加密策略 v2.0》",
+            "section": "3.1 存储加密",
+            "quote_snippet": "数据库透明加密（TDE）必须启用，备份数据也必须加密后存储。"
+          },
+          {
+            "source_doc": "ISO/IEC 27001:2022",
+            "section": "A.8.24",
+            "quote_snippet": "对称加密算法应使用至少128位密钥长度的AES或同等强度的国密算法；"
+          },
+          {
+            "source_doc": "ISO/IEC 27001:2022",
+            "section": "A.8.24",
+            "quote_snippet": "非对称加密应至少使用2048位RSA或ECC等同强度算法。"
+          },
+          {
+            "source_doc": "ISO/IEC 27001:2022",
+            "section": "A.8.24",
+            "quote_snippet": "所有密码产品须通过国家密码管理局核准。"
+          }
+        ],
+        "confidence": 0.9
+      },
+      "raw_text": "{\n\"answer\": \"根据检索结果，私有云业务数据加密需遵循以下标准：\\n1. 数据传输安全：依据 GB/T 22239-2019，虚拟机间及与外部系统间应采用加密通道，如 VXLAN 与 IPsec 结合。面向用户传输应启用 TLS 1.2 或更高版本，禁止弱 SSL。跨数据中心复制流量必须使用 SM4 加密。\\n2. 存储加密要求：依据内部制度《云安全加密策略 v2.0》，存储须使用 AES-256 或 SM4 加密。密钥由自建 KMS 管理，禁止厂商持主密钥。数据库 TDE 必须启用，备份数据也需加密。\\n3. 密码控制与算法：依据 ISO/IEC 27001:2022，对称加密至少 128 位 AES 或同等国密算法，非对称至少 2048 位 RSA 或 ECC。所有密码产品须通过国家密码管理局核准。\",\n\"citations\": [\n{\n\"source_doc\": \"GB/T 22239-2019 信息安全技术 网络安全等级保护基本要求 附录 C 云计算安全扩展要求\",\n\"section\": \"C.2.2.2 数据传输安全\",\n\"quote_snippet\": \"在云计算环境中，应确保虚拟机间及虚拟机与外部系统间的数据传输采用加密通道，如使用VXLAN与IPsec相结合的隔离加密方案。\"\n},\n{\n\"source_doc\": \"GB/T 22239-2019 信息安全技术 网络安全等级保护基本要求 附录 C 云计算安全扩展要求\",\n\"section\": \"C.2.2.2 数据传输安全\",\n\"quote_snippet\": \"面向用户的数据传输应启用TLS 1.2或更高版本协议，禁止使用存在已知弱点的SSL及早期TLS版本。\"\n},\n{\n\"source_doc\": \"GB/T 22239-2019 信息安全技术 网络安全等级保护基本要求 附录 C 云计算安全扩展要求\",\n\"section\": \"C.2.2.2 数据传输安全\",\n\"quote_snippet\": \"对于跨数据中心的数据复制流量，必须使用国密算法SM4进行加密保护。\"\n},\n{\n\"source_doc\": \"内部制度《云安全加密策略 v2.0》\",\n\"section\": \"3.1 存储加密\",\n\"quote_snippet\": \"私有云环境中的业务数据存储须使用AES-256或SM4加密，\"\n},\n{\n\"source_doc\": \"内部制度《云安全加密策略 v2.0》\",\n\"section\": \"3.1 存储加密\",\n\"quote_snippet\": \"密钥由公司自建的密钥管理服务（KMS）统一管理，禁止云平台厂商持有主密钥。\"\n},\n{\n\"source_doc\": \"内部制度《云安全加密策略 v2.0》\",\n\"section\": \"3.1 存储加密\",\n\"quote_snippet\": \"数据库透明加密（TDE）必须启用，备份数据也必须加密后存储。\"\n},\n{\n\"source_doc\": \"ISO/IEC 27001:2022\",\n\"section\": \"A.8.24\",\n\"quote_snippet\": \"对称加密算法应使用至少128位密钥长度的AES或同等强度的国密算法；\"\n},\n{\n\"source_doc\": \"ISO/IEC 27001:2022\",\n\"section\": \"A.8.24\",\n\"quote_snippet\": \"非对称加密应至少使用2048位RSA或ECC等同强度算法。\"\n},\n{\n\"source_doc\": \"ISO/IEC 27001:2022\",\n\"section\": \"A.8.24\",\n\"quote_snippet\": \"所有密码产品须通过国家密码管理局核准。\"\n}\n],\n\"confidence\": 0.9\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 627,
+      "output_tokens": 4042,
+      "latency_ms": 38871,
+      "attempts": 1
+    },
+    {
+      "label": "faithfulness",
+      "parsed": {
+        "score": 5,
+        "reason": "Answer 中的所有声明均能由 mock_retrieved_chunks 原文直接支撑。具体对应关系如下：1. 关于数据传输安全（VXLAN+IPsec、TLS 1.2+、SM4）完全源自 chunk-009a；2. 关于存储加密（AES-256/SM4、自建 KMS、TDE）完全源自 chunk-009c；3. 关于密码控制与算法（AES 128 位、RSA 2048 位、国密局核准）完全源自 chunk-009b。答案准确归纳了检索内容，无幻觉或过度推断。",
+        "unsupported_claims": [],
+        "missing_points": [],
+        "errors": []
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"Answer 中的所有声明均能由 mock_retrieved_chunks 原文直接支撑。具体对应关系如下：1. 关于数据传输安全（VXLAN+IPsec、TLS 1.2+、SM4）完全源自 chunk-009a；2. 关于存储加密（AES-256/SM4、自建 KMS、TDE）完全源自 chunk-009c；3. 关于密码控制与算法（AES 128 位、RSA 2048 位、国密局核准）完全源自 chunk-009b。答案准确归纳了检索内容，无幻觉或过度推断。\",\n  \"unsupported_claims\": []\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1862,
+      "output_tokens": 166,
+      "latency_ms": 2147,
+      "attempts": 1
+    },
+    {
+      "label": "coverage",
+      "parsed": {
+        "score": 5,
+        "reason": "Answer comprehensively covers all six mandatory key points specified in the ground truth. It correctly addresses VM-to-external encryption (VXLAN+IPsec), user-facing TLS requirements (1.2+), cross-datacenter SM4 usage, specific algorithm strength requirements (AES-128/SM4, RSA-2048/ECC), national certification for crypto products, and storage encryption details (AES-256/SM4 with self-managed KMS). The response also strictly avoids any prohibited content.",
+        "unsupported_claims": [],
+        "missing_points": [],
+        "errors": []
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"Answer comprehensively covers all six mandatory key points specified in the ground truth. It correctly addresses VM-to-external encryption (VXLAN+IPsec), user-facing TLS requirements (1.2+), cross-datacenter SM4 usage, specific algorithm strength requirements (AES-128/SM4, RSA-2048/ECC), national certification for crypto products, and storage encryption details (AES-256/SM4 with self-managed KMS). The response also strictly avoids any prohibited content.\",\n  \"missing_points\": []\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1858,
+      "output_tokens": 130,
+      "latency_ms": 1719,
+      "attempts": 1
+    },
+    {
+      "label": "compliance_accuracy",
+      "parsed": {
+        "score": 5,
+        "reason": "Agent output accurately synthesizes information from all provided mock_retrieved_chunks. It correctly cites standard numbers (GB/T 22239-2019, ISO/IEC 27001:2022), section numbers (C.2.2.2, A.8.24, 3.1), and key numerical values (TLS 1.2, SM4, AES-256, 128-bit, 2048-bit) exactly as they appear in the source chunks. All required key points are included without any hallucinations or contradictions.",
+        "unsupported_claims": [],
+        "missing_points": [],
+        "errors": []
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"Agent output accurately synthesizes information from all provided mock_retrieved_chunks. It correctly cites standard numbers (GB/T 22239-2019, ISO/IEC 27001:2022), section numbers (C.2.2.2, A.8.24, 3.1), and key numerical values (TLS 1.2, SM4, AES-256, 128-bit, 2048-bit) exactly as they appear in the source chunks. All required key points are included without any hallucinations or contradictions.\",\n  \"errors\": []\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1859,
+      "output_tokens": 152,
+      "latency_ms": 1701,
+      "attempts": 1
+    }
+  ],
+  "overall_pass": false,
+  "error_type": null,
+  "error_message": null
+}

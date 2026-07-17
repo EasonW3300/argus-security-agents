@@ -1,0 +1,176 @@
+{
+  "test_case_id": "S02-014",
+  "scenario": "用户询问新建信息系统上线前需要完成的安全检查项",
+  "type": "suggestion",
+  "difficulty": "easy",
+  "is_positive": true,
+  "expected_answer_type": "direct_answer",
+  "status": "completed",
+  "agent_output": {
+    "answer": "根据内部制度《信息系统上线安全审批管理办法 v3.2》，信息系统上线前必须完成以下安全检测并提供报告：1）主机和应用系统漏洞扫描，所有高危漏洞必须修复完毕；2）安全配置基线核查，依据CIS Benchmark进行；3）Web应用渗透测试（若为Web系统），由授权第三方完成；4）源代码安全审计，覆盖OWASP Top 10 漏洞；5）数据保护措施验证，确保敏感数据加密存储和传输；6）安全功能测试，包括认证、授权、会话管理、审计日志输出等。未通过任一项，安全团队不批准上线。此外，上线申请单需经开发经理、测试经理、安全工程师、运维经理四方签字方可提交变更窗口。",
+    "citations": [
+      {
+        "source_doc": "内部制度《信息系统上线安全审批管理办法 v3.2》",
+        "section": "5.1 上线安全检测项",
+        "quote_snippet": "信息系统上线前必须完成以下安全检测并提供报告：1）主机和应用系统漏洞扫描，所有高危漏洞必须修复完毕；2）安全配置基线核查，依据CIS Benchmark进行；3）Web应用渗透测试（若为Web系统），由授权第三方完成；4）源代码安全审计，覆盖OWASP Top 10 漏洞；5）数据保护措施验证，确保敏感数据加密存储和传输；6）安全功能测试，包括认证、授权、会话管理、审计日志输出等。未通过任一项，安全团队不批准上线。"
+      },
+      {
+        "source_doc": "内部制度《变更管理规范 v1.5》",
+        "section": "3.2 上线流程",
+        "quote_snippet": "上线申请单需经开发经理、测试经理、安全工程师、运维经理四方签字方可提交变更窗口。"
+      }
+    ],
+    "confidence": 0.95
+  },
+  "code_graders": {
+    "citation_format": {
+      "passed": true,
+      "reason": "citation format valid",
+      "expected": null,
+      "actual": null
+    },
+    "output_schema": {
+      "passed": true,
+      "reason": "output schema valid",
+      "expected": null,
+      "actual": null
+    },
+    "refusal_check": {
+      "passed": true,
+      "reason": "refusal behavior valid",
+      "expected": false,
+      "actual": "根据内部制度《信息系统上线安全审批管理办法 v3.2》，信息系统上线前必须完成以下安全检测并提供报告：1）主机和应用系统漏洞扫描，所有高危漏洞必须修复完毕；2）安全配置基线核查，依据CIS Benchmark进行；3）Web应用渗透测试（若为Web系统），由授权第三方完成；4）源代码安全审计，覆盖OWASP Top 10 漏洞；5）数据保护措施验证，确保敏感数据加密存储和传输；6）安全功能测试，包括认证、授权、会话管理、审计日志输出等。未通过任一项，安全团队不批准上线。此外，上线申请单需经开发经理、测试经理、安全工程师、运维经理四方签字方可提交变更窗口。"
+    },
+    "retrieval_relevance": {
+      "passed": true,
+      "reason": "retrieval mock quality valid",
+      "expected": "sufficient",
+      "actual": [
+        "high",
+        "medium",
+        "low"
+      ]
+    },
+    "citation_grounding": {
+      "passed": false,
+      "reason": "citations not grounded",
+      "expected": null,
+      "actual": null
+    },
+    "confidence_check": {
+      "passed": true,
+      "reason": "confidence valid",
+      "expected": ">= 0.95",
+      "actual": 0.95
+    }
+  },
+  "model_scores": {
+    "faithfulness": {
+      "score": 5,
+      "reason": "Answer 中的所有声明均能由 mock_retrieved_chunks 原文直接支撑。chunk-014a 完整覆盖了答案中关于安全检测的六项具体要求（漏洞扫描、基线核查、渗透测试、代码审计、数据保护、功能测试）及未通过的后果；chunk-014c 明确支持了答案中关于上线申请单需四方签字的规定。引用来源与文档名称也与检索内容一致，无幻觉或过度推断。",
+      "unsupported_claims": [],
+      "missing_points": [],
+      "errors": []
+    },
+    "coverage": {
+      "score": 5,
+      "reason": "Answer fully covers all six mandatory key points specified in the ground truth: vulnerability scanning with high-risk fixes, security baseline checks (CIS Benchmark), Web penetration testing, source code audit (OWASP Top 10), data encryption verification, and security function tests. The response is accurate, well-structured, and includes appropriate citations without violating any negative constraints.",
+      "unsupported_claims": [],
+      "missing_points": [],
+      "errors": []
+    },
+    "compliance_accuracy": {
+      "score": 5,
+      "reason": "Agent 回答准确涵盖了所有必须包含的关键点（漏洞扫描、基线核查、渗透测试、代码审计、数据加密、安全功能测试），且未包含任何禁止项。引用内容（quote_snippet）与 mock_retrieved_chunks 中的 chunk-014a 和 chunk-014c 完全一致，标准编号、条款号（如 5.1 上线安全检测项、3.2 上线流程）及关键数值（高危漏洞修复、四方签字）均与检索到的片段严格匹配。置信度 0.95 也符合预期阈值。",
+      "unsupported_claims": [],
+      "missing_points": [],
+      "errors": []
+    }
+  },
+  "calls": [
+    {
+      "label": "agent",
+      "parsed": {
+        "answer": "根据内部制度《信息系统上线安全审批管理办法 v3.2》，信息系统上线前必须完成以下安全检测并提供报告：1）主机和应用系统漏洞扫描，所有高危漏洞必须修复完毕；2）安全配置基线核查，依据CIS Benchmark进行；3）Web应用渗透测试（若为Web系统），由授权第三方完成；4）源代码安全审计，覆盖OWASP Top 10 漏洞；5）数据保护措施验证，确保敏感数据加密存储和传输；6）安全功能测试，包括认证、授权、会话管理、审计日志输出等。未通过任一项，安全团队不批准上线。此外，上线申请单需经开发经理、测试经理、安全工程师、运维经理四方签字方可提交变更窗口。",
+        "citations": [
+          {
+            "source_doc": "内部制度《信息系统上线安全审批管理办法 v3.2》",
+            "section": "5.1 上线安全检测项",
+            "quote_snippet": "信息系统上线前必须完成以下安全检测并提供报告：1）主机和应用系统漏洞扫描，所有高危漏洞必须修复完毕；2）安全配置基线核查，依据CIS Benchmark进行；3）Web应用渗透测试（若为Web系统），由授权第三方完成；4）源代码安全审计，覆盖OWASP Top 10 漏洞；5）数据保护措施验证，确保敏感数据加密存储和传输；6）安全功能测试，包括认证、授权、会话管理、审计日志输出等。未通过任一项，安全团队不批准上线。"
+          },
+          {
+            "source_doc": "内部制度《变更管理规范 v1.5》",
+            "section": "3.2 上线流程",
+            "quote_snippet": "上线申请单需经开发经理、测试经理、安全工程师、运维经理四方签字方可提交变更窗口。"
+          }
+        ],
+        "confidence": 0.95
+      },
+      "raw_text": "{\n  \"answer\": \"根据内部制度《信息系统上线安全审批管理办法 v3.2》，信息系统上线前必须完成以下安全检测并提供报告：1）主机和应用系统漏洞扫描，所有高危漏洞必须修复完毕；2）安全配置基线核查，依据CIS Benchmark进行；3）Web应用渗透测试（若为Web系统），由授权第三方完成；4）源代码安全审计，覆盖OWASP Top 10 漏洞；5）数据保护措施验证，确保敏感数据加密存储和传输；6）安全功能测试，包括认证、授权、会话管理、审计日志输出等。未通过任一项，安全团队不批准上线。此外，上线申请单需经开发经理、测试经理、安全工程师、运维经理四方签字方可提交变更窗口。\",\n  \"citations\": [\n    {\n      \"source_doc\": \"内部制度《信息系统上线安全审批管理办法 v3.2》\",\n      \"section\": \"5.1 上线安全检测项\",\n      \"quote_snippet\": \"信息系统上线前必须完成以下安全检测并提供报告：1）主机和应用系统漏洞扫描，所有高危漏洞必须修复完毕；2）安全配置基线核查，依据CIS Benchmark进行；3）Web应用渗透测试（若为Web系统），由授权第三方完成；4）源代码安全审计，覆盖OWASP Top 10 漏洞；5）数据保护措施验证，确保敏感数据加密存储和传输；6）安全功能测试，包括认证、授权、会话管理、审计日志输出等。未通过任一项，安全团队不批准上线。\"\n    },\n    {\n      \"source_doc\": \"内部制度《变更管理规范 v1.5》\",\n      \"section\": \"3.2 上线流程\",\n      \"quote_snippet\": \"上线申请单需经开发经理、测试经理、安全工程师、运维经理四方签字方可提交变更窗口。\"\n    }\n  ],\n  \"confidence\": 0.95\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 565,
+      "output_tokens": 3229,
+      "latency_ms": 29883,
+      "attempts": 1
+    },
+    {
+      "label": "faithfulness",
+      "parsed": {
+        "score": 5,
+        "reason": "Answer 中的所有声明均能由 mock_retrieved_chunks 原文直接支撑。chunk-014a 完整覆盖了答案中关于安全检测的六项具体要求（漏洞扫描、基线核查、渗透测试、代码审计、数据保护、功能测试）及未通过的后果；chunk-014c 明确支持了答案中关于上线申请单需四方签字的规定。引用来源与文档名称也与检索内容一致，无幻觉或过度推断。",
+        "unsupported_claims": [],
+        "missing_points": [],
+        "errors": []
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"Answer 中的所有声明均能由 mock_retrieved_chunks 原文直接支撑。chunk-014a 完整覆盖了答案中关于安全检测的六项具体要求（漏洞扫描、基线核查、渗透测试、代码审计、数据保护、功能测试）及未通过的后果；chunk-014c 明确支持了答案中关于上线申请单需四方签字的规定。引用来源与文档名称也与检索内容一致，无幻觉或过度推断。\",\n  \"unsupported_claims\": []\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1173,
+      "output_tokens": 123,
+      "latency_ms": 3011,
+      "attempts": 1
+    },
+    {
+      "label": "coverage",
+      "parsed": {
+        "score": 5,
+        "reason": "Answer fully covers all six mandatory key points specified in the ground truth: vulnerability scanning with high-risk fixes, security baseline checks (CIS Benchmark), Web penetration testing, source code audit (OWASP Top 10), data encryption verification, and security function tests. The response is accurate, well-structured, and includes appropriate citations without violating any negative constraints.",
+        "unsupported_claims": [],
+        "missing_points": [],
+        "errors": []
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"Answer fully covers all six mandatory key points specified in the ground truth: vulnerability scanning with high-risk fixes, security baseline checks (CIS Benchmark), Web penetration testing, source code audit (OWASP Top 10), data encryption verification, and security function tests. The response is accurate, well-structured, and includes appropriate citations without violating any negative constraints.\",\n  \"missing_points\": []\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1169,
+      "output_tokens": 96,
+      "latency_ms": 2160,
+      "attempts": 1
+    },
+    {
+      "label": "compliance_accuracy",
+      "parsed": {
+        "score": 5,
+        "reason": "Agent 回答准确涵盖了所有必须包含的关键点（漏洞扫描、基线核查、渗透测试、代码审计、数据加密、安全功能测试），且未包含任何禁止项。引用内容（quote_snippet）与 mock_retrieved_chunks 中的 chunk-014a 和 chunk-014c 完全一致，标准编号、条款号（如 5.1 上线安全检测项、3.2 上线流程）及关键数值（高危漏洞修复、四方签字）均与检索到的片段严格匹配。置信度 0.95 也符合预期阈值。",
+        "unsupported_claims": [],
+        "missing_points": [],
+        "errors": []
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"Agent 回答准确涵盖了所有必须包含的关键点（漏洞扫描、基线核查、渗透测试、代码审计、数据加密、安全功能测试），且未包含任何禁止项。引用内容（quote_snippet）与 mock_retrieved_chunks 中的 chunk-014a 和 chunk-014c 完全一致，标准编号、条款号（如 5.1 上线安全检测项、3.2 上线流程）及关键数值（高危漏洞修复、四方签字）均与检索到的片段严格匹配。置信度 0.95 也符合预期阈值。\",\n  \"errors\": []\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1170,
+      "output_tokens": 151,
+      "latency_ms": 2114,
+      "attempts": 1
+    }
+  ],
+  "overall_pass": false,
+  "error_type": null,
+  "error_message": null
+}

@@ -1,0 +1,33 @@
+{
+  "run_id": "qwen3.5-flash-baseline",
+  "started_at": "2026-07-17T03:13:07.894346+00:00",
+  "dataset_sha256": "aa3e6580c8dc4cc1034789b82e4def8de66324be8c90410ac51d8874c1618792",
+  "prompt_version": "scenario-02-rag-route-a-v1",
+  "generator": {
+    "provider": "qwen",
+    "model": "qwen3.5-flash",
+    "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1",
+    "response_mode": "json_object",
+    "temperature": 0.0,
+    "max_tokens": 2048,
+    "enable_thinking": null,
+    "extra_body": {}
+  },
+  "judge": {
+    "provider": "qwen",
+    "model": "qwen3.5-flash",
+    "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1",
+    "response_mode": "json_object",
+    "temperature": 0.0,
+    "max_tokens": 2048,
+    "enable_thinking": false,
+    "extra_body": {}
+  },
+  "options": {
+    "case_id": null,
+    "limit": null,
+    "skip_model_graders": false,
+    "use_mock_agent": false
+  },
+  "fingerprint": "319e40f0e5c8cb5c3ad7d0f4a1b12c960bf2e003f11f31f6833f497283dc923e"
+}

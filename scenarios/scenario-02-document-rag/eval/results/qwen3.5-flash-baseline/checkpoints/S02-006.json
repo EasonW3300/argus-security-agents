@@ -1,0 +1,186 @@
+{
+  "test_case_id": "S02-006",
+  "scenario": "用户询问关键信息基础设施安全保护条例中关于供应链安全的要求",
+  "type": "exact_lookup",
+  "difficulty": "medium",
+  "is_positive": true,
+  "expected_answer_type": "direct_answer",
+  "status": "completed",
+  "agent_output": {
+    "answer": "根据检索结果，针对关键信息基础设施运营者的供应链安全规定及采购注意事项如下：\n\n1. 法规层面的具体规定：\n《关键信息基础设施安全保护条例》第十九条明确要求，运营者应当优先采购安全可信的网络产品和服务。若采购可能影响国家安全，应依法通过国家安全审查。此外，运营者需与提供者签订安全保密协议，明确技术支持、安全责任及安全运行维护规范。\n\n2. 采购网络设备时的注意事项：\n- 国家安全审查：若预判产品投入运行后可能影响国家安全，应向网络安全审查办公室申报审查。审查重点评估可控性、安全性及供应链中断风险，特别关注提供者是否受外国政府影响或控制。\n- 内部流程与合同要求：依据内部制度，可能影响国家安全的关键设备采购须提前3个月启动安全审查流程，审查期间不得部署上线。采购合同必须包含安全维护期限不少于5年、源代码托管或第三方代码审计等条款。",
+    "citations": [
+      {
+        "source_doc": "《关键信息基础设施安全保护条例》",
+        "section": "第十九条",
+        "quote_snippet": "关键信息基础设施运营者应当优先采购安全可信的网络产品和服务。采购网络产品和服务可能影响国家安全的，应当依法通过国家网信部门会同国务院有关部门组织的国家安全审查。运营者应与网络产品和服务提供者签订安全保密协议，明确提供者的技术支持和安全责任、安全运行维护规范。"
+      },
+      {
+        "source_doc": "《网络安全审查办法》",
+        "section": "第五条",
+        "quote_snippet": "关键信息基础设施运营者采购网络产品和服务，预判投入运行后可能影响国家安全的，应当向网络安全审查办公室申报审查。审查重点评估产品和服务的可控性、安全性以及供应链中断风险，特别关注提供者受外国政府影响或控制的情况。"
+      },
+      {
+        "source_doc": "内部制度《供应商安全管理规定 v2.1》",
+        "section": "3.2 关基采购补充要求",
+        "quote_snippet": "对于可能影响国家安全的关键设备采购，须提前3个月启动安全审查流程，审查期间不得部署上线。采购合同必须包含安全维护期限不少于5年、源代码托管或第三方代码审计等条款。"
+      }
+    ],
+    "confidence": 0.9
+  },
+  "code_graders": {
+    "citation_format": {
+      "passed": true,
+      "reason": "citation format valid",
+      "expected": null,
+      "actual": null
+    },
+    "output_schema": {
+      "passed": true,
+      "reason": "output schema valid",
+      "expected": null,
+      "actual": null
+    },
+    "refusal_check": {
+      "passed": true,
+      "reason": "refusal behavior valid",
+      "expected": false,
+      "actual": "根据检索结果，针对关键信息基础设施运营者的供应链安全规定及采购注意事项如下：\n\n1. 法规层面的具体规定：\n《关键信息基础设施安全保护条例》第十九条明确要求，运营者应当优先采购安全可信的网络产品和服务。若采购可能影响国家安全，应依法通过国家安全审查。此外，运营者需与提供者签订安全保密协议，明确技术支持、安全责任及安全运行维护规范。\n\n2. 采购网络设备时的注意事项：\n- 国家安全审查：若预判产品投入运行后可能影响国家安全，应向网络安全审查办公室申报审查。审查重点评估可控性、安全性及供应链中断风险，特别关注提供者是否受外国政府影响或控制。\n- 内部流程与合同要求：依据内部制度，可能影响国家安全的关键设备采购须提前3个月启动安全审查流程，审查期间不得部署上线。采购合同必须包含安全维护期限不少于5年、源代码托管或第三方代码审计等条款。"
+    },
+    "retrieval_relevance": {
+      "passed": true,
+      "reason": "retrieval mock quality valid",
+      "expected": "sufficient",
+      "actual": [
+        "high",
+        "high",
+        "medium"
+      ]
+    },
+    "citation_grounding": {
+      "passed": true,
+      "reason": "citations grounded",
+      "expected": null,
+      "actual": null
+    },
+    "confidence_check": {
+      "passed": true,
+      "reason": "confidence valid",
+      "expected": ">= 0.9",
+      "actual": 0.9
+    }
+  },
+  "model_scores": {
+    "faithfulness": {
+      "score": 5,
+      "reason": "Answer 中的所有声明均能由 mock_retrieved_chunks 原文直接支撑。第一点关于《关键信息基础设施安全保护条例》第十九条的规定（优先采购、国安审查、签订协议）与 chunk-006a 完全一致；第二点关于网络安全审查的评估重点（可控性、供应链风险、外国政府影响）与 chunk-006b 完全一致；第三点关于内部制度中的具体流程（提前 3 个月、不得部署、合同条款如源代码托管等）与 chunk-006c 完全一致。回答准确引用了法规与内部政策，无 unsupported claims。",
+      "unsupported_claims": [],
+      "missing_points": [],
+      "errors": []
+    },
+    "coverage": {
+      "score": 5,
+      "reason": "Answer accurately covers all five required key points: (1) prioritizing secure and trustworthy products/services, (2) mandatory national security review for potentially impactful procurements, (3) requirement to sign security confidentiality agreements with suppliers, (4) focus on controllability, security, and supply chain interruption risks during review, and (5) special attention to foreign government influence. The response is well-structured, cites relevant regulations correctly, and avoids any prohibited content.",
+      "unsupported_claims": [],
+      "missing_points": [],
+      "errors": []
+    },
+    "compliance_accuracy": {
+      "score": 5,
+      "reason": "Agent 输出的答案准确涵盖了所有关键信息点，且引用的法规名称、条款号（第十九条、第五条）及核心内容均与 mock_retrieved_chunks 完全一致。对于内部制度中的具体数值要求（提前3个月、维护期不少于5年），Agent 也如实引用了检索到的 chunk-006c 内容，未出现幻觉或篡改。置信度 0.9 满足预期最低值。",
+      "unsupported_claims": [],
+      "missing_points": [],
+      "errors": []
+    }
+  },
+  "calls": [
+    {
+      "label": "agent",
+      "parsed": {
+        "answer": "根据检索结果，针对关键信息基础设施运营者的供应链安全规定及采购注意事项如下：\n\n1. 法规层面的具体规定：\n《关键信息基础设施安全保护条例》第十九条明确要求，运营者应当优先采购安全可信的网络产品和服务。若采购可能影响国家安全，应依法通过国家安全审查。此外，运营者需与提供者签订安全保密协议，明确技术支持、安全责任及安全运行维护规范。\n\n2. 采购网络设备时的注意事项：\n- 国家安全审查：若预判产品投入运行后可能影响国家安全，应向网络安全审查办公室申报审查。审查重点评估可控性、安全性及供应链中断风险，特别关注提供者是否受外国政府影响或控制。\n- 内部流程与合同要求：依据内部制度，可能影响国家安全的关键设备采购须提前3个月启动安全审查流程，审查期间不得部署上线。采购合同必须包含安全维护期限不少于5年、源代码托管或第三方代码审计等条款。",
+        "citations": [
+          {
+            "source_doc": "《关键信息基础设施安全保护条例》",
+            "section": "第十九条",
+            "quote_snippet": "关键信息基础设施运营者应当优先采购安全可信的网络产品和服务。采购网络产品和服务可能影响国家安全的，应当依法通过国家网信部门会同国务院有关部门组织的国家安全审查。运营者应与网络产品和服务提供者签订安全保密协议，明确提供者的技术支持和安全责任、安全运行维护规范。"
+          },
+          {
+            "source_doc": "《网络安全审查办法》",
+            "section": "第五条",
+            "quote_snippet": "关键信息基础设施运营者采购网络产品和服务，预判投入运行后可能影响国家安全的，应当向网络安全审查办公室申报审查。审查重点评估产品和服务的可控性、安全性以及供应链中断风险，特别关注提供者受外国政府影响或控制的情况。"
+          },
+          {
+            "source_doc": "内部制度《供应商安全管理规定 v2.1》",
+            "section": "3.2 关基采购补充要求",
+            "quote_snippet": "对于可能影响国家安全的关键设备采购，须提前3个月启动安全审查流程，审查期间不得部署上线。采购合同必须包含安全维护期限不少于5年、源代码托管或第三方代码审计等条款。"
+          }
+        ],
+        "confidence": 0.9
+      },
+      "raw_text": "{\n\"answer\": \"根据检索结果，针对关键信息基础设施运营者的供应链安全规定及采购注意事项如下：\\n\\n1. 法规层面的具体规定：\\n《关键信息基础设施安全保护条例》第十九条明确要求，运营者应当优先采购安全可信的网络产品和服务。若采购可能影响国家安全，应依法通过国家安全审查。此外，运营者需与提供者签订安全保密协议，明确技术支持、安全责任及安全运行维护规范。\\n\\n2. 采购网络设备时的注意事项：\\n- 国家安全审查：若预判产品投入运行后可能影响国家安全，应向网络安全审查办公室申报审查。审查重点评估可控性、安全性及供应链中断风险，特别关注提供者是否受外国政府影响或控制。\\n- 内部流程与合同要求：依据内部制度，可能影响国家安全的关键设备采购须提前3个月启动安全审查流程，审查期间不得部署上线。采购合同必须包含安全维护期限不少于5年、源代码托管或第三方代码审计等条款。\",\n\"citations\": [\n{\n\"source_doc\": \"《关键信息基础设施安全保护条例》\",\n\"section\": \"第十九条\",\n\"quote_snippet\": \"关键信息基础设施运营者应当优先采购安全可信的网络产品和服务。采购网络产品和服务可能影响国家安全的，应当依法通过国家网信部门会同国务院有关部门组织的国家安全审查。运营者应与网络产品和服务提供者签订安全保密协议，明确提供者的技术支持和安全责任、安全运行维护规范。\"\n},\n{\n\"source_doc\": \"《网络安全审查办法》\",\n\"section\": \"第五条\",\n\"quote_snippet\": \"关键信息基础设施运营者采购网络产品和服务，预判投入运行后可能影响国家安全的，应当向网络安全审查办公室申报审查。审查重点评估产品和服务的可控性、安全性以及供应链中断风险，特别关注提供者受外国政府影响或控制的情况。\"\n},\n{\n\"source_doc\": \"内部制度《供应商安全管理规定 v2.1》\",\n\"section\": \"3.2 关基采购补充要求\",\n\"quote_snippet\": \"对于可能影响国家安全的关键设备采购，须提前3个月启动安全审查流程，审查期间不得部署上线。采购合同必须包含安全维护期限不少于5年、源代码托管或第三方代码审计等条款。\"\n}\n],\n\"confidence\": 0.9\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 527,
+      "output_tokens": 3449,
+      "latency_ms": 32416,
+      "attempts": 1
+    },
+    {
+      "label": "faithfulness",
+      "parsed": {
+        "score": 5,
+        "reason": "Answer 中的所有声明均能由 mock_retrieved_chunks 原文直接支撑。第一点关于《关键信息基础设施安全保护条例》第十九条的规定（优先采购、国安审查、签订协议）与 chunk-006a 完全一致；第二点关于网络安全审查的评估重点（可控性、供应链风险、外国政府影响）与 chunk-006b 完全一致；第三点关于内部制度中的具体流程（提前 3 个月、不得部署、合同条款如源代码托管等）与 chunk-006c 完全一致。回答准确引用了法规与内部政策，无 unsupported claims。",
+        "unsupported_claims": [],
+        "missing_points": [],
+        "errors": []
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"Answer 中的所有声明均能由 mock_retrieved_chunks 原文直接支撑。第一点关于《关键信息基础设施安全保护条例》第十九条的规定（优先采购、国安审查、签订协议）与 chunk-006a 完全一致；第二点关于网络安全审查的评估重点（可控性、供应链风险、外国政府影响）与 chunk-006b 完全一致；第三点关于内部制度中的具体流程（提前 3 个月、不得部署、合同条款如源代码托管等）与 chunk-006c 完全一致。回答准确引用了法规与内部政策，无 unsupported claims。\",\n  \"unsupported_claims\": []\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1228,
+      "output_tokens": 157,
+      "latency_ms": 1841,
+      "attempts": 1
+    },
+    {
+      "label": "coverage",
+      "parsed": {
+        "score": 5,
+        "reason": "Answer accurately covers all five required key points: (1) prioritizing secure and trustworthy products/services, (2) mandatory national security review for potentially impactful procurements, (3) requirement to sign security confidentiality agreements with suppliers, (4) focus on controllability, security, and supply chain interruption risks during review, and (5) special attention to foreign government influence. The response is well-structured, cites relevant regulations correctly, and avoids any prohibited content.",
+        "unsupported_claims": [],
+        "missing_points": [],
+        "errors": []
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"Answer accurately covers all five required key points: (1) prioritizing secure and trustworthy products/services, (2) mandatory national security review for potentially impactful procurements, (3) requirement to sign security confidentiality agreements with suppliers, (4) focus on controllability, security, and supply chain interruption risks during review, and (5) special attention to foreign government influence. The response is well-structured, cites relevant regulations correctly, and avoids any prohibited content.\",\n  \"missing_points\": []\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1224,
+      "output_tokens": 116,
+      "latency_ms": 1511,
+      "attempts": 1
+    },
+    {
+      "label": "compliance_accuracy",
+      "parsed": {
+        "score": 5,
+        "reason": "Agent 输出的答案准确涵盖了所有关键信息点，且引用的法规名称、条款号（第十九条、第五条）及核心内容均与 mock_retrieved_chunks 完全一致。对于内部制度中的具体数值要求（提前3个月、维护期不少于5年），Agent 也如实引用了检索到的 chunk-006c 内容，未出现幻觉或篡改。置信度 0.9 满足预期最低值。",
+        "unsupported_claims": [],
+        "missing_points": [],
+        "errors": []
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"Agent 输出的答案准确涵盖了所有关键信息点，且引用的法规名称、条款号（第十九条、第五条）及核心内容均与 mock_retrieved_chunks 完全一致。对于内部制度中的具体数值要求（提前3个月、维护期不少于5年），Agent 也如实引用了检索到的 chunk-006c 内容，未出现幻觉或篡改。置信度 0.9 满足预期最低值。\",\n  \"errors\": []\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1225,
+      "output_tokens": 115,
+      "latency_ms": 1663,
+      "attempts": 1
+    }
+  ],
+  "overall_pass": true,
+  "error_type": null,
+  "error_message": null
+}

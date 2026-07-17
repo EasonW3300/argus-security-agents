@@ -1,0 +1,256 @@
+{
+  "test_case_id": "S02-012",
+  "scenario": "用户询问远程办公VPN应遵循的安全控制措施",
+  "type": "suggestion",
+  "difficulty": "medium",
+  "is_positive": true,
+  "expected_answer_type": "synthesis",
+  "status": "completed",
+  "agent_output": {
+    "answer": "根据检索到的国家标准、内部制度及最佳实践，远程办公VPN接入合规需落实以下措施：\n1. 身份鉴别与加密通信：应实施强身份鉴别，推荐采用双因素认证；应通过加密隧道（如IPsec或TLS VPN）保护通信内容。\n2. 访问权限控制：应限制远程用户的访问权限，仅授予完成任务所需的最小权限；建议企业采用零信任远程接入方案（如ZTNA），将VPN资源以应用层方式发布，避免网络层完全暴露。\n3. 终端安全管理：应部署终端安全合规检查机制，在接入前验证终端是否安装最新补丁、防病毒软件并启用防火墙；VPN客户端必须由IT统一安装并配置，禁止用户私自安装。\n4. 会话与流量管理：VPN会话空闲超时设置为15分钟自动断开，每日最大连接时长不超过12小时；禁止启用分割隧道（split-tunneling），确保所有流量经由公司网络安全网关检测。\n5. 数据审计与监控：下载敏感数据到本地终端的操作默认禁止，例外需单独审批；所有远程访问操作必须被审计记录；同时应监控异常访问行为，如异地登录、非常规时间访问等。",
+    "citations": [
+      {
+        "source_doc": "GB/T 22239-2019 信息安全技术 网络安全等级保护基本要求",
+        "section": "8.1.3.5 远程访问",
+        "quote_snippet": "对于远程接入内部网络的用户，应实施强身份鉴别，推荐采用双因素认证。应通过加密隧道（如IPsec或TLS VPN）保护通信内容。"
+      },
+      {
+        "source_doc": "GB/T 22239-2019 信息安全技术 网络安全等级保护基本要求",
+        "section": "8.1.3.5 远程访问",
+        "quote_snippet": "应限制远程用户的访问权限，仅授予完成任务所需的最小权限。"
+      },
+      {
+        "source_doc": "NIST SP 800-46 远程访问安全",
+        "section": "4.2 远程访问控制",
+        "quote_snippet": "建议企业采用零信任远程接入方案（如ZTNA），将VPN资源以应用层方式发布，避免网络层完全暴露。"
+      },
+      {
+        "source_doc": "GB/T 22239-2019 信息安全技术 网络安全等级保护基本要求",
+        "section": "8.1.3.5 远程访问",
+        "quote_snippet": "应部署终端安全合规检查机制，在接入前验证终端是否安装最新补丁、防病毒软件并启用防火墙。"
+      },
+      {
+        "source_doc": "内部制度《远程访问安全管理办法 v2.3》",
+        "section": "3.4 VPN使用规范",
+        "quote_snippet": "VPN客户端必须由IT统一安装并配置，禁止用户私自安装。"
+      },
+      {
+        "source_doc": "内部制度《远程访问安全管理办法 v2.3》",
+        "section": "3.4 VPN使用规范",
+        "quote_snippet": "VPN会话空闲超时设置为15分钟自动断开，每日最大连接时长不超过12小时。"
+      },
+      {
+        "source_doc": "内部制度《远程访问安全管理办法 v2.3》",
+        "section": "3.4 VPN使用规范",
+        "quote_snippet": "禁止启用分割隧道（split-tunneling），确保所有流量经由公司网络安全网关检测。"
+      },
+      {
+        "source_doc": "内部制度《远程访问安全管理办法 v2.3》",
+        "section": "3.4 VPN使用规范",
+        "quote_snippet": "下载敏感数据到本地终端的操作默认禁止，例外需单独审批。"
+      },
+      {
+        "source_doc": "GB/T 22239-2019 信息安全技术 网络安全等级保护基本要求",
+        "section": "8.1.3.5 远程访问",
+        "quote_snippet": "所有远程访问操作必须被审计记录。"
+      },
+      {
+        "source_doc": "NIST SP 800-46 远程访问安全",
+        "section": "4.2 远程访问控制",
+        "quote_snippet": "同时应监控异常访问行为，如异地登录、非常规时间访问等。"
+      }
+    ],
+    "confidence": 0.9
+  },
+  "code_graders": {
+    "citation_format": {
+      "passed": true,
+      "reason": "citation format valid",
+      "expected": null,
+      "actual": null
+    },
+    "output_schema": {
+      "passed": true,
+      "reason": "output schema valid",
+      "expected": null,
+      "actual": null
+    },
+    "refusal_check": {
+      "passed": true,
+      "reason": "refusal behavior valid",
+      "expected": false,
+      "actual": "根据检索到的国家标准、内部制度及最佳实践，远程办公VPN接入合规需落实以下措施：\n1. 身份鉴别与加密通信：应实施强身份鉴别，推荐采用双因素认证；应通过加密隧道（如IPsec或TLS VPN）保护通信内容。\n2. 访问权限控制：应限制远程用户的访问权限，仅授予完成任务所需的最小权限；建议企业采用零信任远程接入方案（如ZTNA），将VPN资源以应用层方式发布，避免网络层完全暴露。\n3. 终端安全管理：应部署终端安全合规检查机制，在接入前验证终端是否安装最新补丁、防病毒软件并启用防火墙；VPN客户端必须由IT统一安装并配置，禁止用户私自安装。\n4. 会话与流量管理：VPN会话空闲超时设置为15分钟自动断开，每日最大连接时长不超过12小时；禁止启用分割隧道（split-tunneling），确保所有流量经由公司网络安全网关检测。\n5. 数据审计与监控：下载敏感数据到本地终端的操作默认禁止，例外需单独审批；所有远程访问操作必须被审计记录；同时应监控异常访问行为，如异地登录、非常规时间访问等。"
+    },
+    "retrieval_relevance": {
+      "passed": true,
+      "reason": "retrieval mock quality valid",
+      "expected": "sufficient",
+      "actual": [
+        "high",
+        "high",
+        "medium"
+      ]
+    },
+    "citation_grounding": {
+      "passed": true,
+      "reason": "citations grounded",
+      "expected": null,
+      "actual": null
+    },
+    "confidence_check": {
+      "passed": true,
+      "reason": "confidence valid",
+      "expected": ">= 0.85",
+      "actual": 0.9
+    }
+  },
+  "model_scores": {
+    "faithfulness": {
+      "score": 5,
+      "reason": "Answer 中的所有声明均能由 mock_retrieved_chunks 原文直接支撑。具体对应关系如下：\n1. 身份鉴别与加密通信（双因素认证、IPsec/TLS）对应 chunk-012a。\n2. 访问权限控制（最小权限）对应 chunk-012a；零信任/ZTNA建议对应 chunk-012c。\n3. 终端安全管理（补丁/防病毒/防火墙检查、IT统一安装）分别对应 chunk-012a 和 chunk-012b。\n4. 会话与流量管理（15分钟超时、12小时限制、禁止分割隧道）全部对应 chunk-012b。\n5. 数据审计与监控（下载禁止、操作审计、异常行为监控）分别对应 chunk-012b、chunk-012a 和 chunk-012c。\n所有引用准确，无 unsupported claims。",
+      "unsupported_claims": [],
+      "missing_points": [],
+      "errors": []
+    },
+    "coverage": {
+      "score": 5,
+      "reason": "Answer comprehensively covers all six mandatory key points specified in the ground truth: (1) Two-factor authentication, (2) Encryption tunnel usage (IPsec/TLS), (3) Terminal security compliance checks (patches, AV, firewall), (4) Least privilege principle, (5) Session timeout and duration limits, and (6) Prohibition of split-tunneling. Additionally, the answer correctly avoids including any forbidden points.",
+      "unsupported_claims": [],
+      "missing_points": [],
+      "errors": []
+    },
+    "compliance_accuracy": {
+      "score": 5,
+      "reason": "Agent output accurately synthesizes information from all provided mock_retrieved_chunks. The citations correctly map specific quotes to their source documents and section numbers (e.g., GB/T 22239-2019 section 8.1.3.5, Internal Policy section 3.4). All key numerical values (15 minutes idle timeout, 12 hours max duration) and mandatory requirements (MFA, encryption, split-tunneling prohibition) match the ground truth and retrieved chunks exactly. No hallucinations or missing critical points were found.",
+      "unsupported_claims": [],
+      "missing_points": [],
+      "errors": []
+    }
+  },
+  "calls": [
+    {
+      "label": "agent",
+      "parsed": {
+        "answer": "根据检索到的国家标准、内部制度及最佳实践，远程办公VPN接入合规需落实以下措施：\n1. 身份鉴别与加密通信：应实施强身份鉴别，推荐采用双因素认证；应通过加密隧道（如IPsec或TLS VPN）保护通信内容。\n2. 访问权限控制：应限制远程用户的访问权限，仅授予完成任务所需的最小权限；建议企业采用零信任远程接入方案（如ZTNA），将VPN资源以应用层方式发布，避免网络层完全暴露。\n3. 终端安全管理：应部署终端安全合规检查机制，在接入前验证终端是否安装最新补丁、防病毒软件并启用防火墙；VPN客户端必须由IT统一安装并配置，禁止用户私自安装。\n4. 会话与流量管理：VPN会话空闲超时设置为15分钟自动断开，每日最大连接时长不超过12小时；禁止启用分割隧道（split-tunneling），确保所有流量经由公司网络安全网关检测。\n5. 数据审计与监控：下载敏感数据到本地终端的操作默认禁止，例外需单独审批；所有远程访问操作必须被审计记录；同时应监控异常访问行为，如异地登录、非常规时间访问等。",
+        "citations": [
+          {
+            "source_doc": "GB/T 22239-2019 信息安全技术 网络安全等级保护基本要求",
+            "section": "8.1.3.5 远程访问",
+            "quote_snippet": "对于远程接入内部网络的用户，应实施强身份鉴别，推荐采用双因素认证。应通过加密隧道（如IPsec或TLS VPN）保护通信内容。"
+          },
+          {
+            "source_doc": "GB/T 22239-2019 信息安全技术 网络安全等级保护基本要求",
+            "section": "8.1.3.5 远程访问",
+            "quote_snippet": "应限制远程用户的访问权限，仅授予完成任务所需的最小权限。"
+          },
+          {
+            "source_doc": "NIST SP 800-46 远程访问安全",
+            "section": "4.2 远程访问控制",
+            "quote_snippet": "建议企业采用零信任远程接入方案（如ZTNA），将VPN资源以应用层方式发布，避免网络层完全暴露。"
+          },
+          {
+            "source_doc": "GB/T 22239-2019 信息安全技术 网络安全等级保护基本要求",
+            "section": "8.1.3.5 远程访问",
+            "quote_snippet": "应部署终端安全合规检查机制，在接入前验证终端是否安装最新补丁、防病毒软件并启用防火墙。"
+          },
+          {
+            "source_doc": "内部制度《远程访问安全管理办法 v2.3》",
+            "section": "3.4 VPN使用规范",
+            "quote_snippet": "VPN客户端必须由IT统一安装并配置，禁止用户私自安装。"
+          },
+          {
+            "source_doc": "内部制度《远程访问安全管理办法 v2.3》",
+            "section": "3.4 VPN使用规范",
+            "quote_snippet": "VPN会话空闲超时设置为15分钟自动断开，每日最大连接时长不超过12小时。"
+          },
+          {
+            "source_doc": "内部制度《远程访问安全管理办法 v2.3》",
+            "section": "3.4 VPN使用规范",
+            "quote_snippet": "禁止启用分割隧道（split-tunneling），确保所有流量经由公司网络安全网关检测。"
+          },
+          {
+            "source_doc": "内部制度《远程访问安全管理办法 v2.3》",
+            "section": "3.4 VPN使用规范",
+            "quote_snippet": "下载敏感数据到本地终端的操作默认禁止，例外需单独审批。"
+          },
+          {
+            "source_doc": "GB/T 22239-2019 信息安全技术 网络安全等级保护基本要求",
+            "section": "8.1.3.5 远程访问",
+            "quote_snippet": "所有远程访问操作必须被审计记录。"
+          },
+          {
+            "source_doc": "NIST SP 800-46 远程访问安全",
+            "section": "4.2 远程访问控制",
+            "quote_snippet": "同时应监控异常访问行为，如异地登录、非常规时间访问等。"
+          }
+        ],
+        "confidence": 0.9
+      },
+      "raw_text": "{\n\"answer\": \"根据检索到的国家标准、内部制度及最佳实践，远程办公VPN接入合规需落实以下措施：\\n1. 身份鉴别与加密通信：应实施强身份鉴别，推荐采用双因素认证；应通过加密隧道（如IPsec或TLS VPN）保护通信内容。\\n2. 访问权限控制：应限制远程用户的访问权限，仅授予完成任务所需的最小权限；建议企业采用零信任远程接入方案（如ZTNA），将VPN资源以应用层方式发布，避免网络层完全暴露。\\n3. 终端安全管理：应部署终端安全合规检查机制，在接入前验证终端是否安装最新补丁、防病毒软件并启用防火墙；VPN客户端必须由IT统一安装并配置，禁止用户私自安装。\\n4. 会话与流量管理：VPN会话空闲超时设置为15分钟自动断开，每日最大连接时长不超过12小时；禁止启用分割隧道（split-tunneling），确保所有流量经由公司网络安全网关检测。\\n5. 数据审计与监控：下载敏感数据到本地终端的操作默认禁止，例外需单独审批；所有远程访问操作必须被审计记录；同时应监控异常访问行为，如异地登录、非常规时间访问等。\",\n\"citations\": [\n{\n\"source_doc\": \"GB/T 22239-2019 信息安全技术 网络安全等级保护基本要求\",\n\"section\": \"8.1.3.5 远程访问\",\n\"quote_snippet\": \"对于远程接入内部网络的用户，应实施强身份鉴别，推荐采用双因素认证。应通过加密隧道（如IPsec或TLS VPN）保护通信内容。\"\n},\n{\n\"source_doc\": \"GB/T 22239-2019 信息安全技术 网络安全等级保护基本要求\",\n\"section\": \"8.1.3.5 远程访问\",\n\"quote_snippet\": \"应限制远程用户的访问权限，仅授予完成任务所需的最小权限。\"\n},\n{\n\"source_doc\": \"NIST SP 800-46 远程访问安全\",\n\"section\": \"4.2 远程访问控制\",\n\"quote_snippet\": \"建议企业采用零信任远程接入方案（如ZTNA），将VPN资源以应用层方式发布，避免网络层完全暴露。\"\n},\n{\n\"source_doc\": \"GB/T 22239-2019 信息安全技术 网络安全等级保护基本要求\",\n\"section\": \"8.1.3.5 远程访问\",\n\"quote_snippet\": \"应部署终端安全合规检查机制，在接入前验证终端是否安装最新补丁、防病毒软件并启用防火墙。\"\n},\n{\n\"source_doc\": \"内部制度《远程访问安全管理办法 v2.3》\",\n\"section\": \"3.4 VPN使用规范\",\n\"quote_snippet\": \"VPN客户端必须由IT统一安装并配置，禁止用户私自安装。\"\n},\n{\n\"source_doc\": \"内部制度《远程访问安全管理办法 v2.3》\",\n\"section\": \"3.4 VPN使用规范\",\n\"quote_snippet\": \"VPN会话空闲超时设置为15分钟自动断开，每日最大连接时长不超过12小时。\"\n},\n{\n\"source_doc\": \"内部制度《远程访问安全管理办法 v2.3》\",\n\"section\": \"3.4 VPN使用规范\",\n\"quote_snippet\": \"禁止启用分割隧道（split-tunneling），确保所有流量经由公司网络安全网关检测。\"\n},\n{\n\"source_doc\": \"内部制度《远程访问安全管理办法 v2.3》\",\n\"section\": \"3.4 VPN使用规范\",\n\"quote_snippet\": \"下载敏感数据到本地终端的操作默认禁止，例外需单独审批。\"\n},\n{\n\"source_doc\": \"GB/T 22239-2019 信息安全技术 网络安全等级保护基本要求\",\n\"section\": \"8.1.3.5 远程访问\",\n\"quote_snippet\": \"所有远程访问操作必须被审计记录。\"\n},\n{\n\"source_doc\": \"NIST SP 800-46 远程访问安全\",\n\"section\": \"4.2 远程访问控制\",\n\"quote_snippet\": \"同时应监控异常访问行为，如异地登录、非常规时间访问等。\"\n}\n],\n\"confidence\": 0.9\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 601,
+      "output_tokens": 3348,
+      "latency_ms": 33685,
+      "attempts": 1
+    },
+    {
+      "label": "faithfulness",
+      "parsed": {
+        "score": 5,
+        "reason": "Answer 中的所有声明均能由 mock_retrieved_chunks 原文直接支撑。具体对应关系如下：\n1. 身份鉴别与加密通信（双因素认证、IPsec/TLS）对应 chunk-012a。\n2. 访问权限控制（最小权限）对应 chunk-012a；零信任/ZTNA建议对应 chunk-012c。\n3. 终端安全管理（补丁/防病毒/防火墙检查、IT统一安装）分别对应 chunk-012a 和 chunk-012b。\n4. 会话与流量管理（15分钟超时、12小时限制、禁止分割隧道）全部对应 chunk-012b。\n5. 数据审计与监控（下载禁止、操作审计、异常行为监控）分别对应 chunk-012b、chunk-012a 和 chunk-012c。\n所有引用准确，无 unsupported claims。",
+        "unsupported_claims": [],
+        "missing_points": [],
+        "errors": []
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"Answer 中的所有声明均能由 mock_retrieved_chunks 原文直接支撑。具体对应关系如下：\\n1. 身份鉴别与加密通信（双因素认证、IPsec/TLS）对应 chunk-012a。\\n2. 访问权限控制（最小权限）对应 chunk-012a；零信任/ZTNA建议对应 chunk-012c。\\n3. 终端安全管理（补丁/防病毒/防火墙检查、IT统一安装）分别对应 chunk-012a 和 chunk-012b。\\n4. 会话与流量管理（15分钟超时、12小时限制、禁止分割隧道）全部对应 chunk-012b。\\n5. 数据审计与监控（下载禁止、操作审计、异常行为监控）分别对应 chunk-012b、chunk-012a 和 chunk-012c。\\n所有引用准确，无 unsupported claims。\",\n  \"unsupported_claims\": []\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1855,
+      "output_tokens": 229,
+      "latency_ms": 5120,
+      "attempts": 1
+    },
+    {
+      "label": "coverage",
+      "parsed": {
+        "score": 5,
+        "reason": "Answer comprehensively covers all six mandatory key points specified in the ground truth: (1) Two-factor authentication, (2) Encryption tunnel usage (IPsec/TLS), (3) Terminal security compliance checks (patches, AV, firewall), (4) Least privilege principle, (5) Session timeout and duration limits, and (6) Prohibition of split-tunneling. Additionally, the answer correctly avoids including any forbidden points.",
+        "unsupported_claims": [],
+        "missing_points": [],
+        "errors": []
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"Answer comprehensively covers all six mandatory key points specified in the ground truth: (1) Two-factor authentication, (2) Encryption tunnel usage (IPsec/TLS), (3) Terminal security compliance checks (patches, AV, firewall), (4) Least privilege principle, (5) Session timeout and duration limits, and (6) Prohibition of split-tunneling. Additionally, the answer correctly avoids including any forbidden points.\",\n  \"missing_points\": []\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1851,
+      "output_tokens": 111,
+      "latency_ms": 2288,
+      "attempts": 1
+    },
+    {
+      "label": "compliance_accuracy",
+      "parsed": {
+        "score": 5,
+        "reason": "Agent output accurately synthesizes information from all provided mock_retrieved_chunks. The citations correctly map specific quotes to their source documents and section numbers (e.g., GB/T 22239-2019 section 8.1.3.5, Internal Policy section 3.4). All key numerical values (15 minutes idle timeout, 12 hours max duration) and mandatory requirements (MFA, encryption, split-tunneling prohibition) match the ground truth and retrieved chunks exactly. No hallucinations or missing critical points were found.",
+        "unsupported_claims": [],
+        "missing_points": [],
+        "errors": []
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"Agent output accurately synthesizes information from all provided mock_retrieved_chunks. The citations correctly map specific quotes to their source documents and section numbers (e.g., GB/T 22239-2019 section 8.1.3.5, Internal Policy section 3.4). All key numerical values (15 minutes idle timeout, 12 hours max duration) and mandatory requirements (MFA, encryption, split-tunneling prohibition) match the ground truth and retrieved chunks exactly. No hallucinations or missing critical points were found.\",\n  \"errors\": []\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1852,
+      "output_tokens": 138,
+      "latency_ms": 2843,
+      "attempts": 1
+    }
+  ],
+  "overall_pass": true,
+  "error_type": null,
+  "error_message": null
+}

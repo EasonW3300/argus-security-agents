@@ -1,0 +1,206 @@
+{
+  "test_case_id": "S02-011",
+  "scenario": "用户询问金融行业系统在等保三级基础上还需满足的额外行业监管要求",
+  "type": "suggestion",
+  "difficulty": "hard",
+  "is_positive": true,
+  "expected_answer_type": "synthesis",
+  "status": "completed",
+  "agent_output": {
+    "answer": "金融行业系统在满足等保三级基础上，还需遵循以下行业增强要求：\n1. 总体原则：金融行业在满足GB/T 22239-2019三级要求的基础上，还应实现以下增强控制。\n2. 密码与认证：1）关键交易类数据在传输和存储时必须使用经国家密码管理局核准的密码算法，如SM2/SM3/SM4；2）网上交易系统必须采用双因素认证，且其中一种因素应为基于硬件的令牌或数字证书。\n3. 监控与变更：3）核心系统应具备实时交易监控和反欺诈分析能力；4）生产环境的变更操作必须经过四人授权（申请、复核、审批、执行）并具备审计记录。\n4. 安全测试：5）应每年至少开展两次渗透测试和一次红蓝对抗演练。\n5. 数据安全：金融业机构应将客户个人金融信息、支付敏感信息等定义为4级及以上敏感数据。4级数据要求加密存储、严格访问控制和脱敏展示，数据传输必须采用端到端加密。数据处理活动日志需实时上报金融行业监管平台。",
+    "citations": [
+      {
+        "source_doc": "JR/T 0071-2020 金融行业网络安全等级保护实施指引",
+        "section": "5.2 增强安全要求",
+        "quote_snippet": "金融行业在满足GB/T 22239-2019三级要求的基础上，还应实现以下增强控制"
+      },
+      {
+        "source_doc": "JR/T 0071-2020 金融行业网络安全等级保护实施指引",
+        "section": "5.2 增强安全要求",
+        "quote_snippet": "1）关键交易类数据在传输和存储时必须使用经国家密码管理局核准的密码算法，如SM2/SM3/SM4；2）网上交易系统必须采用双因素认证，且其中一种因素应为基于硬件的令牌或数字证书"
+      },
+      {
+        "source_doc": "JR/T 0071-2020 金融行业网络安全等级保护实施指引",
+        "section": "5.2 增强安全要求",
+        "quote_snippet": "3）核心系统应具备实时交易监控和反欺诈分析能力；4）生产环境的变更操作必须经过四人授权（申请、复核、审批、执行）并具备审计记录"
+      },
+      {
+        "source_doc": "JR/T 0071-2020 金融行业网络安全等级保护实施指引",
+        "section": "5.2 增强安全要求",
+        "quote_snippet": "5）应每年至少开展两次渗透测试和一次红蓝对抗演练"
+      },
+      {
+        "source_doc": "《金融数据安全分级指南》",
+        "section": "6.1 数据分类",
+        "quote_snippet": "金融业机构应将客户个人金融信息、支付敏感信息等定义为4级及以上敏感数据。4级数据要求加密存储、严格访问控制和脱敏展示，数据传输必须采用端到端加密。数据处理活动日志需实时上报金融行业监管平台。"
+      }
+    ],
+    "confidence": 0.95
+  },
+  "code_graders": {
+    "citation_format": {
+      "passed": true,
+      "reason": "citation format valid",
+      "expected": null,
+      "actual": null
+    },
+    "output_schema": {
+      "passed": true,
+      "reason": "output schema valid",
+      "expected": null,
+      "actual": null
+    },
+    "refusal_check": {
+      "passed": true,
+      "reason": "refusal behavior valid",
+      "expected": false,
+      "actual": "金融行业系统在满足等保三级基础上，还需遵循以下行业增强要求：\n1. 总体原则：金融行业在满足GB/T 22239-2019三级要求的基础上，还应实现以下增强控制。\n2. 密码与认证：1）关键交易类数据在传输和存储时必须使用经国家密码管理局核准的密码算法，如SM2/SM3/SM4；2）网上交易系统必须采用双因素认证，且其中一种因素应为基于硬件的令牌或数字证书。\n3. 监控与变更：3）核心系统应具备实时交易监控和反欺诈分析能力；4）生产环境的变更操作必须经过四人授权（申请、复核、审批、执行）并具备审计记录。\n4. 安全测试：5）应每年至少开展两次渗透测试和一次红蓝对抗演练。\n5. 数据安全：金融业机构应将客户个人金融信息、支付敏感信息等定义为4级及以上敏感数据。4级数据要求加密存储、严格访问控制和脱敏展示，数据传输必须采用端到端加密。数据处理活动日志需实时上报金融行业监管平台。"
+    },
+    "retrieval_relevance": {
+      "passed": true,
+      "reason": "retrieval mock quality valid",
+      "expected": "sufficient",
+      "actual": [
+        "high",
+        "high",
+        "medium"
+      ]
+    },
+    "citation_grounding": {
+      "passed": true,
+      "reason": "citations grounded",
+      "expected": null,
+      "actual": null
+    },
+    "confidence_check": {
+      "passed": true,
+      "reason": "confidence valid",
+      "expected": ">= 0.8",
+      "actual": 0.95
+    }
+  },
+  "model_scores": {
+    "faithfulness": {
+      "score": 5,
+      "reason": "Answer 中的所有声明均能由 mock_retrieved_chunks 原文直接支撑。chunk-011a 完整覆盖了答案中关于总体原则、密码算法（SM2/3/4）、双因素认证（含硬件令牌/证书）、实时监控与反欺诈、四人授权变更流程以及渗透测试频率的所有细节。chunk-011b 完整支撑了答案中关于数据分级（4 级及以上）、加密存储、脱敏展示、端到端加密及日志上报的要求。答案未包含任何无法从检索内容中推导出的额外信息，且准确引用了相关标准文档。",
+      "unsupported_claims": [],
+      "missing_points": [],
+      "errors": []
+    },
+    "coverage": {
+      "score": 5,
+      "reason": "模型回答完整覆盖了所有必须包含的关键点（关键交易数据加密算法、双因素认证要求、实时监控与反欺诈、四人授权变更、渗透测试频率、敏感数据加密与脱敏），且未包含任何禁止出现的错误信息。回答结构清晰，逻辑严密，并提供了准确的引用来源。",
+      "unsupported_claims": [],
+      "missing_points": [],
+      "errors": []
+    },
+    "compliance_accuracy": {
+      "score": 5,
+      "reason": "Agent output accurately reflects the content of mock_retrieved_chunks. All key numerical values (e.g., 'four-person authorization', 'twice penetration testing', 'once red-blue exercise') and standard numbers (GB/T 22239-2019, JR/T 0071-2020) match the retrieved chunks exactly. The citations provided in the agent output correctly map to the source documents and sections found in the ground truth and retrieved data.",
+      "unsupported_claims": [],
+      "missing_points": [],
+      "errors": []
+    }
+  },
+  "calls": [
+    {
+      "label": "agent",
+      "parsed": {
+        "answer": "金融行业系统在满足等保三级基础上，还需遵循以下行业增强要求：\n1. 总体原则：金融行业在满足GB/T 22239-2019三级要求的基础上，还应实现以下增强控制。\n2. 密码与认证：1）关键交易类数据在传输和存储时必须使用经国家密码管理局核准的密码算法，如SM2/SM3/SM4；2）网上交易系统必须采用双因素认证，且其中一种因素应为基于硬件的令牌或数字证书。\n3. 监控与变更：3）核心系统应具备实时交易监控和反欺诈分析能力；4）生产环境的变更操作必须经过四人授权（申请、复核、审批、执行）并具备审计记录。\n4. 安全测试：5）应每年至少开展两次渗透测试和一次红蓝对抗演练。\n5. 数据安全：金融业机构应将客户个人金融信息、支付敏感信息等定义为4级及以上敏感数据。4级数据要求加密存储、严格访问控制和脱敏展示，数据传输必须采用端到端加密。数据处理活动日志需实时上报金融行业监管平台。",
+        "citations": [
+          {
+            "source_doc": "JR/T 0071-2020 金融行业网络安全等级保护实施指引",
+            "section": "5.2 增强安全要求",
+            "quote_snippet": "金融行业在满足GB/T 22239-2019三级要求的基础上，还应实现以下增强控制"
+          },
+          {
+            "source_doc": "JR/T 0071-2020 金融行业网络安全等级保护实施指引",
+            "section": "5.2 增强安全要求",
+            "quote_snippet": "1）关键交易类数据在传输和存储时必须使用经国家密码管理局核准的密码算法，如SM2/SM3/SM4；2）网上交易系统必须采用双因素认证，且其中一种因素应为基于硬件的令牌或数字证书"
+          },
+          {
+            "source_doc": "JR/T 0071-2020 金融行业网络安全等级保护实施指引",
+            "section": "5.2 增强安全要求",
+            "quote_snippet": "3）核心系统应具备实时交易监控和反欺诈分析能力；4）生产环境的变更操作必须经过四人授权（申请、复核、审批、执行）并具备审计记录"
+          },
+          {
+            "source_doc": "JR/T 0071-2020 金融行业网络安全等级保护实施指引",
+            "section": "5.2 增强安全要求",
+            "quote_snippet": "5）应每年至少开展两次渗透测试和一次红蓝对抗演练"
+          },
+          {
+            "source_doc": "《金融数据安全分级指南》",
+            "section": "6.1 数据分类",
+            "quote_snippet": "金融业机构应将客户个人金融信息、支付敏感信息等定义为4级及以上敏感数据。4级数据要求加密存储、严格访问控制和脱敏展示，数据传输必须采用端到端加密。数据处理活动日志需实时上报金融行业监管平台。"
+          }
+        ],
+        "confidence": 0.95
+      },
+      "raw_text": "{\n\"answer\": \"金融行业系统在满足等保三级基础上，还需遵循以下行业增强要求：\\n1. 总体原则：金融行业在满足GB/T 22239-2019三级要求的基础上，还应实现以下增强控制。\\n2. 密码与认证：1）关键交易类数据在传输和存储时必须使用经国家密码管理局核准的密码算法，如SM2/SM3/SM4；2）网上交易系统必须采用双因素认证，且其中一种因素应为基于硬件的令牌或数字证书。\\n3. 监控与变更：3）核心系统应具备实时交易监控和反欺诈分析能力；4）生产环境的变更操作必须经过四人授权（申请、复核、审批、执行）并具备审计记录。\\n4. 安全测试：5）应每年至少开展两次渗透测试和一次红蓝对抗演练。\\n5. 数据安全：金融业机构应将客户个人金融信息、支付敏感信息等定义为4级及以上敏感数据。4级数据要求加密存储、严格访问控制和脱敏展示，数据传输必须采用端到端加密。数据处理活动日志需实时上报金融行业监管平台。\",\n\"citations\": [\n{\n\"source_doc\": \"JR/T 0071-2020 金融行业网络安全等级保护实施指引\",\n\"section\": \"5.2 增强安全要求\",\n\"quote_snippet\": \"金融行业在满足GB/T 22239-2019三级要求的基础上，还应实现以下增强控制\"\n},\n{\n\"source_doc\": \"JR/T 0071-2020 金融行业网络安全等级保护实施指引\",\n\"section\": \"5.2 增强安全要求\",\n\"quote_snippet\": \"1）关键交易类数据在传输和存储时必须使用经国家密码管理局核准的密码算法，如SM2/SM3/SM4；2）网上交易系统必须采用双因素认证，且其中一种因素应为基于硬件的令牌或数字证书\"\n},\n{\n\"source_doc\": \"JR/T 0071-2020 金融行业网络安全等级保护实施指引\",\n\"section\": \"5.2 增强安全要求\",\n\"quote_snippet\": \"3）核心系统应具备实时交易监控和反欺诈分析能力；4）生产环境的变更操作必须经过四人授权（申请、复核、审批、执行）并具备审计记录\"\n},\n{\n\"source_doc\": \"JR/T 0071-2020 金融行业网络安全等级保护实施指引\",\n\"section\": \"5.2 增强安全要求\",\n\"quote_snippet\": \"5）应每年至少开展两次渗透测试和一次红蓝对抗演练\"\n},\n{\n\"source_doc\": \"《金融数据安全分级指南》\",\n\"section\": \"6.1 数据分类\",\n\"quote_snippet\": \"金融业机构应将客户个人金融信息、支付敏感信息等定义为4级及以上敏感数据。4级数据要求加密存储、严格访问控制和脱敏展示，数据传输必须采用端到端加密。数据处理活动日志需实时上报金融行业监管平台。\"\n}\n],\n\"confidence\": 0.95\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 630,
+      "output_tokens": 5557,
+      "latency_ms": 50733,
+      "attempts": 1
+    },
+    {
+      "label": "faithfulness",
+      "parsed": {
+        "score": 5,
+        "reason": "Answer 中的所有声明均能由 mock_retrieved_chunks 原文直接支撑。chunk-011a 完整覆盖了答案中关于总体原则、密码算法（SM2/3/4）、双因素认证（含硬件令牌/证书）、实时监控与反欺诈、四人授权变更流程以及渗透测试频率的所有细节。chunk-011b 完整支撑了答案中关于数据分级（4 级及以上）、加密存储、脱敏展示、端到端加密及日志上报的要求。答案未包含任何无法从检索内容中推导出的额外信息，且准确引用了相关标准文档。",
+        "unsupported_claims": [],
+        "missing_points": [],
+        "errors": []
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"Answer 中的所有声明均能由 mock_retrieved_chunks 原文直接支撑。chunk-011a 完整覆盖了答案中关于总体原则、密码算法（SM2/3/4）、双因素认证（含硬件令牌/证书）、实时监控与反欺诈、四人授权变更流程以及渗透测试频率的所有细节。chunk-011b 完整支撑了答案中关于数据分级（4 级及以上）、加密存储、脱敏展示、端到端加密及日志上报的要求。答案未包含任何无法从检索内容中推导出的额外信息，且准确引用了相关标准文档。\",\n  \"unsupported_claims\": []\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1604,
+      "output_tokens": 152,
+      "latency_ms": 3023,
+      "attempts": 1
+    },
+    {
+      "label": "coverage",
+      "parsed": {
+        "score": 5,
+        "reason": "模型回答完整覆盖了所有必须包含的关键点（关键交易数据加密算法、双因素认证要求、实时监控与反欺诈、四人授权变更、渗透测试频率、敏感数据加密与脱敏），且未包含任何禁止出现的错误信息。回答结构清晰，逻辑严密，并提供了准确的引用来源。",
+        "unsupported_claims": [],
+        "missing_points": [],
+        "errors": []
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"模型回答完整覆盖了所有必须包含的关键点（关键交易数据加密算法、双因素认证要求、实时监控与反欺诈、四人授权变更、渗透测试频率、敏感数据加密与脱敏），且未包含任何禁止出现的错误信息。回答结构清晰，逻辑严密，并提供了准确的引用来源。\",\n  \"missing_points\": []\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1600,
+      "output_tokens": 88,
+      "latency_ms": 1388,
+      "attempts": 1
+    },
+    {
+      "label": "compliance_accuracy",
+      "parsed": {
+        "score": 5,
+        "reason": "Agent output accurately reflects the content of mock_retrieved_chunks. All key numerical values (e.g., 'four-person authorization', 'twice penetration testing', 'once red-blue exercise') and standard numbers (GB/T 22239-2019, JR/T 0071-2020) match the retrieved chunks exactly. The citations provided in the agent output correctly map to the source documents and sections found in the ground truth and retrieved data.",
+        "unsupported_claims": [],
+        "missing_points": [],
+        "errors": []
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"Agent output accurately reflects the content of mock_retrieved_chunks. All key numerical values (e.g., 'four-person authorization', 'twice penetration testing', 'once red-blue exercise') and standard numbers (GB/T 22239-2019, JR/T 0071-2020) match the retrieved chunks exactly. The citations provided in the agent output correctly map to the source documents and sections found in the ground truth and retrieved data.\",\n  \"errors\": []\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1601,
+      "output_tokens": 122,
+      "latency_ms": 1699,
+      "attempts": 1
+    }
+  ],
+  "overall_pass": true,
+  "error_type": null,
+  "error_message": null
+}

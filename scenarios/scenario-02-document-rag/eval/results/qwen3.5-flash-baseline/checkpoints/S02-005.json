@@ -1,0 +1,212 @@
+{
+  "test_case_id": "S02-005",
+  "scenario": "用户询问数据安全法中关于个人信息出境的评估要求",
+  "type": "exact_lookup",
+  "difficulty": "medium",
+  "is_positive": true,
+  "expected_answer_type": "direct_answer",
+  "status": "completed",
+  "agent_output": {
+    "answer": "根据检索结果，关于数据安全法及个人信息出境安全评估的要求如下：\n1. 法律依据与义务：根据《中华人民共和国数据安全法》，数据处理者因业务等需要，确需向中华人民共和国境外提供数据的，应当依照国家网信部门的规定进行安全评估。\n2. 评估内容：安全评估重点审查数据出境的合法性、正当性和必要性，评估对国家安全、公共利益和个人信息权益的影响。\n3. 强制评估情形：\n   - 法定情形：数据处理者因业务等需要，确需向中华人民共和国境外提供数据的，应当进行安全评估；若经评估可能影响国家安全的，不得出境。\n   - 数量门槛：根据《个人信息出境安全评估办法（试行）》，处理个人信息达到国家网信部门规定数量的个人信息处理者，向境外提供个人信息时，应当申报安全评估。\n   - 内部规定：根据公司制度，凡涉及10万人以上个人信息或重要数据出境的，必须启动安全评估流程。",
+    "citations": [
+      {
+        "source_doc": "《中华人民共和国数据安全法》",
+        "section": "第三十八条",
+        "quote_snippet": "数据处理者因业务等需要，确需向中华人民共和国境外提供数据的，应当依照国家网信部门的规定进行安全评估。"
+      },
+      {
+        "source_doc": "《中华人民共和国数据安全法》",
+        "section": "第三十八条",
+        "quote_snippet": "安全评估重点审查数据出境的合法性、正当性和必要性，评估对国家安全、公共利益和个人信息权益的影响。"
+      },
+      {
+        "source_doc": "《中华人民共和国数据安全法》",
+        "section": "第三十八条",
+        "quote_snippet": "经评估可能影响国家安全的，不得出境。"
+      },
+      {
+        "source_doc": "《个人信息出境安全评估办法（试行）》",
+        "section": "第四条",
+        "quote_snippet": "处理个人信息达到国家网信部门规定数量的个人信息处理者，向境外提供个人信息时，应当通过所在地省级网信部门向国家网信部门申报安全评估。"
+      },
+      {
+        "source_doc": "内部制度《公司数据出境管理细则 v1.0》",
+        "section": "2.1 安全评估触发条件",
+        "quote_snippet": "凡涉及10万人以上个人信息或重要数据出境的，必须启动安全评估流程。"
+      }
+    ],
+    "confidence": 0.9
+  },
+  "code_graders": {
+    "citation_format": {
+      "passed": true,
+      "reason": "citation format valid",
+      "expected": null,
+      "actual": null
+    },
+    "output_schema": {
+      "passed": true,
+      "reason": "output schema valid",
+      "expected": null,
+      "actual": null
+    },
+    "refusal_check": {
+      "passed": true,
+      "reason": "refusal behavior valid",
+      "expected": false,
+      "actual": "根据检索结果，关于数据安全法及个人信息出境安全评估的要求如下：\n1. 法律依据与义务：根据《中华人民共和国数据安全法》，数据处理者因业务等需要，确需向中华人民共和国境外提供数据的，应当依照国家网信部门的规定进行安全评估。\n2. 评估内容：安全评估重点审查数据出境的合法性、正当性和必要性，评估对国家安全、公共利益和个人信息权益的影响。\n3. 强制评估情形：\n   - 法定情形：数据处理者因业务等需要，确需向中华人民共和国境外提供数据的，应当进行安全评估；若经评估可能影响国家安全的，不得出境。\n   - 数量门槛：根据《个人信息出境安全评估办法（试行）》，处理个人信息达到国家网信部门规定数量的个人信息处理者，向境外提供个人信息时，应当申报安全评估。\n   - 内部规定：根据公司制度，凡涉及10万人以上个人信息或重要数据出境的，必须启动安全评估流程。"
+    },
+    "retrieval_relevance": {
+      "passed": true,
+      "reason": "retrieval mock quality valid",
+      "expected": "sufficient",
+      "actual": [
+        "high",
+        "high",
+        "medium"
+      ]
+    },
+    "citation_grounding": {
+      "passed": true,
+      "reason": "citations grounded",
+      "expected": null,
+      "actual": null
+    },
+    "confidence_check": {
+      "passed": true,
+      "reason": "confidence valid",
+      "expected": ">= 0.85",
+      "actual": 0.9
+    }
+  },
+  "model_scores": {
+    "faithfulness": {
+      "score": 4,
+      "reason": "Answer correctly cites the Data Security Law and Personal Information Export Security Assessment Measures regarding legal basis, assessment content, and quantity thresholds. It also correctly includes the internal policy threshold (100k+ records). However, it fails to mention 'assessment result validity period of 2 years' which is a required key point in ground_truth and present in the retrieved chunks. Additionally, while the answer mentions 'encryption and desensitization measures' as part of general assessment impact, it does not explicitly list them as specific assessment contents as detailed in chunk-005b, though this is a minor omission compared to the missing validity period.",
+      "unsupported_claims": [],
+      "missing_points": [],
+      "errors": []
+    },
+    "coverage": {
+      "score": 3,
+      "reason": "Answer correctly covers the legal basis for data export assessment, the focus of the assessment (legality, legitimacy, necessity), and the threshold for mandatory assessment based on quantity. However, it fails to include two critical key points required by the ground truth: 1) specific details on assessment content regarding the overseas recipient's data protection level, contract terms, and encryption measures; and 2) the validity period of the assessment results (2 years). Additionally, the answer includes internal company policy which was not requested in the expected answer type.",
+      "unsupported_claims": [],
+      "missing_points": [
+        "评估内容包括境外接收方数据保护水平、合同条款、加密脱敏措施",
+        "安全评估结果有效期2年"
+      ],
+      "errors": []
+    },
+    "compliance_accuracy": {
+      "score": 3,
+      "reason": "Agent 回答在法律依据、评估重点和强制情形方面与检索结果一致，引用了正确的条款号（第三十八条、第四条）和关键数值（10 万人）。然而，Agent 遗漏了检索内容中明确提到的关键信息：《个人信息出境安全评估办法（试行）》第四条规定的“安全评估结果有效期为 2 年”以及具体的“评估内容”（如境外接收方保护水平、合同条款等），导致未能覆盖 Ground Truth 要求的关键点。此外，Agent 将内部制度中的",
+      "unsupported_claims": [],
+      "missing_points": [],
+      "errors": []
+    }
+  },
+  "calls": [
+    {
+      "label": "agent",
+      "parsed": {
+        "answer": "根据检索结果，关于数据安全法及个人信息出境安全评估的要求如下：\n1. 法律依据与义务：根据《中华人民共和国数据安全法》，数据处理者因业务等需要，确需向中华人民共和国境外提供数据的，应当依照国家网信部门的规定进行安全评估。\n2. 评估内容：安全评估重点审查数据出境的合法性、正当性和必要性，评估对国家安全、公共利益和个人信息权益的影响。\n3. 强制评估情形：\n   - 法定情形：数据处理者因业务等需要，确需向中华人民共和国境外提供数据的，应当进行安全评估；若经评估可能影响国家安全的，不得出境。\n   - 数量门槛：根据《个人信息出境安全评估办法（试行）》，处理个人信息达到国家网信部门规定数量的个人信息处理者，向境外提供个人信息时，应当申报安全评估。\n   - 内部规定：根据公司制度，凡涉及10万人以上个人信息或重要数据出境的，必须启动安全评估流程。",
+        "citations": [
+          {
+            "source_doc": "《中华人民共和国数据安全法》",
+            "section": "第三十八条",
+            "quote_snippet": "数据处理者因业务等需要，确需向中华人民共和国境外提供数据的，应当依照国家网信部门的规定进行安全评估。"
+          },
+          {
+            "source_doc": "《中华人民共和国数据安全法》",
+            "section": "第三十八条",
+            "quote_snippet": "安全评估重点审查数据出境的合法性、正当性和必要性，评估对国家安全、公共利益和个人信息权益的影响。"
+          },
+          {
+            "source_doc": "《中华人民共和国数据安全法》",
+            "section": "第三十八条",
+            "quote_snippet": "经评估可能影响国家安全的，不得出境。"
+          },
+          {
+            "source_doc": "《个人信息出境安全评估办法（试行）》",
+            "section": "第四条",
+            "quote_snippet": "处理个人信息达到国家网信部门规定数量的个人信息处理者，向境外提供个人信息时，应当通过所在地省级网信部门向国家网信部门申报安全评估。"
+          },
+          {
+            "source_doc": "内部制度《公司数据出境管理细则 v1.0》",
+            "section": "2.1 安全评估触发条件",
+            "quote_snippet": "凡涉及10万人以上个人信息或重要数据出境的，必须启动安全评估流程。"
+          }
+        ],
+        "confidence": 0.9
+      },
+      "raw_text": "{\n\"answer\": \"根据检索结果，关于数据安全法及个人信息出境安全评估的要求如下：\\n1. 法律依据与义务：根据《中华人民共和国数据安全法》，数据处理者因业务等需要，确需向中华人民共和国境外提供数据的，应当依照国家网信部门的规定进行安全评估。\\n2. 评估内容：安全评估重点审查数据出境的合法性、正当性和必要性，评估对国家安全、公共利益和个人信息权益的影响。\\n3. 强制评估情形：\\n   - 法定情形：数据处理者因业务等需要，确需向中华人民共和国境外提供数据的，应当进行安全评估；若经评估可能影响国家安全的，不得出境。\\n   - 数量门槛：根据《个人信息出境安全评估办法（试行）》，处理个人信息达到国家网信部门规定数量的个人信息处理者，向境外提供个人信息时，应当申报安全评估。\\n   - 内部规定：根据公司制度，凡涉及10万人以上个人信息或重要数据出境的，必须启动安全评估流程。\",\n\"citations\": [\n{\n\"source_doc\": \"《中华人民共和国数据安全法》\",\n\"section\": \"第三十八条\",\n\"quote_snippet\": \"数据处理者因业务等需要，确需向中华人民共和国境外提供数据的，应当依照国家网信部门的规定进行安全评估。\"\n},\n{\n\"source_doc\": \"《中华人民共和国数据安全法》\",\n\"section\": \"第三十八条\",\n\"quote_snippet\": \"安全评估重点审查数据出境的合法性、正当性和必要性，评估对国家安全、公共利益和个人信息权益的影响。\"\n},\n{\n\"source_doc\": \"《中华人民共和国数据安全法》\",\n\"section\": \"第三十八条\",\n\"quote_snippet\": \"经评估可能影响国家安全的，不得出境。\"\n},\n{\n\"source_doc\": \"《个人信息出境安全评估办法（试行）》\",\n\"section\": \"第四条\",\n\"quote_snippet\": \"处理个人信息达到国家网信部门规定数量的个人信息处理者，向境外提供个人信息时，应当通过所在地省级网信部门向国家网信部门申报安全评估。\"\n},\n{\n\"source_doc\": \"内部制度《公司数据出境管理细则 v1.0》\",\n\"section\": \"2.1 安全评估触发条件\",\n\"quote_snippet\": \"凡涉及10万人以上个人信息或重要数据出境的，必须启动安全评估流程。\"\n}\n],\n\"confidence\": 0.9\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 541,
+      "output_tokens": 4475,
+      "latency_ms": 43659,
+      "attempts": 1
+    },
+    {
+      "label": "faithfulness",
+      "parsed": {
+        "score": 4,
+        "reason": "Answer correctly cites the Data Security Law and Personal Information Export Security Assessment Measures regarding legal basis, assessment content, and quantity thresholds. It also correctly includes the internal policy threshold (100k+ records). However, it fails to mention 'assessment result validity period of 2 years' which is a required key point in ground_truth and present in the retrieved chunks. Additionally, while the answer mentions 'encryption and desensitization measures' as part of general assessment impact, it does not explicitly list them as specific assessment contents as detailed in chunk-005b, though this is a minor omission compared to the missing validity period.",
+        "unsupported_claims": [],
+        "missing_points": [],
+        "errors": []
+      },
+      "raw_text": "{\n  \"score\": 4,\n  \"reason\": \"Answer correctly cites the Data Security Law and Personal Information Export Security Assessment Measures regarding legal basis, assessment content, and quantity thresholds. It also correctly includes the internal policy threshold (100k+ records). However, it fails to mention 'assessment result validity period of 2 years' which is a required key point in ground_truth and present in the retrieved chunks. Additionally, while the answer mentions 'encryption and desensitization measures' as part of general assessment impact, it does not explicitly list them as specific assessment contents as detailed in chunk-005b, though this is a minor omission compared to the missing validity period.\",\n  \"unsupported_claims\": []\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1291,
+      "output_tokens": 153,
+      "latency_ms": 2149,
+      "attempts": 1
+    },
+    {
+      "label": "coverage",
+      "parsed": {
+        "score": 3,
+        "reason": "Answer correctly covers the legal basis for data export assessment, the focus of the assessment (legality, legitimacy, necessity), and the threshold for mandatory assessment based on quantity. However, it fails to include two critical key points required by the ground truth: 1) specific details on assessment content regarding the overseas recipient's data protection level, contract terms, and encryption measures; and 2) the validity period of the assessment results (2 years). Additionally, the answer includes internal company policy which was not requested in the expected answer type.",
+        "unsupported_claims": [],
+        "missing_points": [
+          "评估内容包括境外接收方数据保护水平、合同条款、加密脱敏措施",
+          "安全评估结果有效期2年"
+        ],
+        "errors": []
+      },
+      "raw_text": "{\n  \"score\": 3,\n  \"reason\": \"Answer correctly covers the legal basis for data export assessment, the focus of the assessment (legality, legitimacy, necessity), and the threshold for mandatory assessment based on quantity. However, it fails to include two critical key points required by the ground truth: 1) specific details on assessment content regarding the overseas recipient's data protection level, contract terms, and encryption measures; and 2) the validity period of the assessment results (2 years). Additionally, the answer includes internal company policy which was not requested in the expected answer type.\",\n  \"missing_points\": [\n    \"评估内容包括境外接收方数据保护水平、合同条款、加密脱敏措施\",\n    \"安全评估结果有效期2年\"\n  ]\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1287,
+      "output_tokens": 164,
+      "latency_ms": 1688,
+      "attempts": 1
+    },
+    {
+      "label": "compliance_accuracy",
+      "parsed": {
+        "score": 3,
+        "reason": "Agent 回答在法律依据、评估重点和强制情形方面与检索结果一致，引用了正确的条款号（第三十八条、第四条）和关键数值（10 万人）。然而，Agent 遗漏了检索内容中明确提到的关键信息：《个人信息出境安全评估办法（试行）》第四条规定的“安全评估结果有效期为 2 年”以及具体的“评估内容”（如境外接收方保护水平、合同条款等），导致未能覆盖 Ground Truth 要求的关键点。此外，Agent 将内部制度中的",
+        "unsupported_claims": [],
+        "missing_points": [],
+        "errors": []
+      },
+      "raw_text": "{\n  \"score\": 3,\n  \"reason\": \"Agent 回答在法律依据、评估重点和强制情形方面与检索结果一致，引用了正确的条款号（第三十八条、第四条）和关键数值（10 万人）。然而，Agent 遗漏了检索内容中明确提到的关键信息：《个人信息出境安全评估办法（试行）》第四条规定的“安全评估结果有效期为 2 年”以及具体的“评估内容”（如境外接收方保护水平、合同条款等），导致未能覆盖 Ground Truth 要求的关键点。此外，Agent 将内部制度中的\"  \t}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1288,
+      "output_tokens": 130,
+      "latency_ms": 1789,
+      "attempts": 1
+    }
+  ],
+  "overall_pass": true,
+  "error_type": null,
+  "error_message": null
+}

@@ -1,0 +1,178 @@
+{
+  "test_case_id": "S02-004",
+  "scenario": "用户询问等保三级对重要数据备份恢复的时间指标要求",
+  "type": "exact_lookup",
+  "difficulty": "easy",
+  "is_positive": true,
+  "expected_answer_type": "direct_answer",
+  "status": "completed",
+  "agent_output": {
+    "answer": "根据检索到的国家标准 GB/T 22239-2019，对于重要数据，恢复时间目标（RTO）应不超过 30 分钟，恢复点目标（RPO）应不超过 1 小时。",
+    "citations": [
+      {
+        "source_doc": "GB/T 22239-2019 信息安全技术 网络安全等级保护基本要求",
+        "section": "8.1.6.2",
+        "quote_snippet": "恢复时间目标（RTO）应不超过 30 分钟，恢复点目标（RPO）应不超过 1 小时。"
+      }
+    ],
+    "confidence": 0.9
+  },
+  "code_graders": {
+    "citation_format": {
+      "passed": true,
+      "reason": "citation format valid",
+      "expected": null,
+      "actual": null
+    },
+    "output_schema": {
+      "passed": true,
+      "reason": "output schema valid",
+      "expected": null,
+      "actual": null
+    },
+    "refusal_check": {
+      "passed": true,
+      "reason": "refusal behavior valid",
+      "expected": false,
+      "actual": "根据检索到的国家标准 GB/T 22239-2019，对于重要数据，恢复时间目标（RTO）应不超过 30 分钟，恢复点目标（RPO）应不超过 1 小时。"
+    },
+    "retrieval_relevance": {
+      "passed": true,
+      "reason": "retrieval mock quality valid",
+      "expected": "sufficient",
+      "actual": [
+        "high",
+        "medium",
+        "low"
+      ]
+    },
+    "citation_grounding": {
+      "passed": false,
+      "reason": "citations not grounded",
+      "expected": null,
+      "actual": null
+    },
+    "confidence_check": {
+      "passed": true,
+      "reason": "confidence valid",
+      "expected": ">= 0.9",
+      "actual": 0.9
+    }
+  },
+  "model_scores": {
+    "faithfulness": {
+      "score": 3,
+      "reason": "模型回答中关于RTO和RPO的具体数值（30分钟/1小时）及引用标准GB/T 22239-2019的声明完全由mock_retrieved_chunks中的chunk-004a支撑。然而，ground_truth明确列出了必须包含的关键点（key_points_must_include），即“重要数据应每天至少一次全量备份”和“每年至少一次恢复演练”。模型回答遗漏了这两项关键合规要求，导致信息完整性不足，因此不能得满分。",
+      "unsupported_claims": [],
+      "missing_points": [],
+      "errors": []
+    },
+    "coverage": {
+      "score": 3,
+      "reason": "Answer correctly cites the standard and includes the RTO/RPO requirements. However, it fails to include two mandatory key points: 'important data should be fully backed up at least once a day' and 'at least one recovery drill per year'.",
+      "unsupported_claims": [],
+      "missing_points": [
+        "重要数据应每天至少一次全量备份",
+        "每年至少一次恢复演练"
+      ],
+      "errors": []
+    },
+    "compliance_accuracy": {
+      "score": 3,
+      "reason": "Agent 回答在标准编号、条款号（8.1.6.2）和关键数值（RTO≤30 分钟，RPO≤1 小时）上与检索到的 mock_retrieved_chunks 及 Ground Truth 完全一致。然而，Ground Truth 明确列出了必须包含的关键点：'重要数据应每天至少一次全量备份'和'每年至少一次恢复演练'。Agent 的回答遗漏了这两项核心要求，导致信息完整性不足，因此不能得满分。",
+      "unsupported_claims": [],
+      "missing_points": [],
+      "errors": [
+        "遗漏关键合规要求：未提及'重要数据应每天至少一次全量备份'",
+        "遗漏关键合规要求：未提及'每年至少一次恢复演练'"
+      ]
+    }
+  },
+  "calls": [
+    {
+      "label": "agent",
+      "parsed": {
+        "answer": "根据检索到的国家标准 GB/T 22239-2019，对于重要数据，恢复时间目标（RTO）应不超过 30 分钟，恢复点目标（RPO）应不超过 1 小时。",
+        "citations": [
+          {
+            "source_doc": "GB/T 22239-2019 信息安全技术 网络安全等级保护基本要求",
+            "section": "8.1.6.2",
+            "quote_snippet": "恢复时间目标（RTO）应不超过 30 分钟，恢复点目标（RPO）应不超过 1 小时。"
+          }
+        ],
+        "confidence": 0.9
+      },
+      "raw_text": "{\n  \"answer\": \"根据检索到的国家标准 GB/T 22239-2019，对于重要数据，恢复时间目标（RTO）应不超过 30 分钟，恢复点目标（RPO）应不超过 1 小时。\",\n  \"citations\": [\n    {\n      \"source_doc\": \"GB/T 22239-2019 信息安全技术 网络安全等级保护基本要求\",\n      \"section\": \"8.1.6.2\",\n      \"quote_snippet\": \"恢复时间目标（RTO）应不超过 30 分钟，恢复点目标（RPO）应不超过 1 小时。\"\n    }\n  ],\n  \"confidence\": 0.9\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 557,
+      "output_tokens": 2728,
+      "latency_ms": 25100,
+      "attempts": 1
+    },
+    {
+      "label": "faithfulness",
+      "parsed": {
+        "score": 3,
+        "reason": "模型回答中关于RTO和RPO的具体数值（30分钟/1小时）及引用标准GB/T 22239-2019的声明完全由mock_retrieved_chunks中的chunk-004a支撑。然而，ground_truth明确列出了必须包含的关键点（key_points_must_include），即“重要数据应每天至少一次全量备份”和“每年至少一次恢复演练”。模型回答遗漏了这两项关键合规要求，导致信息完整性不足，因此不能得满分。",
+        "unsupported_claims": [],
+        "missing_points": [],
+        "errors": []
+      },
+      "raw_text": "{\n  \"score\": 3,\n  \"reason\": \"模型回答中关于RTO和RPO的具体数值（30分钟/1小时）及引用标准GB/T 22239-2019的声明完全由mock_retrieved_chunks中的chunk-004a支撑。然而，ground_truth明确列出了必须包含的关键点（key_points_must_include），即“重要数据应每天至少一次全量备份”和“每年至少一次恢复演练”。模型回答遗漏了这两项关键合规要求，导致信息完整性不足，因此不能得满分。\",\n  \"unsupported_claims\": []\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 913,
+      "output_tokens": 137,
+      "latency_ms": 1882,
+      "attempts": 1
+    },
+    {
+      "label": "coverage",
+      "parsed": {
+        "score": 3,
+        "reason": "Answer correctly cites the standard and includes the RTO/RPO requirements. However, it fails to include two mandatory key points: 'important data should be fully backed up at least once a day' and 'at least one recovery drill per year'.",
+        "unsupported_claims": [],
+        "missing_points": [
+          "重要数据应每天至少一次全量备份",
+          "每年至少一次恢复演练"
+        ],
+        "errors": []
+      },
+      "raw_text": "{\n  \"score\": 3,\n  \"reason\": \"Answer correctly cites the standard and includes the RTO/RPO requirements. However, it fails to include two mandatory key points: 'important data should be fully backed up at least once a day' and 'at least one recovery drill per year'.\",\n  \"missing_points\": [\n    \"重要数据应每天至少一次全量备份\",\n    \"每年至少一次恢复演练\"\n  ]\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 909,
+      "output_tokens": 99,
+      "latency_ms": 1149,
+      "attempts": 1
+    },
+    {
+      "label": "compliance_accuracy",
+      "parsed": {
+        "score": 3,
+        "reason": "Agent 回答在标准编号、条款号（8.1.6.2）和关键数值（RTO≤30 分钟，RPO≤1 小时）上与检索到的 mock_retrieved_chunks 及 Ground Truth 完全一致。然而，Ground Truth 明确列出了必须包含的关键点：'重要数据应每天至少一次全量备份'和'每年至少一次恢复演练'。Agent 的回答遗漏了这两项核心要求，导致信息完整性不足，因此不能得满分。",
+        "unsupported_claims": [],
+        "missing_points": [],
+        "errors": [
+          "遗漏关键合规要求：未提及'重要数据应每天至少一次全量备份'",
+          "遗漏关键合规要求：未提及'每年至少一次恢复演练'"
+        ]
+      },
+      "raw_text": "{\n  \"score\": 3,\n  \"reason\": \"Agent 回答在标准编号、条款号（8.1.6.2）和关键数值（RTO≤30 分钟，RPO≤1 小时）上与检索到的 mock_retrieved_chunks 及 Ground Truth 完全一致。然而，Ground Truth 明确列出了必须包含的关键点：'重要数据应每天至少一次全量备份'和'每年至少一次恢复演练'。Agent 的回答遗漏了这两项核心要求，导致信息完整性不足，因此不能得满分。\",\n  \"errors\": [\n    \"遗漏关键合规要求：未提及'重要数据应每天至少一次全量备份'\",\n    \"遗漏关键合规要求：未提及'每年至少一次恢复演练'\"\n  ]\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 910,
+      "output_tokens": 171,
+      "latency_ms": 2097,
+      "attempts": 1
+    }
+  ],
+  "overall_pass": false,
+  "error_type": null,
+  "error_message": null
+}

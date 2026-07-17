@@ -1,0 +1,186 @@
+{
+  "test_case_id": "S02-018",
+  "scenario": "用户要求比较NIST CSF与等保2.0在架构理念上的异同",
+  "type": "cross_reference",
+  "difficulty": "medium",
+  "is_positive": true,
+  "expected_answer_type": "comparison",
+  "status": "completed",
+  "agent_output": {
+    "answer": "基于检索结果，NIST CSF与等保2.0在架构理念上的异同如下：\n1. 架构模型差异：等保2.0提出“一个中心、三重防护”的纵深防御架构，侧重于网络层面的分层隔离和集中管控；而NIST CSF核心包括五个功能（识别、保护、检测、响应、恢复），以风险为基础，强调持续改进。\n2. 功能域覆盖差异：NIST CSF的“保护”和“检测”与等保三重防护存在映射关系，但等保缺少显式的“响应”和“恢复”功能域，其相关要求分散在安全事件管理章节。\n3. 侧重点差异：CSF更侧重业务连续性和弹性，而等保更侧重防御纵深和合规达标。",
+    "citations": [
+      {
+        "source_doc": "GB/T 22239-2019 信息安全技术 网络安全等级保护基本要求",
+        "section": "4.2 等保2.0防护思想",
+        "quote_snippet": "等保2.0提出“一个中心、三重防护”的纵深防御架构：以安全管理中心为核心，构建安全计算环境防护、安全区域边界防护和安全通信网络防护。该架构更侧重于网络层面的分层隔离和集中管控。"
+      },
+      {
+        "source_doc": "NIST Cybersecurity Framework v1.1",
+        "section": "Core 核心功能",
+        "quote_snippet": "NIST CSF核心包括五个功能：识别（Identify）—资产管理、风险评估；保护（Protect）—访问控制、意识培训；检测（Detect）—异常和事件监测；响应（Respond）—响应规划、减缓；恢复（Recover）—恢复规划、改进。框架以风险为基础，强调持续改进。"
+      },
+      {
+        "source_doc": "内部白皮书《等保与CSF映射指南》",
+        "section": "3.2 理念分析",
+        "quote_snippet": "NIST CSF的“保护”和“检测”与等保三重防护存在映射关系，但等保缺少显式的“响应”和“恢复”功能域，其相关要求分散在安全事件管理章节。CSF更侧重业务连续性和弹性，而等保更侧重防御纵深和合规达标。"
+      }
+    ],
+    "confidence": 0.9
+  },
+  "code_graders": {
+    "citation_format": {
+      "passed": true,
+      "reason": "citation format valid",
+      "expected": null,
+      "actual": null
+    },
+    "output_schema": {
+      "passed": true,
+      "reason": "output schema valid",
+      "expected": null,
+      "actual": null
+    },
+    "refusal_check": {
+      "passed": true,
+      "reason": "refusal behavior valid",
+      "expected": false,
+      "actual": "基于检索结果，NIST CSF与等保2.0在架构理念上的异同如下：\n1. 架构模型差异：等保2.0提出“一个中心、三重防护”的纵深防御架构，侧重于网络层面的分层隔离和集中管控；而NIST CSF核心包括五个功能（识别、保护、检测、响应、恢复），以风险为基础，强调持续改进。\n2. 功能域覆盖差异：NIST CSF的“保护”和“检测”与等保三重防护存在映射关系，但等保缺少显式的“响应”和“恢复”功能域，其相关要求分散在安全事件管理章节。\n3. 侧重点差异：CSF更侧重业务连续性和弹性，而等保更侧重防御纵深和合规达标。"
+    },
+    "retrieval_relevance": {
+      "passed": true,
+      "reason": "retrieval mock quality valid",
+      "expected": "sufficient",
+      "actual": [
+        "high",
+        "high",
+        "medium"
+      ]
+    },
+    "citation_grounding": {
+      "passed": true,
+      "reason": "citations grounded",
+      "expected": null,
+      "actual": null
+    },
+    "confidence_check": {
+      "passed": true,
+      "reason": "confidence valid",
+      "expected": ">= 0.85",
+      "actual": 0.9
+    }
+  },
+  "model_scores": {
+    "faithfulness": {
+      "score": 5,
+      "reason": "Answer 中的所有声明均能由 mock_retrieved_chunks 原文直接支撑。第一点关于架构模型差异的陈述分别对应 chunk-018b（等保2.0）和 chunk-018a（NIST CSF）；第二点和第三点关于功能域覆盖及侧重点的差异，完全复述并总结了 chunk-018c 的内容。引用来源与检索结果一致，无幻觉或 unsupported claims。",
+      "unsupported_claims": [],
+      "missing_points": [],
+      "errors": []
+    },
+    "coverage": {
+      "score": 5,
+      "reason": "Answer fully covers all four required key points: (1) NIST CSF's five functions, (2) MLPS 2.0's 'one center, three protections' architecture, (3) the distinction regarding explicit response/recovery in CSF vs. dispersed requirements in MLPS, and (4) the difference in focus (risk/continuous improvement vs. defense depth/compliance). The answer also correctly avoids including any forbidden points.",
+      "unsupported_claims": [],
+      "missing_points": [],
+      "errors": []
+    },
+    "compliance_accuracy": {
+      "score": 5,
+      "reason": "Agent output accurately reflects the content of mock_retrieved_chunks. The standard numbers (GB/T 22239-2019), section titles ('Core 核心功能', '4.2 等保2.0防护思想'), and key numerical/structural details (five functions for NIST CSF, 'one center three protections' for MLPS 2.0) match the retrieved chunks exactly. All key points required by ground_truth are covered without violating negative constraints.",
+      "unsupported_claims": [],
+      "missing_points": [],
+      "errors": []
+    }
+  },
+  "calls": [
+    {
+      "label": "agent",
+      "parsed": {
+        "answer": "基于检索结果，NIST CSF与等保2.0在架构理念上的异同如下：\n1. 架构模型差异：等保2.0提出“一个中心、三重防护”的纵深防御架构，侧重于网络层面的分层隔离和集中管控；而NIST CSF核心包括五个功能（识别、保护、检测、响应、恢复），以风险为基础，强调持续改进。\n2. 功能域覆盖差异：NIST CSF的“保护”和“检测”与等保三重防护存在映射关系，但等保缺少显式的“响应”和“恢复”功能域，其相关要求分散在安全事件管理章节。\n3. 侧重点差异：CSF更侧重业务连续性和弹性，而等保更侧重防御纵深和合规达标。",
+        "citations": [
+          {
+            "source_doc": "GB/T 22239-2019 信息安全技术 网络安全等级保护基本要求",
+            "section": "4.2 等保2.0防护思想",
+            "quote_snippet": "等保2.0提出“一个中心、三重防护”的纵深防御架构：以安全管理中心为核心，构建安全计算环境防护、安全区域边界防护和安全通信网络防护。该架构更侧重于网络层面的分层隔离和集中管控。"
+          },
+          {
+            "source_doc": "NIST Cybersecurity Framework v1.1",
+            "section": "Core 核心功能",
+            "quote_snippet": "NIST CSF核心包括五个功能：识别（Identify）—资产管理、风险评估；保护（Protect）—访问控制、意识培训；检测（Detect）—异常和事件监测；响应（Respond）—响应规划、减缓；恢复（Recover）—恢复规划、改进。框架以风险为基础，强调持续改进。"
+          },
+          {
+            "source_doc": "内部白皮书《等保与CSF映射指南》",
+            "section": "3.2 理念分析",
+            "quote_snippet": "NIST CSF的“保护”和“检测”与等保三重防护存在映射关系，但等保缺少显式的“响应”和“恢复”功能域，其相关要求分散在安全事件管理章节。CSF更侧重业务连续性和弹性，而等保更侧重防御纵深和合规达标。"
+          }
+        ],
+        "confidence": 0.9
+      },
+      "raw_text": "{\n\"answer\": \"基于检索结果，NIST CSF与等保2.0在架构理念上的异同如下：\\n1. 架构模型差异：等保2.0提出“一个中心、三重防护”的纵深防御架构，侧重于网络层面的分层隔离和集中管控；而NIST CSF核心包括五个功能（识别、保护、检测、响应、恢复），以风险为基础，强调持续改进。\\n2. 功能域覆盖差异：NIST CSF的“保护”和“检测”与等保三重防护存在映射关系，但等保缺少显式的“响应”和“恢复”功能域，其相关要求分散在安全事件管理章节。\\n3. 侧重点差异：CSF更侧重业务连续性和弹性，而等保更侧重防御纵深和合规达标。\",\n\"citations\": [\n{\n\"source_doc\": \"GB/T 22239-2019 信息安全技术 网络安全等级保护基本要求\",\n\"section\": \"4.2 等保2.0防护思想\",\n\"quote_snippet\": \"等保2.0提出“一个中心、三重防护”的纵深防御架构：以安全管理中心为核心，构建安全计算环境防护、安全区域边界防护和安全通信网络防护。该架构更侧重于网络层面的分层隔离和集中管控。\"\n},\n{\n\"source_doc\": \"NIST Cybersecurity Framework v1.1\",\n\"section\": \"Core 核心功能\",\n\"quote_snippet\": \"NIST CSF核心包括五个功能：识别（Identify）—资产管理、风险评估；保护（Protect）—访问控制、意识培训；检测（Detect）—异常和事件监测；响应（Respond）—响应规划、减缓；恢复（Recover）—恢复规划、改进。框架以风险为基础，强调持续改进。\"\n},\n{\n\"source_doc\": \"内部白皮书《等保与CSF映射指南》\",\n\"section\": \"3.2 理念分析\",\n\"quote_snippet\": \"NIST CSF的“保护”和“检测”与等保三重防护存在映射关系，但等保缺少显式的“响应”和“恢复”功能域，其相关要求分散在安全事件管理章节。CSF更侧重业务连续性和弹性，而等保更侧重防御纵深和合规达标。\"\n}\n],\n\"confidence\": 0.9\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 603,
+      "output_tokens": 3097,
+      "latency_ms": 27945,
+      "attempts": 1
+    },
+    {
+      "label": "faithfulness",
+      "parsed": {
+        "score": 5,
+        "reason": "Answer 中的所有声明均能由 mock_retrieved_chunks 原文直接支撑。第一点关于架构模型差异的陈述分别对应 chunk-018b（等保2.0）和 chunk-018a（NIST CSF）；第二点和第三点关于功能域覆盖及侧重点的差异，完全复述并总结了 chunk-018c 的内容。引用来源与检索结果一致，无幻觉或 unsupported claims。",
+        "unsupported_claims": [],
+        "missing_points": [],
+        "errors": []
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"Answer 中的所有声明均能由 mock_retrieved_chunks 原文直接支撑。第一点关于架构模型差异的陈述分别对应 chunk-018b（等保2.0）和 chunk-018a（NIST CSF）；第二点和第三点关于功能域覆盖及侧重点的差异，完全复述并总结了 chunk-018c 的内容。引用来源与检索结果一致，无幻觉或 unsupported claims。\",\n  \"unsupported_claims\": []\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1380,
+      "output_tokens": 120,
+      "latency_ms": 2732,
+      "attempts": 1
+    },
+    {
+      "label": "coverage",
+      "parsed": {
+        "score": 5,
+        "reason": "Answer fully covers all four required key points: (1) NIST CSF's five functions, (2) MLPS 2.0's 'one center, three protections' architecture, (3) the distinction regarding explicit response/recovery in CSF vs. dispersed requirements in MLPS, and (4) the difference in focus (risk/continuous improvement vs. defense depth/compliance). The answer also correctly avoids including any forbidden points.",
+        "unsupported_claims": [],
+        "missing_points": [],
+        "errors": []
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"Answer fully covers all four required key points: (1) NIST CSF's five functions, (2) MLPS 2.0's 'one center, three protections' architecture, (3) the distinction regarding explicit response/recovery in CSF vs. dispersed requirements in MLPS, and (4) the difference in focus (risk/continuous improvement vs. defense depth/compliance). The answer also correctly avoids including any forbidden points.\",\n  \"missing_points\": []\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1376,
+      "output_tokens": 114,
+      "latency_ms": 1468,
+      "attempts": 1
+    },
+    {
+      "label": "compliance_accuracy",
+      "parsed": {
+        "score": 5,
+        "reason": "Agent output accurately reflects the content of mock_retrieved_chunks. The standard numbers (GB/T 22239-2019), section titles ('Core 核心功能', '4.2 等保2.0防护思想'), and key numerical/structural details (five functions for NIST CSF, 'one center three protections' for MLPS 2.0) match the retrieved chunks exactly. All key points required by ground_truth are covered without violating negative constraints.",
+        "unsupported_claims": [],
+        "missing_points": [],
+        "errors": []
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"Agent output accurately reflects the content of mock_retrieved_chunks. The standard numbers (GB/T 22239-2019), section titles ('Core 核心功能', '4.2 等保2.0防护思想'), and key numerical/structural details (five functions for NIST CSF, 'one center three protections' for MLPS 2.0) match the retrieved chunks exactly. All key points required by ground_truth are covered without violating negative constraints.\",\n  \"errors\": []\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1377,
+      "output_tokens": 124,
+      "latency_ms": 1791,
+      "attempts": 1
+    }
+  ],
+  "overall_pass": true,
+  "error_type": null,
+  "error_message": null
+}

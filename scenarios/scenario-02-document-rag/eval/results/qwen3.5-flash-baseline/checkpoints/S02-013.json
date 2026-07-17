@@ -1,0 +1,186 @@
+{
+  "test_case_id": "S02-013",
+  "scenario": "用户询问如何设计满足合规要求的日志采集和审计体系",
+  "type": "suggestion",
+  "difficulty": "medium",
+  "is_positive": true,
+  "expected_answer_type": "synthesis",
+  "status": "completed",
+  "agent_output": {
+    "answer": "基于检索结果，构建合规日志采集和审计体系应包含以下方面：\n1. 集中化存储与管理：审计日志应集中存储，建议采用集中式日志管理方案，将服务器、网络设备、应用的日志统一发送至SIEM系统。\n2. 日志内容要素：审计记录应包括事件时间、类型、主体、客体和结果，涵盖用户活动、例外情况、故障和安全事件。\n3. 完整性与防篡改：应对日志进行完整性保护，防止未授权修改和删除，可采用数字签名或哈希校验；日志记录应受到保护，防止篡改。\n4. 时间同步：日志应包含时间戳，且各系统时钟必须与可靠时间源同步。\n5. 保留期限：应定义日志保留期限，建议启用至少90天在线存储和1年离线归档。\n6. 分析与响应：审计日志应支持按条件检索和统计，并根据策略触发告警；建立日志分析和异常检测流程，配置关联规则检测攻击行为，并将SIEM告警集成到工单或SOAR平台以实现闭环管理。",
+    "citations": [
+      {
+        "source_doc": "GB/T 22239-2019 信息安全技术 网络安全等级保护基本要求",
+        "section": "8.1.4.3",
+        "quote_snippet": "审计日志应集中存储，审计记录应包括事件时间、类型、主体、客体和结果。应对日志进行完整性保护，防止未授权修改和删除，可采用数字签名或哈希校验。审计日志应支持按条件检索和统计，并根据策略触发告警。"
+      },
+      {
+        "source_doc": "ISO/IEC 27001:2022",
+        "section": "A.8.15",
+        "quote_snippet": "组织应记录涵盖用户活动、例外情况、故障和安全事件的日志。日志应包含时间戳，且各系统时钟必须与可靠时间源同步。日志记录应受到保护，防止篡改。应定义日志保留期限，并建立日志分析和异常检测流程。"
+      },
+      {
+        "source_doc": "CIS Controls v8",
+        "section": "CIS 8 审计日志管理",
+        "quote_snippet": "建议采用集中式日志管理方案，将服务器、网络设备、应用的日志统一发送至SIEM系统。启用至少90天在线存储和1年离线归档。配置关联规则检测攻击行为，并将SIEM告警集成到工单或SOAR平台以实现闭环管理。"
+      }
+    ],
+    "confidence": 0.9
+  },
+  "code_graders": {
+    "citation_format": {
+      "passed": true,
+      "reason": "citation format valid",
+      "expected": null,
+      "actual": null
+    },
+    "output_schema": {
+      "passed": true,
+      "reason": "output schema valid",
+      "expected": null,
+      "actual": null
+    },
+    "refusal_check": {
+      "passed": true,
+      "reason": "refusal behavior valid",
+      "expected": false,
+      "actual": "基于检索结果，构建合规日志采集和审计体系应包含以下方面：\n1. 集中化存储与管理：审计日志应集中存储，建议采用集中式日志管理方案，将服务器、网络设备、应用的日志统一发送至SIEM系统。\n2. 日志内容要素：审计记录应包括事件时间、类型、主体、客体和结果，涵盖用户活动、例外情况、故障和安全事件。\n3. 完整性与防篡改：应对日志进行完整性保护，防止未授权修改和删除，可采用数字签名或哈希校验；日志记录应受到保护，防止篡改。\n4. 时间同步：日志应包含时间戳，且各系统时钟必须与可靠时间源同步。\n5. 保留期限：应定义日志保留期限，建议启用至少90天在线存储和1年离线归档。\n6. 分析与响应：审计日志应支持按条件检索和统计，并根据策略触发告警；建立日志分析和异常检测流程，配置关联规则检测攻击行为，并将SIEM告警集成到工单或SOAR平台以实现闭环管理。"
+    },
+    "retrieval_relevance": {
+      "passed": true,
+      "reason": "retrieval mock quality valid",
+      "expected": "sufficient",
+      "actual": [
+        "high",
+        "high",
+        "medium"
+      ]
+    },
+    "citation_grounding": {
+      "passed": true,
+      "reason": "citations grounded",
+      "expected": null,
+      "actual": null
+    },
+    "confidence_check": {
+      "passed": true,
+      "reason": "confidence valid",
+      "expected": ">= 0.85",
+      "actual": 0.9
+    }
+  },
+  "model_scores": {
+    "faithfulness": {
+      "score": 5,
+      "reason": "Answer 中的每一项声明均能直接在 mock_retrieved_chunks 原文中找到对应支撑。具体而言：1. 集中化存储与 SIEM 建议由 chunk-013c 和 chunk-013a 支撑；2. 日志内容要素（时间、类型等）由 chunk-013a 和 chunk-013b 支撑；3. 完整性保护（数字签名/哈希）由 chunk-013a 支撑；4. 时间同步要求由 chunk-013b 支撑；5. 保留期限（90 天/1 年）由 chunk-013c 支撑；6. 分析与响应（检索、告警、SOAR 集成）由 chunk-013a 和 chunk-013c 共同支撑。所有关键信息点均有据可查，无过度推断或幻觉。",
+      "unsupported_claims": [],
+      "missing_points": [],
+      "errors": []
+    },
+    "coverage": {
+      "score": 5,
+      "reason": "Answer comprehensively covers all six required key points: centralized storage with necessary fields, integrity protection (digital signature/hash), clock synchronization, retention period and retrieval/alerting, SIEM management with correlation rules, and alert integration into SOAR/ticketing for closed-loop. It also correctly avoids prohibited content.",
+      "unsupported_claims": [],
+      "missing_points": [],
+      "errors": []
+    },
+    "compliance_accuracy": {
+      "score": 5,
+      "reason": "Agent output accurately synthesizes information from all three retrieved chunks. The standard numbers (8.1.4.3, A.8.15, CIS 8), document titles, and key numerical values (90 days online, 1 year offline) match the mock_retrieved_chunks exactly. The content covers all required key points without including forbidden information.",
+      "unsupported_claims": [],
+      "missing_points": [],
+      "errors": []
+    }
+  },
+  "calls": [
+    {
+      "label": "agent",
+      "parsed": {
+        "answer": "基于检索结果，构建合规日志采集和审计体系应包含以下方面：\n1. 集中化存储与管理：审计日志应集中存储，建议采用集中式日志管理方案，将服务器、网络设备、应用的日志统一发送至SIEM系统。\n2. 日志内容要素：审计记录应包括事件时间、类型、主体、客体和结果，涵盖用户活动、例外情况、故障和安全事件。\n3. 完整性与防篡改：应对日志进行完整性保护，防止未授权修改和删除，可采用数字签名或哈希校验；日志记录应受到保护，防止篡改。\n4. 时间同步：日志应包含时间戳，且各系统时钟必须与可靠时间源同步。\n5. 保留期限：应定义日志保留期限，建议启用至少90天在线存储和1年离线归档。\n6. 分析与响应：审计日志应支持按条件检索和统计，并根据策略触发告警；建立日志分析和异常检测流程，配置关联规则检测攻击行为，并将SIEM告警集成到工单或SOAR平台以实现闭环管理。",
+        "citations": [
+          {
+            "source_doc": "GB/T 22239-2019 信息安全技术 网络安全等级保护基本要求",
+            "section": "8.1.4.3",
+            "quote_snippet": "审计日志应集中存储，审计记录应包括事件时间、类型、主体、客体和结果。应对日志进行完整性保护，防止未授权修改和删除，可采用数字签名或哈希校验。审计日志应支持按条件检索和统计，并根据策略触发告警。"
+          },
+          {
+            "source_doc": "ISO/IEC 27001:2022",
+            "section": "A.8.15",
+            "quote_snippet": "组织应记录涵盖用户活动、例外情况、故障和安全事件的日志。日志应包含时间戳，且各系统时钟必须与可靠时间源同步。日志记录应受到保护，防止篡改。应定义日志保留期限，并建立日志分析和异常检测流程。"
+          },
+          {
+            "source_doc": "CIS Controls v8",
+            "section": "CIS 8 审计日志管理",
+            "quote_snippet": "建议采用集中式日志管理方案，将服务器、网络设备、应用的日志统一发送至SIEM系统。启用至少90天在线存储和1年离线归档。配置关联规则检测攻击行为，并将SIEM告警集成到工单或SOAR平台以实现闭环管理。"
+          }
+        ],
+        "confidence": 0.9
+      },
+      "raw_text": "{\n  \"answer\": \"基于检索结果，构建合规日志采集和审计体系应包含以下方面：\\n1. 集中化存储与管理：审计日志应集中存储，建议采用集中式日志管理方案，将服务器、网络设备、应用的日志统一发送至SIEM系统。\\n2. 日志内容要素：审计记录应包括事件时间、类型、主体、客体和结果，涵盖用户活动、例外情况、故障和安全事件。\\n3. 完整性与防篡改：应对日志进行完整性保护，防止未授权修改和删除，可采用数字签名或哈希校验；日志记录应受到保护，防止篡改。\\n4. 时间同步：日志应包含时间戳，且各系统时钟必须与可靠时间源同步。\\n5. 保留期限：应定义日志保留期限，建议启用至少90天在线存储和1年离线归档。\\n6. 分析与响应：审计日志应支持按条件检索和统计，并根据策略触发告警；建立日志分析和异常检测流程，配置关联规则检测攻击行为，并将SIEM告警集成到工单或SOAR平台以实现闭环管理。\",\n  \"citations\": [\n    {\n      \"source_doc\": \"GB/T 22239-2019 信息安全技术 网络安全等级保护基本要求\",\n      \"section\": \"8.1.4.3\",\n      \"quote_snippet\": \"审计日志应集中存储，审计记录应包括事件时间、类型、主体、客体和结果。应对日志进行完整性保护，防止未授权修改和删除，可采用数字签名或哈希校验。审计日志应支持按条件检索和统计，并根据策略触发告警。\"\n    },\n    {\n      \"source_doc\": \"ISO/IEC 27001:2022\",\n      \"section\": \"A.8.15\",\n      \"quote_snippet\": \"组织应记录涵盖用户活动、例外情况、故障和安全事件的日志。日志应包含时间戳，且各系统时钟必须与可靠时间源同步。日志记录应受到保护，防止篡改。应定义日志保留期限，并建立日志分析和异常检测流程。\"\n    },\n    {\n      \"source_doc\": \"CIS Controls v8\",\n      \"section\": \"CIS 8 审计日志管理\",\n      \"quote_snippet\": \"建议采用集中式日志管理方案，将服务器、网络设备、应用的日志统一发送至SIEM系统。启用至少90天在线存储和1年离线归档。配置关联规则检测攻击行为，并将SIEM告警集成到工单或SOAR平台以实现闭环管理。\"\n    }\n  ],\n  \"confidence\": 0.9\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 578,
+      "output_tokens": 3543,
+      "latency_ms": 34549,
+      "attempts": 1
+    },
+    {
+      "label": "faithfulness",
+      "parsed": {
+        "score": 5,
+        "reason": "Answer 中的每一项声明均能直接在 mock_retrieved_chunks 原文中找到对应支撑。具体而言：1. 集中化存储与 SIEM 建议由 chunk-013c 和 chunk-013a 支撑；2. 日志内容要素（时间、类型等）由 chunk-013a 和 chunk-013b 支撑；3. 完整性保护（数字签名/哈希）由 chunk-013a 支撑；4. 时间同步要求由 chunk-013b 支撑；5. 保留期限（90 天/1 年）由 chunk-013c 支撑；6. 分析与响应（检索、告警、SOAR 集成）由 chunk-013a 和 chunk-013c 共同支撑。所有关键信息点均有据可查，无过度推断或幻觉。",
+        "unsupported_claims": [],
+        "missing_points": [],
+        "errors": []
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"Answer 中的每一项声明均能直接在 mock_retrieved_chunks 原文中找到对应支撑。具体而言：1. 集中化存储与 SIEM 建议由 chunk-013c 和 chunk-013a 支撑；2. 日志内容要素（时间、类型等）由 chunk-013a 和 chunk-013b 支撑；3. 完整性保护（数字签名/哈希）由 chunk-013a 支撑；4. 时间同步要求由 chunk-013b 支撑；5. 保留期限（90 天/1 年）由 chunk-013c 支撑；6. 分析与响应（检索、告警、SOAR 集成）由 chunk-013a 和 chunk-013c 共同支撑。所有关键信息点均有据可查，无过度推断或幻觉。\",\n  \"unsupported_claims\": []\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1414,
+      "output_tokens": 219,
+      "latency_ms": 9478,
+      "attempts": 1
+    },
+    {
+      "label": "coverage",
+      "parsed": {
+        "score": 5,
+        "reason": "Answer comprehensively covers all six required key points: centralized storage with necessary fields, integrity protection (digital signature/hash), clock synchronization, retention period and retrieval/alerting, SIEM management with correlation rules, and alert integration into SOAR/ticketing for closed-loop. It also correctly avoids prohibited content.",
+        "unsupported_claims": [],
+        "missing_points": [],
+        "errors": []
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"Answer comprehensively covers all six required key points: centralized storage with necessary fields, integrity protection (digital signature/hash), clock synchronization, retention period and retrieval/alerting, SIEM management with correlation rules, and alert integration into SOAR/ticketing for closed-loop. It also correctly avoids prohibited content.\",\n  \"missing_points\": []\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1410,
+      "output_tokens": 84,
+      "latency_ms": 1363,
+      "attempts": 1
+    },
+    {
+      "label": "compliance_accuracy",
+      "parsed": {
+        "score": 5,
+        "reason": "Agent output accurately synthesizes information from all three retrieved chunks. The standard numbers (8.1.4.3, A.8.15, CIS 8), document titles, and key numerical values (90 days online, 1 year offline) match the mock_retrieved_chunks exactly. The content covers all required key points without including forbidden information.",
+        "unsupported_claims": [],
+        "missing_points": [],
+        "errors": []
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"Agent output accurately synthesizes information from all three retrieved chunks. The standard numbers (8.1.4.3, A.8.15, CIS 8), document titles, and key numerical values (90 days online, 1 year offline) match the mock_retrieved_chunks exactly. The content covers all required key points without including forbidden information.\",\n  \"errors\": []\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1411,
+      "output_tokens": 97,
+      "latency_ms": 1362,
+      "attempts": 1
+    }
+  ],
+  "overall_pass": true,
+  "error_type": null,
+  "error_message": null
+}

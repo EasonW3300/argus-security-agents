@@ -1,0 +1,216 @@
+{
+  "test_case_id": "S02-007",
+  "scenario": "用户询问等保三级对安全管理中心（态势感知/SOC）的功能要求",
+  "type": "exact_lookup",
+  "difficulty": "medium",
+  "is_positive": true,
+  "expected_answer_type": "direct_answer",
+  "status": "completed",
+  "agent_output": {
+    "answer": "根据检索到的国家标准，等保三级对安全管理中心的具体功能要求如下：\n1. 应建立安全管理中心，对分布在各个节点的安全设备、网络设备、服务器等资产的安全事件进行集中收集、监测、关联分析和预警。\n2. 安全管理中心应具备对整体安全态势的展示能力，包括但不限于攻击趋势、脆弱性分布和资产风险态势。\n3. 应支持与国家或行业安全监测平台的接口对接，实现安全事件的实时上报和协同响应。\n4. 测评要点包括是否实现了对各类安全事件的集中采集和归一化处理。\n5. 是否具备基于规则的关联分析引擎，能够识别多步攻击和异常行为。\n6. 是否对安全态势进行可视化展示。\n7. 是否配置了告警策略并实现与工单系统的联动。\n8. 是否保存关联分析结果至少180天。",
+    "citations": [
+      {
+        "source_doc": "GB/T 22239-2019 信息安全技术 网络安全等级保护基本要求",
+        "section": "8.1.4.1",
+        "quote_snippet": "应建立安全管理中心，对分布在各个节点的安全设备、网络设备、服务器等资产的安全事件进行集中收集、监测、关联分析和预警。"
+      },
+      {
+        "source_doc": "GB/T 22239-2019 信息安全技术 网络安全等级保护基本要求",
+        "section": "8.1.4.1",
+        "quote_snippet": "安全管理中心应具备对整体安全态势的展示能力，包括但不限于攻击趋势、脆弱性分布和资产风险态势。"
+      },
+      {
+        "source_doc": "GB/T 22239-2019 信息安全技术 网络安全等级保护基本要求",
+        "section": "8.1.4.1",
+        "quote_snippet": "应支持与国家或行业安全监测平台的接口对接，实现安全事件的实时上报和协同响应。"
+      },
+      {
+        "source_doc": "GB/T 28448-2019 信息安全技术 网络安全等级保护测评要求",
+        "section": "8.1.4.1 测评项",
+        "quote_snippet": "是否实现了对各类安全事件的集中采集和归一化处理；是否具备基于规则的关联分析引擎，能够识别多步攻击和异常行为；"
+      },
+      {
+        "source_doc": "GB/T 28448-2019 信息安全技术 网络安全等级保护测评要求",
+        "section": "8.1.4.1 测评项",
+        "quote_snippet": "是否对安全态势进行可视化展示；是否配置了告警策略并实现与工单系统的联动；"
+      },
+      {
+        "source_doc": "GB/T 28448-2019 信息安全技术 网络安全等级保护测评要求",
+        "section": "8.1.4.1 测评项",
+        "quote_snippet": "是否保存关联分析结果至少180天。"
+      }
+    ],
+    "confidence": 0.9
+  },
+  "code_graders": {
+    "citation_format": {
+      "passed": true,
+      "reason": "citation format valid",
+      "expected": null,
+      "actual": null
+    },
+    "output_schema": {
+      "passed": true,
+      "reason": "output schema valid",
+      "expected": null,
+      "actual": null
+    },
+    "refusal_check": {
+      "passed": true,
+      "reason": "refusal behavior valid",
+      "expected": false,
+      "actual": "根据检索到的国家标准，等保三级对安全管理中心的具体功能要求如下：\n1. 应建立安全管理中心，对分布在各个节点的安全设备、网络设备、服务器等资产的安全事件进行集中收集、监测、关联分析和预警。\n2. 安全管理中心应具备对整体安全态势的展示能力，包括但不限于攻击趋势、脆弱性分布和资产风险态势。\n3. 应支持与国家或行业安全监测平台的接口对接，实现安全事件的实时上报和协同响应。\n4. 测评要点包括是否实现了对各类安全事件的集中采集和归一化处理。\n5. 是否具备基于规则的关联分析引擎，能够识别多步攻击和异常行为。\n6. 是否对安全态势进行可视化展示。\n7. 是否配置了告警策略并实现与工单系统的联动。\n8. 是否保存关联分析结果至少180天。"
+    },
+    "retrieval_relevance": {
+      "passed": true,
+      "reason": "retrieval mock quality valid",
+      "expected": "sufficient",
+      "actual": [
+        "high",
+        "high",
+        "medium"
+      ]
+    },
+    "citation_grounding": {
+      "passed": true,
+      "reason": "citations grounded",
+      "expected": null,
+      "actual": null
+    },
+    "confidence_check": {
+      "passed": true,
+      "reason": "confidence valid",
+      "expected": ">= 0.85",
+      "actual": 0.9
+    }
+  },
+  "model_scores": {
+    "faithfulness": {
+      "score": 5,
+      "reason": "Answer 中的所有声明均能由 mock_retrieved_chunks 原文直接支撑。chunk-007a 完整覆盖了答案中的第 1、2、3 点（建立中心、态势展示、平台对接）；chunk-007b 完整覆盖了答案中的第 4 至 8 点（集中采集归一化、关联分析引擎、可视化展示、告警联动、结果保存 180 天）。引用片段与原文内容高度一致，无事实性偏差或过度推断。",
+      "unsupported_claims": [],
+      "missing_points": [],
+      "errors": []
+    },
+    "coverage": {
+      "score": 5,
+      "reason": "Answer comprehensively covers all four mandatory key points from the ground truth: (1) centralized collection, correlation analysis, and warning of security events; (2) overall security situation display capability; (3) support for docking with national/industry monitoring platforms; and (4) specific assessment requirements including centralized collection, correlation analysis engine, visualization, alarm linkage, and result retention. The answer is accurate, well-structured, and supported by relevant citations.",
+      "unsupported_claims": [],
+      "missing_points": [],
+      "errors": []
+    },
+    "compliance_accuracy": {
+      "score": 5,
+      "reason": "Agent 输出的答案准确涵盖了所有关键要点（集中收集、态势展示、平台对接、测评项核查），且引用的标准编号（GB/T 22239-2019, GB/T 28448-2019）、条款号（8.1.4.1）及关键数值（180天）均与 mock_retrieved_chunks 中的内容完全一致。引用片段在检索到的文本中均有明确出处，无幻觉或错误信息。",
+      "unsupported_claims": [],
+      "missing_points": [],
+      "errors": []
+    }
+  },
+  "calls": [
+    {
+      "label": "agent",
+      "parsed": {
+        "answer": "根据检索到的国家标准，等保三级对安全管理中心的具体功能要求如下：\n1. 应建立安全管理中心，对分布在各个节点的安全设备、网络设备、服务器等资产的安全事件进行集中收集、监测、关联分析和预警。\n2. 安全管理中心应具备对整体安全态势的展示能力，包括但不限于攻击趋势、脆弱性分布和资产风险态势。\n3. 应支持与国家或行业安全监测平台的接口对接，实现安全事件的实时上报和协同响应。\n4. 测评要点包括是否实现了对各类安全事件的集中采集和归一化处理。\n5. 是否具备基于规则的关联分析引擎，能够识别多步攻击和异常行为。\n6. 是否对安全态势进行可视化展示。\n7. 是否配置了告警策略并实现与工单系统的联动。\n8. 是否保存关联分析结果至少180天。",
+        "citations": [
+          {
+            "source_doc": "GB/T 22239-2019 信息安全技术 网络安全等级保护基本要求",
+            "section": "8.1.4.1",
+            "quote_snippet": "应建立安全管理中心，对分布在各个节点的安全设备、网络设备、服务器等资产的安全事件进行集中收集、监测、关联分析和预警。"
+          },
+          {
+            "source_doc": "GB/T 22239-2019 信息安全技术 网络安全等级保护基本要求",
+            "section": "8.1.4.1",
+            "quote_snippet": "安全管理中心应具备对整体安全态势的展示能力，包括但不限于攻击趋势、脆弱性分布和资产风险态势。"
+          },
+          {
+            "source_doc": "GB/T 22239-2019 信息安全技术 网络安全等级保护基本要求",
+            "section": "8.1.4.1",
+            "quote_snippet": "应支持与国家或行业安全监测平台的接口对接，实现安全事件的实时上报和协同响应。"
+          },
+          {
+            "source_doc": "GB/T 28448-2019 信息安全技术 网络安全等级保护测评要求",
+            "section": "8.1.4.1 测评项",
+            "quote_snippet": "是否实现了对各类安全事件的集中采集和归一化处理；是否具备基于规则的关联分析引擎，能够识别多步攻击和异常行为；"
+          },
+          {
+            "source_doc": "GB/T 28448-2019 信息安全技术 网络安全等级保护测评要求",
+            "section": "8.1.4.1 测评项",
+            "quote_snippet": "是否对安全态势进行可视化展示；是否配置了告警策略并实现与工单系统的联动；"
+          },
+          {
+            "source_doc": "GB/T 28448-2019 信息安全技术 网络安全等级保护测评要求",
+            "section": "8.1.4.1 测评项",
+            "quote_snippet": "是否保存关联分析结果至少180天。"
+          }
+        ],
+        "confidence": 0.9
+      },
+      "raw_text": "{\n\"answer\": \"根据检索到的国家标准，等保三级对安全管理中心的具体功能要求如下：\\n1. 应建立安全管理中心，对分布在各个节点的安全设备、网络设备、服务器等资产的安全事件进行集中收集、监测、关联分析和预警。\\n2. 安全管理中心应具备对整体安全态势的展示能力，包括但不限于攻击趋势、脆弱性分布和资产风险态势。\\n3. 应支持与国家或行业安全监测平台的接口对接，实现安全事件的实时上报和协同响应。\\n4. 测评要点包括是否实现了对各类安全事件的集中采集和归一化处理。\\n5. 是否具备基于规则的关联分析引擎，能够识别多步攻击和异常行为。\\n6. 是否对安全态势进行可视化展示。\\n7. 是否配置了告警策略并实现与工单系统的联动。\\n8. 是否保存关联分析结果至少180天。\",\n\"citations\": [\n{\n\"source_doc\": \"GB/T 22239-2019 信息安全技术 网络安全等级保护基本要求\",\n\"section\": \"8.1.4.1\",\n\"quote_snippet\": \"应建立安全管理中心，对分布在各个节点的安全设备、网络设备、服务器等资产的安全事件进行集中收集、监测、关联分析和预警。\"\n},\n{\n\"source_doc\": \"GB/T 22239-2019 信息安全技术 网络安全等级保护基本要求\",\n\"section\": \"8.1.4.1\",\n\"quote_snippet\": \"安全管理中心应具备对整体安全态势的展示能力，包括但不限于攻击趋势、脆弱性分布和资产风险态势。\"\n},\n{\n\"source_doc\": \"GB/T 22239-2019 信息安全技术 网络安全等级保护基本要求\",\n\"section\": \"8.1.4.1\",\n\"quote_snippet\": \"应支持与国家或行业安全监测平台的接口对接，实现安全事件的实时上报和协同响应。\"\n},\n{\n\"source_doc\": \"GB/T 28448-2019 信息安全技术 网络安全等级保护测评要求\",\n\"section\": \"8.1.4.1 测评项\",\n\"quote_snippet\": \"是否实现了对各类安全事件的集中采集和归一化处理；是否具备基于规则的关联分析引擎，能够识别多步攻击和异常行为；\"\n},\n{\n\"source_doc\": \"GB/T 28448-2019 信息安全技术 网络安全等级保护测评要求\",\n\"section\": \"8.1.4.1 测评项\",\n\"quote_snippet\": \"是否对安全态势进行可视化展示；是否配置了告警策略并实现与工单系统的联动；\"\n},\n{\n\"source_doc\": \"GB/T 28448-2019 信息安全技术 网络安全等级保护测评要求\",\n\"section\": \"8.1.4.1 测评项\",\n\"quote_snippet\": \"是否保存关联分析结果至少180天。\"\n}\n],\n\"confidence\": 0.9\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 606,
+      "output_tokens": 4545,
+      "latency_ms": 42576,
+      "attempts": 1
+    },
+    {
+      "label": "faithfulness",
+      "parsed": {
+        "score": 5,
+        "reason": "Answer 中的所有声明均能由 mock_retrieved_chunks 原文直接支撑。chunk-007a 完整覆盖了答案中的第 1、2、3 点（建立中心、态势展示、平台对接）；chunk-007b 完整覆盖了答案中的第 4 至 8 点（集中采集归一化、关联分析引擎、可视化展示、告警联动、结果保存 180 天）。引用片段与原文内容高度一致，无事实性偏差或过度推断。",
+        "unsupported_claims": [],
+        "missing_points": [],
+        "errors": []
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"Answer 中的所有声明均能由 mock_retrieved_chunks 原文直接支撑。chunk-007a 完整覆盖了答案中的第 1、2、3 点（建立中心、态势展示、平台对接）；chunk-007b 完整覆盖了答案中的第 4 至 8 点（集中采集归一化、关联分析引擎、可视化展示、告警联动、结果保存 180 天）。引用片段与原文内容高度一致，无事实性偏差或过度推断。\",\n  \"unsupported_claims\": []\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1564,
+      "output_tokens": 137,
+      "latency_ms": 2272,
+      "attempts": 1
+    },
+    {
+      "label": "coverage",
+      "parsed": {
+        "score": 5,
+        "reason": "Answer comprehensively covers all four mandatory key points from the ground truth: (1) centralized collection, correlation analysis, and warning of security events; (2) overall security situation display capability; (3) support for docking with national/industry monitoring platforms; and (4) specific assessment requirements including centralized collection, correlation analysis engine, visualization, alarm linkage, and result retention. The answer is accurate, well-structured, and supported by relevant citations.",
+        "unsupported_claims": [],
+        "missing_points": [],
+        "errors": []
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"Answer comprehensively covers all four mandatory key points from the ground truth: (1) centralized collection, correlation analysis, and warning of security events; (2) overall security situation display capability; (3) support for docking with national/industry monitoring platforms; and (4) specific assessment requirements including centralized collection, correlation analysis engine, visualization, alarm linkage, and result retention. The answer is accurate, well-structured, and supported by relevant citations.\",\n  \"missing_points\": []\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1560,
+      "output_tokens": 114,
+      "latency_ms": 1635,
+      "attempts": 1
+    },
+    {
+      "label": "compliance_accuracy",
+      "parsed": {
+        "score": 5,
+        "reason": "Agent 输出的答案准确涵盖了所有关键要点（集中收集、态势展示、平台对接、测评项核查），且引用的标准编号（GB/T 22239-2019, GB/T 28448-2019）、条款号（8.1.4.1）及关键数值（180天）均与 mock_retrieved_chunks 中的内容完全一致。引用片段在检索到的文本中均有明确出处，无幻觉或错误信息。",
+        "unsupported_claims": [],
+        "missing_points": [],
+        "errors": []
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"Agent 输出的答案准确涵盖了所有关键要点（集中收集、态势展示、平台对接、测评项核查），且引用的标准编号（GB/T 22239-2019, GB/T 28448-2019）、条款号（8.1.4.1）及关键数值（180天）均与 mock_retrieved_chunks 中的内容完全一致。引用片段在检索到的文本中均有明确出处，无幻觉或错误信息。\",\n  \"errors\": []\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1561,
+      "output_tokens": 130,
+      "latency_ms": 1742,
+      "attempts": 1
+    }
+  ],
+  "overall_pass": true,
+  "error_type": null,
+  "error_message": null
+}

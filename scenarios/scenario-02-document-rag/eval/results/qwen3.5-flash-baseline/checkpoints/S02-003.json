@@ -1,0 +1,190 @@
+{
+  "test_case_id": "S02-003",
+  "scenario": "用户询问ISO 27001:2022中访问控制策略的评审频率",
+  "type": "exact_lookup",
+  "difficulty": "medium",
+  "is_positive": true,
+  "expected_answer_type": "direct_answer",
+  "status": "completed",
+  "agent_output": {
+    "answer": "根据检索到的 ISO/IEC 27001:2022 标准，访问控制策略的评审周期规定为至少每年一次。当发生可能影响访问控制要求的重大变更时，应立即进行评审。此外，评审结果应形成记录，并根据需要修订策略。作为实施指南参考，ISO/IEC 27002:2022 建议对于承载敏感数据或关键业务的信息系统，除年度常规评审外，可每半年进行一次专项评审。",
+    "citations": [
+      {
+        "source_doc": "ISO/IEC 27001:2022",
+        "section": "A.5.15",
+        "quote_snippet": "策略应进行定期评审，评审间隔至少每年一次，当发生可能影响访问控制要求的重大变更时，应立即进行评审。"
+      },
+      {
+        "source_doc": "ISO/IEC 27001:2022",
+        "section": "A.5.15",
+        "quote_snippet": "评审结果应形成记录，并根据需要修订策略。"
+      },
+      {
+        "source_doc": "ISO/IEC 27002:2022",
+        "section": "5.15",
+        "quote_snippet": "除年度常规评审外，对于承载敏感数据或关键业务的信息系统，建议每半年进行一次访问权限和策略的专项评审。"
+      }
+    ],
+    "confidence": 0.95
+  },
+  "code_graders": {
+    "citation_format": {
+      "passed": true,
+      "reason": "citation format valid",
+      "expected": null,
+      "actual": null
+    },
+    "output_schema": {
+      "passed": true,
+      "reason": "output schema valid",
+      "expected": null,
+      "actual": null
+    },
+    "refusal_check": {
+      "passed": true,
+      "reason": "refusal behavior valid",
+      "expected": false,
+      "actual": "根据检索到的 ISO/IEC 27001:2022 标准，访问控制策略的评审周期规定为至少每年一次。当发生可能影响访问控制要求的重大变更时，应立即进行评审。此外，评审结果应形成记录，并根据需要修订策略。作为实施指南参考，ISO/IEC 27002:2022 建议对于承载敏感数据或关键业务的信息系统，除年度常规评审外，可每半年进行一次专项评审。"
+    },
+    "retrieval_relevance": {
+      "passed": true,
+      "reason": "retrieval mock quality valid",
+      "expected": "sufficient",
+      "actual": [
+        "high",
+        "high",
+        "medium"
+      ]
+    },
+    "citation_grounding": {
+      "passed": true,
+      "reason": "citations grounded",
+      "expected": null,
+      "actual": null
+    },
+    "confidence_check": {
+      "passed": true,
+      "reason": "confidence valid",
+      "expected": ">= 0.9",
+      "actual": 0.95
+    }
+  },
+  "model_scores": {
+    "faithfulness": {
+      "score": 5,
+      "reason": "Answer accurately reflects all key points supported by the retrieved chunks: (1) 'Access control policy shall be approved by management' is explicitly stated in chunk-003a; (2) 'Regular review interval at least once a year' and 'immediate review upon major changes' are directly from chunk-003a; (3) 'ISO/IEC 27002 suggests semi-annual special reviews for critical systems' matches chunk-003b. No unsupported claims or hallucinations detected.",
+      "unsupported_claims": [],
+      "missing_points": [],
+      "errors": []
+    },
+    "coverage": {
+      "score": 4,
+      "reason": "Answer correctly covers the review frequency (at least annually), immediate review upon major changes, and the ISO 27002 recommendation for semi-annual reviews. However, it fails to explicitly mention that 'Access control policies must be approved by management', which is a mandatory key point found in the retrieved chunk A.5.15 and required by ground_truth.",
+      "unsupported_claims": [],
+      "missing_points": [
+        "访问控制策略应由管理层批准"
+      ],
+      "errors": []
+    },
+    "compliance_accuracy": {
+      "score": 5,
+      "reason": "Agent 的回答准确涵盖了所有必须包含的关键点（管理层批准、年度常规评审、重大变更立即评审、ISO 27002 半年专项建议），且未包含任何禁止出现的错误信息。引用的标准编号（ISO/IEC 27001:2022, ISO/IEC 27002:2022）、条款号（A.5.15, 5.15）及关键数值（每年一次、每半年一次）均与 mock_retrieved_chunks 中的内容完全一致。引用片段也与检索到的原文高度吻合。置信度 0.95 满足最低要求。",
+      "unsupported_claims": [],
+      "missing_points": [],
+      "errors": []
+    }
+  },
+  "calls": [
+    {
+      "label": "agent",
+      "parsed": {
+        "answer": "根据检索到的 ISO/IEC 27001:2022 标准，访问控制策略的评审周期规定为至少每年一次。当发生可能影响访问控制要求的重大变更时，应立即进行评审。此外，评审结果应形成记录，并根据需要修订策略。作为实施指南参考，ISO/IEC 27002:2022 建议对于承载敏感数据或关键业务的信息系统，除年度常规评审外，可每半年进行一次专项评审。",
+        "citations": [
+          {
+            "source_doc": "ISO/IEC 27001:2022",
+            "section": "A.5.15",
+            "quote_snippet": "策略应进行定期评审，评审间隔至少每年一次，当发生可能影响访问控制要求的重大变更时，应立即进行评审。"
+          },
+          {
+            "source_doc": "ISO/IEC 27001:2022",
+            "section": "A.5.15",
+            "quote_snippet": "评审结果应形成记录，并根据需要修订策略。"
+          },
+          {
+            "source_doc": "ISO/IEC 27002:2022",
+            "section": "5.15",
+            "quote_snippet": "除年度常规评审外，对于承载敏感数据或关键业务的信息系统，建议每半年进行一次访问权限和策略的专项评审。"
+          }
+        ],
+        "confidence": 0.95
+      },
+      "raw_text": "{\n\"answer\": \"根据检索到的 ISO/IEC 27001:2022 标准，访问控制策略的评审周期规定为至少每年一次。当发生可能影响访问控制要求的重大变更时，应立即进行评审。此外，评审结果应形成记录，并根据需要修订策略。作为实施指南参考，ISO/IEC 27002:2022 建议对于承载敏感数据或关键业务的信息系统，除年度常规评审外，可每半年进行一次专项评审。\",\n\"citations\": [\n{\n\"source_doc\": \"ISO/IEC 27001:2022\",\n\"section\": \"A.5.15\",\n\"quote_snippet\": \"策略应进行定期评审，评审间隔至少每年一次，当发生可能影响访问控制要求的重大变更时，应立即进行评审。\"\n},\n{\n\"source_doc\": \"ISO/IEC 27001:2022\",\n\"section\": \"A.5.15\",\n\"quote_snippet\": \"评审结果应形成记录，并根据需要修订策略。\"\n},\n{\n\"source_doc\": \"ISO/IEC 27002:2022\",\n\"section\": \"5.15\",\n\"quote_snippet\": \"除年度常规评审外，对于承载敏感数据或关键业务的信息系统，建议每半年进行一次访问权限和策略的专项评审。\"\n}\n],\n\"confidence\": 0.95\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 570,
+      "output_tokens": 4192,
+      "latency_ms": 40402,
+      "attempts": 1
+    },
+    {
+      "label": "faithfulness",
+      "parsed": {
+        "score": 5,
+        "reason": "Answer accurately reflects all key points supported by the retrieved chunks: (1) 'Access control policy shall be approved by management' is explicitly stated in chunk-003a; (2) 'Regular review interval at least once a year' and 'immediate review upon major changes' are directly from chunk-003a; (3) 'ISO/IEC 27002 suggests semi-annual special reviews for critical systems' matches chunk-003b. No unsupported claims or hallucinations detected.",
+        "unsupported_claims": [],
+        "missing_points": [],
+        "errors": []
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"Answer accurately reflects all key points supported by the retrieved chunks: (1) 'Access control policy shall be approved by management' is explicitly stated in chunk-003a; (2) 'Regular review interval at least once a year' and 'immediate review upon major changes' are directly from chunk-003a; (3) 'ISO/IEC 27002 suggests semi-annual special reviews for critical systems' matches chunk-003b. No unsupported claims or hallucinations detected.\",\n  \"unsupported_claims\": []\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1126,
+      "output_tokens": 133,
+      "latency_ms": 1996,
+      "attempts": 1
+    },
+    {
+      "label": "coverage",
+      "parsed": {
+        "score": 4,
+        "reason": "Answer correctly covers the review frequency (at least annually), immediate review upon major changes, and the ISO 27002 recommendation for semi-annual reviews. However, it fails to explicitly mention that 'Access control policies must be approved by management', which is a mandatory key point found in the retrieved chunk A.5.15 and required by ground_truth.",
+        "unsupported_claims": [],
+        "missing_points": [
+          "访问控制策略应由管理层批准"
+        ],
+        "errors": []
+      },
+      "raw_text": "{\n  \"score\": 4,\n  \"reason\": \"Answer correctly covers the review frequency (at least annually), immediate review upon major changes, and the ISO 27002 recommendation for semi-annual reviews. However, it fails to explicitly mention that 'Access control policies must be approved by management', which is a mandatory key point found in the retrieved chunk A.5.15 and required by ground_truth.\",\n  \"missing_points\": [\n    \"访问控制策略应由管理层批准\"\n  ]\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1122,
+      "output_tokens": 111,
+      "latency_ms": 2280,
+      "attempts": 1
+    },
+    {
+      "label": "compliance_accuracy",
+      "parsed": {
+        "score": 5,
+        "reason": "Agent 的回答准确涵盖了所有必须包含的关键点（管理层批准、年度常规评审、重大变更立即评审、ISO 27002 半年专项建议），且未包含任何禁止出现的错误信息。引用的标准编号（ISO/IEC 27001:2022, ISO/IEC 27002:2022）、条款号（A.5.15, 5.15）及关键数值（每年一次、每半年一次）均与 mock_retrieved_chunks 中的内容完全一致。引用片段也与检索到的原文高度吻合。置信度 0.95 满足最低要求。",
+        "unsupported_claims": [],
+        "missing_points": [],
+        "errors": []
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"Agent 的回答准确涵盖了所有必须包含的关键点（管理层批准、年度常规评审、重大变更立即评审、ISO 27002 半年专项建议），且未包含任何禁止出现的错误信息。引用的标准编号（ISO/IEC 27001:2022, ISO/IEC 27002:2022）、条款号（A.5.15, 5.15）及关键数值（每年一次、每半年一次）均与 mock_retrieved_chunks 中的内容完全一致。引用片段也与检索到的原文高度吻合。置信度 0.95 满足最低要求。\",\n  \"errors\": []\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1123,
+      "output_tokens": 165,
+      "latency_ms": 2027,
+      "attempts": 1
+    }
+  ],
+  "overall_pass": true,
+  "error_type": null,
+  "error_message": null
+}

@@ -1,0 +1,186 @@
+{
+  "test_case_id": "S02-022",
+  "scenario": "跨国企业需同时满足《个人信息保护法》和GDPR，用户询问架构层面合规方案",
+  "type": "scenario_analysis",
+  "difficulty": "medium",
+  "is_positive": true,
+  "expected_answer_type": "analysis",
+  "status": "completed",
+  "agent_output": {
+    "answer": "针对集团在中国和欧盟的业务，个人信息处理架构设计建议如下：\n1. 数据本地化策略：建议在中国和欧盟各设立一个数据中心，个人信息在各自司法管辖区内本地化存储和处理。\n2. 跨境传输合规：若涉及跨境，中国侧依据《中华人民共和国个人信息保护法》第三十八条，处理个人信息达到规定数量须将信息本地化存储，确需出境的须通过安全评估；欧盟侧依据EU GDPR 2016/679第44-49条，将个人数据传输至第三国需基于充分性认定、标准合同条款（SCC）或企业约束性规则（BCR）。\n3. 技术实现方案：通过API网关实现业务逻辑的协同，仅传递去标识化或聚合后的统计数据，避免原始个人信息跨境传输。双方数据中心均部署数据脱敏模块，确保跨域查询时只暴露必要信息。\n4. 管理义务：数据控制者需实施数据保护影响评估（DPIA），并任命数据保护官（DPO）。",
+    "citations": [
+      {
+        "source_doc": "内部架构建议《全球隐私合规蓝图 v0.8》",
+        "section": "2.2 数据本地化与中转",
+        "quote_snippet": "建议在中国和欧盟各设立一个数据中心，个人信息在各自司法管辖区内本地化存储和处理。通过API网关实现业务逻辑的协同，仅传递去标识化或聚合后的统计数据，避免原始个人信息跨境传输。双方数据中心均部署数据脱敏模块，确保跨域查询时只暴露必要信息。"
+      },
+      {
+        "source_doc": "《中华人民共和国个人信息保护法》",
+        "section": "第三十八条",
+        "quote_snippet": "个人信息处理者因业务需要向境外提供个人信息的，应当通过国家网信部门安全评估或与境外接收方签订标准合同。处理个人信息达到规定数量须将信息本地化存储，确需出境的须通过安全评估。"
+      },
+      {
+        "source_doc": "EU GDPR 2016/679",
+        "section": "第44-49条 跨境传输",
+        "quote_snippet": "将个人数据传输至第三国需基于充分性认定、标准合同条款（SCC）或企业约束性规则（BCR）。数据控制者需实施数据保护影响评估（DPIA），并任命数据保护官（DPO）。"
+      }
+    ],
+    "confidence": 0.9
+  },
+  "code_graders": {
+    "citation_format": {
+      "passed": true,
+      "reason": "citation format valid",
+      "expected": null,
+      "actual": null
+    },
+    "output_schema": {
+      "passed": true,
+      "reason": "output schema valid",
+      "expected": null,
+      "actual": null
+    },
+    "refusal_check": {
+      "passed": true,
+      "reason": "refusal behavior valid",
+      "expected": false,
+      "actual": "针对集团在中国和欧盟的业务，个人信息处理架构设计建议如下：\n1. 数据本地化策略：建议在中国和欧盟各设立一个数据中心，个人信息在各自司法管辖区内本地化存储和处理。\n2. 跨境传输合规：若涉及跨境，中国侧依据《中华人民共和国个人信息保护法》第三十八条，处理个人信息达到规定数量须将信息本地化存储，确需出境的须通过安全评估；欧盟侧依据EU GDPR 2016/679第44-49条，将个人数据传输至第三国需基于充分性认定、标准合同条款（SCC）或企业约束性规则（BCR）。\n3. 技术实现方案：通过API网关实现业务逻辑的协同，仅传递去标识化或聚合后的统计数据，避免原始个人信息跨境传输。双方数据中心均部署数据脱敏模块，确保跨域查询时只暴露必要信息。\n4. 管理义务：数据控制者需实施数据保护影响评估（DPIA），并任命数据保护官（DPO）。"
+    },
+    "retrieval_relevance": {
+      "passed": true,
+      "reason": "retrieval mock quality valid",
+      "expected": "sufficient",
+      "actual": [
+        "high",
+        "high",
+        "medium"
+      ]
+    },
+    "citation_grounding": {
+      "passed": true,
+      "reason": "citations grounded",
+      "expected": null,
+      "actual": null
+    },
+    "confidence_check": {
+      "passed": true,
+      "reason": "confidence valid",
+      "expected": ">= 0.8",
+      "actual": 0.9
+    }
+  },
+  "model_scores": {
+    "faithfulness": {
+      "score": 5,
+      "reason": "Answer 中的所有声明均能由 mock_retrieved_chunks 原文直接支撑。具体而言：1. 数据本地化策略（设立数据中心、本地化存储）完全对应 chunk-022c；2. 跨境传输合规中关于中国 PIPL 第三十八条的安全评估和数量要求，以及欧盟 GDPR 第 44-49 条的充分性认定、SCC/BCR 机制，分别精确匹配 chunk-022a 和 chunk-022b；3. 技术实现方案中的 API 网关、去标识化、脱敏模块等细节均源自 chunk-022c；4. 管理义务中的 DPIA 和 DPO 任命明确包含在 chunk-022b 中。引用准确，无 unsupported claims。",
+      "unsupported_claims": [],
+      "missing_points": [],
+      "errors": []
+    },
+    "coverage": {
+      "score": 5,
+      "reason": "Answer fully covers all four mandatory key points: (1) correctly states PIPL requirements for cross-border transfer (security assessment or standard contracts) and localization for large volumes; (2) accurately lists GDPR mechanisms (adequacy, SCC, BCR) along with DPIA and DPO obligations; (3) proposes establishing separate data centers in China and EU for local storage; (4) recommends deploying data masking modules and transmitting only de-identified/aggregated data to avoid raw PII cross-border transfer. The answer also avoids the prohibited point about centralized storage in Europe.",
+      "unsupported_claims": [],
+      "missing_points": [],
+      "errors": []
+    },
+    "compliance_accuracy": {
+      "score": 5,
+      "reason": "Agent output accurately reflects the content of mock_retrieved_chunks. The standard numbers (PIPL Article 38, GDPR Articles 44-49), section titles, and key numerical/qualitative requirements (localization, security assessment, SCC/BCR, DPIA/DPO) match the retrieved chunks exactly. All expected key points are covered without including prohibited information.",
+      "unsupported_claims": [],
+      "missing_points": [],
+      "errors": []
+    }
+  },
+  "calls": [
+    {
+      "label": "agent",
+      "parsed": {
+        "answer": "针对集团在中国和欧盟的业务，个人信息处理架构设计建议如下：\n1. 数据本地化策略：建议在中国和欧盟各设立一个数据中心，个人信息在各自司法管辖区内本地化存储和处理。\n2. 跨境传输合规：若涉及跨境，中国侧依据《中华人民共和国个人信息保护法》第三十八条，处理个人信息达到规定数量须将信息本地化存储，确需出境的须通过安全评估；欧盟侧依据EU GDPR 2016/679第44-49条，将个人数据传输至第三国需基于充分性认定、标准合同条款（SCC）或企业约束性规则（BCR）。\n3. 技术实现方案：通过API网关实现业务逻辑的协同，仅传递去标识化或聚合后的统计数据，避免原始个人信息跨境传输。双方数据中心均部署数据脱敏模块，确保跨域查询时只暴露必要信息。\n4. 管理义务：数据控制者需实施数据保护影响评估（DPIA），并任命数据保护官（DPO）。",
+        "citations": [
+          {
+            "source_doc": "内部架构建议《全球隐私合规蓝图 v0.8》",
+            "section": "2.2 数据本地化与中转",
+            "quote_snippet": "建议在中国和欧盟各设立一个数据中心，个人信息在各自司法管辖区内本地化存储和处理。通过API网关实现业务逻辑的协同，仅传递去标识化或聚合后的统计数据，避免原始个人信息跨境传输。双方数据中心均部署数据脱敏模块，确保跨域查询时只暴露必要信息。"
+          },
+          {
+            "source_doc": "《中华人民共和国个人信息保护法》",
+            "section": "第三十八条",
+            "quote_snippet": "个人信息处理者因业务需要向境外提供个人信息的，应当通过国家网信部门安全评估或与境外接收方签订标准合同。处理个人信息达到规定数量须将信息本地化存储，确需出境的须通过安全评估。"
+          },
+          {
+            "source_doc": "EU GDPR 2016/679",
+            "section": "第44-49条 跨境传输",
+            "quote_snippet": "将个人数据传输至第三国需基于充分性认定、标准合同条款（SCC）或企业约束性规则（BCR）。数据控制者需实施数据保护影响评估（DPIA），并任命数据保护官（DPO）。"
+          }
+        ],
+        "confidence": 0.9
+      },
+      "raw_text": "{\n\"answer\": \"针对集团在中国和欧盟的业务，个人信息处理架构设计建议如下：\\n1. 数据本地化策略：建议在中国和欧盟各设立一个数据中心，个人信息在各自司法管辖区内本地化存储和处理。\\n2. 跨境传输合规：若涉及跨境，中国侧依据《中华人民共和国个人信息保护法》第三十八条，处理个人信息达到规定数量须将信息本地化存储，确需出境的须通过安全评估；欧盟侧依据EU GDPR 2016/679第44-49条，将个人数据传输至第三国需基于充分性认定、标准合同条款（SCC）或企业约束性规则（BCR）。\\n3. 技术实现方案：通过API网关实现业务逻辑的协同，仅传递去标识化或聚合后的统计数据，避免原始个人信息跨境传输。双方数据中心均部署数据脱敏模块，确保跨域查询时只暴露必要信息。\\n4. 管理义务：数据控制者需实施数据保护影响评估（DPIA），并任命数据保护官（DPO）。\",\n\"citations\": [\n{\n\"source_doc\": \"内部架构建议《全球隐私合规蓝图 v0.8》\",\n\"section\": \"2.2 数据本地化与中转\",\n\"quote_snippet\": \"建议在中国和欧盟各设立一个数据中心，个人信息在各自司法管辖区内本地化存储和处理。通过API网关实现业务逻辑的协同，仅传递去标识化或聚合后的统计数据，避免原始个人信息跨境传输。双方数据中心均部署数据脱敏模块，确保跨域查询时只暴露必要信息。\"\n},\n{\n\"source_doc\": \"《中华人民共和国个人信息保护法》\",\n\"section\": \"第三十八条\",\n\"quote_snippet\": \"个人信息处理者因业务需要向境外提供个人信息的，应当通过国家网信部门安全评估或与境外接收方签订标准合同。处理个人信息达到规定数量须将信息本地化存储，确需出境的须通过安全评估。\"\n},\n{\n\"source_doc\": \"EU GDPR 2016/679\",\n\"section\": \"第44-49条 跨境传输\",\n\"quote_snippet\": \"将个人数据传输至第三国需基于充分性认定、标准合同条款（SCC）或企业约束性规则（BCR）。数据控制者需实施数据保护影响评估（DPIA），并任命数据保护官（DPO）。\"\n}\n],\n\"confidence\": 0.9\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 573,
+      "output_tokens": 3862,
+      "latency_ms": 30350,
+      "attempts": 1
+    },
+    {
+      "label": "faithfulness",
+      "parsed": {
+        "score": 5,
+        "reason": "Answer 中的所有声明均能由 mock_retrieved_chunks 原文直接支撑。具体而言：1. 数据本地化策略（设立数据中心、本地化存储）完全对应 chunk-022c；2. 跨境传输合规中关于中国 PIPL 第三十八条的安全评估和数量要求，以及欧盟 GDPR 第 44-49 条的充分性认定、SCC/BCR 机制，分别精确匹配 chunk-022a 和 chunk-022b；3. 技术实现方案中的 API 网关、去标识化、脱敏模块等细节均源自 chunk-022c；4. 管理义务中的 DPIA 和 DPO 任命明确包含在 chunk-022b 中。引用准确，无 unsupported claims。",
+        "unsupported_claims": [],
+        "missing_points": [],
+        "errors": []
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"Answer 中的所有声明均能由 mock_retrieved_chunks 原文直接支撑。具体而言：1. 数据本地化策略（设立数据中心、本地化存储）完全对应 chunk-022c；2. 跨境传输合规中关于中国 PIPL 第三十八条的安全评估和数量要求，以及欧盟 GDPR 第 44-49 条的充分性认定、SCC/BCR 机制，分别精确匹配 chunk-022a 和 chunk-022b；3. 技术实现方案中的 API 网关、去标识化、脱敏模块等细节均源自 chunk-022c；4. 管理义务中的 DPIA 和 DPO 任命明确包含在 chunk-022b 中。引用准确，无 unsupported claims。\",\n  \"unsupported_claims\": []\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1344,
+      "output_tokens": 196,
+      "latency_ms": 2358,
+      "attempts": 1
+    },
+    {
+      "label": "coverage",
+      "parsed": {
+        "score": 5,
+        "reason": "Answer fully covers all four mandatory key points: (1) correctly states PIPL requirements for cross-border transfer (security assessment or standard contracts) and localization for large volumes; (2) accurately lists GDPR mechanisms (adequacy, SCC, BCR) along with DPIA and DPO obligations; (3) proposes establishing separate data centers in China and EU for local storage; (4) recommends deploying data masking modules and transmitting only de-identified/aggregated data to avoid raw PII cross-border transfer. The answer also avoids the prohibited point about centralized storage in Europe.",
+        "unsupported_claims": [],
+        "missing_points": [],
+        "errors": []
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"Answer fully covers all four mandatory key points: (1) correctly states PIPL requirements for cross-border transfer (security assessment or standard contracts) and localization for large volumes; (2) accurately lists GDPR mechanisms (adequacy, SCC, BCR) along with DPIA and DPO obligations; (3) proposes establishing separate data centers in China and EU for local storage; (4) recommends deploying data masking modules and transmitting only de-identified/aggregated data to avoid raw PII cross-border transfer. The answer also avoids the prohibited point about centralized storage in Europe.\",\n  \"missing_points\": []\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1340,
+      "output_tokens": 139,
+      "latency_ms": 1581,
+      "attempts": 1
+    },
+    {
+      "label": "compliance_accuracy",
+      "parsed": {
+        "score": 5,
+        "reason": "Agent output accurately reflects the content of mock_retrieved_chunks. The standard numbers (PIPL Article 38, GDPR Articles 44-49), section titles, and key numerical/qualitative requirements (localization, security assessment, SCC/BCR, DPIA/DPO) match the retrieved chunks exactly. All expected key points are covered without including prohibited information.",
+        "unsupported_claims": [],
+        "missing_points": [],
+        "errors": []
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"Agent output accurately reflects the content of mock_retrieved_chunks. The standard numbers (PIPL Article 38, GDPR Articles 44-49), section titles, and key numerical/qualitative requirements (localization, security assessment, SCC/BCR, DPIA/DPO) match the retrieved chunks exactly. All expected key points are covered without including prohibited information.\",\n  \"errors\": []\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1341,
+      "output_tokens": 100,
+      "latency_ms": 1852,
+      "attempts": 1
+    }
+  ],
+  "overall_pass": true,
+  "error_type": null,
+  "error_message": null
+}

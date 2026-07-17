@@ -1,0 +1,186 @@
+{
+  "test_case_id": "S02-020",
+  "scenario": "用户要求分析等保三级安全审计与SOC 2 Type II审计标准的差距及补充控制",
+  "type": "cross_reference",
+  "difficulty": "hard",
+  "is_positive": true,
+  "expected_answer_type": "comparison",
+  "status": "completed",
+  "agent_output": {
+    "answer": "根据检索结果，等保三级与 SOC 2 Type II 在安全审计方面存在以下差距及需增加的控制：\n1. 日志保留期限：等保要求日志保存不少于180天，而 SOC 2 要求保持至少12个月。\n2. 审查频率：SOC 2 进一步要求异常活动审查的时效性（每周），建议至少每周审查异常活动。\n3. 审计范围：SOC 2 强调对变更管理的审计、供应商访问行为的监控以及向客户报告安全事件的义务，而等保主要关注记录留存和基本完整性。\n4. 需增加控制：建议补充自动化异常检测告警、每月审计报告评审、以及对第三方支持人员的所有操作进行完整审计录像等控制。同时确保日志记录涵盖所有的访问和操作，并能关联到特定用户。",
+    "citations": [
+      {
+        "source_doc": "GB/T 22239-2019 信息安全技术 网络安全等级保护基本要求",
+        "section": "8.1.4.3 安全审计",
+        "quote_snippet": "等保三级安全审计要求包括：审计日志集中存储，覆盖用户行为和重要安全事件；日志保存不少于180天；保护日志完整性和机密性；支持审计追踪和查询；审计管理权限与操作权限分离。"
+      },
+      {
+        "source_doc": "内部制度《审计标准对照分析表》",
+        "section": "1.3 差异项",
+        "quote_snippet": "等保主要关注记录留存和基本完整性，SOC 2进一步要求异常活动审查的时效性（每周）、变更管理审计及供应商行为审计。建议补充自动化异常检测告警、每月审计报告评审、以及对第三方支持人员的所有操作进行完整审计录像等控制。"
+      },
+      {
+        "source_doc": "AICPA TSC 2017 (SOC 2) 审计标准",
+        "section": "CC7.2 审计与问责",
+        "quote_snippet": "SOC 2 Type II 要求服务组织监控系统活动，检测安全事件，并维护审计日志以支持调查。日志记录应涵盖所有的访问和操作，并能关联到特定用户。审计策略应定义审查频率（建议至少每周审查异常活动），日志应受保护并保持至少12个月。此外，SOC 2强调对变更管理的审计、供应商访问行为的监控以及向客户报告安全事件的义务。"
+      }
+    ],
+    "confidence": 0.9
+  },
+  "code_graders": {
+    "citation_format": {
+      "passed": true,
+      "reason": "citation format valid",
+      "expected": null,
+      "actual": null
+    },
+    "output_schema": {
+      "passed": true,
+      "reason": "output schema valid",
+      "expected": null,
+      "actual": null
+    },
+    "refusal_check": {
+      "passed": true,
+      "reason": "refusal behavior valid",
+      "expected": false,
+      "actual": "根据检索结果，等保三级与 SOC 2 Type II 在安全审计方面存在以下差距及需增加的控制：\n1. 日志保留期限：等保要求日志保存不少于180天，而 SOC 2 要求保持至少12个月。\n2. 审查频率：SOC 2 进一步要求异常活动审查的时效性（每周），建议至少每周审查异常活动。\n3. 审计范围：SOC 2 强调对变更管理的审计、供应商访问行为的监控以及向客户报告安全事件的义务，而等保主要关注记录留存和基本完整性。\n4. 需增加控制：建议补充自动化异常检测告警、每月审计报告评审、以及对第三方支持人员的所有操作进行完整审计录像等控制。同时确保日志记录涵盖所有的访问和操作，并能关联到特定用户。"
+    },
+    "retrieval_relevance": {
+      "passed": true,
+      "reason": "retrieval mock quality valid",
+      "expected": "sufficient",
+      "actual": [
+        "high",
+        "high",
+        "medium"
+      ]
+    },
+    "citation_grounding": {
+      "passed": true,
+      "reason": "citations grounded",
+      "expected": null,
+      "actual": null
+    },
+    "confidence_check": {
+      "passed": true,
+      "reason": "confidence valid",
+      "expected": ">= 0.8",
+      "actual": 0.9
+    }
+  },
+  "model_scores": {
+    "faithfulness": {
+      "score": 5,
+      "reason": "Answer 中的所有声明均能由 mock_retrieved_chunks 原文直接支撑。具体对应关系如下：1. '日志保存不少于180天' 和 'SOC 2...保持至少12个月' 分别由 chunk-020a 和 chunk-020b 明确支持；2. '每周审查异常活动' 由 chunk-020b 和 chunk-020c 支持；3. '变更管理审计、供应商访问行为监控、向客户报告安全事件' 由 chunk-020b 和 chunk-020c 支持；4. '建议补充自动化异常检测告警、每月审计报告评审、第三方操作审计录像' 完全匹配 chunk-020c 的内容。所有关键点和对比分析均有据可依，无 unsupported claims。",
+      "unsupported_claims": [],
+      "missing_points": [],
+      "errors": []
+    },
+    "coverage": {
+      "score": 5,
+      "reason": "Answer comprehensively covers all five required key points from the ground truth: (1) Log retention periods (180 days vs 12 months), (2) SOC 2 weekly review requirement vs lack thereof in MLPS, (3) SOC 2 emphasis on change management and vendor monitoring, (4) SOC 2 obligation to report security events to customers, and (5) specific recommendations for additional controls (automation, monthly reviews, third-party video). The answer also correctly avoids including any forbidden points.",
+      "unsupported_claims": [],
+      "missing_points": [],
+      "errors": []
+    },
+    "compliance_accuracy": {
+      "score": 5,
+      "reason": "Agent 的回答准确涵盖了所有关键比较点（日志保留期、审查频率、审计范围及建议控制措施），且引用的标准编号（GB/T 22239-2019, AICPA TSC 2017）、条款号（8.1.4.3, CC7.2）及关键数值（180天，12个月，每周）均与 mock_retrieved_chunks 中的内容完全一致。引用来源和置信度也符合要求。",
+      "unsupported_claims": [],
+      "missing_points": [],
+      "errors": []
+    }
+  },
+  "calls": [
+    {
+      "label": "agent",
+      "parsed": {
+        "answer": "根据检索结果，等保三级与 SOC 2 Type II 在安全审计方面存在以下差距及需增加的控制：\n1. 日志保留期限：等保要求日志保存不少于180天，而 SOC 2 要求保持至少12个月。\n2. 审查频率：SOC 2 进一步要求异常活动审查的时效性（每周），建议至少每周审查异常活动。\n3. 审计范围：SOC 2 强调对变更管理的审计、供应商访问行为的监控以及向客户报告安全事件的义务，而等保主要关注记录留存和基本完整性。\n4. 需增加控制：建议补充自动化异常检测告警、每月审计报告评审、以及对第三方支持人员的所有操作进行完整审计录像等控制。同时确保日志记录涵盖所有的访问和操作，并能关联到特定用户。",
+        "citations": [
+          {
+            "source_doc": "GB/T 22239-2019 信息安全技术 网络安全等级保护基本要求",
+            "section": "8.1.4.3 安全审计",
+            "quote_snippet": "等保三级安全审计要求包括：审计日志集中存储，覆盖用户行为和重要安全事件；日志保存不少于180天；保护日志完整性和机密性；支持审计追踪和查询；审计管理权限与操作权限分离。"
+          },
+          {
+            "source_doc": "内部制度《审计标准对照分析表》",
+            "section": "1.3 差异项",
+            "quote_snippet": "等保主要关注记录留存和基本完整性，SOC 2进一步要求异常活动审查的时效性（每周）、变更管理审计及供应商行为审计。建议补充自动化异常检测告警、每月审计报告评审、以及对第三方支持人员的所有操作进行完整审计录像等控制。"
+          },
+          {
+            "source_doc": "AICPA TSC 2017 (SOC 2) 审计标准",
+            "section": "CC7.2 审计与问责",
+            "quote_snippet": "SOC 2 Type II 要求服务组织监控系统活动，检测安全事件，并维护审计日志以支持调查。日志记录应涵盖所有的访问和操作，并能关联到特定用户。审计策略应定义审查频率（建议至少每周审查异常活动），日志应受保护并保持至少12个月。此外，SOC 2强调对变更管理的审计、供应商访问行为的监控以及向客户报告安全事件的义务。"
+          }
+        ],
+        "confidence": 0.9
+      },
+      "raw_text": "{\n  \"answer\": \"根据检索结果，等保三级与 SOC 2 Type II 在安全审计方面存在以下差距及需增加的控制：\\n1. 日志保留期限：等保要求日志保存不少于180天，而 SOC 2 要求保持至少12个月。\\n2. 审查频率：SOC 2 进一步要求异常活动审查的时效性（每周），建议至少每周审查异常活动。\\n3. 审计范围：SOC 2 强调对变更管理的审计、供应商访问行为的监控以及向客户报告安全事件的义务，而等保主要关注记录留存和基本完整性。\\n4. 需增加控制：建议补充自动化异常检测告警、每月审计报告评审、以及对第三方支持人员的所有操作进行完整审计录像等控制。同时确保日志记录涵盖所有的访问和操作，并能关联到特定用户。\",\n  \"citations\": [\n    {\n      \"source_doc\": \"GB/T 22239-2019 信息安全技术 网络安全等级保护基本要求\",\n      \"section\": \"8.1.4.3 安全审计\",\n      \"quote_snippet\": \"等保三级安全审计要求包括：审计日志集中存储，覆盖用户行为和重要安全事件；日志保存不少于180天；保护日志完整性和机密性；支持审计追踪和查询；审计管理权限与操作权限分离。\"\n    },\n    {\n      \"source_doc\": \"内部制度《审计标准对照分析表》\",\n      \"section\": \"1.3 差异项\",\n      \"quote_snippet\": \"等保主要关注记录留存和基本完整性，SOC 2进一步要求异常活动审查的时效性（每周）、变更管理审计及供应商行为审计。建议补充自动化异常检测告警、每月审计报告评审、以及对第三方支持人员的所有操作进行完整审计录像等控制。\"\n    },\n    {\n      \"source_doc\": \"AICPA TSC 2017 (SOC 2) 审计标准\",\n      \"section\": \"CC7.2 审计与问责\",\n      \"quote_snippet\": \"SOC 2 Type II 要求服务组织监控系统活动，检测安全事件，并维护审计日志以支持调查。日志记录应涵盖所有的访问和操作，并能关联到特定用户。审计策略应定义审查频率（建议至少每周审查异常活动），日志应受保护并保持至少12个月。此外，SOC 2强调对变更管理的审计、供应商访问行为的监控以及向客户报告安全事件的义务。\"\n    }\n  ],\n  \"confidence\": 0.9\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 610,
+      "output_tokens": 4165,
+      "latency_ms": 37461,
+      "attempts": 1
+    },
+    {
+      "label": "faithfulness",
+      "parsed": {
+        "score": 5,
+        "reason": "Answer 中的所有声明均能由 mock_retrieved_chunks 原文直接支撑。具体对应关系如下：1. '日志保存不少于180天' 和 'SOC 2...保持至少12个月' 分别由 chunk-020a 和 chunk-020b 明确支持；2. '每周审查异常活动' 由 chunk-020b 和 chunk-020c 支持；3. '变更管理审计、供应商访问行为监控、向客户报告安全事件' 由 chunk-020b 和 chunk-020c 支持；4. '建议补充自动化异常检测告警、每月审计报告评审、第三方操作审计录像' 完全匹配 chunk-020c 的内容。所有关键点和对比分析均有据可依，无 unsupported claims。",
+        "unsupported_claims": [],
+        "missing_points": [],
+        "errors": []
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"Answer 中的所有声明均能由 mock_retrieved_chunks 原文直接支撑。具体对应关系如下：1. '日志保存不少于180天' 和 'SOC 2...保持至少12个月' 分别由 chunk-020a 和 chunk-020b 明确支持；2. '每周审查异常活动' 由 chunk-020b 和 chunk-020c 支持；3. '变更管理审计、供应商访问行为监控、向客户报告安全事件' 由 chunk-020b 和 chunk-020c 支持；4. '建议补充自动化异常检测告警、每月审计报告评审、第三方操作审计录像' 完全匹配 chunk-020c 的内容。所有关键点和对比分析均有据可依，无 unsupported claims。\",\n  \"unsupported_claims\": []\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1411,
+      "output_tokens": 202,
+      "latency_ms": 2908,
+      "attempts": 1
+    },
+    {
+      "label": "coverage",
+      "parsed": {
+        "score": 5,
+        "reason": "Answer comprehensively covers all five required key points from the ground truth: (1) Log retention periods (180 days vs 12 months), (2) SOC 2 weekly review requirement vs lack thereof in MLPS, (3) SOC 2 emphasis on change management and vendor monitoring, (4) SOC 2 obligation to report security events to customers, and (5) specific recommendations for additional controls (automation, monthly reviews, third-party video). The answer also correctly avoids including any forbidden points.",
+        "unsupported_claims": [],
+        "missing_points": [],
+        "errors": []
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"Answer comprehensively covers all five required key points from the ground truth: (1) Log retention periods (180 days vs 12 months), (2) SOC 2 weekly review requirement vs lack thereof in MLPS, (3) SOC 2 emphasis on change management and vendor monitoring, (4) SOC 2 obligation to report security events to customers, and (5) specific recommendations for additional controls (automation, monthly reviews, third-party video). The answer also correctly avoids including any forbidden points.\",\n  \"missing_points\": []\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1407,
+      "output_tokens": 128,
+      "latency_ms": 1827,
+      "attempts": 1
+    },
+    {
+      "label": "compliance_accuracy",
+      "parsed": {
+        "score": 5,
+        "reason": "Agent 的回答准确涵盖了所有关键比较点（日志保留期、审查频率、审计范围及建议控制措施），且引用的标准编号（GB/T 22239-2019, AICPA TSC 2017）、条款号（8.1.4.3, CC7.2）及关键数值（180天，12个月，每周）均与 mock_retrieved_chunks 中的内容完全一致。引用来源和置信度也符合要求。",
+        "unsupported_claims": [],
+        "missing_points": [],
+        "errors": []
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"Agent 的回答准确涵盖了所有关键比较点（日志保留期、审查频率、审计范围及建议控制措施），且引用的标准编号（GB/T 22239-2019, AICPA TSC 2017）、条款号（8.1.4.3, CC7.2）及关键数值（180天，12个月，每周）均与 mock_retrieved_chunks 中的内容完全一致。引用来源和置信度也符合要求。\",\n  \"errors\": []\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1408,
+      "output_tokens": 130,
+      "latency_ms": 1549,
+      "attempts": 1
+    }
+  ],
+  "overall_pass": true,
+  "error_type": null,
+  "error_message": null
+}

@@ -1,0 +1,226 @@
+{
+  "test_case_id": "S02-015",
+  "scenario": "用户询问容器化部署（K8s）的生产环境如何满足等保合规要求",
+  "type": "suggestion",
+  "difficulty": "medium",
+  "is_positive": true,
+  "expected_answer_type": "synthesis",
+  "status": "completed",
+  "agent_output": {
+    "answer": "根据检索结果，K8s 生产环境在等保三级测评中需注意以下合规点：\n1. 镜像安全：应保证基础镜像来自可信源，并在部署前进行镜像安全扫描，修复已知高危漏洞。\n2. 运行时权限与网络：容器运行时应遵循最小权限原则，禁止以root用户运行容器进程。应配置网络策略实现容器间的东西向流量隔离（微分段），默认拒绝所有通信，按需开放。\n3. 管理接口安全：容器编排平台的管理接口应实施强身份认证和RBAC访问控制，管理流量使用TLS加密。\n4. 控制面安全：etcd集群应启用TLS加密通信并进行客户端证书认证；API Server应禁用匿名访问，并启用Node和RBAC授权模式；kubelet应使用认证授权且禁用匿名访问。\n5. 策略与日志：生产集群应部署Pod安全策略（PSP）或OPA/Gatekeeper，限制容器能力添加（如禁止特权容器、禁止挂载宿主机敏感目录）。所有集群组件日志应发送到集中日志系统。",
+    "citations": [
+      {
+        "source_doc": "GB/T 22239-2019 附录C 云计算安全扩展要求",
+        "section": "C.3.2 容器安全",
+        "quote_snippet": "使用容器技术时，应保证基础镜像来自可信源，并在部署前进行镜像安全扫描，修复已知高危漏洞。"
+      },
+      {
+        "source_doc": "GB/T 22239-2019 附录C 云计算安全扩展要求",
+        "section": "C.3.2 容器安全",
+        "quote_snippet": "容器运行时应遵循最小权限原则，禁止以root用户运行容器进程。"
+      },
+      {
+        "source_doc": "GB/T 22239-2019 附录C 云计算安全扩展要求",
+        "section": "C.3.2 容器安全",
+        "quote_snippet": "应配置网络策略实现容器间的东西向流量隔离（微分段），默认拒绝所有通信，按需开放。"
+      },
+      {
+        "source_doc": "GB/T 22239-2019 附录C 云计算安全扩展要求",
+        "section": "C.3.2 容器安全",
+        "quote_snippet": "容器编排平台的管理接口应实施强身份认证和RBAC访问控制，管理流量使用TLS加密。"
+      },
+      {
+        "source_doc": "CIS Kubernetes Benchmark 1.6.0",
+        "section": "2.1 控制面安全",
+        "quote_snippet": "etcd集群应启用TLS加密通信并进行客户端证书认证；API Server应禁用匿名访问，并启用Node和RBAC授权模式；kubelet应使用认证授权且禁用匿名访问"
+      },
+      {
+        "source_doc": "内部制度《容器安全管理规范 v1.0》",
+        "section": "4.2 运行时安全",
+        "quote_snippet": "生产集群应部署Pod安全策略（PSP）或OPA/Gatekeeper，限制容器能力添加（如禁止特权容器、禁止挂载宿主机敏感目录）。"
+      },
+      {
+        "source_doc": "CIS Kubernetes Benchmark 1.6.0",
+        "section": "2.1 控制面安全",
+        "quote_snippet": "所有集群组件日志应发送到集中日志系统。"
+      }
+    ],
+    "confidence": 0.9
+  },
+  "code_graders": {
+    "citation_format": {
+      "passed": true,
+      "reason": "citation format valid",
+      "expected": null,
+      "actual": null
+    },
+    "output_schema": {
+      "passed": true,
+      "reason": "output schema valid",
+      "expected": null,
+      "actual": null
+    },
+    "refusal_check": {
+      "passed": true,
+      "reason": "refusal behavior valid",
+      "expected": false,
+      "actual": "根据检索结果，K8s 生产环境在等保三级测评中需注意以下合规点：\n1. 镜像安全：应保证基础镜像来自可信源，并在部署前进行镜像安全扫描，修复已知高危漏洞。\n2. 运行时权限与网络：容器运行时应遵循最小权限原则，禁止以root用户运行容器进程。应配置网络策略实现容器间的东西向流量隔离（微分段），默认拒绝所有通信，按需开放。\n3. 管理接口安全：容器编排平台的管理接口应实施强身份认证和RBAC访问控制，管理流量使用TLS加密。\n4. 控制面安全：etcd集群应启用TLS加密通信并进行客户端证书认证；API Server应禁用匿名访问，并启用Node和RBAC授权模式；kubelet应使用认证授权且禁用匿名访问。\n5. 策略与日志：生产集群应部署Pod安全策略（PSP）或OPA/Gatekeeper，限制容器能力添加（如禁止特权容器、禁止挂载宿主机敏感目录）。所有集群组件日志应发送到集中日志系统。"
+    },
+    "retrieval_relevance": {
+      "passed": true,
+      "reason": "retrieval mock quality valid",
+      "expected": "sufficient",
+      "actual": [
+        "high",
+        "high",
+        "medium"
+      ]
+    },
+    "citation_grounding": {
+      "passed": true,
+      "reason": "citations grounded",
+      "expected": null,
+      "actual": null
+    },
+    "confidence_check": {
+      "passed": true,
+      "reason": "confidence valid",
+      "expected": ">= 0.8",
+      "actual": 0.9
+    }
+  },
+  "model_scores": {
+    "faithfulness": {
+      "score": 5,
+      "reason": "Answer 中的所有声明均能由 mock_retrieved_chunks 原文直接支撑。具体对应关系如下：1. 镜像安全（chunk-015a）；2. 运行时权限与网络（chunk-015a）；3. 管理接口安全（chunk-015a）；4. 控制面安全（chunk-015b）；5. 策略与日志（chunk-015c 和 chunk-015b）。答案准确综合了所有检索片段的信息，未包含任何无法从原文推导出的内容或错误信息。",
+      "unsupported_claims": [],
+      "missing_points": [],
+      "errors": []
+    },
+    "coverage": {
+      "score": 5,
+      "reason": "Answer comprehensively covers all six required key points from the ground truth: (1) trusted image sources and vulnerability scanning, (2) least privilege with no root execution, (3) network policy for micro-segmentation, (4) management interface authentication/RBAC/TLS, (5) etcd encryption/cert auth and API Server anonymous access denial, and (6) Pod security policies to restrict privileged containers. The answer also correctly avoids including any forbidden points.",
+      "unsupported_claims": [],
+      "missing_points": [],
+      "errors": []
+    },
+    "compliance_accuracy": {
+      "score": 5,
+      "reason": "Agent 的回答准确涵盖了所有必须包含的关键点（镜像安全、最小权限/禁止 root、网络微分段、管理接口认证/RBAC/TLS、控制面加密与匿名访问禁用、PSP 策略）。引用的标准编号（GB/T 22239-2019）、条款号（C.3.2, 2.1, 4.2）及关键数值/要求均与 mock_retrieved_chunks 完全一致，且未包含任何禁止出现的错误观点。置信度 0.9 也满足最低要求。",
+      "unsupported_claims": [],
+      "missing_points": [],
+      "errors": []
+    }
+  },
+  "calls": [
+    {
+      "label": "agent",
+      "parsed": {
+        "answer": "根据检索结果，K8s 生产环境在等保三级测评中需注意以下合规点：\n1. 镜像安全：应保证基础镜像来自可信源，并在部署前进行镜像安全扫描，修复已知高危漏洞。\n2. 运行时权限与网络：容器运行时应遵循最小权限原则，禁止以root用户运行容器进程。应配置网络策略实现容器间的东西向流量隔离（微分段），默认拒绝所有通信，按需开放。\n3. 管理接口安全：容器编排平台的管理接口应实施强身份认证和RBAC访问控制，管理流量使用TLS加密。\n4. 控制面安全：etcd集群应启用TLS加密通信并进行客户端证书认证；API Server应禁用匿名访问，并启用Node和RBAC授权模式；kubelet应使用认证授权且禁用匿名访问。\n5. 策略与日志：生产集群应部署Pod安全策略（PSP）或OPA/Gatekeeper，限制容器能力添加（如禁止特权容器、禁止挂载宿主机敏感目录）。所有集群组件日志应发送到集中日志系统。",
+        "citations": [
+          {
+            "source_doc": "GB/T 22239-2019 附录C 云计算安全扩展要求",
+            "section": "C.3.2 容器安全",
+            "quote_snippet": "使用容器技术时，应保证基础镜像来自可信源，并在部署前进行镜像安全扫描，修复已知高危漏洞。"
+          },
+          {
+            "source_doc": "GB/T 22239-2019 附录C 云计算安全扩展要求",
+            "section": "C.3.2 容器安全",
+            "quote_snippet": "容器运行时应遵循最小权限原则，禁止以root用户运行容器进程。"
+          },
+          {
+            "source_doc": "GB/T 22239-2019 附录C 云计算安全扩展要求",
+            "section": "C.3.2 容器安全",
+            "quote_snippet": "应配置网络策略实现容器间的东西向流量隔离（微分段），默认拒绝所有通信，按需开放。"
+          },
+          {
+            "source_doc": "GB/T 22239-2019 附录C 云计算安全扩展要求",
+            "section": "C.3.2 容器安全",
+            "quote_snippet": "容器编排平台的管理接口应实施强身份认证和RBAC访问控制，管理流量使用TLS加密。"
+          },
+          {
+            "source_doc": "CIS Kubernetes Benchmark 1.6.0",
+            "section": "2.1 控制面安全",
+            "quote_snippet": "etcd集群应启用TLS加密通信并进行客户端证书认证；API Server应禁用匿名访问，并启用Node和RBAC授权模式；kubelet应使用认证授权且禁用匿名访问"
+          },
+          {
+            "source_doc": "内部制度《容器安全管理规范 v1.0》",
+            "section": "4.2 运行时安全",
+            "quote_snippet": "生产集群应部署Pod安全策略（PSP）或OPA/Gatekeeper，限制容器能力添加（如禁止特权容器、禁止挂载宿主机敏感目录）。"
+          },
+          {
+            "source_doc": "CIS Kubernetes Benchmark 1.6.0",
+            "section": "2.1 控制面安全",
+            "quote_snippet": "所有集群组件日志应发送到集中日志系统。"
+          }
+        ],
+        "confidence": 0.9
+      },
+      "raw_text": "{\n\"answer\": \"根据检索结果，K8s 生产环境在等保三级测评中需注意以下合规点：\\n1. 镜像安全：应保证基础镜像来自可信源，并在部署前进行镜像安全扫描，修复已知高危漏洞。\\n2. 运行时权限与网络：容器运行时应遵循最小权限原则，禁止以root用户运行容器进程。应配置网络策略实现容器间的东西向流量隔离（微分段），默认拒绝所有通信，按需开放。\\n3. 管理接口安全：容器编排平台的管理接口应实施强身份认证和RBAC访问控制，管理流量使用TLS加密。\\n4. 控制面安全：etcd集群应启用TLS加密通信并进行客户端证书认证；API Server应禁用匿名访问，并启用Node和RBAC授权模式；kubelet应使用认证授权且禁用匿名访问。\\n5. 策略与日志：生产集群应部署Pod安全策略（PSP）或OPA/Gatekeeper，限制容器能力添加（如禁止特权容器、禁止挂载宿主机敏感目录）。所有集群组件日志应发送到集中日志系统。\",\n\"citations\": [\n{\n\"source_doc\": \"GB/T 22239-2019 附录C 云计算安全扩展要求\",\n\"section\": \"C.3.2 容器安全\",\n\"quote_snippet\": \"使用容器技术时，应保证基础镜像来自可信源，并在部署前进行镜像安全扫描，修复已知高危漏洞。\"\n},\n{\n\"source_doc\": \"GB/T 22239-2019 附录C 云计算安全扩展要求\",\n\"section\": \"C.3.2 容器安全\",\n\"quote_snippet\": \"容器运行时应遵循最小权限原则，禁止以root用户运行容器进程。\"\n},\n{\n\"source_doc\": \"GB/T 22239-2019 附录C 云计算安全扩展要求\",\n\"section\": \"C.3.2 容器安全\",\n\"quote_snippet\": \"应配置网络策略实现容器间的东西向流量隔离（微分段），默认拒绝所有通信，按需开放。\"\n},\n{\n\"source_doc\": \"GB/T 22239-2019 附录C 云计算安全扩展要求\",\n\"section\": \"C.3.2 容器安全\",\n\"quote_snippet\": \"容器编排平台的管理接口应实施强身份认证和RBAC访问控制，管理流量使用TLS加密。\"\n},\n{\n\"source_doc\": \"CIS Kubernetes Benchmark 1.6.0\",\n\"section\": \"2.1 控制面安全\",\n\"quote_snippet\": \"etcd集群应启用TLS加密通信并进行客户端证书认证；API Server应禁用匿名访问，并启用Node和RBAC授权模式；kubelet应使用认证授权且禁用匿名访问\"\n},\n{\n\"source_doc\": \"内部制度《容器安全管理规范 v1.0》\",\n\"section\": \"4.2 运行时安全\",\n\"quote_snippet\": \"生产集群应部署Pod安全策略（PSP）或OPA/Gatekeeper，限制容器能力添加（如禁止特权容器、禁止挂载宿主机敏感目录）。\"\n},\n{\n\"source_doc\": \"CIS Kubernetes Benchmark 1.6.0\",\n\"section\": \"2.1 控制面安全\",\n\"quote_snippet\": \"所有集群组件日志应发送到集中日志系统。\"\n}\n],\n\"confidence\": 0.9\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 600,
+      "output_tokens": 3955,
+      "latency_ms": 36936,
+      "attempts": 1
+    },
+    {
+      "label": "faithfulness",
+      "parsed": {
+        "score": 5,
+        "reason": "Answer 中的所有声明均能由 mock_retrieved_chunks 原文直接支撑。具体对应关系如下：1. 镜像安全（chunk-015a）；2. 运行时权限与网络（chunk-015a）；3. 管理接口安全（chunk-015a）；4. 控制面安全（chunk-015b）；5. 策略与日志（chunk-015c 和 chunk-015b）。答案准确综合了所有检索片段的信息，未包含任何无法从原文推导出的内容或错误信息。",
+        "unsupported_claims": [],
+        "missing_points": [],
+        "errors": []
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"Answer 中的所有声明均能由 mock_retrieved_chunks 原文直接支撑。具体对应关系如下：1. 镜像安全（chunk-015a）；2. 运行时权限与网络（chunk-015a）；3. 管理接口安全（chunk-015a）；4. 控制面安全（chunk-015b）；5. 策略与日志（chunk-015c 和 chunk-015b）。答案准确综合了所有检索片段的信息，未包含任何无法从原文推导出的内容或错误信息。\",\n  \"unsupported_claims\": []\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1641,
+      "output_tokens": 152,
+      "latency_ms": 5694,
+      "attempts": 1
+    },
+    {
+      "label": "coverage",
+      "parsed": {
+        "score": 5,
+        "reason": "Answer comprehensively covers all six required key points from the ground truth: (1) trusted image sources and vulnerability scanning, (2) least privilege with no root execution, (3) network policy for micro-segmentation, (4) management interface authentication/RBAC/TLS, (5) etcd encryption/cert auth and API Server anonymous access denial, and (6) Pod security policies to restrict privileged containers. The answer also correctly avoids including any forbidden points.",
+        "unsupported_claims": [],
+        "missing_points": [],
+        "errors": []
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"Answer comprehensively covers all six required key points from the ground truth: (1) trusted image sources and vulnerability scanning, (2) least privilege with no root execution, (3) network policy for micro-segmentation, (4) management interface authentication/RBAC/TLS, (5) etcd encryption/cert auth and API Server anonymous access denial, and (6) Pod security policies to restrict privileged containers. The answer also correctly avoids including any forbidden points.\",\n  \"missing_points\": []\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1637,
+      "output_tokens": 119,
+      "latency_ms": 1614,
+      "attempts": 1
+    },
+    {
+      "label": "compliance_accuracy",
+      "parsed": {
+        "score": 5,
+        "reason": "Agent 的回答准确涵盖了所有必须包含的关键点（镜像安全、最小权限/禁止 root、网络微分段、管理接口认证/RBAC/TLS、控制面加密与匿名访问禁用、PSP 策略）。引用的标准编号（GB/T 22239-2019）、条款号（C.3.2, 2.1, 4.2）及关键数值/要求均与 mock_retrieved_chunks 完全一致，且未包含任何禁止出现的错误观点。置信度 0.9 也满足最低要求。",
+        "unsupported_claims": [],
+        "missing_points": [],
+        "errors": []
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"Agent 的回答准确涵盖了所有必须包含的关键点（镜像安全、最小权限/禁止 root、网络微分段、管理接口认证/RBAC/TLS、控制面加密与匿名访问禁用、PSP 策略）。引用的标准编号（GB/T 22239-2019）、条款号（C.3.2, 2.1, 4.2）及关键数值/要求均与 mock_retrieved_chunks 完全一致，且未包含任何禁止出现的错误观点。置信度 0.9 也满足最低要求。\",\n  \"errors\": []\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1638,
+      "output_tokens": 144,
+      "latency_ms": 1567,
+      "attempts": 1
+    }
+  ],
+  "overall_pass": true,
+  "error_type": null,
+  "error_message": null
+}

@@ -1,0 +1,190 @@
+{
+  "test_case_id": "S02-001",
+  "scenario": "用户询问等保三级对安全审计日志保存期限的具体要求",
+  "type": "exact_lookup",
+  "difficulty": "easy",
+  "is_positive": true,
+  "expected_answer_type": "direct_answer",
+  "status": "completed",
+  "agent_output": {
+    "answer": "根据检索到的国家标准及公司内部制度，等保三级系统的安全审计日志保存期限要求如下：\n1. 一般操作日志：保存时间不少于 180 天。\n2. 关键安全事件日志、系统变更日志及管理员操作日志：保存时间应不少于 1 年。\n\n公司规定核心业务系统需满足等保三级及以上监管要求，日志在线保存不少于 180 天，关键安全日志保存不少于 1 年。",
+    "citations": [
+      {
+        "source_doc": "GB/T 22239-2019 信息安全技术 网络安全等级保护基本要求",
+        "section": "8.1.4.3",
+        "quote_snippet": "对于一般操作日志，保存时间不少于180天；对于关键安全事件日志、系统变更日志及管理员操作日志，保存时间应不少于1年。"
+      },
+      {
+        "source_doc": "内部制度《公司安全日志管理规范 v2.1》",
+        "section": "4.2 保存期限",
+        "quote_snippet": "对于核心业务系统，应满足等保三级及以上监管要求，日志在线保存不少于180天，关键安全日志保存不少于1年。"
+      }
+    ],
+    "confidence": 0.95
+  },
+  "code_graders": {
+    "citation_format": {
+      "passed": true,
+      "reason": "citation format valid",
+      "expected": null,
+      "actual": null
+    },
+    "output_schema": {
+      "passed": true,
+      "reason": "output schema valid",
+      "expected": null,
+      "actual": null
+    },
+    "refusal_check": {
+      "passed": true,
+      "reason": "refusal behavior valid",
+      "expected": false,
+      "actual": "根据检索到的国家标准及公司内部制度，等保三级系统的安全审计日志保存期限要求如下：\n1. 一般操作日志：保存时间不少于 180 天。\n2. 关键安全事件日志、系统变更日志及管理员操作日志：保存时间应不少于 1 年。\n\n公司规定核心业务系统需满足等保三级及以上监管要求，日志在线保存不少于 180 天，关键安全日志保存不少于 1 年。"
+    },
+    "retrieval_relevance": {
+      "passed": true,
+      "reason": "retrieval mock quality valid",
+      "expected": "sufficient",
+      "actual": [
+        "high",
+        "medium",
+        "low"
+      ]
+    },
+    "citation_grounding": {
+      "passed": true,
+      "reason": "citations grounded",
+      "expected": null,
+      "actual": null
+    },
+    "confidence_check": {
+      "passed": true,
+      "reason": "confidence valid",
+      "expected": ">= 0.9",
+      "actual": 0.95
+    }
+  },
+  "model_scores": {
+    "faithfulness": {
+      "score": 4,
+      "reason": "Answer correctly cites the retention periods (180 days for general logs, 1 year for critical logs) from both the national standard and internal policy chunks. However, it fails to include two mandatory key points found in the ground truth: 'audit logs should be centrally stored and protected against unauthorized modification/deletion' and 'log integrity verification mechanisms should be deployed'. These specific requirements are explicitly stated in chunk-001a but were omitted from the final answer.",
+      "unsupported_claims": [],
+      "missing_points": [],
+      "errors": []
+    },
+    "coverage": {
+      "score": 3,
+      "reason": "Answer correctly covers the two key points regarding log retention periods (180 days for general logs, 1 year for critical logs) and cites the correct standard. However, it fails to include the other two mandatory key points specified in the ground truth: 'audit logs should be centrally stored and protected against unauthorized modification/deletion' and 'log integrity verification mechanisms should be deployed'. These points are present in the retrieved chunks but omitted from the final answer.",
+      "unsupported_claims": [],
+      "missing_points": [
+        "审计日志应集中存储并防止未授权修改和删除",
+        "应部署日志完整性校验机制"
+      ],
+      "errors": []
+    },
+    "compliance_accuracy": {
+      "score": 3,
+      "reason": "Agent 回答在关键数值（180 天、1 年）和标准编号（GB/T 22239-2019）上与检索内容一致，引用了正确的条款号。但是，Agent 遗漏了 ground_truth 中明确要求的必须包含的关键点：'审计日志应集中存储并防止未授权修改和删除'以及'应部署日志完整性校验机制'。此外，Agent 引用的内部制度片段与 mock_retrieved_chunks 中的原文存在细微偏差（mock 中为'所有信息系统...至少 90 天'，agent 直接概括为核心业务系统要求，虽逻辑通顺但引用片段不完全匹配），且未提及 mock 中强调的'集中存储'和'完整性校验'等合规细节。",
+      "unsupported_claims": [],
+      "missing_points": [],
+      "errors": [
+        "遗漏关键点：未提及'审计日志应集中存储并防止未授权修改和删除'",
+        "遗漏关键点：未提及'应部署日志完整性校验机制'",
+        "引用片段不精确：内部制度引用未完全覆盖 mock 中关于'所有信息系统'的基础规定背景"
+      ]
+    }
+  },
+  "calls": [
+    {
+      "label": "agent",
+      "parsed": {
+        "answer": "根据检索到的国家标准及公司内部制度，等保三级系统的安全审计日志保存期限要求如下：\n1. 一般操作日志：保存时间不少于 180 天。\n2. 关键安全事件日志、系统变更日志及管理员操作日志：保存时间应不少于 1 年。\n\n公司规定核心业务系统需满足等保三级及以上监管要求，日志在线保存不少于 180 天，关键安全日志保存不少于 1 年。",
+        "citations": [
+          {
+            "source_doc": "GB/T 22239-2019 信息安全技术 网络安全等级保护基本要求",
+            "section": "8.1.4.3",
+            "quote_snippet": "对于一般操作日志，保存时间不少于180天；对于关键安全事件日志、系统变更日志及管理员操作日志，保存时间应不少于1年。"
+          },
+          {
+            "source_doc": "内部制度《公司安全日志管理规范 v2.1》",
+            "section": "4.2 保存期限",
+            "quote_snippet": "对于核心业务系统，应满足等保三级及以上监管要求，日志在线保存不少于180天，关键安全日志保存不少于1年。"
+          }
+        ],
+        "confidence": 0.95
+      },
+      "raw_text": "{\n  \"answer\": \"根据检索到的国家标准及公司内部制度，等保三级系统的安全审计日志保存期限要求如下：\\n1. 一般操作日志：保存时间不少于 180 天。\\n2. 关键安全事件日志、系统变更日志及管理员操作日志：保存时间应不少于 1 年。\\n\\n公司规定核心业务系统需满足等保三级及以上监管要求，日志在线保存不少于 180 天，关键安全日志保存不少于 1 年。\",\n  \"citations\": [\n    {\n      \"source_doc\": \"GB/T 22239-2019 信息安全技术 网络安全等级保护基本要求\",\n      \"section\": \"8.1.4.3\",\n      \"quote_snippet\": \"对于一般操作日志，保存时间不少于180天；对于关键安全事件日志、系统变更日志及管理员操作日志，保存时间应不少于1年。\"\n    },\n    {\n      \"source_doc\": \"内部制度《公司安全日志管理规范 v2.1》\",\n      \"section\": \"4.2 保存期限\",\n      \"quote_snippet\": \"对于核心业务系统，应满足等保三级及以上监管要求，日志在线保存不少于180天，关键安全日志保存不少于1年。\"\n    }\n  ],\n  \"confidence\": 0.95\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 650,
+      "output_tokens": 2674,
+      "latency_ms": 30454,
+      "attempts": 2
+    },
+    {
+      "label": "faithfulness",
+      "parsed": {
+        "score": 4,
+        "reason": "Answer correctly cites the retention periods (180 days for general logs, 1 year for critical logs) from both the national standard and internal policy chunks. However, it fails to include two mandatory key points found in the ground truth: 'audit logs should be centrally stored and protected against unauthorized modification/deletion' and 'log integrity verification mechanisms should be deployed'. These specific requirements are explicitly stated in chunk-001a but were omitted from the final answer.",
+        "unsupported_claims": [],
+        "missing_points": [],
+        "errors": []
+      },
+      "raw_text": "{\n  \"score\": 4,\n  \"reason\": \"Answer correctly cites the retention periods (180 days for general logs, 1 year for critical logs) from both the national standard and internal policy chunks. However, it fails to include two mandatory key points found in the ground truth: 'audit logs should be centrally stored and protected against unauthorized modification/deletion' and 'log integrity verification mechanisms should be deployed'. These specific requirements are explicitly stated in chunk-001a but were omitted from the final answer.\",\n  \"unsupported_claims\": []\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1211,
+      "output_tokens": 119,
+      "latency_ms": 2117,
+      "attempts": 1
+    },
+    {
+      "label": "coverage",
+      "parsed": {
+        "score": 3,
+        "reason": "Answer correctly covers the two key points regarding log retention periods (180 days for general logs, 1 year for critical logs) and cites the correct standard. However, it fails to include the other two mandatory key points specified in the ground truth: 'audit logs should be centrally stored and protected against unauthorized modification/deletion' and 'log integrity verification mechanisms should be deployed'. These points are present in the retrieved chunks but omitted from the final answer.",
+        "unsupported_claims": [],
+        "missing_points": [
+          "审计日志应集中存储并防止未授权修改和删除",
+          "应部署日志完整性校验机制"
+        ],
+        "errors": []
+      },
+      "raw_text": "{\n  \"score\": 3,\n  \"reason\": \"Answer correctly covers the two key points regarding log retention periods (180 days for general logs, 1 year for critical logs) and cites the correct standard. However, it fails to include the other two mandatory key points specified in the ground truth: 'audit logs should be centrally stored and protected against unauthorized modification/deletion' and 'log integrity verification mechanisms should be deployed'. These points are present in the retrieved chunks but omitted from the final answer.\",\n  \"missing_points\": [\n    \"审计日志应集中存储并防止未授权修改和删除\",\n    \"应部署日志完整性校验机制\"\n  ]\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1207,
+      "output_tokens": 144,
+      "latency_ms": 1968,
+      "attempts": 1
+    },
+    {
+      "label": "compliance_accuracy",
+      "parsed": {
+        "score": 3,
+        "reason": "Agent 回答在关键数值（180 天、1 年）和标准编号（GB/T 22239-2019）上与检索内容一致，引用了正确的条款号。但是，Agent 遗漏了 ground_truth 中明确要求的必须包含的关键点：'审计日志应集中存储并防止未授权修改和删除'以及'应部署日志完整性校验机制'。此外，Agent 引用的内部制度片段与 mock_retrieved_chunks 中的原文存在细微偏差（mock 中为'所有信息系统...至少 90 天'，agent 直接概括为核心业务系统要求，虽逻辑通顺但引用片段不完全匹配），且未提及 mock 中强调的'集中存储'和'完整性校验'等合规细节。",
+        "unsupported_claims": [],
+        "missing_points": [],
+        "errors": [
+          "遗漏关键点：未提及'审计日志应集中存储并防止未授权修改和删除'",
+          "遗漏关键点：未提及'应部署日志完整性校验机制'",
+          "引用片段不精确：内部制度引用未完全覆盖 mock 中关于'所有信息系统'的基础规定背景"
+        ]
+      },
+      "raw_text": "{\n  \"score\": 3,\n  \"reason\": \"Agent 回答在关键数值（180 天、1 年）和标准编号（GB/T 22239-2019）上与检索内容一致，引用了正确的条款号。但是，Agent 遗漏了 ground_truth 中明确要求的必须包含的关键点：'审计日志应集中存储并防止未授权修改和删除'以及'应部署日志完整性校验机制'。此外，Agent 引用的内部制度片段与 mock_retrieved_chunks 中的原文存在细微偏差（mock 中为'所有信息系统...至少 90 天'，agent 直接概括为核心业务系统要求，虽逻辑通顺但引用片段不完全匹配），且未提及 mock 中强调的'集中存储'和'完整性校验'等合规细节。\",\n  \"errors\": [\n    \"遗漏关键点：未提及'审计日志应集中存储并防止未授权修改和删除'\",\n    \"遗漏关键点：未提及'应部署日志完整性校验机制'\",\n    \"引用片段不精确：内部制度引用未完全覆盖 mock 中关于'所有信息系统'的基础规定背景\"\n  ]\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1208,
+      "output_tokens": 255,
+      "latency_ms": 2816,
+      "attempts": 1
+    }
+  ],
+  "overall_pass": true,
+  "error_type": null,
+  "error_message": null
+}

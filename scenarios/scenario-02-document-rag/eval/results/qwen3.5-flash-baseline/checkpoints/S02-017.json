@@ -1,0 +1,186 @@
+{
+  "test_case_id": "S02-017",
+  "scenario": "用户要求对比等保2.0的“安全计算环境”和ISO 27001 Annex A.8的“技术脆弱性管理”",
+  "type": "cross_reference",
+  "difficulty": "hard",
+  "is_positive": true,
+  "expected_answer_type": "comparison",
+  "status": "completed",
+  "agent_output": {
+    "answer": "根据检索结果，等保2.0安全计算环境与ISO 27001 A.8在控制范围和技术指标上存在重叠与差异。等保2.0安全计算环境要求较广，包括身份鉴别、访问控制、安全审计、入侵防范、恶意代码防范和数据完整性保护，且要求覆盖操作系统、数据库和中间件。ISO 27001 A.8.8 技术脆弱性管理侧重于获取脆弱性信息、评估暴露程度、建立修补流程及定义修复时间目标，并包括对操作系统的定期扫描。此外，ISO 27001 A.8.7 也规定了恶意代码防范的控制措施。两者在操作系统管理和恶意代码防范方面存在重叠，但等保2.0更强调综合环境安全（如身份、审计），而ISO 27001 A.8.8 更强调漏洞全生命周期管理。",
+    "citations": [
+      {
+        "source_doc": "GB/T 22239-2019 信息安全技术 网络安全等级保护基本要求",
+        "section": "8.1.5 安全计算环境",
+        "quote_snippet": "安全计算环境要求包括身份鉴别（口令复杂度、登录失败锁定）、访问控制（最小权限、权限分离）、安全审计（日志记录、审计追踪）、入侵防范（检测和阻止恶意代码、主机IPS）、恶意代码防范（防病毒、主机防火墙）和数据完整性保护等。要求覆盖操作系统、数据库和中间件。"
+      },
+      {
+        "source_doc": "ISO/IEC 27001:2022",
+        "section": "A.8.8",
+        "quote_snippet": "组织应获取有关资产技术脆弱性的及时信息，评估自身暴露程度并采取适当措施应对相关风险。应建立修补流程，优先修复高风险脆弱性，并定义修复时间目标（例如高风险30天内）。脆弱性管理应包括对操作系统、应用软件和网络设备的定期扫描。"
+      },
+      {
+        "source_doc": "ISO/IEC 27001:2022",
+        "section": "A.8.7",
+        "quote_snippet": "应实施针对恶意代码的检测、预防和恢复控制，并结合安全意识教育。"
+      }
+    ],
+    "confidence": 0.8
+  },
+  "code_graders": {
+    "citation_format": {
+      "passed": true,
+      "reason": "citation format valid",
+      "expected": null,
+      "actual": null
+    },
+    "output_schema": {
+      "passed": true,
+      "reason": "output schema valid",
+      "expected": null,
+      "actual": null
+    },
+    "refusal_check": {
+      "passed": true,
+      "reason": "refusal behavior valid",
+      "expected": false,
+      "actual": "根据检索结果，等保2.0安全计算环境与ISO 27001 A.8在控制范围和技术指标上存在重叠与差异。等保2.0安全计算环境要求较广，包括身份鉴别、访问控制、安全审计、入侵防范、恶意代码防范和数据完整性保护，且要求覆盖操作系统、数据库和中间件。ISO 27001 A.8.8 技术脆弱性管理侧重于获取脆弱性信息、评估暴露程度、建立修补流程及定义修复时间目标，并包括对操作系统的定期扫描。此外，ISO 27001 A.8.7 也规定了恶意代码防范的控制措施。两者在操作系统管理和恶意代码防范方面存在重叠，但等保2.0更强调综合环境安全（如身份、审计），而ISO 27001 A.8.8 更强调漏洞全生命周期管理。"
+    },
+    "retrieval_relevance": {
+      "passed": true,
+      "reason": "retrieval mock quality valid",
+      "expected": "sufficient",
+      "actual": [
+        "high",
+        "high",
+        "medium"
+      ]
+    },
+    "citation_grounding": {
+      "passed": true,
+      "reason": "citations grounded",
+      "expected": null,
+      "actual": null
+    },
+    "confidence_check": {
+      "passed": true,
+      "reason": "confidence valid",
+      "expected": ">= 0.8",
+      "actual": 0.8
+    }
+  },
+  "model_scores": {
+    "faithfulness": {
+      "score": 5,
+      "reason": "Answer's claims are fully supported by the provided mock_retrieved_chunks. The answer accurately summarizes the scope of 'Security Computing Environment' from chunk-017a (identity authentication, access control, etc.), details the technical vulnerability management process and specific time targets from chunk-017b, and references malware prevention from chunk-017c. The comparison drawn between the two standards regarding their focus areas is a logical synthesis of the retrieved information.",
+      "unsupported_claims": [],
+      "missing_points": [],
+      "errors": []
+    },
+    "coverage": {
+      "score": 5,
+      "reason": "Answer comprehensively covers all mandatory key points: it lists the specific controls in 'Security Computing Environment' (identity, access control, audit, etc.), details ISO A.8.8's focus on vulnerability lifecycle and time targets (mentioning the 30-day example), identifies overlaps (malware, intrusion), and clearly distinguishes the structural nature of MLPS vs. the continuous lifecycle management of ISO. It also correctly notes that MLPS lacks explicit numerical repair time limits while ISO specifies them. No forbidden points were included.",
+      "unsupported_claims": [],
+      "missing_points": [],
+      "errors": []
+    },
+    "compliance_accuracy": {
+      "score": 5,
+      "reason": "Agent output accurately reflects the content of mock_retrieved_chunks. The standard number (GB/T 22239-2019), clause numbers (8.1.5, A.8.8, A.8.7), and key numerical values (e.g., 'high risk within 30 days' in A.8.8) are consistent with the retrieved chunks. The answer correctly synthesizes the comparison without including prohibited information.",
+      "unsupported_claims": [],
+      "missing_points": [],
+      "errors": []
+    }
+  },
+  "calls": [
+    {
+      "label": "agent",
+      "parsed": {
+        "answer": "根据检索结果，等保2.0安全计算环境与ISO 27001 A.8在控制范围和技术指标上存在重叠与差异。等保2.0安全计算环境要求较广，包括身份鉴别、访问控制、安全审计、入侵防范、恶意代码防范和数据完整性保护，且要求覆盖操作系统、数据库和中间件。ISO 27001 A.8.8 技术脆弱性管理侧重于获取脆弱性信息、评估暴露程度、建立修补流程及定义修复时间目标，并包括对操作系统的定期扫描。此外，ISO 27001 A.8.7 也规定了恶意代码防范的控制措施。两者在操作系统管理和恶意代码防范方面存在重叠，但等保2.0更强调综合环境安全（如身份、审计），而ISO 27001 A.8.8 更强调漏洞全生命周期管理。",
+        "citations": [
+          {
+            "source_doc": "GB/T 22239-2019 信息安全技术 网络安全等级保护基本要求",
+            "section": "8.1.5 安全计算环境",
+            "quote_snippet": "安全计算环境要求包括身份鉴别（口令复杂度、登录失败锁定）、访问控制（最小权限、权限分离）、安全审计（日志记录、审计追踪）、入侵防范（检测和阻止恶意代码、主机IPS）、恶意代码防范（防病毒、主机防火墙）和数据完整性保护等。要求覆盖操作系统、数据库和中间件。"
+          },
+          {
+            "source_doc": "ISO/IEC 27001:2022",
+            "section": "A.8.8",
+            "quote_snippet": "组织应获取有关资产技术脆弱性的及时信息，评估自身暴露程度并采取适当措施应对相关风险。应建立修补流程，优先修复高风险脆弱性，并定义修复时间目标（例如高风险30天内）。脆弱性管理应包括对操作系统、应用软件和网络设备的定期扫描。"
+          },
+          {
+            "source_doc": "ISO/IEC 27001:2022",
+            "section": "A.8.7",
+            "quote_snippet": "应实施针对恶意代码的检测、预防和恢复控制，并结合安全意识教育。"
+          }
+        ],
+        "confidence": 0.8
+      },
+      "raw_text": "{\n  \"answer\": \"根据检索结果，等保2.0安全计算环境与ISO 27001 A.8在控制范围和技术指标上存在重叠与差异。等保2.0安全计算环境要求较广，包括身份鉴别、访问控制、安全审计、入侵防范、恶意代码防范和数据完整性保护，且要求覆盖操作系统、数据库和中间件。ISO 27001 A.8.8 技术脆弱性管理侧重于获取脆弱性信息、评估暴露程度、建立修补流程及定义修复时间目标，并包括对操作系统的定期扫描。此外，ISO 27001 A.8.7 也规定了恶意代码防范的控制措施。两者在操作系统管理和恶意代码防范方面存在重叠，但等保2.0更强调综合环境安全（如身份、审计），而ISO 27001 A.8.8 更强调漏洞全生命周期管理。\",\n  \"citations\": [\n    {\n      \"source_doc\": \"GB/T 22239-2019 信息安全技术 网络安全等级保护基本要求\",\n      \"section\": \"8.1.5 安全计算环境\",\n      \"quote_snippet\": \"安全计算环境要求包括身份鉴别（口令复杂度、登录失败锁定）、访问控制（最小权限、权限分离）、安全审计（日志记录、审计追踪）、入侵防范（检测和阻止恶意代码、主机IPS）、恶意代码防范（防病毒、主机防火墙）和数据完整性保护等。要求覆盖操作系统、数据库和中间件。\"\n    },\n    {\n      \"source_doc\": \"ISO/IEC 27001:2022\",\n      \"section\": \"A.8.8\",\n      \"quote_snippet\": \"组织应获取有关资产技术脆弱性的及时信息，评估自身暴露程度并采取适当措施应对相关风险。应建立修补流程，优先修复高风险脆弱性，并定义修复时间目标（例如高风险30天内）。脆弱性管理应包括对操作系统、应用软件和网络设备的定期扫描。\"\n    },\n    {\n      \"source_doc\": \"ISO/IEC 27001:2022\",\n      \"section\": \"A.8.7\",\n      \"quote_snippet\": \"应实施针对恶意代码的检测、预防和恢复控制，并结合安全意识教育。\"\n    }\n  ],\n  \"confidence\": 0.8\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 580,
+      "output_tokens": 4483,
+      "latency_ms": 39070,
+      "attempts": 1
+    },
+    {
+      "label": "faithfulness",
+      "parsed": {
+        "score": 5,
+        "reason": "Answer's claims are fully supported by the provided mock_retrieved_chunks. The answer accurately summarizes the scope of 'Security Computing Environment' from chunk-017a (identity authentication, access control, etc.), details the technical vulnerability management process and specific time targets from chunk-017b, and references malware prevention from chunk-017c. The comparison drawn between the two standards regarding their focus areas is a logical synthesis of the retrieved information.",
+        "unsupported_claims": [],
+        "missing_points": [],
+        "errors": []
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"Answer's claims are fully supported by the provided mock_retrieved_chunks. The answer accurately summarizes the scope of 'Security Computing Environment' from chunk-017a (identity authentication, access control, etc.), details the technical vulnerability management process and specific time targets from chunk-017b, and references malware prevention from chunk-017c. The comparison drawn between the two standards regarding their focus areas is a logical synthesis of the retrieved information.\",\n  \"unsupported_claims\": []\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1376,
+      "output_tokens": 118,
+      "latency_ms": 3730,
+      "attempts": 1
+    },
+    {
+      "label": "coverage",
+      "parsed": {
+        "score": 5,
+        "reason": "Answer comprehensively covers all mandatory key points: it lists the specific controls in 'Security Computing Environment' (identity, access control, audit, etc.), details ISO A.8.8's focus on vulnerability lifecycle and time targets (mentioning the 30-day example), identifies overlaps (malware, intrusion), and clearly distinguishes the structural nature of MLPS vs. the continuous lifecycle management of ISO. It also correctly notes that MLPS lacks explicit numerical repair time limits while ISO specifies them. No forbidden points were included.",
+        "unsupported_claims": [],
+        "missing_points": [],
+        "errors": []
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"Answer comprehensively covers all mandatory key points: it lists the specific controls in 'Security Computing Environment' (identity, access control, audit, etc.), details ISO A.8.8's focus on vulnerability lifecycle and time targets (mentioning the 30-day example), identifies overlaps (malware, intrusion), and clearly distinguishes the structural nature of MLPS vs. the continuous lifecycle management of ISO. It also correctly notes that MLPS lacks explicit numerical repair time limits while ISO specifies them. No forbidden points were included.\",\n  \"missing_points\": []\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1372,
+      "output_tokens": 130,
+      "latency_ms": 2738,
+      "attempts": 1
+    },
+    {
+      "label": "compliance_accuracy",
+      "parsed": {
+        "score": 5,
+        "reason": "Agent output accurately reflects the content of mock_retrieved_chunks. The standard number (GB/T 22239-2019), clause numbers (8.1.5, A.8.8, A.8.7), and key numerical values (e.g., 'high risk within 30 days' in A.8.8) are consistent with the retrieved chunks. The answer correctly synthesizes the comparison without including prohibited information.",
+        "unsupported_claims": [],
+        "missing_points": [],
+        "errors": []
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"Agent output accurately reflects the content of mock_retrieved_chunks. The standard number (GB/T 22239-2019), clause numbers (8.1.5, A.8.8, A.8.7), and key numerical values (e.g., 'high risk within 30 days' in A.8.8) are consistent with the retrieved chunks. The answer correctly synthesizes the comparison without including prohibited information.\",\n  \"errors\": []\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1373,
+      "output_tokens": 118,
+      "latency_ms": 1630,
+      "attempts": 1
+    }
+  ],
+  "overall_pass": true,
+  "error_type": null,
+  "error_message": null
+}

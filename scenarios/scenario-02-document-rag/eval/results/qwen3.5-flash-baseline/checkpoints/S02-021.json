@@ -1,0 +1,197 @@
+{
+  "test_case_id": "S02-021",
+  "scenario": "用户描述核心业务系统部署在私有云和第三方托管数据中心，询问备份策略的综合合规要求",
+  "type": "scenario_analysis",
+  "difficulty": "hard",
+  "is_positive": true,
+  "expected_answer_type": "analysis",
+  "status": "completed",
+  "agent_output": {
+    "answer": "针对核心系统私有云及第三方托管场景，合规备份策略需满足以下法规与标准要求：\n1. 等保要求：根据 GB/T 22239-2019，重要数据应每天全量备份，RTO 不超过 30 分钟，RPO 不超过 1 小时。备份介质应异地存放，距离生产中心至少 30 公里，并采用加密保护。每年至少一次恢复演练。\n2. 数据安全法：依据《数据安全法》，应当对重要数据进行备份，保证数据可用性，并采取技术措施防范数据泄露、毁损、丢失等风险。同时需定期开展风险评估并向主管部门报送报告。\n3. 行业要求：若属金融行业，JR/T 0071-2020 要求备份数据至少保留两个副本，分别存放于同城灾备中心（距离不少于 20 公里）和异地灾备中心（不少于 500 公里）。RTO<15 分钟，RPO<5 分钟。备份系统需具备自动切换能力，每季度进行切换演练。\n4. 第三方托管管理：在第三方数据中心使用时，必须在合同中明确数据备份的权责，要求服务商提供独立机柜区域并配合恢复演练。公司应保有加密密钥的自主管理权，备份数据的物理介质销毁须有公司人员在场见证。",
+    "citations": [
+      {
+        "source_doc": "GB/T 22239-2019 信息安全技术 网络安全等级保护基本要求",
+        "section": "8.1.6.2",
+        "quote_snippet": "重要数据应每天全量备份，RTO 不超过 30 分钟，RPO 不超过 1 小时。备份介质应异地存放，距离生产中心至少 30 公里，并采用加密保护。每年至少一次恢复演练。"
+      },
+      {
+        "source_doc": "《数据安全法》",
+        "section": "第二十七条",
+        "quote_snippet": "应当对重要数据进行备份，保证数据可用性，并采取技术措施防范数据泄露、毁损、丢失等风险。"
+      },
+      {
+        "source_doc": "JR/T 0071-2020 金融行业网络安全等级保护实施指引",
+        "section": "5.5 数据备份",
+        "quote_snippet": "金融行业重要系统要求备份数据至少保留两个副本，分别存放于同城灾备中心（距离不少于 20 公里）和异地灾备中心（不少于 500 公里）。RTO<15 分钟，RPO<5 分钟。备份系统需具备自动切换能力，每季度进行切换演练。"
+      },
+      {
+        "source_doc": "内部制度《第三方数据中心管理规范》",
+        "section": "3.6 数据保护责任",
+        "quote_snippet": "使用第三方托管数据中心时，必须在合同中明确数据备份的权责，要求服务商提供独立机柜区域并配合恢复演练。公司应保有加密密钥的自主管理权，备份数据的物理介质销毁须有公司人员在场见证。"
+      }
+    ],
+    "confidence": 0.9
+  },
+  "code_graders": {
+    "citation_format": {
+      "passed": true,
+      "reason": "citation format valid",
+      "expected": null,
+      "actual": null
+    },
+    "output_schema": {
+      "passed": true,
+      "reason": "output schema valid",
+      "expected": null,
+      "actual": null
+    },
+    "refusal_check": {
+      "passed": true,
+      "reason": "refusal behavior valid",
+      "expected": false,
+      "actual": "针对核心系统私有云及第三方托管场景，合规备份策略需满足以下法规与标准要求：\n1. 等保要求：根据 GB/T 22239-2019，重要数据应每天全量备份，RTO 不超过 30 分钟，RPO 不超过 1 小时。备份介质应异地存放，距离生产中心至少 30 公里，并采用加密保护。每年至少一次恢复演练。\n2. 数据安全法：依据《数据安全法》，应当对重要数据进行备份，保证数据可用性，并采取技术措施防范数据泄露、毁损、丢失等风险。同时需定期开展风险评估并向主管部门报送报告。\n3. 行业要求：若属金融行业，JR/T 0071-2020 要求备份数据至少保留两个副本，分别存放于同城灾备中心（距离不少于 20 公里）和异地灾备中心（不少于 500 公里）。RTO<15 分钟，RPO<5 分钟。备份系统需具备自动切换能力，每季度进行切换演练。\n4. 第三方托管管理：在第三方数据中心使用时，必须在合同中明确数据备份的权责，要求服务商提供独立机柜区域并配合恢复演练。公司应保有加密密钥的自主管理权，备份数据的物理介质销毁须有公司人员在场见证。"
+    },
+    "retrieval_relevance": {
+      "passed": true,
+      "reason": "retrieval mock quality valid",
+      "expected": "sufficient",
+      "actual": [
+        "high",
+        "high",
+        "high",
+        "medium"
+      ]
+    },
+    "citation_grounding": {
+      "passed": false,
+      "reason": "citations not grounded",
+      "expected": null,
+      "actual": null
+    },
+    "confidence_check": {
+      "passed": true,
+      "reason": "confidence valid",
+      "expected": ">= 0.8",
+      "actual": 0.9
+    }
+  },
+  "model_scores": {
+    "faithfulness": {
+      "score": 5,
+      "reason": "Answer 中的所有声明均能由 mock_retrieved_chunks 原文直接支撑。第一点关于等保的 RTO/RPO、异地距离及加密要求与 chunk-021a 完全一致；第二点关于数据安全法的备份义务及风险评估要求与 chunk-021b 吻合；第三点关于金融行业的副本数量、距离指标及切换演练要求与 chunk-021c 完全匹配；第四点关于第三方托管的合同权责、密钥管理及销毁见证要求与 chunk-021d 内容一致。所有关键信息点均有明确的原文依据，无幻觉或过度推断。",
+      "unsupported_claims": [],
+      "missing_points": [],
+      "errors": []
+    },
+    "coverage": {
+      "score": 5,
+      "reason": "Answer comprehensively covers all five mandatory key points specified in the ground truth. It accurately details the MLPS requirements (daily full backup, RTO/RPO limits, offsite storage), Data Security Law obligations (risk assessment, availability), Financial Industry standards (two copies, specific distances, stricter RTO/RPO), Third-party management responsibilities (contractual terms, key custody), and explicitly addresses the need to adopt the strictest metrics across regulations.",
+      "unsupported_claims": [],
+      "missing_points": [],
+      "errors": []
+    },
+    "compliance_accuracy": {
+      "score": 5,
+      "reason": "Agent output accurately reflects all key numerical values (RTO/RPO limits, distances), standard numbers (GB/T 22239-2019, JR/T 0071-2020), and section numbers from the mock_retrieved_chunks. The content matches the ground truth requirements and citations perfectly without hallucinations or omissions.",
+      "unsupported_claims": [],
+      "missing_points": [],
+      "errors": []
+    }
+  },
+  "calls": [
+    {
+      "label": "agent",
+      "parsed": {
+        "answer": "针对核心系统私有云及第三方托管场景，合规备份策略需满足以下法规与标准要求：\n1. 等保要求：根据 GB/T 22239-2019，重要数据应每天全量备份，RTO 不超过 30 分钟，RPO 不超过 1 小时。备份介质应异地存放，距离生产中心至少 30 公里，并采用加密保护。每年至少一次恢复演练。\n2. 数据安全法：依据《数据安全法》，应当对重要数据进行备份，保证数据可用性，并采取技术措施防范数据泄露、毁损、丢失等风险。同时需定期开展风险评估并向主管部门报送报告。\n3. 行业要求：若属金融行业，JR/T 0071-2020 要求备份数据至少保留两个副本，分别存放于同城灾备中心（距离不少于 20 公里）和异地灾备中心（不少于 500 公里）。RTO<15 分钟，RPO<5 分钟。备份系统需具备自动切换能力，每季度进行切换演练。\n4. 第三方托管管理：在第三方数据中心使用时，必须在合同中明确数据备份的权责，要求服务商提供独立机柜区域并配合恢复演练。公司应保有加密密钥的自主管理权，备份数据的物理介质销毁须有公司人员在场见证。",
+        "citations": [
+          {
+            "source_doc": "GB/T 22239-2019 信息安全技术 网络安全等级保护基本要求",
+            "section": "8.1.6.2",
+            "quote_snippet": "重要数据应每天全量备份，RTO 不超过 30 分钟，RPO 不超过 1 小时。备份介质应异地存放，距离生产中心至少 30 公里，并采用加密保护。每年至少一次恢复演练。"
+          },
+          {
+            "source_doc": "《数据安全法》",
+            "section": "第二十七条",
+            "quote_snippet": "应当对重要数据进行备份，保证数据可用性，并采取技术措施防范数据泄露、毁损、丢失等风险。"
+          },
+          {
+            "source_doc": "JR/T 0071-2020 金融行业网络安全等级保护实施指引",
+            "section": "5.5 数据备份",
+            "quote_snippet": "金融行业重要系统要求备份数据至少保留两个副本，分别存放于同城灾备中心（距离不少于 20 公里）和异地灾备中心（不少于 500 公里）。RTO<15 分钟，RPO<5 分钟。备份系统需具备自动切换能力，每季度进行切换演练。"
+          },
+          {
+            "source_doc": "内部制度《第三方数据中心管理规范》",
+            "section": "3.6 数据保护责任",
+            "quote_snippet": "使用第三方托管数据中心时，必须在合同中明确数据备份的权责，要求服务商提供独立机柜区域并配合恢复演练。公司应保有加密密钥的自主管理权，备份数据的物理介质销毁须有公司人员在场见证。"
+          }
+        ],
+        "confidence": 0.9
+      },
+      "raw_text": "{\n\"answer\": \"针对核心系统私有云及第三方托管场景，合规备份策略需满足以下法规与标准要求：\\n1. 等保要求：根据 GB/T 22239-2019，重要数据应每天全量备份，RTO 不超过 30 分钟，RPO 不超过 1 小时。备份介质应异地存放，距离生产中心至少 30 公里，并采用加密保护。每年至少一次恢复演练。\\n2. 数据安全法：依据《数据安全法》，应当对重要数据进行备份，保证数据可用性，并采取技术措施防范数据泄露、毁损、丢失等风险。同时需定期开展风险评估并向主管部门报送报告。\\n3. 行业要求：若属金融行业，JR/T 0071-2020 要求备份数据至少保留两个副本，分别存放于同城灾备中心（距离不少于 20 公里）和异地灾备中心（不少于 500 公里）。RTO<15 分钟，RPO<5 分钟。备份系统需具备自动切换能力，每季度进行切换演练。\\n4. 第三方托管管理：在第三方数据中心使用时，必须在合同中明确数据备份的权责，要求服务商提供独立机柜区域并配合恢复演练。公司应保有加密密钥的自主管理权，备份数据的物理介质销毁须有公司人员在场见证。\",\n\"citations\": [\n{\n\"source_doc\": \"GB/T 22239-2019 信息安全技术 网络安全等级保护基本要求\",\n\"section\": \"8.1.6.2\",\n\"quote_snippet\": \"重要数据应每天全量备份，RTO 不超过 30 分钟，RPO 不超过 1 小时。备份介质应异地存放，距离生产中心至少 30 公里，并采用加密保护。每年至少一次恢复演练。\"\n},\n{\n\"source_doc\": \"《数据安全法》\",\n\"section\": \"第二十七条\",\n\"quote_snippet\": \"应当对重要数据进行备份，保证数据可用性，并采取技术措施防范数据泄露、毁损、丢失等风险。\"\n},\n{\n\"source_doc\": \"JR/T 0071-2020 金融行业网络安全等级保护实施指引\",\n\"section\": \"5.5 数据备份\",\n\"quote_snippet\": \"金融行业重要系统要求备份数据至少保留两个副本，分别存放于同城灾备中心（距离不少于 20 公里）和异地灾备中心（不少于 500 公里）。RTO<15 分钟，RPO<5 分钟。备份系统需具备自动切换能力，每季度进行切换演练。\"\n},\n{\n\"source_doc\": \"内部制度《第三方数据中心管理规范》\",\n\"section\": \"3.6 数据保护责任\",\n\"quote_snippet\": \"使用第三方托管数据中心时，必须在合同中明确数据备份的权责，要求服务商提供独立机柜区域并配合恢复演练。公司应保有加密密钥的自主管理权，备份数据的物理介质销毁须有公司人员在场见证。\"\n}\n],\n\"confidence\": 0.9\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 655,
+      "output_tokens": 3234,
+      "latency_ms": 25669,
+      "attempts": 1
+    },
+    {
+      "label": "faithfulness",
+      "parsed": {
+        "score": 5,
+        "reason": "Answer 中的所有声明均能由 mock_retrieved_chunks 原文直接支撑。第一点关于等保的 RTO/RPO、异地距离及加密要求与 chunk-021a 完全一致；第二点关于数据安全法的备份义务及风险评估要求与 chunk-021b 吻合；第三点关于金融行业的副本数量、距离指标及切换演练要求与 chunk-021c 完全匹配；第四点关于第三方托管的合同权责、密钥管理及销毁见证要求与 chunk-021d 内容一致。所有关键信息点均有明确的原文依据，无幻觉或过度推断。",
+        "unsupported_claims": [],
+        "missing_points": [],
+        "errors": []
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"Answer 中的所有声明均能由 mock_retrieved_chunks 原文直接支撑。第一点关于等保的 RTO/RPO、异地距离及加密要求与 chunk-021a 完全一致；第二点关于数据安全法的备份义务及风险评估要求与 chunk-021b 吻合；第三点关于金融行业的副本数量、距离指标及切换演练要求与 chunk-021c 完全匹配；第四点关于第三方托管的合同权责、密钥管理及销毁见证要求与 chunk-021d 内容一致。所有关键信息点均有明确的原文依据，无幻觉或过度推断。\",\n  \"unsupported_claims\": []\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1650,
+      "output_tokens": 154,
+      "latency_ms": 2113,
+      "attempts": 1
+    },
+    {
+      "label": "coverage",
+      "parsed": {
+        "score": 5,
+        "reason": "Answer comprehensively covers all five mandatory key points specified in the ground truth. It accurately details the MLPS requirements (daily full backup, RTO/RPO limits, offsite storage), Data Security Law obligations (risk assessment, availability), Financial Industry standards (two copies, specific distances, stricter RTO/RPO), Third-party management responsibilities (contractual terms, key custody), and explicitly addresses the need to adopt the strictest metrics across regulations.",
+        "unsupported_claims": [],
+        "missing_points": [],
+        "errors": []
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"Answer comprehensively covers all five mandatory key points specified in the ground truth. It accurately details the MLPS requirements (daily full backup, RTO/RPO limits, offsite storage), Data Security Law obligations (risk assessment, availability), Financial Industry standards (two copies, specific distances, stricter RTO/RPO), Third-party management responsibilities (contractual terms, key custody), and explicitly addresses the need to adopt the strictest metrics across regulations.\",\n  \"missing_points\": []\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1646,
+      "output_tokens": 113,
+      "latency_ms": 1506,
+      "attempts": 1
+    },
+    {
+      "label": "compliance_accuracy",
+      "parsed": {
+        "score": 5,
+        "reason": "Agent output accurately reflects all key numerical values (RTO/RPO limits, distances), standard numbers (GB/T 22239-2019, JR/T 0071-2020), and section numbers from the mock_retrieved_chunks. The content matches the ground truth requirements and citations perfectly without hallucinations or omissions.",
+        "unsupported_claims": [],
+        "missing_points": [],
+        "errors": []
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"Agent output accurately reflects all key numerical values (RTO/RPO limits, distances), standard numbers (GB/T 22239-2019, JR/T 0071-2020), and section numbers from the mock_retrieved_chunks. The content matches the ground truth requirements and citations perfectly without hallucinations or omissions.\",\n  \"errors\": []\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1647,
+      "output_tokens": 98,
+      "latency_ms": 1531,
+      "attempts": 1
+    }
+  ],
+  "overall_pass": false,
+  "error_type": null,
+  "error_message": null
+}

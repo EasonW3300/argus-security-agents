@@ -1,0 +1,186 @@
+{
+  "test_case_id": "S02-016",
+  "scenario": "用户要求对比ISO 27001:2022 Annex A.5信息安全策略与等保2.0安全管理制度要求的对应关系",
+  "type": "cross_reference",
+  "difficulty": "medium",
+  "is_positive": true,
+  "expected_answer_type": "comparison",
+  "status": "completed",
+  "agent_output": {
+    "answer": "基于检索结果，ISO 27001 的 A.5.1 条款与等保 2.0 的 8.1.1.1 条款存在对应关系。两者均要求顶层安全策略文件由管理层批准、定期评审。在文件体系方面，等保进一步要求形成“制度 - 规定 - 规程 - 记录”四级文件体系，而 ISO 则更强调策略的传达和合规性声明。具体而言，等保要求制度由管理层正式发布并定期修订，修订周期不宜超过一年；ISO 要求策略至少每年或在重大变化时进行评审，并涵盖对法律、法规及合同安全义务的符合性。",
+    "citations": [
+      {
+        "source_doc": "内部制度《体系整合对照表 v1.0》",
+        "section": "2.1 策略层对照",
+        "quote_snippet": "ISO A.5.1 对应等保 8.1.1.1，两者均要求顶层安全策略文件由管理层批准、定期评审。等保进一步要求形成“制度 - 规定 - 规程 - 记录”四级文件体系，ISO 则更强调策略的传达和合规性声明。"
+      },
+      {
+        "source_doc": "GB/T 22239-2019 信息安全技术 网络安全等级保护基本要求",
+        "section": "8.1.1.1 安全管理制度",
+        "quote_snippet": "应建立信息安全管理制度体系，包括但不限于安全策略、管理规定、操作规程和记录表单。制度应由管理层正式发布并定期修订，修订周期不宜超过一年。"
+      },
+      {
+        "source_doc": "ISO/IEC 27001:2022",
+        "section": "A.5.1",
+        "quote_snippet": "管理层应批准一套信息安全策略文件，该策略应体现组织的安全目标和承诺。策略应传达至所有相关方，并至少每年或在重大变化时进行评审。策略应涵盖对法律、法规及合同安全义务的符合性。"
+      }
+    ],
+    "confidence": 0.9
+  },
+  "code_graders": {
+    "citation_format": {
+      "passed": true,
+      "reason": "citation format valid",
+      "expected": null,
+      "actual": null
+    },
+    "output_schema": {
+      "passed": true,
+      "reason": "output schema valid",
+      "expected": null,
+      "actual": null
+    },
+    "refusal_check": {
+      "passed": true,
+      "reason": "refusal behavior valid",
+      "expected": false,
+      "actual": "基于检索结果，ISO 27001 的 A.5.1 条款与等保 2.0 的 8.1.1.1 条款存在对应关系。两者均要求顶层安全策略文件由管理层批准、定期评审。在文件体系方面，等保进一步要求形成“制度 - 规定 - 规程 - 记录”四级文件体系，而 ISO 则更强调策略的传达和合规性声明。具体而言，等保要求制度由管理层正式发布并定期修订，修订周期不宜超过一年；ISO 要求策略至少每年或在重大变化时进行评审，并涵盖对法律、法规及合同安全义务的符合性。"
+    },
+    "retrieval_relevance": {
+      "passed": true,
+      "reason": "retrieval mock quality valid",
+      "expected": "sufficient",
+      "actual": [
+        "high",
+        "high",
+        "medium"
+      ]
+    },
+    "citation_grounding": {
+      "passed": false,
+      "reason": "citations not grounded",
+      "expected": null,
+      "actual": null
+    },
+    "confidence_check": {
+      "passed": true,
+      "reason": "confidence valid",
+      "expected": ">= 0.85",
+      "actual": 0.9
+    }
+  },
+  "model_scores": {
+    "faithfulness": {
+      "score": 5,
+      "reason": "Answer 中的所有声明均能由 mock_retrieved_chunks 原文直接支撑。具体对应关系如下：1. 'ISO A.5.1 与等保 8.1.1.1 存在对应关系...两者均要求顶层安全策略文件由管理层批准、定期评审' 完全对应 chunk-016c；2. '等保进一步要求形成“制度 - 规定 - 规程 - 记录”四级文件体系' 对应 chunk-016b 中的'包括但不限于安全策略、管理规定、操作规程和记录表单'及 chunk-016c 的总结；3. 'ISO 则更强调策略的传达和合规性声明' 对应 chunk-016c 及 chunk-016a 中关于'传达至所有相关方'和'涵盖对法律、法规及合同安全义务的符合性'的描述；4. '等保要求...修订周期不宜超过一年' 直接引用自 chunk-016b；5. 'ISO 要求策略至少每年或在重大变化时进行评审，并涵盖对法律、法规及合同安全义务的符合性' 直接引用自 chunk-016a。答案逻辑清晰，事实准确，无 unsupported claims。",
+      "unsupported_claims": [],
+      "missing_points": [],
+      "errors": []
+    },
+    "coverage": {
+      "score": 5,
+      "reason": "Answer fully covers all four required key points: (1) Both ISO A.5.1 and MLPS 8.1.1.1 require management approval and periodic review of security policies; (2) MLPS requires a four-level document system (policy, regulation, procedure, record); (3) ISO emphasizes communication of the policy to all relevant parties; (4) Both require at least annual review. The answer also correctly avoids including any forbidden points.",
+      "unsupported_claims": [],
+      "missing_points": [],
+      "errors": []
+    },
+    "compliance_accuracy": {
+      "score": 5,
+      "reason": "Agent 输出的答案准确涵盖了所有必须包含的关键点（ISO A.5.1与等保8.1.1.1的对应关系、管理层批准、定期评审、四级文件体系、策略传达等），且未包含任何禁止出现的错误信息。引用的标准编号（ISO/IEC 27001:2022, GB/T 22239-2019）、条款号（A.5.1, 8.1.1.1）及关键数值（每年评审、修订周期不宜超过一年）均与 mock_retrieved_chunks 中的内容完全一致。引用来源和置信度也符合要求。",
+      "unsupported_claims": [],
+      "missing_points": [],
+      "errors": []
+    }
+  },
+  "calls": [
+    {
+      "label": "agent",
+      "parsed": {
+        "answer": "基于检索结果，ISO 27001 的 A.5.1 条款与等保 2.0 的 8.1.1.1 条款存在对应关系。两者均要求顶层安全策略文件由管理层批准、定期评审。在文件体系方面，等保进一步要求形成“制度 - 规定 - 规程 - 记录”四级文件体系，而 ISO 则更强调策略的传达和合规性声明。具体而言，等保要求制度由管理层正式发布并定期修订，修订周期不宜超过一年；ISO 要求策略至少每年或在重大变化时进行评审，并涵盖对法律、法规及合同安全义务的符合性。",
+        "citations": [
+          {
+            "source_doc": "内部制度《体系整合对照表 v1.0》",
+            "section": "2.1 策略层对照",
+            "quote_snippet": "ISO A.5.1 对应等保 8.1.1.1，两者均要求顶层安全策略文件由管理层批准、定期评审。等保进一步要求形成“制度 - 规定 - 规程 - 记录”四级文件体系，ISO 则更强调策略的传达和合规性声明。"
+          },
+          {
+            "source_doc": "GB/T 22239-2019 信息安全技术 网络安全等级保护基本要求",
+            "section": "8.1.1.1 安全管理制度",
+            "quote_snippet": "应建立信息安全管理制度体系，包括但不限于安全策略、管理规定、操作规程和记录表单。制度应由管理层正式发布并定期修订，修订周期不宜超过一年。"
+          },
+          {
+            "source_doc": "ISO/IEC 27001:2022",
+            "section": "A.5.1",
+            "quote_snippet": "管理层应批准一套信息安全策略文件，该策略应体现组织的安全目标和承诺。策略应传达至所有相关方，并至少每年或在重大变化时进行评审。策略应涵盖对法律、法规及合同安全义务的符合性。"
+          }
+        ],
+        "confidence": 0.9
+      },
+      "raw_text": "{\n\"answer\": \"基于检索结果，ISO 27001 的 A.5.1 条款与等保 2.0 的 8.1.1.1 条款存在对应关系。两者均要求顶层安全策略文件由管理层批准、定期评审。在文件体系方面，等保进一步要求形成“制度 - 规定 - 规程 - 记录”四级文件体系，而 ISO 则更强调策略的传达和合规性声明。具体而言，等保要求制度由管理层正式发布并定期修订，修订周期不宜超过一年；ISO 要求策略至少每年或在重大变化时进行评审，并涵盖对法律、法规及合同安全义务的符合性。\",\n\"citations\": [\n{\n\"source_doc\": \"内部制度《体系整合对照表 v1.0》\",\n\"section\": \"2.1 策略层对照\",\n\"quote_snippet\": \"ISO A.5.1 对应等保 8.1.1.1，两者均要求顶层安全策略文件由管理层批准、定期评审。等保进一步要求形成“制度 - 规定 - 规程 - 记录”四级文件体系，ISO 则更强调策略的传达和合规性声明。\"\n},\n{\n\"source_doc\": \"GB/T 22239-2019 信息安全技术 网络安全等级保护基本要求\",\n\"section\": \"8.1.1.1 安全管理制度\",\n\"quote_snippet\": \"应建立信息安全管理制度体系，包括但不限于安全策略、管理规定、操作规程和记录表单。制度应由管理层正式发布并定期修订，修订周期不宜超过一年。\"\n},\n{\n\"source_doc\": \"ISO/IEC 27001:2022\",\n\"section\": \"A.5.1\",\n\"quote_snippet\": \"管理层应批准一套信息安全策略文件，该策略应体现组织的安全目标和承诺。策略应传达至所有相关方，并至少每年或在重大变化时进行评审。策略应涵盖对法律、法规及合同安全义务的符合性。\"\n}\n],\n\"confidence\": 0.9\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 593,
+      "output_tokens": 4117,
+      "latency_ms": 39761,
+      "attempts": 1
+    },
+    {
+      "label": "faithfulness",
+      "parsed": {
+        "score": 5,
+        "reason": "Answer 中的所有声明均能由 mock_retrieved_chunks 原文直接支撑。具体对应关系如下：1. 'ISO A.5.1 与等保 8.1.1.1 存在对应关系...两者均要求顶层安全策略文件由管理层批准、定期评审' 完全对应 chunk-016c；2. '等保进一步要求形成“制度 - 规定 - 规程 - 记录”四级文件体系' 对应 chunk-016b 中的'包括但不限于安全策略、管理规定、操作规程和记录表单'及 chunk-016c 的总结；3. 'ISO 则更强调策略的传达和合规性声明' 对应 chunk-016c 及 chunk-016a 中关于'传达至所有相关方'和'涵盖对法律、法规及合同安全义务的符合性'的描述；4. '等保要求...修订周期不宜超过一年' 直接引用自 chunk-016b；5. 'ISO 要求策略至少每年或在重大变化时进行评审，并涵盖对法律、法规及合同安全义务的符合性' 直接引用自 chunk-016a。答案逻辑清晰，事实准确，无 unsupported claims。",
+        "unsupported_claims": [],
+        "missing_points": [],
+        "errors": []
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"Answer 中的所有声明均能由 mock_retrieved_chunks 原文直接支撑。具体对应关系如下：1. 'ISO A.5.1 与等保 8.1.1.1 存在对应关系...两者均要求顶层安全策略文件由管理层批准、定期评审' 完全对应 chunk-016c；2. '等保进一步要求形成“制度 - 规定 - 规程 - 记录”四级文件体系' 对应 chunk-016b 中的'包括但不限于安全策略、管理规定、操作规程和记录表单'及 chunk-016c 的总结；3. 'ISO 则更强调策略的传达和合规性声明' 对应 chunk-016c 及 chunk-016a 中关于'传达至所有相关方'和'涵盖对法律、法规及合同安全义务的符合性'的描述；4. '等保要求...修订周期不宜超过一年' 直接引用自 chunk-016b；5. 'ISO 要求策略至少每年或在重大变化时进行评审，并涵盖对法律、法规及合同安全义务的符合性' 直接引用自 chunk-016a。答案逻辑清晰，事实准确，无 unsupported claims。\",\n  \"unsupported_claims\": []\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1301,
+      "output_tokens": 288,
+      "latency_ms": 5016,
+      "attempts": 1
+    },
+    {
+      "label": "coverage",
+      "parsed": {
+        "score": 5,
+        "reason": "Answer fully covers all four required key points: (1) Both ISO A.5.1 and MLPS 8.1.1.1 require management approval and periodic review of security policies; (2) MLPS requires a four-level document system (policy, regulation, procedure, record); (3) ISO emphasizes communication of the policy to all relevant parties; (4) Both require at least annual review. The answer also correctly avoids including any forbidden points.",
+        "unsupported_claims": [],
+        "missing_points": [],
+        "errors": []
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"Answer fully covers all four required key points: (1) Both ISO A.5.1 and MLPS 8.1.1.1 require management approval and periodic review of security policies; (2) MLPS requires a four-level document system (policy, regulation, procedure, record); (3) ISO emphasizes communication of the policy to all relevant parties; (4) Both require at least annual review. The answer also correctly avoids including any forbidden points.\",\n  \"missing_points\": []\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1297,
+      "output_tokens": 118,
+      "latency_ms": 1108,
+      "attempts": 1
+    },
+    {
+      "label": "compliance_accuracy",
+      "parsed": {
+        "score": 5,
+        "reason": "Agent 输出的答案准确涵盖了所有必须包含的关键点（ISO A.5.1与等保8.1.1.1的对应关系、管理层批准、定期评审、四级文件体系、策略传达等），且未包含任何禁止出现的错误信息。引用的标准编号（ISO/IEC 27001:2022, GB/T 22239-2019）、条款号（A.5.1, 8.1.1.1）及关键数值（每年评审、修订周期不宜超过一年）均与 mock_retrieved_chunks 中的内容完全一致。引用来源和置信度也符合要求。",
+        "unsupported_claims": [],
+        "missing_points": [],
+        "errors": []
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"Agent 输出的答案准确涵盖了所有必须包含的关键点（ISO A.5.1与等保8.1.1.1的对应关系、管理层批准、定期评审、四级文件体系、策略传达等），且未包含任何禁止出现的错误信息。引用的标准编号（ISO/IEC 27001:2022, GB/T 22239-2019）、条款号（A.5.1, 8.1.1.1）及关键数值（每年评审、修订周期不宜超过一年）均与 mock_retrieved_chunks 中的内容完全一致。引用来源和置信度也符合要求。\",\n  \"errors\": []\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1298,
+      "output_tokens": 165,
+      "latency_ms": 1581,
+      "attempts": 1
+    }
+  ],
+  "overall_pass": false,
+  "error_type": null,
+  "error_message": null
+}
