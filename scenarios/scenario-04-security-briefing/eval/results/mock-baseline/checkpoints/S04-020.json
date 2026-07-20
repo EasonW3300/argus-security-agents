@@ -20,7 +20,10 @@
           "title": "摘要",
           "body": "# 摘要\n\n告警总数。alert_stats.total：50。",
           "data_source_mapping": {
-            "alert_stats.total": "50"
+            "alert_stats.total": "alert_stats.total"
+          },
+          "data_values": {
+            "alert_stats.total": 50
           }
         }
       ]
@@ -49,8 +52,8 @@
         {
           "metric": "告警总数",
           "source_value": 50,
-          "mappings": [
-            "50"
+          "data_values": [
+            50
           ]
         }
       ]
@@ -65,7 +68,8 @@
         "section_ids": [
           "sum"
         ],
-        "placeholders": []
+        "placeholders": [],
+        "missing_required_data": []
       }
     },
     "format_compliance": {
@@ -111,5 +115,28 @@
   "calls": [],
   "overall_pass": false,
   "error_type": null,
-  "error_message": null
+  "error_message": null,
+  "run_provenance": {
+    "dataset_sha256": "649a00fd34d4d65188498c83dca61342356ab900089ceddd512b96137c24a46c",
+    "agent_mode": "mock",
+    "agent": {
+      "provider": "mock",
+      "model": "scenario-04-mock",
+      "base_url": null,
+      "response_mode": "prompt_json",
+      "temperature": 0.0,
+      "max_tokens": 4096,
+      "timeout_seconds": 90.0
+    },
+    "judge": {
+      "provider": "mock",
+      "model": "scenario-04-mock",
+      "base_url": null,
+      "response_mode": "prompt_json",
+      "temperature": 0.0,
+      "max_tokens": 4096,
+      "timeout_seconds": 90.0
+    },
+    "grader_mode": "code_only"
+  }
 }

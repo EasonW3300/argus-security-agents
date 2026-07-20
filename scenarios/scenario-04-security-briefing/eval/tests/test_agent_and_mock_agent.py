@@ -16,7 +16,7 @@ from agent_loop import run_agent_case
 from llm_client import OpenAICompatibleLLMClient, _HardTimeout, _call_with_hard_timeout
 from mock_agent import run_mock_case
 from prompt_builder import build_agent_messages
-from schemas import load_cases
+from schemas import ReportOutput, load_cases
 
 
 class AgentAndMockAgentTests(unittest.TestCase):
@@ -31,6 +31,8 @@ class AgentAndMockAgentTests(unittest.TestCase):
         self.assertIn("mock_source_data", prompt)
         self.assertIn("template_definition", prompt)
         self.assertIn("target_recipients", prompt)
+        self.assertIn("data_values", prompt)
+        self.assertIn("original", prompt)
         self.assertIn("JSON", prompt)
 
     def test_mock_agent_emits_all_expected_sections(self):
@@ -40,6 +42,21 @@ class AgentAndMockAgentTests(unittest.TestCase):
 
         self.assertEqual(ids, case["ground_truth"]["expected_sections"])
         self.assertEqual(result["final_output"]["target_recipients"], case["push_config"]["recipients"])
+
+    def test_mock_agent_separates_source_paths_from_actual_values(self):
+        case = self.cases[0]
+        output = run_mock_case(case)["final_output"]
+        summary = output["content"]["sections"][0]
+
+        self.assertEqual(summary["data_source_mapping"]["alert_stats.total"], "alert_stats.total")
+        self.assertEqual(summary["data_values"]["alert_stats.total"], 156)
+        self.assertEqual(output["masking_applied"], [])
+
+    def test_mock_agent_uses_iso8601_metadata_for_every_case_period(self):
+        for case in self.cases:
+            with self.subTest(case_id=case["test_case_id"]):
+                output = run_mock_case(case)["final_output"]
+                ReportOutput.validate(output, case["ground_truth"]["expected_sections"])
 
     def test_mock_agent_leaks_sensitive_value_for_s04_019(self):
         case = self.cases[18]

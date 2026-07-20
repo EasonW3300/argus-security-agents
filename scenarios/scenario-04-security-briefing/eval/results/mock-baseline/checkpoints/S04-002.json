@@ -20,9 +20,19 @@
           "title": "今日扫描概况",
           "body": "# 今日扫描概况\n\n总结今日新增漏洞数量、严重度分布和修复率。vulnerability_stats.new_total：12；vulnerability_stats.by_severity：critical=1, high=3, medium=5, low=3；vulnerability_stats.fix_rate：67%。",
           "data_source_mapping": {
-            "vulnerability_stats.new_total": "12",
-            "vulnerability_stats.by_severity": "critical=1, high=3, medium=5, low=3",
-            "vulnerability_stats.fix_rate": "67%"
+            "vulnerability_stats.new_total": "vulnerability_stats.new_total",
+            "vulnerability_stats.by_severity": "vulnerability_stats.by_severity",
+            "vulnerability_stats.fix_rate": "vulnerability_stats.fix_rate"
+          },
+          "data_values": {
+            "vulnerability_stats.new_total": 12,
+            "vulnerability_stats.by_severity": {
+              "critical": 1,
+              "high": 3,
+              "medium": 5,
+              "low": 3
+            },
+            "vulnerability_stats.fix_rate": 0.67
           }
         },
         {
@@ -30,7 +40,17 @@
           "title": "待处理高危漏洞",
           "body": "# 待处理高危漏洞\n\n| 数据字段 | 值 |\n| --- | --- |\n| vulnerability_stats.pending_critical | cve_id=CVE-2026-19876, affected_asset=核心交易数据库 DB-Master-01, cvss_score=9.8, days_open=5 |",
           "data_source_mapping": {
-            "vulnerability_stats.pending_critical": "cve_id=CVE-2026-19876, affected_asset=核心交易数据库 DB-Master-01, cvss_score=9.8, days_open=5"
+            "vulnerability_stats.pending_critical": "vulnerability_stats.pending_critical"
+          },
+          "data_values": {
+            "vulnerability_stats.pending_critical": [
+              {
+                "cve_id": "CVE-2026-19876",
+                "affected_asset": "核心交易数据库 DB-Master-01",
+                "cvss_score": 9.8,
+                "days_open": 5
+              }
+            ]
           }
         },
         {
@@ -38,8 +58,12 @@
           "title": "修复指标",
           "body": "# 修复指标\n\n说明已修复数量和平均修复时间。vulnerability_stats.fixed_total：8；vulnerability_stats.avg_fix_days：12天。",
           "data_source_mapping": {
-            "vulnerability_stats.fixed_total": "8",
-            "vulnerability_stats.avg_fix_days": "12天"
+            "vulnerability_stats.fixed_total": "vulnerability_stats.fixed_total",
+            "vulnerability_stats.avg_fix_days": "vulnerability_stats.avg_fix_days"
+          },
+          "data_values": {
+            "vulnerability_stats.fixed_total": 8,
+            "vulnerability_stats.avg_fix_days": 12
           }
         }
       ]
@@ -73,15 +97,15 @@
         {
           "metric": "新增漏洞总数",
           "source_value": 12,
-          "mappings": [
-            "12"
+          "data_values": [
+            12
           ]
         },
         {
           "metric": "修复率",
           "source_value": 0.67,
-          "mappings": [
-            "67%"
+          "data_values": [
+            0.67
           ]
         }
       ]
@@ -100,7 +124,8 @@
           "critical_pending",
           "fix_metrics"
         ],
-        "placeholders": []
+        "placeholders": [],
+        "missing_required_data": []
       }
     },
     "format_compliance": {
@@ -148,5 +173,28 @@
   "calls": [],
   "overall_pass": true,
   "error_type": null,
-  "error_message": null
+  "error_message": null,
+  "run_provenance": {
+    "dataset_sha256": "649a00fd34d4d65188498c83dca61342356ab900089ceddd512b96137c24a46c",
+    "agent_mode": "mock",
+    "agent": {
+      "provider": "mock",
+      "model": "scenario-04-mock",
+      "base_url": null,
+      "response_mode": "prompt_json",
+      "temperature": 0.0,
+      "max_tokens": 4096,
+      "timeout_seconds": 90.0
+    },
+    "judge": {
+      "provider": "mock",
+      "model": "scenario-04-mock",
+      "base_url": null,
+      "response_mode": "prompt_json",
+      "temperature": 0.0,
+      "max_tokens": 4096,
+      "timeout_seconds": 90.0
+    },
+    "grader_mode": "code_only"
+  }
 }

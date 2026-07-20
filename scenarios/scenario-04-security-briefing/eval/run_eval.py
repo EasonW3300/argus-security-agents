@@ -21,9 +21,12 @@ ROOT = Path(__file__).resolve().parent
 DATA_PATH = ROOT.parent / "EvalsData.json"
 
 
-def write_checkpoint(run_dir, result):
+def write_checkpoint(run_dir, result, run_provenance=None):
     """Atomically persist one case result so interrupted runs remain resumable."""
     result = result.to_dict() if hasattr(result, "to_dict") else result
+    result = dict(result)
+    if run_provenance is not None:
+        result["run_provenance"] = dict(run_provenance)
     case_id = result.get("test_case_id") if isinstance(result, dict) else None
     if not case_id:
         raise ValueError("checkpoint result must contain test_case_id")
@@ -44,6 +47,14 @@ def load_checkpoint_results(run_dir):
         except (OSError, ValueError, json.JSONDecodeError):
             continue
     return results
+
+
+def load_run_manifest(run_dir):
+    try:
+        payload = json.loads((Path(run_dir) / "run_manifest.json").read_text(encoding="utf-8"))
+    except (OSError, ValueError, json.JSONDecodeError):
+        return None
+    return payload if isinstance(payload, dict) else None
 
 
 def select_cases(cases, case_id=None, limit=None):
@@ -97,13 +108,31 @@ def run_case(case, config, mock_agent=False, skip_model_graders=False, agent_cli
         return CaseResult(**_identity(case), status="error", code_graders=run_code_graders({}, case), calls=calls, error_type=type(exc).__name__, error_message=_redact(exc, config))
 
 
-def build_manifest(data_path, config, options):
+def build_run_provenance(data_path, config, *, mock_agent, skip_model_graders):
+    """Fingerprint every input that can make a completed checkpoint stale."""
+    return {
+        "dataset_sha256": hashlib.sha256(Path(data_path).read_bytes()).hexdigest(),
+        "agent_mode": "mock" if mock_agent else "real",
+        "agent": config.agent.public_dict(),
+        "judge": config.judge.public_dict(),
+        "grader_mode": "code_only" if skip_model_graders else "code_and_model",
+    }
+
+
+def build_manifest(data_path, config, options, run_provenance=None):
+    provenance = run_provenance or build_run_provenance(
+        data_path,
+        config,
+        mock_agent=bool(options.get("mock_agent")),
+        skip_model_graders=bool(options.get("skip_model_graders")),
+    )
     return {
         "started_at": datetime.now(timezone.utc).isoformat(),
-        "dataset_sha256": hashlib.sha256(Path(data_path).read_bytes()).hexdigest(),
+        "dataset_sha256": provenance["dataset_sha256"],
         "agent": config.agent.public_dict(),
         "judge": config.judge.public_dict(),
         "options": dict(options),
+        "run_provenance": provenance,
     }
 
 
@@ -113,17 +142,37 @@ def run_eval(data_path=DATA_PATH, run_dir=ROOT / "results" / "mock-baseline", co
     if request_timeout_seconds is not None:
         config.agent.timeout_seconds = config.judge.timeout_seconds = float(request_timeout_seconds)
     cases = select_cases(load_cases(data_path), case_id, limit)
-    checkpoints = load_checkpoint_results(run_dir) if resume else {}
+    effective_skip_model_graders = bool(skip_model_graders or mock_agent)
+    options = {
+        "mock_agent": mock_agent,
+        "skip_model_graders": effective_skip_model_graders,
+        "case_id": case_id,
+        "limit": limit,
+        "request_timeout_seconds": request_timeout_seconds,
+    }
+    run_provenance = build_run_provenance(
+        data_path, config, mock_agent=mock_agent, skip_model_graders=effective_skip_model_graders
+    )
+    prior_manifest = load_run_manifest(run_dir) if resume else None
+    provenance_matches = bool(prior_manifest and prior_manifest.get("run_provenance") == run_provenance)
+    checkpoints = load_checkpoint_results(run_dir) if provenance_matches else {}
+    checkpoints = {
+        case_id: checkpoint for case_id, checkpoint in checkpoints.items()
+        if checkpoint.get("run_provenance") == run_provenance
+    }
+    manifest = build_manifest(data_path, config, options, run_provenance)
+    # Persist the active run before any agent call, so an interruption leaves
+    # checkpoints tied to an inspectable, immutable provenance fingerprint.
+    atomic_write_json(run_dir / "run_manifest.json", manifest)
     results = []
     for case in cases:
         cached = checkpoints.get(case["test_case_id"])
         if cached and cached.get("status") == "completed":
             results.append(cached)
             continue
-        result = run_case(case, config, mock_agent, skip_model_graders or mock_agent, agent_client, judge_client)
-        write_checkpoint(run_dir, result)
+        result = run_case(case, config, mock_agent, effective_skip_model_graders, agent_client, judge_client)
+        write_checkpoint(run_dir, result, run_provenance)
         results.append(result)
-    manifest = build_manifest(data_path, config, {"mock_agent": mock_agent, "skip_model_graders": bool(skip_model_graders or mock_agent), "case_id": case_id, "limit": limit, "request_timeout_seconds": request_timeout_seconds})
     summary = write_reports(run_dir, manifest, results)
     return 0 if summary["completed"] == summary["total"] else 1
 

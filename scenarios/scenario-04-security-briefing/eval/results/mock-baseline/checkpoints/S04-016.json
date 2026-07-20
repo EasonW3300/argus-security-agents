@@ -18,11 +18,19 @@
         {
           "section_id": "event_overview",
           "title": "事件概述",
-          "body": "# 事件概述\n\n简述事件类型、严重级别和影响范围。incident_detail.type：ransomware；incident_detail.severity：critical；incident_detail.affected_assets：财务系统终端 FIN-PC-12。",
+          "body": "# 事件概述\n\n简述事件类型、严重级别和影响范围。incident_detail.type：ransomware；incident_detail.severity：critical；incident_detail.affected_assets：财务系统终端 FIN-PC-12。\nincident_detail.incident_id：INC-2026-0716-005。",
           "data_source_mapping": {
+            "incident_detail.type": "incident_detail.type",
+            "incident_detail.severity": "incident_detail.severity",
+            "incident_detail.affected_assets": "incident_detail.affected_assets",
+            "incident_detail.incident_id": "incident_detail.incident_id"
+          },
+          "data_values": {
             "incident_detail.type": "ransomware",
             "incident_detail.severity": "critical",
-            "incident_detail.affected_assets": "财务系统终端 FIN-PC-12",
+            "incident_detail.affected_assets": [
+              "财务系统终端 FIN-PC-12"
+            ],
             "incident_detail.incident_id": "INC-2026-0716-005"
           }
         },
@@ -31,7 +39,31 @@
           "title": "事件时间线",
           "body": "# 事件时间线\n\n| 数据字段 | 值 |\n| --- | --- |\n| incident_detail.timeline | time=2026-07-16T14:30:00Z, event=SOC收到终端防病毒软件告警，疑似勒索软件行为, time=2026-07-16T14:32:00Z, event=安全分析师确认文件加密后缀为.locked，通知断网, time=2026-07-16T14:35:00Z, event=网络隔离完成，开始取证, time=2026-07-16T15:10:00Z, event=确认感染来源为钓鱼邮件附件，攻击者IP 203.0.113.99, time=2026-07-16T16:00:00Z, event=从备份恢复数据，系统恢复运行 |",
           "data_source_mapping": {
-            "incident_detail.timeline": "time=2026-07-16T14:30:00Z, event=SOC收到终端防病毒软件告警，疑似勒索软件行为, time=2026-07-16T14:32:00Z, event=安全分析师确认文件加密后缀为.locked，通知断网, time=2026-07-16T14:35:00Z, event=网络隔离完成，开始取证, time=2026-07-16T15:10:00Z, event=确认感染来源为钓鱼邮件附件，攻击者IP 203.0.113.99, time=2026-07-16T16:00:00Z, event=从备份恢复数据，系统恢复运行"
+            "incident_detail.timeline": "incident_detail.timeline"
+          },
+          "data_values": {
+            "incident_detail.timeline": [
+              {
+                "time": "2026-07-16T14:30:00Z",
+                "event": "SOC收到终端防病毒软件告警，疑似勒索软件行为"
+              },
+              {
+                "time": "2026-07-16T14:32:00Z",
+                "event": "安全分析师确认文件加密后缀为.locked，通知断网"
+              },
+              {
+                "time": "2026-07-16T14:35:00Z",
+                "event": "网络隔离完成，开始取证"
+              },
+              {
+                "time": "2026-07-16T15:10:00Z",
+                "event": "确认感染来源为钓鱼邮件附件，攻击者IP 203.0.113.99"
+              },
+              {
+                "time": "2026-07-16T16:00:00Z",
+                "event": "从备份恢复数据，系统恢复运行"
+              }
+            ]
           }
         },
         {
@@ -39,6 +71,9 @@
           "title": "根因分析",
           "body": "# 根因分析\n\n分析事件发生的根本原因。incident_detail.root_cause：员工点击恶意宏文档，本地防病毒特征库过期导致未拦截。",
           "data_source_mapping": {
+            "incident_detail.root_cause": "incident_detail.root_cause"
+          },
+          "data_values": {
             "incident_detail.root_cause": "员工点击恶意宏文档，本地防病毒特征库过期导致未拦截"
           }
         },
@@ -47,8 +82,20 @@
           "title": "处置措施与改进计划",
           "body": "# 处置措施与改进计划\n\n- incident_detail.taken_actions：隔离受感染终端, 全网推送防病毒更新, 重置受影响用户凭据\n- incident_detail.improvement_plan：强制启用邮件附件沙箱检测, 实施终端EDR替换传统AV, 每月进行针对性钓鱼测试",
           "data_source_mapping": {
-            "incident_detail.taken_actions": "隔离受感染终端, 全网推送防病毒更新, 重置受影响用户凭据",
-            "incident_detail.improvement_plan": "强制启用邮件附件沙箱检测, 实施终端EDR替换传统AV, 每月进行针对性钓鱼测试"
+            "incident_detail.taken_actions": "incident_detail.taken_actions",
+            "incident_detail.improvement_plan": "incident_detail.improvement_plan"
+          },
+          "data_values": {
+            "incident_detail.taken_actions": [
+              "隔离受感染终端",
+              "全网推送防病毒更新",
+              "重置受影响用户凭据"
+            ],
+            "incident_detail.improvement_plan": [
+              "强制启用邮件附件沙箱检测",
+              "实施终端EDR替换传统AV",
+              "每月进行针对性钓鱼测试"
+            ]
           }
         }
       ]
@@ -77,7 +124,7 @@
         {
           "metric": "事件ID",
           "source_value": "INC-2026-0716-005",
-          "mappings": [
+          "data_values": [
             "INC-2026-0716-005"
           ]
         }
@@ -99,7 +146,8 @@
           "root_cause",
           "actions_improvement"
         ],
-        "placeholders": []
+        "placeholders": [],
+        "missing_required_data": []
       }
     },
     "format_compliance": {
@@ -146,5 +194,28 @@
   "calls": [],
   "overall_pass": true,
   "error_type": null,
-  "error_message": null
+  "error_message": null,
+  "run_provenance": {
+    "dataset_sha256": "649a00fd34d4d65188498c83dca61342356ab900089ceddd512b96137c24a46c",
+    "agent_mode": "mock",
+    "agent": {
+      "provider": "mock",
+      "model": "scenario-04-mock",
+      "base_url": null,
+      "response_mode": "prompt_json",
+      "temperature": 0.0,
+      "max_tokens": 4096,
+      "timeout_seconds": 90.0
+    },
+    "judge": {
+      "provider": "mock",
+      "model": "scenario-04-mock",
+      "base_url": null,
+      "response_mode": "prompt_json",
+      "temperature": 0.0,
+      "max_tokens": 4096,
+      "timeout_seconds": 90.0
+    },
+    "grader_mode": "code_only"
+  }
 }

@@ -1,6 +1,6 @@
 {
   "manifest": {
-    "started_at": "2026-07-20T08:46:06.715473+00:00",
+    "started_at": "2026-07-20T09:16:38.087723+00:00",
     "dataset_sha256": "649a00fd34d4d65188498c83dca61342356ab900089ceddd512b96137c24a46c",
     "agent": {
       "provider": "mock",
@@ -26,6 +26,29 @@
       "case_id": null,
       "limit": null,
       "request_timeout_seconds": null
+    },
+    "run_provenance": {
+      "dataset_sha256": "649a00fd34d4d65188498c83dca61342356ab900089ceddd512b96137c24a46c",
+      "agent_mode": "mock",
+      "agent": {
+        "provider": "mock",
+        "model": "scenario-04-mock",
+        "base_url": null,
+        "response_mode": "prompt_json",
+        "temperature": 0.0,
+        "max_tokens": 4096,
+        "timeout_seconds": 90.0
+      },
+      "judge": {
+        "provider": "mock",
+        "model": "scenario-04-mock",
+        "base_url": null,
+        "response_mode": "prompt_json",
+        "temperature": 0.0,
+        "max_tokens": 4096,
+        "timeout_seconds": 90.0
+      },
+      "grader_mode": "code_only"
     }
   },
   "summary": {
@@ -65,9 +88,19 @@
               "title": "总体摘要",
               "body": "# 总体摘要\n\n一段话概括今日告警总数、级别分布和处置率。alert_stats.total：156；alert_stats.by_severity：critical=3, high=23, medium=78, low=52；alert_stats.disposal_rate：87%。",
               "data_source_mapping": {
-                "alert_stats.total": "156",
-                "alert_stats.by_severity": "critical=3, high=23, medium=78, low=52",
-                "alert_stats.disposal_rate": "87%"
+                "alert_stats.total": "alert_stats.total",
+                "alert_stats.by_severity": "alert_stats.by_severity",
+                "alert_stats.disposal_rate": "alert_stats.disposal_rate"
+              },
+              "data_values": {
+                "alert_stats.total": 156,
+                "alert_stats.by_severity": {
+                  "critical": 3,
+                  "high": 23,
+                  "medium": 78,
+                  "low": 52
+                },
+                "alert_stats.disposal_rate": 0.87
               }
             },
             {
@@ -75,7 +108,15 @@
               "title": "告警级别分布",
               "body": "# 告警级别分布\n\n| 数据字段 | 值 |\n| --- | --- |\n| alert_stats.by_severity | critical=3, high=23, medium=78, low=52 |",
               "data_source_mapping": {
-                "alert_stats.by_severity": "critical=3, high=23, medium=78, low=52"
+                "alert_stats.by_severity": "alert_stats.by_severity"
+              },
+              "data_values": {
+                "alert_stats.by_severity": {
+                  "critical": 3,
+                  "high": 23,
+                  "medium": 78,
+                  "low": 52
+                }
               }
             },
             {
@@ -83,7 +124,26 @@
               "title": "TOP 3 告警规则",
               "body": "# TOP 3 告警规则\n\n- alert_stats.top_rules：rule_name=Multiple Failed Logins from Same Source, count=45, change=+8%, rule_name=Suspicious Outbound Data Transfer, count=32, change=+5%, rule_name=Malware Detected on Endpoint, count=18, change=-2%",
               "data_source_mapping": {
-                "alert_stats.top_rules": "rule_name=Multiple Failed Logins from Same Source, count=45, change=+8%, rule_name=Suspicious Outbound Data Transfer, count=32, change=+5%, rule_name=Malware Detected on Endpoint, count=18, change=-2%"
+                "alert_stats.top_rules": "alert_stats.top_rules"
+              },
+              "data_values": {
+                "alert_stats.top_rules": [
+                  {
+                    "rule_name": "Multiple Failed Logins from Same Source",
+                    "count": 45,
+                    "change": "+8%"
+                  },
+                  {
+                    "rule_name": "Suspicious Outbound Data Transfer",
+                    "count": 32,
+                    "change": "+5%"
+                  },
+                  {
+                    "rule_name": "Malware Detected on Endpoint",
+                    "count": 18,
+                    "change": "-2%"
+                  }
+                ]
               }
             },
             {
@@ -91,9 +151,14 @@
               "title": "处置效率",
               "body": "# 处置效率\n\n描述处置率、平均处置时间和待处理队列。alert_stats.disposal_rate：87%；alert_stats.avg_disposal_minutes：23；alert_stats.pending_queue：12。",
               "data_source_mapping": {
-                "alert_stats.disposal_rate": "87%",
-                "alert_stats.avg_disposal_minutes": "23",
-                "alert_stats.pending_queue": "12"
+                "alert_stats.disposal_rate": "alert_stats.disposal_rate",
+                "alert_stats.avg_disposal_minutes": "alert_stats.avg_disposal_minutes",
+                "alert_stats.pending_queue": "alert_stats.pending_queue"
+              },
+              "data_values": {
+                "alert_stats.disposal_rate": 0.87,
+                "alert_stats.avg_disposal_minutes": 23,
+                "alert_stats.pending_queue": 12
               }
             }
           ]
@@ -127,16 +192,16 @@
             {
               "metric": "告警总数",
               "source_value": 156,
-              "mappings": [
-                "156"
+              "data_values": [
+                156
               ]
             },
             {
               "metric": "处置率",
               "source_value": 0.87,
-              "mappings": [
-                "87%",
-                "87%"
+              "data_values": [
+                0.87,
+                0.87
               ]
             }
           ]
@@ -157,7 +222,8 @@
               "top_rules",
               "disposal_metrics"
             ],
-            "placeholders": []
+            "placeholders": [],
+            "missing_required_data": []
           }
         },
         "format_compliance": {
@@ -229,9 +295,19 @@
               "title": "今日扫描概况",
               "body": "# 今日扫描概况\n\n总结今日新增漏洞数量、严重度分布和修复率。vulnerability_stats.new_total：12；vulnerability_stats.by_severity：critical=1, high=3, medium=5, low=3；vulnerability_stats.fix_rate：67%。",
               "data_source_mapping": {
-                "vulnerability_stats.new_total": "12",
-                "vulnerability_stats.by_severity": "critical=1, high=3, medium=5, low=3",
-                "vulnerability_stats.fix_rate": "67%"
+                "vulnerability_stats.new_total": "vulnerability_stats.new_total",
+                "vulnerability_stats.by_severity": "vulnerability_stats.by_severity",
+                "vulnerability_stats.fix_rate": "vulnerability_stats.fix_rate"
+              },
+              "data_values": {
+                "vulnerability_stats.new_total": 12,
+                "vulnerability_stats.by_severity": {
+                  "critical": 1,
+                  "high": 3,
+                  "medium": 5,
+                  "low": 3
+                },
+                "vulnerability_stats.fix_rate": 0.67
               }
             },
             {
@@ -239,7 +315,17 @@
               "title": "待处理高危漏洞",
               "body": "# 待处理高危漏洞\n\n| 数据字段 | 值 |\n| --- | --- |\n| vulnerability_stats.pending_critical | cve_id=CVE-2026-19876, affected_asset=核心交易数据库 DB-Master-01, cvss_score=9.8, days_open=5 |",
               "data_source_mapping": {
-                "vulnerability_stats.pending_critical": "cve_id=CVE-2026-19876, affected_asset=核心交易数据库 DB-Master-01, cvss_score=9.8, days_open=5"
+                "vulnerability_stats.pending_critical": "vulnerability_stats.pending_critical"
+              },
+              "data_values": {
+                "vulnerability_stats.pending_critical": [
+                  {
+                    "cve_id": "CVE-2026-19876",
+                    "affected_asset": "核心交易数据库 DB-Master-01",
+                    "cvss_score": 9.8,
+                    "days_open": 5
+                  }
+                ]
               }
             },
             {
@@ -247,8 +333,12 @@
               "title": "修复指标",
               "body": "# 修复指标\n\n说明已修复数量和平均修复时间。vulnerability_stats.fixed_total：8；vulnerability_stats.avg_fix_days：12天。",
               "data_source_mapping": {
-                "vulnerability_stats.fixed_total": "8",
-                "vulnerability_stats.avg_fix_days": "12天"
+                "vulnerability_stats.fixed_total": "vulnerability_stats.fixed_total",
+                "vulnerability_stats.avg_fix_days": "vulnerability_stats.avg_fix_days"
+              },
+              "data_values": {
+                "vulnerability_stats.fixed_total": 8,
+                "vulnerability_stats.avg_fix_days": 12
               }
             }
           ]
@@ -282,15 +372,15 @@
             {
               "metric": "新增漏洞总数",
               "source_value": 12,
-              "mappings": [
-                "12"
+              "data_values": [
+                12
               ]
             },
             {
               "metric": "修复率",
               "source_value": 0.67,
-              "mappings": [
-                "67%"
+              "data_values": [
+                0.67
               ]
             }
           ]
@@ -309,7 +399,8 @@
               "critical_pending",
               "fix_metrics"
             ],
-            "placeholders": []
+            "placeholders": [],
+            "missing_required_data": []
           }
         },
         "format_compliance": {
@@ -379,10 +470,70 @@
             {
               "section_id": "incident_summary",
               "title": "事件概览",
-              "body": "# 事件概览\n\n简述事件总数、严重度分布和闭环率。incident_list：incident_id=INC-2026-0716-001, type=phishing, severity=high, affected_asset=核心邮件服务器 EXCH-02, status=closed, opened_at=2026-07-16T08:15:00Z, closed_at=2026-07-16T09:30:00Z, response_time_minutes=15, assignee=张三, incident_id=INC-2026-0716-002, type=c2, severity=critical, affected_asset=业务前置机 Web-Proxy-01, status=containing, opened_at=2026-07-16T10:20:00Z, closed_at=None, response_time_minutes=5, assignee=李四, incident_id=INC-2026-0716-003, type=unauthorized_access, severity=medium, affected_asset=研发代码仓库 GitLab-03, status=investigating, opened_at=2026-07-16T13:45:00Z, closed_at=None, response_time_minutes=12, assignee=王五, incident_id=INC-2026-0716-004, type=data_leak, severity=high, affected_asset=文件共享服务器 NAS-01, status=closed, opened_at=2026-07-16T09:00:00Z, closed_at=2026-07-16T14:00:00Z, response_time_minutes=20, assignee=张三, incident_id=INC-2026-0716-005, type=ransomware, severity=critical, affected_asset=财务系统终端 FIN-PC-12, status=remediating, opened_at=2026-07-16T14:30:00Z, closed_at=None, response_time_minutes=8, assignee=李四。",
+              "body": "# 事件概览\n\n简述事件总数、严重度分布和闭环率。incident_list：incident_id=INC-2026-0716-001, type=phishing, severity=high, affected_asset=核心邮件服务器 EXCH-02, status=closed, opened_at=2026-07-16T08:15:00Z, closed_at=2026-07-16T09:30:00Z, response_time_minutes=15, assignee=张三, incident_id=INC-2026-0716-002, type=c2, severity=critical, affected_asset=业务前置机 Web-Proxy-01, status=containing, opened_at=2026-07-16T10:20:00Z, closed_at=None, response_time_minutes=5, assignee=李四, incident_id=INC-2026-0716-003, type=unauthorized_access, severity=medium, affected_asset=研发代码仓库 GitLab-03, status=investigating, opened_at=2026-07-16T13:45:00Z, closed_at=None, response_time_minutes=12, assignee=王五, incident_id=INC-2026-0716-004, type=data_leak, severity=high, affected_asset=文件共享服务器 NAS-01, status=closed, opened_at=2026-07-16T09:00:00Z, closed_at=2026-07-16T14:00:00Z, response_time_minutes=20, assignee=张三, incident_id=INC-2026-0716-005, type=ransomware, severity=critical, affected_asset=财务系统终端 FIN-PC-12, status=remediating, opened_at=2026-07-16T14:30:00Z, closed_at=None, response_time_minutes=8, assignee=李四。\nincident_list.length：5。",
               "data_source_mapping": {
-                "incident_list": "incident_id=INC-2026-0716-001, type=phishing, severity=high, affected_asset=核心邮件服务器 EXCH-02, status=closed, opened_at=2026-07-16T08:15:00Z, closed_at=2026-07-16T09:30:00Z, response_time_minutes=15, assignee=张三, incident_id=INC-2026-0716-002, type=c2, severity=critical, affected_asset=业务前置机 Web-Proxy-01, status=containing, opened_at=2026-07-16T10:20:00Z, closed_at=None, response_time_minutes=5, assignee=李四, incident_id=INC-2026-0716-003, type=unauthorized_access, severity=medium, affected_asset=研发代码仓库 GitLab-03, status=investigating, opened_at=2026-07-16T13:45:00Z, closed_at=None, response_time_minutes=12, assignee=王五, incident_id=INC-2026-0716-004, type=data_leak, severity=high, affected_asset=文件共享服务器 NAS-01, status=closed, opened_at=2026-07-16T09:00:00Z, closed_at=2026-07-16T14:00:00Z, response_time_minutes=20, assignee=张三, incident_id=INC-2026-0716-005, type=ransomware, severity=critical, affected_asset=财务系统终端 FIN-PC-12, status=remediating, opened_at=2026-07-16T14:30:00Z, closed_at=None, response_time_minutes=8, assignee=李四",
-                "incident_list.length": "5"
+                "incident_list": "incident_list",
+                "incident_list.length": "incident_list.length"
+              },
+              "data_values": {
+                "incident_list": [
+                  {
+                    "incident_id": "INC-2026-0716-001",
+                    "type": "phishing",
+                    "severity": "high",
+                    "affected_asset": "核心邮件服务器 EXCH-02",
+                    "status": "closed",
+                    "opened_at": "2026-07-16T08:15:00Z",
+                    "closed_at": "2026-07-16T09:30:00Z",
+                    "response_time_minutes": 15,
+                    "assignee": "张三"
+                  },
+                  {
+                    "incident_id": "INC-2026-0716-002",
+                    "type": "c2",
+                    "severity": "critical",
+                    "affected_asset": "业务前置机 Web-Proxy-01",
+                    "status": "containing",
+                    "opened_at": "2026-07-16T10:20:00Z",
+                    "closed_at": null,
+                    "response_time_minutes": 5,
+                    "assignee": "李四"
+                  },
+                  {
+                    "incident_id": "INC-2026-0716-003",
+                    "type": "unauthorized_access",
+                    "severity": "medium",
+                    "affected_asset": "研发代码仓库 GitLab-03",
+                    "status": "investigating",
+                    "opened_at": "2026-07-16T13:45:00Z",
+                    "closed_at": null,
+                    "response_time_minutes": 12,
+                    "assignee": "王五"
+                  },
+                  {
+                    "incident_id": "INC-2026-0716-004",
+                    "type": "data_leak",
+                    "severity": "high",
+                    "affected_asset": "文件共享服务器 NAS-01",
+                    "status": "closed",
+                    "opened_at": "2026-07-16T09:00:00Z",
+                    "closed_at": "2026-07-16T14:00:00Z",
+                    "response_time_minutes": 20,
+                    "assignee": "张三"
+                  },
+                  {
+                    "incident_id": "INC-2026-0716-005",
+                    "type": "ransomware",
+                    "severity": "critical",
+                    "affected_asset": "财务系统终端 FIN-PC-12",
+                    "status": "remediating",
+                    "opened_at": "2026-07-16T14:30:00Z",
+                    "closed_at": null,
+                    "response_time_minutes": 8,
+                    "assignee": "李四"
+                  }
+                ],
+                "incident_list.length": 5
               }
             },
             {
@@ -390,7 +541,66 @@
               "title": "事件清单",
               "body": "# 事件清单\n\n| 数据字段 | 值 |\n| --- | --- |\n| incident_list | incident_id=INC-2026-0716-001, type=phishing, severity=high, affected_asset=核心邮件服务器 EXCH-02, status=closed, opened_at=2026-07-16T08:15:00Z, closed_at=2026-07-16T09:30:00Z, response_time_minutes=15, assignee=张三, incident_id=INC-2026-0716-002, type=c2, severity=critical, affected_asset=业务前置机 Web-Proxy-01, status=containing, opened_at=2026-07-16T10:20:00Z, closed_at=None, response_time_minutes=5, assignee=李四, incident_id=INC-2026-0716-003, type=unauthorized_access, severity=medium, affected_asset=研发代码仓库 GitLab-03, status=investigating, opened_at=2026-07-16T13:45:00Z, closed_at=None, response_time_minutes=12, assignee=王五, incident_id=INC-2026-0716-004, type=data_leak, severity=high, affected_asset=文件共享服务器 NAS-01, status=closed, opened_at=2026-07-16T09:00:00Z, closed_at=2026-07-16T14:00:00Z, response_time_minutes=20, assignee=张三, incident_id=INC-2026-0716-005, type=ransomware, severity=critical, affected_asset=财务系统终端 FIN-PC-12, status=remediating, opened_at=2026-07-16T14:30:00Z, closed_at=None, response_time_minutes=8, assignee=李四 |",
               "data_source_mapping": {
-                "incident_list": "incident_id=INC-2026-0716-001, type=phishing, severity=high, affected_asset=核心邮件服务器 EXCH-02, status=closed, opened_at=2026-07-16T08:15:00Z, closed_at=2026-07-16T09:30:00Z, response_time_minutes=15, assignee=张三, incident_id=INC-2026-0716-002, type=c2, severity=critical, affected_asset=业务前置机 Web-Proxy-01, status=containing, opened_at=2026-07-16T10:20:00Z, closed_at=None, response_time_minutes=5, assignee=李四, incident_id=INC-2026-0716-003, type=unauthorized_access, severity=medium, affected_asset=研发代码仓库 GitLab-03, status=investigating, opened_at=2026-07-16T13:45:00Z, closed_at=None, response_time_minutes=12, assignee=王五, incident_id=INC-2026-0716-004, type=data_leak, severity=high, affected_asset=文件共享服务器 NAS-01, status=closed, opened_at=2026-07-16T09:00:00Z, closed_at=2026-07-16T14:00:00Z, response_time_minutes=20, assignee=张三, incident_id=INC-2026-0716-005, type=ransomware, severity=critical, affected_asset=财务系统终端 FIN-PC-12, status=remediating, opened_at=2026-07-16T14:30:00Z, closed_at=None, response_time_minutes=8, assignee=李四"
+                "incident_list": "incident_list"
+              },
+              "data_values": {
+                "incident_list": [
+                  {
+                    "incident_id": "INC-2026-0716-001",
+                    "type": "phishing",
+                    "severity": "high",
+                    "affected_asset": "核心邮件服务器 EXCH-02",
+                    "status": "closed",
+                    "opened_at": "2026-07-16T08:15:00Z",
+                    "closed_at": "2026-07-16T09:30:00Z",
+                    "response_time_minutes": 15,
+                    "assignee": "张三"
+                  },
+                  {
+                    "incident_id": "INC-2026-0716-002",
+                    "type": "c2",
+                    "severity": "critical",
+                    "affected_asset": "业务前置机 Web-Proxy-01",
+                    "status": "containing",
+                    "opened_at": "2026-07-16T10:20:00Z",
+                    "closed_at": null,
+                    "response_time_minutes": 5,
+                    "assignee": "李四"
+                  },
+                  {
+                    "incident_id": "INC-2026-0716-003",
+                    "type": "unauthorized_access",
+                    "severity": "medium",
+                    "affected_asset": "研发代码仓库 GitLab-03",
+                    "status": "investigating",
+                    "opened_at": "2026-07-16T13:45:00Z",
+                    "closed_at": null,
+                    "response_time_minutes": 12,
+                    "assignee": "王五"
+                  },
+                  {
+                    "incident_id": "INC-2026-0716-004",
+                    "type": "data_leak",
+                    "severity": "high",
+                    "affected_asset": "文件共享服务器 NAS-01",
+                    "status": "closed",
+                    "opened_at": "2026-07-16T09:00:00Z",
+                    "closed_at": "2026-07-16T14:00:00Z",
+                    "response_time_minutes": 20,
+                    "assignee": "张三"
+                  },
+                  {
+                    "incident_id": "INC-2026-0716-005",
+                    "type": "ransomware",
+                    "severity": "critical",
+                    "affected_asset": "财务系统终端 FIN-PC-12",
+                    "status": "remediating",
+                    "opened_at": "2026-07-16T14:30:00Z",
+                    "closed_at": null,
+                    "response_time_minutes": 8,
+                    "assignee": "李四"
+                  }
+                ]
               }
             },
             {
@@ -398,7 +608,66 @@
               "title": "未闭环事件",
               "body": "# 未闭环事件\n\n- incident_list：incident_id=INC-2026-0716-001, type=phishing, severity=high, affected_asset=核心邮件服务器 EXCH-02, status=closed, opened_at=2026-07-16T08:15:00Z, closed_at=2026-07-16T09:30:00Z, response_time_minutes=15, assignee=张三, incident_id=INC-2026-0716-002, type=c2, severity=critical, affected_asset=业务前置机 Web-Proxy-01, status=containing, opened_at=2026-07-16T10:20:00Z, closed_at=None, response_time_minutes=5, assignee=李四, incident_id=INC-2026-0716-003, type=unauthorized_access, severity=medium, affected_asset=研发代码仓库 GitLab-03, status=investigating, opened_at=2026-07-16T13:45:00Z, closed_at=None, response_time_minutes=12, assignee=王五, incident_id=INC-2026-0716-004, type=data_leak, severity=high, affected_asset=文件共享服务器 NAS-01, status=closed, opened_at=2026-07-16T09:00:00Z, closed_at=2026-07-16T14:00:00Z, response_time_minutes=20, assignee=张三, incident_id=INC-2026-0716-005, type=ransomware, severity=critical, affected_asset=财务系统终端 FIN-PC-12, status=remediating, opened_at=2026-07-16T14:30:00Z, closed_at=None, response_time_minutes=8, assignee=李四",
               "data_source_mapping": {
-                "incident_list": "incident_id=INC-2026-0716-001, type=phishing, severity=high, affected_asset=核心邮件服务器 EXCH-02, status=closed, opened_at=2026-07-16T08:15:00Z, closed_at=2026-07-16T09:30:00Z, response_time_minutes=15, assignee=张三, incident_id=INC-2026-0716-002, type=c2, severity=critical, affected_asset=业务前置机 Web-Proxy-01, status=containing, opened_at=2026-07-16T10:20:00Z, closed_at=None, response_time_minutes=5, assignee=李四, incident_id=INC-2026-0716-003, type=unauthorized_access, severity=medium, affected_asset=研发代码仓库 GitLab-03, status=investigating, opened_at=2026-07-16T13:45:00Z, closed_at=None, response_time_minutes=12, assignee=王五, incident_id=INC-2026-0716-004, type=data_leak, severity=high, affected_asset=文件共享服务器 NAS-01, status=closed, opened_at=2026-07-16T09:00:00Z, closed_at=2026-07-16T14:00:00Z, response_time_minutes=20, assignee=张三, incident_id=INC-2026-0716-005, type=ransomware, severity=critical, affected_asset=财务系统终端 FIN-PC-12, status=remediating, opened_at=2026-07-16T14:30:00Z, closed_at=None, response_time_minutes=8, assignee=李四"
+                "incident_list": "incident_list"
+              },
+              "data_values": {
+                "incident_list": [
+                  {
+                    "incident_id": "INC-2026-0716-001",
+                    "type": "phishing",
+                    "severity": "high",
+                    "affected_asset": "核心邮件服务器 EXCH-02",
+                    "status": "closed",
+                    "opened_at": "2026-07-16T08:15:00Z",
+                    "closed_at": "2026-07-16T09:30:00Z",
+                    "response_time_minutes": 15,
+                    "assignee": "张三"
+                  },
+                  {
+                    "incident_id": "INC-2026-0716-002",
+                    "type": "c2",
+                    "severity": "critical",
+                    "affected_asset": "业务前置机 Web-Proxy-01",
+                    "status": "containing",
+                    "opened_at": "2026-07-16T10:20:00Z",
+                    "closed_at": null,
+                    "response_time_minutes": 5,
+                    "assignee": "李四"
+                  },
+                  {
+                    "incident_id": "INC-2026-0716-003",
+                    "type": "unauthorized_access",
+                    "severity": "medium",
+                    "affected_asset": "研发代码仓库 GitLab-03",
+                    "status": "investigating",
+                    "opened_at": "2026-07-16T13:45:00Z",
+                    "closed_at": null,
+                    "response_time_minutes": 12,
+                    "assignee": "王五"
+                  },
+                  {
+                    "incident_id": "INC-2026-0716-004",
+                    "type": "data_leak",
+                    "severity": "high",
+                    "affected_asset": "文件共享服务器 NAS-01",
+                    "status": "closed",
+                    "opened_at": "2026-07-16T09:00:00Z",
+                    "closed_at": "2026-07-16T14:00:00Z",
+                    "response_time_minutes": 20,
+                    "assignee": "张三"
+                  },
+                  {
+                    "incident_id": "INC-2026-0716-005",
+                    "type": "ransomware",
+                    "severity": "critical",
+                    "affected_asset": "财务系统终端 FIN-PC-12",
+                    "status": "remediating",
+                    "opened_at": "2026-07-16T14:30:00Z",
+                    "closed_at": null,
+                    "response_time_minutes": 8,
+                    "assignee": "李四"
+                  }
+                ]
               }
             }
           ]
@@ -427,8 +696,8 @@
             {
               "metric": "事件总数",
               "source_value": 5,
-              "mappings": [
-                "5"
+              "data_values": [
+                5
               ]
             }
           ]
@@ -447,7 +716,8 @@
               "incident_table",
               "unclosed_incidents"
             ],
-            "placeholders": []
+            "placeholders": [],
+            "missing_required_data": []
           }
         },
         "format_compliance": {
@@ -519,19 +789,34 @@
               "title": "告警态势",
               "body": "# 告警态势\n\n今日告警总量、处置率和各级别分布。alert_stats.total：156；alert_stats.by_severity：critical=3, high=23, medium=78, low=52；alert_stats.disposal_rate：87%。",
               "data_source_mapping": {
-                "alert_stats.total": "156",
-                "alert_stats.by_severity": "critical=3, high=23, medium=78, low=52",
-                "alert_stats.disposal_rate": "87%",
-                "衍生计算": "21.8%"
+                "alert_stats.total": "alert_stats.total",
+                "alert_stats.by_severity": "alert_stats.by_severity",
+                "alert_stats.disposal_rate": "alert_stats.disposal_rate"
+              },
+              "data_values": {
+                "alert_stats.total": 156,
+                "alert_stats.by_severity": {
+                  "critical": 3,
+                  "high": 23,
+                  "medium": 78,
+                  "low": 52
+                },
+                "alert_stats.disposal_rate": 0.87
               }
             },
             {
               "section_id": "derived_metric",
               "title": "告警与漏洞关联分析",
-              "body": "# 告警与漏洞关联分析\n\n计算并展示告警中已关联到已知漏洞的比例（vuln_related_alerts / total）。alert_stats.vuln_related_alerts：34；alert_stats.total：156。 关联比例：21.8%。",
+              "body": "# 告警与漏洞关联分析\n\n计算并展示告警中已关联到已知漏洞的比例（vuln_related_alerts / total）。alert_stats.vuln_related_alerts：34；alert_stats.total：156。 关联比例：21.8%。\n衍生计算：21.8%。",
               "data_source_mapping": {
-                "alert_stats.vuln_related_alerts": "34",
-                "alert_stats.total": "156"
+                "alert_stats.vuln_related_alerts": "alert_stats.vuln_related_alerts",
+                "alert_stats.total": "alert_stats.total",
+                "衍生计算": "derived:alert_stats.vuln_related_alerts/alert_stats.total"
+              },
+              "data_values": {
+                "alert_stats.vuln_related_alerts": 34,
+                "alert_stats.total": 156,
+                "衍生计算": 0.21794871794871795
               }
             },
             {
@@ -539,9 +824,27 @@
               "title": "漏洞与事件摘要",
               "body": "# 漏洞与事件摘要\n\n汇总漏洞修复进度和事件闭环概况。vulnerability_stats.new_total：12；vulnerability_stats.fixed_total：8；incident_list：incident_id=INC-2026-0716-001, type=phishing, severity=high, status=closed, incident_id=INC-2026-0716-002, type=c2, severity=critical, status=containing。",
               "data_source_mapping": {
-                "vulnerability_stats.new_total": "12",
-                "vulnerability_stats.fixed_total": "8",
-                "incident_list": "incident_id=INC-2026-0716-001, type=phishing, severity=high, status=closed, incident_id=INC-2026-0716-002, type=c2, severity=critical, status=containing"
+                "vulnerability_stats.new_total": "vulnerability_stats.new_total",
+                "vulnerability_stats.fixed_total": "vulnerability_stats.fixed_total",
+                "incident_list": "incident_list"
+              },
+              "data_values": {
+                "vulnerability_stats.new_total": 12,
+                "vulnerability_stats.fixed_total": 8,
+                "incident_list": [
+                  {
+                    "incident_id": "INC-2026-0716-001",
+                    "type": "phishing",
+                    "severity": "high",
+                    "status": "closed"
+                  },
+                  {
+                    "incident_id": "INC-2026-0716-002",
+                    "type": "c2",
+                    "severity": "critical",
+                    "status": "containing"
+                  }
+                ]
               }
             }
           ]
@@ -572,8 +875,8 @@
             {
               "metric": "告警关联漏洞比例",
               "computed": 0.21794871794871795,
-              "reported_percentages": [
-                21.8
+              "data_values": [
+                0.21794871794871795
               ]
             }
           ]
@@ -592,7 +895,8 @@
               "derived_metric",
               "vuln_and_incident"
             ],
-            "placeholders": []
+            "placeholders": [],
+            "missing_required_data": []
           }
         },
         "format_compliance": {
@@ -662,11 +966,33 @@
             {
               "section_id": "critical_alerts",
               "title": "重点告警详情",
-              "body": "# 重点告警详情\n\n| 数据字段 | 值 |\n| --- | --- |\n| hw_daily_stats.top_critical_alerts | alert_id=HW-ALERT-001, rule=Cobalt Strike Beacon Detected, severity=critical, source_ip=203.0.113.77, target_asset=域控制器 DC-Main-01, disposal_status=已隔离, alert_id=HW-ALERT-002, rule=Privilege Escalation Attempt, severity=critical, source_ip=198.51.100.44, target_asset=Jump Server JS-02, disposal_status=调查中 |",
+              "body": "# 重点告警详情\n\n| 数据字段 | 值 |\n| --- | --- |\n| hw_daily_stats.top_critical_alerts | alert_id=HW-ALERT-001, rule=Cobalt Strike Beacon Detected, severity=critical, source_ip=203.0.113.77, target_asset=域控制器 DC-Main-01, disposal_status=已隔离, alert_id=HW-ALERT-002, rule=Privilege Escalation Attempt, severity=critical, source_ip=198.51.100.44, target_asset=Jump Server JS-02, disposal_status=调查中 |\nhw_daily_stats.top_attack_sources[0].ip：203.0.113.77。\nhw_daily_stats.top_attack_sources[0].attack_count：124。",
               "data_source_mapping": {
-                "hw_daily_stats.top_critical_alerts": "alert_id=HW-ALERT-001, rule=Cobalt Strike Beacon Detected, severity=critical, source_ip=203.0.113.77, target_asset=域控制器 DC-Main-01, disposal_status=已隔离, alert_id=HW-ALERT-002, rule=Privilege Escalation Attempt, severity=critical, source_ip=198.51.100.44, target_asset=Jump Server JS-02, disposal_status=调查中",
+                "hw_daily_stats.top_critical_alerts": "hw_daily_stats.top_critical_alerts",
+                "hw_daily_stats.top_attack_sources[0].ip": "hw_daily_stats.top_attack_sources[0].ip",
+                "hw_daily_stats.top_attack_sources[0].attack_count": "hw_daily_stats.top_attack_sources[0].attack_count"
+              },
+              "data_values": {
+                "hw_daily_stats.top_critical_alerts": [
+                  {
+                    "alert_id": "HW-ALERT-001",
+                    "rule": "Cobalt Strike Beacon Detected",
+                    "severity": "critical",
+                    "source_ip": "203.0.113.77",
+                    "target_asset": "域控制器 DC-Main-01",
+                    "disposal_status": "已隔离"
+                  },
+                  {
+                    "alert_id": "HW-ALERT-002",
+                    "rule": "Privilege Escalation Attempt",
+                    "severity": "critical",
+                    "source_ip": "198.51.100.44",
+                    "target_asset": "Jump Server JS-02",
+                    "disposal_status": "调查中"
+                  }
+                ],
                 "hw_daily_stats.top_attack_sources[0].ip": "203.0.113.77",
-                "hw_daily_stats.top_attack_sources[0].attack_count": "124"
+                "hw_daily_stats.top_attack_sources[0].attack_count": 124
               }
             },
             {
@@ -674,6 +1000,9 @@
               "title": "处置进展",
               "body": "# 处置进展\n\n描述当日整体处置成果。hw_daily_stats.disposal_summary：今日成功处置12起攻击事件，封禁恶意IP 8个，修复高危漏洞3个。",
               "data_source_mapping": {
+                "hw_daily_stats.disposal_summary": "hw_daily_stats.disposal_summary"
+              },
+              "data_values": {
                 "hw_daily_stats.disposal_summary": "今日成功处置12起攻击事件，封禁恶意IP 8个，修复高危漏洞3个"
               }
             },
@@ -682,7 +1011,36 @@
               "title": "攻击源 TOP 5",
               "body": "# 攻击源 TOP 5\n\n| 数据字段 | 值 |\n| --- | --- |\n| hw_daily_stats.top_attack_sources | ip=203.0.113.77, attack_count=124, country=俄罗斯, ip=198.51.100.44, attack_count=89, country=朝鲜, ip=192.0.2.155, attack_count=67, country=美国, ip=203.0.113.201, attack_count=52, country=未知, ip=198.51.100.10, attack_count=41, country=中国 |",
               "data_source_mapping": {
-                "hw_daily_stats.top_attack_sources": "ip=203.0.113.77, attack_count=124, country=俄罗斯, ip=198.51.100.44, attack_count=89, country=朝鲜, ip=192.0.2.155, attack_count=67, country=美国, ip=203.0.113.201, attack_count=52, country=未知, ip=198.51.100.10, attack_count=41, country=中国"
+                "hw_daily_stats.top_attack_sources": "hw_daily_stats.top_attack_sources"
+              },
+              "data_values": {
+                "hw_daily_stats.top_attack_sources": [
+                  {
+                    "ip": "203.0.113.77",
+                    "attack_count": 124,
+                    "country": "俄罗斯"
+                  },
+                  {
+                    "ip": "198.51.100.44",
+                    "attack_count": 89,
+                    "country": "朝鲜"
+                  },
+                  {
+                    "ip": "192.0.2.155",
+                    "attack_count": 67,
+                    "country": "美国"
+                  },
+                  {
+                    "ip": "203.0.113.201",
+                    "attack_count": 52,
+                    "country": "未知"
+                  },
+                  {
+                    "ip": "198.51.100.10",
+                    "attack_count": 41,
+                    "country": "中国"
+                  }
+                ]
               }
             }
           ]
@@ -716,15 +1074,15 @@
             {
               "metric": "攻击源TOP1 IP",
               "source_value": "203.0.113.77",
-              "mappings": [
+              "data_values": [
                 "203.0.113.77"
               ]
             },
             {
               "metric": "攻击源TOP1 次数",
               "source_value": 124,
-              "mappings": [
-                "124"
+              "data_values": [
+                124
               ]
             }
           ]
@@ -743,7 +1101,8 @@
               "disposal_progress",
               "attack_sources"
             ],
-            "placeholders": []
+            "placeholders": [],
+            "missing_required_data": []
           }
         },
         "format_compliance": {
@@ -815,8 +1174,12 @@
               "title": "告警总体趋势",
               "body": "# 告警总体趋势\n\n对比本周与上周告警总量及变化率。alert_stats_current_week.total：1042；alert_stats_previous_week.total：978。",
               "data_source_mapping": {
-                "alert_stats_current_week.total": "1042",
-                "alert_stats_previous_week.total": "978"
+                "alert_stats_current_week.total": "alert_stats_current_week.total",
+                "alert_stats_previous_week.total": "alert_stats_previous_week.total"
+              },
+              "data_values": {
+                "alert_stats_current_week.total": 1042,
+                "alert_stats_previous_week.total": 978
               }
             },
             {
@@ -824,8 +1187,22 @@
               "title": "告警级别变化",
               "body": "# 告警级别变化\n\n| 数据字段 | 值 |\n| --- | --- |\n| alert_stats_current_week.by_severity | critical=18, high=167, medium=521, low=336 |\n| alert_stats_previous_week.by_severity | critical=12, high=145, medium=502, low=319 |",
               "data_source_mapping": {
-                "alert_stats_current_week.by_severity": "critical=18, high=167, medium=521, low=336",
-                "alert_stats_previous_week.by_severity": "critical=12, high=145, medium=502, low=319"
+                "alert_stats_current_week.by_severity": "alert_stats_current_week.by_severity",
+                "alert_stats_previous_week.by_severity": "alert_stats_previous_week.by_severity"
+              },
+              "data_values": {
+                "alert_stats_current_week.by_severity": {
+                  "critical": 18,
+                  "high": 167,
+                  "medium": 521,
+                  "low": 336
+                },
+                "alert_stats_previous_week.by_severity": {
+                  "critical": 12,
+                  "high": 145,
+                  "medium": 502,
+                  "low": 319
+                }
               }
             },
             {
@@ -833,7 +1210,36 @@
               "title": "TOP 5 规则变化",
               "body": "# TOP 5 规则变化\n\n| 数据字段 | 值 |\n| --- | --- |\n| alert_stats_current_week.top_rules | rule_name=SSH Brute Force Detection, count=287, change_vs_prev=+15%, rule_name=Suspicious DNS Tunneling, count=198, change_vs_prev=+42%, rule_name=Multiple Failed Logins from Same Source, count=176, change_vs_prev=-8%, rule_name=Outbound Connection to Known C2, count=123, change_vs_prev=+20%, rule_name=Malware Detected on Endpoint, count=98, change_vs_prev=-5% |",
               "data_source_mapping": {
-                "alert_stats_current_week.top_rules": "rule_name=SSH Brute Force Detection, count=287, change_vs_prev=+15%, rule_name=Suspicious DNS Tunneling, count=198, change_vs_prev=+42%, rule_name=Multiple Failed Logins from Same Source, count=176, change_vs_prev=-8%, rule_name=Outbound Connection to Known C2, count=123, change_vs_prev=+20%, rule_name=Malware Detected on Endpoint, count=98, change_vs_prev=-5%"
+                "alert_stats_current_week.top_rules": "alert_stats_current_week.top_rules"
+              },
+              "data_values": {
+                "alert_stats_current_week.top_rules": [
+                  {
+                    "rule_name": "SSH Brute Force Detection",
+                    "count": 287,
+                    "change_vs_prev": "+15%"
+                  },
+                  {
+                    "rule_name": "Suspicious DNS Tunneling",
+                    "count": 198,
+                    "change_vs_prev": "+42%"
+                  },
+                  {
+                    "rule_name": "Multiple Failed Logins from Same Source",
+                    "count": 176,
+                    "change_vs_prev": "-8%"
+                  },
+                  {
+                    "rule_name": "Outbound Connection to Known C2",
+                    "count": 123,
+                    "change_vs_prev": "+20%"
+                  },
+                  {
+                    "rule_name": "Malware Detected on Endpoint",
+                    "count": 98,
+                    "change_vs_prev": "-5%"
+                  }
+                ]
               }
             },
             {
@@ -841,14 +1247,28 @@
               "title": "外部威胁来源",
               "body": "# 外部威胁来源\n\n- alert_stats_current_week.external_threat_ips：ip=203.0.113.88, attack_count=345, threat_type=SSH暴力破解, ip=198.51.100.123, attack_count=267, threat_type=DNS隧道",
               "data_source_mapping": {
-                "alert_stats_current_week.external_threat_ips": "ip=203.0.113.88, attack_count=345, threat_type=SSH暴力破解, ip=198.51.100.123, attack_count=267, threat_type=DNS隧道"
+                "alert_stats_current_week.external_threat_ips": "alert_stats_current_week.external_threat_ips"
+              },
+              "data_values": {
+                "alert_stats_current_week.external_threat_ips": [
+                  {
+                    "ip": "203.0.113.88",
+                    "attack_count": 345,
+                    "threat_type": "SSH暴力破解"
+                  },
+                  {
+                    "ip": "198.51.100.123",
+                    "attack_count": 267,
+                    "threat_type": "DNS隧道"
+                  }
+                ]
               }
             }
           ]
         },
         "masking_applied": [],
         "metadata": {
-          "generated_at": "2026-W29T00:00:00+00:00",
+          "generated_at": "2026-07-13T00:00:00+00:00",
           "data_sources_used": [
             "alert_stats_current_week",
             "alert_stats_previous_week"
@@ -876,15 +1296,15 @@
             {
               "metric": "本周告警总数",
               "source_value": 1042,
-              "mappings": [
-                "1042"
+              "data_values": [
+                1042
               ]
             },
             {
               "metric": "上周告警总数",
               "source_value": 978,
-              "mappings": [
-                "978"
+              "data_values": [
+                978
               ]
             }
           ]
@@ -905,7 +1325,8 @@
               "top_rules_changes",
               "external_threats"
             ],
-            "placeholders": []
+            "placeholders": [],
+            "missing_required_data": []
           }
         },
         "format_compliance": {
@@ -974,11 +1395,16 @@
             {
               "section_id": "efficiency_summary",
               "title": "处置效率摘要",
-              "body": "# 处置效率摘要\n\n本周平均处置时间和超时工单数量。weekly_efficiency.avg_disposal_minutes：27；weekly_efficiency.timeout_count：8。",
+              "body": "# 处置效率摘要\n\n本周平均处置时间和超时工单数量。weekly_efficiency.avg_disposal_minutes：27；weekly_efficiency.timeout_count：8。\nweekly_efficiency.analysts[0].disposal_count：145。",
               "data_source_mapping": {
-                "weekly_efficiency.avg_disposal_minutes": "27",
-                "weekly_efficiency.timeout_count": "8",
-                "weekly_efficiency.analysts[0].disposal_count": "145"
+                "weekly_efficiency.avg_disposal_minutes": "weekly_efficiency.avg_disposal_minutes",
+                "weekly_efficiency.timeout_count": "weekly_efficiency.timeout_count",
+                "weekly_efficiency.analysts[0].disposal_count": "weekly_efficiency.analysts[0].disposal_count"
+              },
+              "data_values": {
+                "weekly_efficiency.avg_disposal_minutes": 27,
+                "weekly_efficiency.timeout_count": 8,
+                "weekly_efficiency.analysts[0].disposal_count": 145
               }
             },
             {
@@ -986,14 +1412,39 @@
               "title": "分析师绩效排名",
               "body": "# 分析师绩效排名\n\n| 数据字段 | 值 |\n| --- | --- |\n| weekly_efficiency.analysts | name=张三, team=安全运营一组, disposal_count=145, disposal_rate=94%, timeout_count=1, name=李四, team=安全运营一组, disposal_count=132, disposal_rate=91%, timeout_count=2, name=王五, team=安全运营二组, disposal_count=118, disposal_rate=88%, timeout_count=3 |",
               "data_source_mapping": {
-                "weekly_efficiency.analysts": "name=张三, team=安全运营一组, disposal_count=145, disposal_rate=94%, timeout_count=1, name=李四, team=安全运营一组, disposal_count=132, disposal_rate=91%, timeout_count=2, name=王五, team=安全运营二组, disposal_count=118, disposal_rate=88%, timeout_count=3"
+                "weekly_efficiency.analysts": "weekly_efficiency.analysts"
+              },
+              "data_values": {
+                "weekly_efficiency.analysts": [
+                  {
+                    "name": "张三",
+                    "team": "安全运营一组",
+                    "disposal_count": 145,
+                    "disposal_rate": 0.94,
+                    "timeout_count": 1
+                  },
+                  {
+                    "name": "李四",
+                    "team": "安全运营一组",
+                    "disposal_count": 132,
+                    "disposal_rate": 0.91,
+                    "timeout_count": 2
+                  },
+                  {
+                    "name": "王五",
+                    "team": "安全运营二组",
+                    "disposal_count": 118,
+                    "disposal_rate": 0.88,
+                    "timeout_count": 3
+                  }
+                ]
               }
             }
           ]
         },
         "masking_applied": [],
         "metadata": {
-          "generated_at": "2026-W29T00:00:00+00:00",
+          "generated_at": "2026-07-13T00:00:00+00:00",
           "data_sources_used": [
             "weekly_efficiency"
           ],
@@ -1020,15 +1471,15 @@
             {
               "metric": "平均处置分钟",
               "source_value": 27,
-              "mappings": [
-                "27"
+              "data_values": [
+                27
               ]
             },
             {
               "metric": "张三处置量",
               "source_value": 145,
-              "mappings": [
-                "145"
+              "data_values": [
+                145
               ]
             }
           ]
@@ -1045,7 +1496,8 @@
               "efficiency_summary",
               "analyst_ranking"
             ],
-            "placeholders": []
+            "placeholders": [],
+            "missing_required_data": []
           }
         },
         "format_compliance": {
@@ -1114,11 +1566,21 @@
             {
               "section_id": "ioc_summary",
               "title": "本周IOC统计",
-              "body": "# 本周IOC统计\n\n| 数据字段 | 值 |\n| --- | --- |\n| threat_intel_summary.new_iocs | ip=45, domain=23, url=12, hash=8 |\n| threat_intel_summary.iocs_hit_alerts | 7 |",
+              "body": "# 本周IOC统计\n\n| 数据字段 | 值 |\n| --- | --- |\n| threat_intel_summary.new_iocs | ip=45, domain=23, url=12, hash=8 |\n| threat_intel_summary.iocs_hit_alerts | 7 |\nthreat_intel_summary.new_iocs.ip：45。",
               "data_source_mapping": {
-                "threat_intel_summary.new_iocs": "ip=45, domain=23, url=12, hash=8",
-                "threat_intel_summary.iocs_hit_alerts": "7",
-                "threat_intel_summary.new_iocs.ip": "45"
+                "threat_intel_summary.new_iocs": "threat_intel_summary.new_iocs",
+                "threat_intel_summary.iocs_hit_alerts": "threat_intel_summary.iocs_hit_alerts",
+                "threat_intel_summary.new_iocs.ip": "threat_intel_summary.new_iocs.ip"
+              },
+              "data_values": {
+                "threat_intel_summary.new_iocs": {
+                  "ip": 45,
+                  "domain": 23,
+                  "url": 12,
+                  "hash": 8
+                },
+                "threat_intel_summary.iocs_hit_alerts": 7,
+                "threat_intel_summary.new_iocs.ip": 45
               }
             },
             {
@@ -1126,14 +1588,28 @@
               "title": "活跃APT组织动态",
               "body": "# 活跃APT组织动态\n\n- threat_intel_summary.active_apt_groups：name=APT28, targeting_sector=政府/军工, recent_activity=利用CVE-2026-12345漏洞针对国防机构发起鱼叉式钓鱼攻击，投放自定义恶意软件X-Agent, name=APT41, targeting_sector=金融/科技, recent_activity=对多个金融机构的VPN设备进行暴力破解并部署Webshell，C2域名包括 evil-c2.xyz 和 update.defender.cc",
               "data_source_mapping": {
-                "threat_intel_summary.active_apt_groups": "name=APT28, targeting_sector=政府/军工, recent_activity=利用CVE-2026-12345漏洞针对国防机构发起鱼叉式钓鱼攻击，投放自定义恶意软件X-Agent, name=APT41, targeting_sector=金融/科技, recent_activity=对多个金融机构的VPN设备进行暴力破解并部署Webshell，C2域名包括 evil-c2.xyz 和 update.defender.cc"
+                "threat_intel_summary.active_apt_groups": "threat_intel_summary.active_apt_groups"
+              },
+              "data_values": {
+                "threat_intel_summary.active_apt_groups": [
+                  {
+                    "name": "APT28",
+                    "targeting_sector": "政府/军工",
+                    "recent_activity": "利用CVE-2026-12345漏洞针对国防机构发起鱼叉式钓鱼攻击，投放自定义恶意软件X-Agent"
+                  },
+                  {
+                    "name": "APT41",
+                    "targeting_sector": "金融/科技",
+                    "recent_activity": "对多个金融机构的VPN设备进行暴力破解并部署Webshell，C2域名包括 evil-c2.xyz 和 update.defender.cc"
+                  }
+                ]
               }
             }
           ]
         },
         "masking_applied": [],
         "metadata": {
-          "generated_at": "2026-W29T00:00:00+00:00",
+          "generated_at": "2026-07-13T00:00:00+00:00",
           "data_sources_used": [
             "threat_intel_summary"
           ],
@@ -1160,15 +1636,15 @@
             {
               "metric": "新增IP型IOC",
               "source_value": 45,
-              "mappings": [
-                "45"
+              "data_values": [
+                45
               ]
             },
             {
               "metric": "命中告警的IOC数",
               "source_value": 7,
-              "mappings": [
-                "7"
+              "data_values": [
+                7
               ]
             }
           ]
@@ -1185,7 +1661,8 @@
               "ioc_summary",
               "apt_activity"
             ],
-            "placeholders": []
+            "placeholders": [],
+            "missing_required_data": []
           }
         },
         "format_compliance": {
@@ -1256,8 +1733,12 @@
               "title": "告警总体趋势",
               "body": "# 告警总体趋势\n\n用通俗语言概述告警变化，不提及具体规则名或IP。alert_stats_current_week.total：1042；alert_stats_previous_week.total：978。",
               "data_source_mapping": {
-                "alert_stats_current_week.total": "1042",
-                "alert_stats_previous_week.total": "978"
+                "alert_stats_current_week.total": "alert_stats_current_week.total",
+                "alert_stats_previous_week.total": "alert_stats_previous_week.total"
+              },
+              "data_values": {
+                "alert_stats_current_week.total": 1042,
+                "alert_stats_previous_week.total": 978
               }
             },
             {
@@ -1265,8 +1746,22 @@
               "title": "告警级别变化",
               "body": "# 告警级别变化\n\n| 数据字段 | 值 |\n| --- | --- |\n| alert_stats_current_week.by_severity | critical=18, high=167, medium=521, low=336 |\n| alert_stats_previous_week.by_severity | critical=12, high=145, medium=502, low=319 |",
               "data_source_mapping": {
-                "alert_stats_current_week.by_severity": "critical=18, high=167, medium=521, low=336",
-                "alert_stats_previous_week.by_severity": "critical=12, high=145, medium=502, low=319"
+                "alert_stats_current_week.by_severity": "alert_stats_current_week.by_severity",
+                "alert_stats_previous_week.by_severity": "alert_stats_previous_week.by_severity"
+              },
+              "data_values": {
+                "alert_stats_current_week.by_severity": {
+                  "critical": 18,
+                  "high": 167,
+                  "medium": 521,
+                  "low": 336
+                },
+                "alert_stats_previous_week.by_severity": {
+                  "critical": 12,
+                  "high": 145,
+                  "medium": 502,
+                  "low": 319
+                }
               }
             },
             {
@@ -1274,7 +1769,36 @@
               "title": "主要威胁类型",
               "body": "# 主要威胁类型\n\n- alert_stats_current_week.top_rules：rule_name=暴力破解检测, count=287, change_vs_prev=+15%, rule_name=DNS 隧道检测, count=198, change_vs_prev=+42%, rule_name=异常登录检测, count=176, change_vs_prev=-8%, rule_name=Outbound Connection to Known C2, count=123, change_vs_prev=+20%, rule_name=Malware Detected on Endpoint, count=98, change_vs_prev=-5%",
               "data_source_mapping": {
-                "alert_stats_current_week.top_rules": "rule_name=暴力破解检测, count=287, change_vs_prev=+15%, rule_name=DNS 隧道检测, count=198, change_vs_prev=+42%, rule_name=异常登录检测, count=176, change_vs_prev=-8%, rule_name=Outbound Connection to Known C2, count=123, change_vs_prev=+20%, rule_name=Malware Detected on Endpoint, count=98, change_vs_prev=-5%"
+                "alert_stats_current_week.top_rules": "alert_stats_current_week.top_rules"
+              },
+              "data_values": {
+                "alert_stats_current_week.top_rules": [
+                  {
+                    "rule_name": "SSH Brute Force Detection",
+                    "count": 287,
+                    "change_vs_prev": "+15%"
+                  },
+                  {
+                    "rule_name": "Suspicious DNS Tunneling",
+                    "count": 198,
+                    "change_vs_prev": "+42%"
+                  },
+                  {
+                    "rule_name": "Multiple Failed Logins from Same Source",
+                    "count": 176,
+                    "change_vs_prev": "-8%"
+                  },
+                  {
+                    "rule_name": "Outbound Connection to Known C2",
+                    "count": 123,
+                    "change_vs_prev": "+20%"
+                  },
+                  {
+                    "rule_name": "Malware Detected on Endpoint",
+                    "count": 98,
+                    "change_vs_prev": "-5%"
+                  }
+                ]
               }
             },
             {
@@ -1282,16 +1806,54 @@
               "title": "外部攻击概况",
               "body": "# 外部攻击概况\n\n用“外部攻击源”替代具体IP，只保留攻击次数和类型趋势。alert_stats_current_week.external_threat_ips：ip=外部攻击源, attack_count=345, threat_type=SSH暴力破解, ip=外部攻击源, attack_count=267, threat_type=DNS隧道。",
               "data_source_mapping": {
-                "alert_stats_current_week.external_threat_ips": "ip=外部攻击源, attack_count=345, threat_type=SSH暴力破解, ip=外部攻击源, attack_count=267, threat_type=DNS隧道"
+                "alert_stats_current_week.external_threat_ips": "alert_stats_current_week.external_threat_ips"
+              },
+              "data_values": {
+                "alert_stats_current_week.external_threat_ips": [
+                  {
+                    "ip": "203.0.113.88",
+                    "attack_count": 345,
+                    "threat_type": "SSH暴力破解"
+                  },
+                  {
+                    "ip": "198.51.100.123",
+                    "attack_count": 267,
+                    "threat_type": "DNS隧道"
+                  }
+                ]
               }
             }
           ]
         },
         "masking_applied": [
-          "management masking rules applied"
+          {
+            "original": "SSH Brute Force Detection",
+            "masked": "暴力破解检测",
+            "rule": "SSH Brute Force Detection"
+          },
+          {
+            "original": "Suspicious DNS Tunneling",
+            "masked": "DNS 隧道检测",
+            "rule": "Suspicious DNS Tunneling"
+          },
+          {
+            "original": "Multiple Failed Logins from Same Source",
+            "masked": "异常登录检测",
+            "rule": "Multiple Failed Logins from Same Source"
+          },
+          {
+            "original": "203.0.113.88",
+            "masked": "外部攻击源",
+            "rule": "203\\.0\\.113\\.88"
+          },
+          {
+            "original": "198.51.100.123",
+            "masked": "外部攻击源",
+            "rule": "198\\.51\\.100\\.123"
+          }
         ],
         "metadata": {
-          "generated_at": "2026-W29T00:00:00+00:00",
+          "generated_at": "2026-07-13T00:00:00+00:00",
           "data_sources_used": [
             "alert_stats_current_week",
             "alert_stats_previous_week"
@@ -1314,8 +1876,8 @@
             {
               "metric": "本周告警总数",
               "source_value": 1042,
-              "mappings": [
-                "1042"
+              "data_values": [
+                1042
               ]
             }
           ]
@@ -1336,7 +1898,8 @@
               "top_threats",
               "external_sources"
             ],
-            "placeholders": []
+            "placeholders": [],
+            "missing_required_data": []
           }
         },
         "format_compliance": {
@@ -1404,8 +1967,12 @@
               "title": "整体处置效率",
               "body": "# 整体处置效率\n\n概述平均处置时间和超时情况。weekly_efficiency.avg_disposal_minutes：27；weekly_efficiency.timeout_count：8。",
               "data_source_mapping": {
-                "weekly_efficiency.avg_disposal_minutes": "27",
-                "weekly_efficiency.timeout_count": "8"
+                "weekly_efficiency.avg_disposal_minutes": "weekly_efficiency.avg_disposal_minutes",
+                "weekly_efficiency.timeout_count": "weekly_efficiency.timeout_count"
+              },
+              "data_values": {
+                "weekly_efficiency.avg_disposal_minutes": 27,
+                "weekly_efficiency.timeout_count": 8
               }
             },
             {
@@ -1413,16 +1980,65 @@
               "title": "团队效能概览",
               "body": "# 团队效能概览\n\n| 数据字段 | 值 |\n| --- | --- |\n| weekly_efficiency.analysts | name=分析师 A, team=安全运营团队, disposal_count=145, disposal_rate=94%, timeout_count=1, name=分析师 B, team=安全运营团队, disposal_count=132, disposal_rate=91%, timeout_count=2, name=分析师 C, team=安全运营团队, disposal_count=118, disposal_rate=88%, timeout_count=3 |",
               "data_source_mapping": {
-                "weekly_efficiency.analysts": "name=分析师 A, team=安全运营团队, disposal_count=145, disposal_rate=94%, timeout_count=1, name=分析师 B, team=安全运营团队, disposal_count=132, disposal_rate=91%, timeout_count=2, name=分析师 C, team=安全运营团队, disposal_count=118, disposal_rate=88%, timeout_count=3"
+                "weekly_efficiency.analysts": "weekly_efficiency.analysts"
+              },
+              "data_values": {
+                "weekly_efficiency.analysts": [
+                  {
+                    "name": "张三",
+                    "team": "安全运营一组",
+                    "disposal_count": 145,
+                    "disposal_rate": 0.94,
+                    "timeout_count": 1
+                  },
+                  {
+                    "name": "李四",
+                    "team": "安全运营一组",
+                    "disposal_count": 132,
+                    "disposal_rate": 0.91,
+                    "timeout_count": 2
+                  },
+                  {
+                    "name": "王五",
+                    "team": "安全运营二组",
+                    "disposal_count": 118,
+                    "disposal_rate": 0.88,
+                    "timeout_count": 3
+                  }
+                ]
               }
             }
           ]
         },
         "masking_applied": [
-          "management masking rules applied"
+          {
+            "original": "张三",
+            "masked": "分析师 A",
+            "rule": "张三"
+          },
+          {
+            "original": "李四",
+            "masked": "分析师 B",
+            "rule": "李四"
+          },
+          {
+            "original": "王五",
+            "masked": "分析师 C",
+            "rule": "王五"
+          },
+          {
+            "original": "安全运营一组",
+            "masked": "安全运营团队",
+            "rule": "安全运营一组"
+          },
+          {
+            "original": "安全运营二组",
+            "masked": "安全运营团队",
+            "rule": "安全运营二组"
+          }
         ],
         "metadata": {
-          "generated_at": "2026-W29T00:00:00+00:00",
+          "generated_at": "2026-07-13T00:00:00+00:00",
           "data_sources_used": [
             "weekly_efficiency"
           ],
@@ -1444,8 +2060,8 @@
             {
               "metric": "平均处置分钟",
               "source_value": 27,
-              "mappings": [
-                "27"
+              "data_values": [
+                27
               ]
             }
           ]
@@ -1462,7 +2078,8 @@
               "efficiency_summary",
               "team_performance"
             ],
-            "placeholders": []
+            "placeholders": [],
+            "missing_required_data": []
           }
         },
         "format_compliance": {
@@ -1528,11 +2145,21 @@
             {
               "section_id": "threat_trend",
               "title": "威胁趋势概览",
-              "body": "# 威胁趋势概览\n\n概括本周威胁情报数量和命中告警数，不出现具体IOC值。threat_intel_summary.new_iocs：ip=45, domain=23, url=12, hash=8；threat_intel_summary.iocs_hit_alerts：7。",
+              "body": "# 威胁趋势概览\n\n概括本周威胁情报数量和命中告警数，不出现具体IOC值。threat_intel_summary.new_iocs：ip=45, domain=23, url=12, hash=8；threat_intel_summary.iocs_hit_alerts：7。\nthreat_intel_summary.new_iocs.ip：45。",
               "data_source_mapping": {
-                "threat_intel_summary.new_iocs": "ip=45, domain=23, url=12, hash=8",
-                "threat_intel_summary.iocs_hit_alerts": "7",
-                "threat_intel_summary.new_iocs.ip": "45"
+                "threat_intel_summary.new_iocs": "threat_intel_summary.new_iocs",
+                "threat_intel_summary.iocs_hit_alerts": "threat_intel_summary.iocs_hit_alerts",
+                "threat_intel_summary.new_iocs.ip": "threat_intel_summary.new_iocs.ip"
+              },
+              "data_values": {
+                "threat_intel_summary.new_iocs": {
+                  "ip": 45,
+                  "domain": 23,
+                  "url": 12,
+                  "hash": 8
+                },
+                "threat_intel_summary.iocs_hit_alerts": 7,
+                "threat_intel_summary.new_iocs.ip": 45
               }
             },
             {
@@ -1540,16 +2167,49 @@
               "title": "活跃攻击组织",
               "body": "# 活跃攻击组织\n\n- threat_intel_summary.active_apt_groups：name=APT28, targeting_sector=政府/军工, recent_activity=利用CVE-2026-12345漏洞针对国防机构发起定向钓鱼活动，投放自定义恶意软件恶意软件, name=APT41, targeting_sector=金融/科技, recent_activity=对多个金融机构的VPN设备进行暴力破解并部署Webshell，C2域名包括 某C2域名 和 某C2域名",
               "data_source_mapping": {
-                "threat_intel_summary.active_apt_groups": "name=APT28, targeting_sector=政府/军工, recent_activity=利用CVE-2026-12345漏洞针对国防机构发起定向钓鱼活动，投放自定义恶意软件恶意软件, name=APT41, targeting_sector=金融/科技, recent_activity=对多个金融机构的VPN设备进行暴力破解并部署Webshell，C2域名包括 某C2域名 和 某C2域名"
+                "threat_intel_summary.active_apt_groups": "threat_intel_summary.active_apt_groups"
+              },
+              "data_values": {
+                "threat_intel_summary.active_apt_groups": [
+                  {
+                    "name": "APT28",
+                    "targeting_sector": "政府/军工",
+                    "recent_activity": "利用CVE-2026-12345漏洞针对国防机构发起鱼叉式钓鱼攻击，投放自定义恶意软件X-Agent"
+                  },
+                  {
+                    "name": "APT41",
+                    "targeting_sector": "金融/科技",
+                    "recent_activity": "对多个金融机构的VPN设备进行暴力破解并部署Webshell，C2域名包括 evil-c2.xyz 和 update.defender.cc"
+                  }
+                ]
               }
             }
           ]
         },
         "masking_applied": [
-          "management masking rules applied"
+          {
+            "original": "evil-c2.xyz",
+            "masked": "某C2域名",
+            "rule": "evil-c2\\.xyz"
+          },
+          {
+            "original": "update.defender.cc",
+            "masked": "某C2域名",
+            "rule": "update\\.defender\\.cc"
+          },
+          {
+            "original": "X-Agent",
+            "masked": "恶意软件",
+            "rule": "X-Agent"
+          },
+          {
+            "original": "鱼叉式钓鱼攻击",
+            "masked": "定向钓鱼活动",
+            "rule": "鱼叉式钓鱼攻击"
+          }
         ],
         "metadata": {
-          "generated_at": "2026-W29T00:00:00+00:00",
+          "generated_at": "2026-07-13T00:00:00+00:00",
           "data_sources_used": [
             "threat_intel_summary"
           ],
@@ -1571,8 +2231,8 @@
             {
               "metric": "新增IP型IOC",
               "source_value": 45,
-              "mappings": [
-                "45"
+              "data_values": [
+                45
               ]
             }
           ]
@@ -1589,7 +2249,8 @@
               "threat_trend",
               "apt_summary"
             ],
-            "placeholders": []
+            "placeholders": [],
+            "missing_required_data": []
           }
         },
         "format_compliance": {
@@ -1655,12 +2316,39 @@
             {
               "section_id": "alert_trend",
               "title": "告警月度趋势",
-              "body": "# 告警月度趋势\n\n| 数据字段 | 值 |\n| --- | --- |\n| monthly_kpi.weekly_alerts | week=W27, total=987, disposal_rate=89%, week=W28, total=978, disposal_rate=90%, week=W29, total=1042, disposal_rate=91%, week=W30, total=1005, disposal_rate=92% |",
+              "body": "# 告警月度趋势\n\n| 数据字段 | 值 |\n| --- | --- |\n| monthly_kpi.weekly_alerts | week=W27, total=987, disposal_rate=89%, week=W28, total=978, disposal_rate=90%, week=W29, total=1042, disposal_rate=91%, week=W30, total=1005, disposal_rate=92% |\nmonthly_kpi.weekly_alerts[2].total：1042。\nmonthly_kpi.vulnerability_stats_monthly.fix_rate：71%。\nmonthly_kpi.incident_stats_monthly.closure_rate：85.7%。",
               "data_source_mapping": {
-                "monthly_kpi.weekly_alerts": "week=W27, total=987, disposal_rate=89%, week=W28, total=978, disposal_rate=90%, week=W29, total=1042, disposal_rate=91%, week=W30, total=1005, disposal_rate=92%",
-                "monthly_kpi.weekly_alerts[2].total": "1042",
-                "monthly_kpi.vulnerability_stats_monthly.fix_rate": "71%",
-                "monthly_kpi.incident_stats_monthly.closure_rate": "85.7%"
+                "monthly_kpi.weekly_alerts": "monthly_kpi.weekly_alerts",
+                "monthly_kpi.weekly_alerts[2].total": "monthly_kpi.weekly_alerts[2].total",
+                "monthly_kpi.vulnerability_stats_monthly.fix_rate": "monthly_kpi.vulnerability_stats_monthly.fix_rate",
+                "monthly_kpi.incident_stats_monthly.closure_rate": "monthly_kpi.incident_stats_monthly.closure_rate"
+              },
+              "data_values": {
+                "monthly_kpi.weekly_alerts": [
+                  {
+                    "week": "W27",
+                    "total": 987,
+                    "disposal_rate": 0.89
+                  },
+                  {
+                    "week": "W28",
+                    "total": 978,
+                    "disposal_rate": 0.9
+                  },
+                  {
+                    "week": "W29",
+                    "total": 1042,
+                    "disposal_rate": 0.91
+                  },
+                  {
+                    "week": "W30",
+                    "total": 1005,
+                    "disposal_rate": 0.92
+                  }
+                ],
+                "monthly_kpi.weekly_alerts[2].total": 1042,
+                "monthly_kpi.vulnerability_stats_monthly.fix_rate": 0.71,
+                "monthly_kpi.incident_stats_monthly.closure_rate": 0.857
               }
             },
             {
@@ -1668,7 +2356,16 @@
               "title": "漏洞修复KPI",
               "body": "# 漏洞修复KPI\n\n修复率及与上月对比。monthly_kpi.vulnerability_stats_monthly：new_total=45, fixed_total=32, fix_rate=71%, prev_month_new_total=38, prev_month_fix_rate=68%。",
               "data_source_mapping": {
-                "monthly_kpi.vulnerability_stats_monthly": "new_total=45, fixed_total=32, fix_rate=71%, prev_month_new_total=38, prev_month_fix_rate=68%"
+                "monthly_kpi.vulnerability_stats_monthly": "monthly_kpi.vulnerability_stats_monthly"
+              },
+              "data_values": {
+                "monthly_kpi.vulnerability_stats_monthly": {
+                  "new_total": 45,
+                  "fixed_total": 32,
+                  "fix_rate": 0.71,
+                  "prev_month_new_total": 38,
+                  "prev_month_fix_rate": 0.68
+                }
               }
             },
             {
@@ -1676,16 +2373,22 @@
               "title": "事件闭环率",
               "body": "# 事件闭环率\n\n事件总量、闭环率和环比。monthly_kpi.incident_stats_monthly：total_incidents=28, closed_incidents=24, closure_rate=85.7%, prev_month_closure_rate=82%。",
               "data_source_mapping": {
-                "monthly_kpi.incident_stats_monthly": "total_incidents=28, closed_incidents=24, closure_rate=85.7%, prev_month_closure_rate=82%"
+                "monthly_kpi.incident_stats_monthly": "monthly_kpi.incident_stats_monthly"
+              },
+              "data_values": {
+                "monthly_kpi.incident_stats_monthly": {
+                  "total_incidents": 28,
+                  "closed_incidents": 24,
+                  "closure_rate": 0.857,
+                  "prev_month_closure_rate": 0.82
+                }
               }
             }
           ]
         },
-        "masking_applied": [
-          "management masking rules applied"
-        ],
+        "masking_applied": [],
         "metadata": {
-          "generated_at": "2026-07T00:00:00+00:00",
+          "generated_at": "2026-07-01T00:00:00+00:00",
           "data_sources_used": [
             "monthly_kpi"
           ],
@@ -1717,22 +2420,22 @@
             {
               "metric": "W29告警数",
               "source_value": 1042,
-              "mappings": [
-                "1042"
+              "data_values": [
+                1042
               ]
             },
             {
               "metric": "月度漏洞修复率",
               "source_value": 0.71,
-              "mappings": [
-                "71%"
+              "data_values": [
+                0.71
               ]
             },
             {
               "metric": "事件闭环率",
               "source_value": 0.857,
-              "mappings": [
-                "85.7%"
+              "data_values": [
+                0.857
               ]
             }
           ]
@@ -1751,7 +2454,8 @@
               "vuln_kpi",
               "incident_kpi"
             ],
-            "placeholders": []
+            "placeholders": [],
+            "missing_required_data": []
           }
         },
         "format_compliance": {
@@ -1817,10 +2521,39 @@
             {
               "section_id": "dept_ranking",
               "title": "各部门安全评分排名",
-              "body": "# 各部门安全评分排名\n\n| 数据字段 | 值 |\n| --- | --- |\n| department_scores | department=部门 A, security_score=85, rank=1, trend=up, department=部门 B, security_score=78, rank=2, trend=stable, department=部门 C, security_score=72, rank=3, trend=down, department=部门 D, security_score=68, rank=4, trend=down |",
+              "body": "# 各部门安全评分排名\n\n| 数据字段 | 值 |\n| --- | --- |\n| department_scores | department=部门 A, security_score=85, rank=1, trend=up, department=部门 B, security_score=78, rank=2, trend=stable, department=部门 C, security_score=72, rank=3, trend=down, department=部门 D, security_score=68, rank=4, trend=down |\ndepartment_scores[0].security_score：85。",
               "data_source_mapping": {
-                "department_scores": "department=部门 A, security_score=85, rank=1, trend=up, department=部门 B, security_score=78, rank=2, trend=stable, department=部门 C, security_score=72, rank=3, trend=down, department=部门 D, security_score=68, rank=4, trend=down",
-                "department_scores[0].security_score": "85"
+                "department_scores": "department_scores",
+                "department_scores[0].security_score": "department_scores[0].security_score"
+              },
+              "data_values": {
+                "department_scores": [
+                  {
+                    "department": "核心业务部",
+                    "security_score": 85,
+                    "rank": 1,
+                    "trend": "up"
+                  },
+                  {
+                    "department": "运维部",
+                    "security_score": 78,
+                    "rank": 2,
+                    "trend": "stable"
+                  },
+                  {
+                    "department": "研发中心",
+                    "security_score": 72,
+                    "rank": 3,
+                    "trend": "down"
+                  },
+                  {
+                    "department": "财务部",
+                    "security_score": 68,
+                    "rank": 4,
+                    "trend": "down"
+                  }
+                ],
+                "department_scores[0].security_score": 85
               }
             },
             {
@@ -1828,16 +2561,53 @@
               "title": "整改优先级矩阵",
               "body": "# 整改优先级矩阵\n\n| 数据字段 | 值 |\n| --- | --- |\n| compliance_findings | finding_id=F-001, description=部门 A服务器存在未修复高危漏洞, risk_level=高, remediation_cost=中, priority=P1, finding_id=F-002, description=部门 C代码仓库访问权限未定期复核, risk_level=中, remediation_cost=低, priority=P2 |",
               "data_source_mapping": {
-                "compliance_findings": "finding_id=F-001, description=部门 A服务器存在未修复高危漏洞, risk_level=高, remediation_cost=中, priority=P1, finding_id=F-002, description=部门 C代码仓库访问权限未定期复核, risk_level=中, remediation_cost=低, priority=P2"
+                "compliance_findings": "compliance_findings"
+              },
+              "data_values": {
+                "compliance_findings": [
+                  {
+                    "finding_id": "F-001",
+                    "description": "核心业务部服务器存在未修复高危漏洞",
+                    "risk_level": "高",
+                    "remediation_cost": "中",
+                    "priority": "P1"
+                  },
+                  {
+                    "finding_id": "F-002",
+                    "description": "研发中心代码仓库访问权限未定期复核",
+                    "risk_level": "中",
+                    "remediation_cost": "低",
+                    "priority": "P2"
+                  }
+                ]
               }
             }
           ]
         },
         "masking_applied": [
-          "management masking rules applied"
+          {
+            "original": "核心业务部",
+            "masked": "部门 A",
+            "rule": "核心业务部"
+          },
+          {
+            "original": "运维部",
+            "masked": "部门 B",
+            "rule": "运维部"
+          },
+          {
+            "original": "研发中心",
+            "masked": "部门 C",
+            "rule": "研发中心"
+          },
+          {
+            "original": "财务部",
+            "masked": "部门 D",
+            "rule": "财务部"
+          }
         ],
         "metadata": {
-          "generated_at": "2026-07T00:00:00+00:00",
+          "generated_at": "2026-07-01T00:00:00+00:00",
           "data_sources_used": [
             "department_scores",
             "compliance_findings"
@@ -1860,8 +2630,8 @@
             {
               "metric": "核心业务部分数",
               "source_value": 85,
-              "mappings": [
-                "85"
+              "data_values": [
+                85
               ]
             }
           ]
@@ -1878,7 +2648,8 @@
               "dept_ranking",
               "remediation_matrix"
             ],
-            "placeholders": []
+            "placeholders": [],
+            "missing_required_data": []
           }
         },
         "format_compliance": {
@@ -1946,10 +2717,18 @@
               "title": "漏洞发现与修复趋势",
               "body": "# 漏洞发现与修复趋势\n\n对比本月和上月的新增漏洞数、修复率。vulnerability_monthly.new_total：45；vulnerability_monthly.fix_rate：71%；vulnerability_monthly.prev_month：new_total=38, fix_rate=68%, avg_fix_days_critical=9。",
               "data_source_mapping": {
-                "vulnerability_monthly.new_total": "45",
-                "vulnerability_monthly.fix_rate": "71%",
-                "vulnerability_monthly.prev_month": "new_total=38, fix_rate=68%, avg_fix_days_critical=9",
-                "vulnerability_monthly.avg_fix_days_critical": "7"
+                "vulnerability_monthly.new_total": "vulnerability_monthly.new_total",
+                "vulnerability_monthly.fix_rate": "vulnerability_monthly.fix_rate",
+                "vulnerability_monthly.prev_month": "vulnerability_monthly.prev_month"
+              },
+              "data_values": {
+                "vulnerability_monthly.new_total": 45,
+                "vulnerability_monthly.fix_rate": 0.71,
+                "vulnerability_monthly.prev_month": {
+                  "new_total": 38,
+                  "fix_rate": 0.68,
+                  "avg_fix_days_critical": 9
+                }
               }
             },
             {
@@ -1957,7 +2736,10 @@
               "title": "高危漏洞平均修复时间",
               "body": "# 高危漏洞平均修复时间\n\n报告高危漏洞的平均修复天数及与上月对比。vulnerability_monthly.avg_fix_days_critical：7天。",
               "data_source_mapping": {
-                "vulnerability_monthly.avg_fix_days_critical": "7天"
+                "vulnerability_monthly.avg_fix_days_critical": "vulnerability_monthly.avg_fix_days_critical"
+              },
+              "data_values": {
+                "vulnerability_monthly.avg_fix_days_critical": 7
               }
             },
             {
@@ -1965,16 +2747,22 @@
               "title": "积压漏洞数量",
               "body": "# 积压漏洞数量\n\n| 数据字段 | 值 |\n| --- | --- |\n| vulnerability_monthly.backlog | critical=2, high=5, medium=10, low=6 |",
               "data_source_mapping": {
-                "vulnerability_monthly.backlog": "critical=2, high=5, medium=10, low=6"
+                "vulnerability_monthly.backlog": "vulnerability_monthly.backlog"
+              },
+              "data_values": {
+                "vulnerability_monthly.backlog": {
+                  "critical": 2,
+                  "high": 5,
+                  "medium": 10,
+                  "low": 6
+                }
               }
             }
           ]
         },
-        "masking_applied": [
-          "management masking rules applied"
-        ],
+        "masking_applied": [],
         "metadata": {
-          "generated_at": "2026-07T00:00:00+00:00",
+          "generated_at": "2026-07-01T00:00:00+00:00",
           "data_sources_used": [
             "vulnerability_monthly"
           ],
@@ -2001,16 +2789,15 @@
             {
               "metric": "本月新增漏洞",
               "source_value": 45,
-              "mappings": [
-                "45"
+              "data_values": [
+                45
               ]
             },
             {
               "metric": "高危平均修复天数",
               "source_value": 7,
-              "mappings": [
-                "7",
-                "7天"
+              "data_values": [
+                7
               ]
             }
           ]
@@ -2029,7 +2816,8 @@
               "critical_fix_time",
               "backlog"
             ],
-            "placeholders": []
+            "placeholders": [],
+            "missing_required_data": []
           }
         },
         "format_compliance": {
@@ -2095,10 +2883,14 @@
             {
               "section_id": "executive_summary",
               "title": "执行摘要",
-              "body": "# 执行摘要\n\n两段话概括本季度安全形势。。",
+              "body": "# 执行摘要\n\n两段话概括本季度安全形势。。\nquarterly_data.vulnerability_trend.fix_rate：76.6%。\nquarterly_data.industry_benchmark.company_disposal_rate：91%。",
               "data_source_mapping": {
-                "quarterly_data.vulnerability_trend.fix_rate": "76.6%",
-                "quarterly_data.industry_benchmark.company_disposal_rate": "91%"
+                "quarterly_data.vulnerability_trend.fix_rate": "quarterly_data.vulnerability_trend.fix_rate",
+                "quarterly_data.industry_benchmark.company_disposal_rate": "quarterly_data.industry_benchmark.company_disposal_rate"
+              },
+              "data_values": {
+                "quarterly_data.vulnerability_trend.fix_rate": 0.766,
+                "quarterly_data.industry_benchmark.company_disposal_rate": 0.91
               }
             },
             {
@@ -2106,8 +2898,36 @@
               "title": "告警与漏洞趋势",
               "body": "# 告警与漏洞趋势\n\n分析告警和漏洞的发展趋势。quarterly_data.alert_trend：months=month=4月, total=3200, change=+5%, month=5月, total=3450, change=+7.8%, month=6月, total=3120, change=-9.6%, description=季度前期告警上升，6月因防火墙策略优化下降；quarterly_data.vulnerability_trend：quarter_new=128, quarter_fixed=98, fix_rate=76.6%, description=修复率较上季度提升4个百分点。",
               "data_source_mapping": {
-                "quarterly_data.alert_trend": "months=month=4月, total=3200, change=+5%, month=5月, total=3450, change=+7.8%, month=6月, total=3120, change=-9.6%, description=季度前期告警上升，6月因防火墙策略优化下降",
-                "quarterly_data.vulnerability_trend": "quarter_new=128, quarter_fixed=98, fix_rate=76.6%, description=修复率较上季度提升4个百分点"
+                "quarterly_data.alert_trend": "quarterly_data.alert_trend",
+                "quarterly_data.vulnerability_trend": "quarterly_data.vulnerability_trend"
+              },
+              "data_values": {
+                "quarterly_data.alert_trend": {
+                  "months": [
+                    {
+                      "month": "4月",
+                      "total": 3200,
+                      "change": "+5%"
+                    },
+                    {
+                      "month": "5月",
+                      "total": 3450,
+                      "change": "+7.8%"
+                    },
+                    {
+                      "month": "6月",
+                      "total": 3120,
+                      "change": "-9.6%"
+                    }
+                  ],
+                  "description": "季度前期告警上升，6月因防火墙策略优化下降"
+                },
+                "quarterly_data.vulnerability_trend": {
+                  "quarter_new": 128,
+                  "quarter_fixed": 98,
+                  "fix_rate": 0.766,
+                  "description": "修复率较上季度提升4个百分点"
+                }
               }
             },
             {
@@ -2115,8 +2935,23 @@
               "title": "事件与威胁情报",
               "body": "# 事件与威胁情报\n\n总结事件响应效率和主要威胁类型。quarterly_data.incident_trend：total=45, avg_response_minutes=22, closure_rate=92%；quarterly_data.threat_intel_trend：top_categories=C2, phishing, ransomware, description=钓鱼攻击占比显著上升，勒索软件活跃度持平。",
               "data_source_mapping": {
-                "quarterly_data.incident_trend": "total=45, avg_response_minutes=22, closure_rate=92%",
-                "quarterly_data.threat_intel_trend": "top_categories=C2, phishing, ransomware, description=钓鱼攻击占比显著上升，勒索软件活跃度持平"
+                "quarterly_data.incident_trend": "quarterly_data.incident_trend",
+                "quarterly_data.threat_intel_trend": "quarterly_data.threat_intel_trend"
+              },
+              "data_values": {
+                "quarterly_data.incident_trend": {
+                  "total": 45,
+                  "avg_response_minutes": 22,
+                  "closure_rate": 0.92
+                },
+                "quarterly_data.threat_intel_trend": {
+                  "top_categories": [
+                    "C2",
+                    "phishing",
+                    "ransomware"
+                  ],
+                  "description": "钓鱼攻击占比显著上升，勒索软件活跃度持平"
+                }
               }
             },
             {
@@ -2124,7 +2959,15 @@
               "title": "行业对标",
               "body": "# 行业对标\n\n| 数据字段 | 值 |\n| --- | --- |\n| quarterly_data.industry_benchmark | industry_avg_alert_disposal_rate=85%, company_disposal_rate=91%, industry_avg_fix_rate=70%, company_fix_rate=76.6% |",
               "data_source_mapping": {
-                "quarterly_data.industry_benchmark": "industry_avg_alert_disposal_rate=85%, company_disposal_rate=91%, industry_avg_fix_rate=70%, company_fix_rate=76.6%"
+                "quarterly_data.industry_benchmark": "quarterly_data.industry_benchmark"
+              },
+              "data_values": {
+                "quarterly_data.industry_benchmark": {
+                  "industry_avg_alert_disposal_rate": 0.85,
+                  "company_disposal_rate": 0.91,
+                  "industry_avg_fix_rate": 0.7,
+                  "company_fix_rate": 0.766
+                }
               }
             },
             {
@@ -2132,7 +2975,14 @@
               "title": "下季度风险预测",
               "body": "# 下季度风险预测\n\n- quarterly_data.risk_forecast：零日漏洞利用可能在下季度增长，建议增加虚拟补丁投入, 内部员工钓鱼点击率季度环比上升10%，需加强安全意识培训, 供应链攻击风险随第三方接入增加而上升，应启动供应商安全审核",
               "data_source_mapping": {
-                "quarterly_data.risk_forecast": "零日漏洞利用可能在下季度增长，建议增加虚拟补丁投入, 内部员工钓鱼点击率季度环比上升10%，需加强安全意识培训, 供应链攻击风险随第三方接入增加而上升，应启动供应商安全审核"
+                "quarterly_data.risk_forecast": "quarterly_data.risk_forecast"
+              },
+              "data_values": {
+                "quarterly_data.risk_forecast": [
+                  "零日漏洞利用可能在下季度增长，建议增加虚拟补丁投入",
+                  "内部员工钓鱼点击率季度环比上升10%，需加强安全意识培训",
+                  "供应链攻击风险随第三方接入增加而上升，应启动供应商安全审核"
+                ]
               }
             },
             {
@@ -2140,16 +2990,17 @@
               "title": "资源规划建议",
               "body": "# 资源规划建议\n\n给出人员、工具和培训建议。quarterly_data.resource_planning：建议下季度新增2名安全分析师，追加预算购买APT检测工具，并安排一次全公司钓鱼演练。",
               "data_source_mapping": {
+                "quarterly_data.resource_planning": "quarterly_data.resource_planning"
+              },
+              "data_values": {
                 "quarterly_data.resource_planning": "建议下季度新增2名安全分析师，追加预算购买APT检测工具，并安排一次全公司钓鱼演练"
               }
             }
           ]
         },
-        "masking_applied": [
-          "management masking rules applied"
-        ],
+        "masking_applied": [],
         "metadata": {
-          "generated_at": "2026-Q2T00:00:00+00:00",
+          "generated_at": "2026-04-01T00:00:00+00:00",
           "data_sources_used": [
             "quarterly_data"
           ],
@@ -2176,15 +3027,15 @@
             {
               "metric": "季度漏洞修复率",
               "source_value": 0.766,
-              "mappings": [
-                "76.6%"
+              "data_values": [
+                0.766
               ]
             },
             {
               "metric": "公司处置率",
               "source_value": 0.91,
-              "mappings": [
-                "91%"
+              "data_values": [
+                0.91
               ]
             }
           ]
@@ -2209,7 +3060,8 @@
               "forecast",
               "resource"
             ],
-            "placeholders": []
+            "placeholders": [],
+            "missing_required_data": []
           }
         },
         "format_compliance": {
@@ -2275,11 +3127,19 @@
             {
               "section_id": "event_overview",
               "title": "事件概述",
-              "body": "# 事件概述\n\n简述事件类型、严重级别和影响范围。incident_detail.type：ransomware；incident_detail.severity：critical；incident_detail.affected_assets：财务系统终端 FIN-PC-12。",
+              "body": "# 事件概述\n\n简述事件类型、严重级别和影响范围。incident_detail.type：ransomware；incident_detail.severity：critical；incident_detail.affected_assets：财务系统终端 FIN-PC-12。\nincident_detail.incident_id：INC-2026-0716-005。",
               "data_source_mapping": {
+                "incident_detail.type": "incident_detail.type",
+                "incident_detail.severity": "incident_detail.severity",
+                "incident_detail.affected_assets": "incident_detail.affected_assets",
+                "incident_detail.incident_id": "incident_detail.incident_id"
+              },
+              "data_values": {
                 "incident_detail.type": "ransomware",
                 "incident_detail.severity": "critical",
-                "incident_detail.affected_assets": "财务系统终端 FIN-PC-12",
+                "incident_detail.affected_assets": [
+                  "财务系统终端 FIN-PC-12"
+                ],
                 "incident_detail.incident_id": "INC-2026-0716-005"
               }
             },
@@ -2288,7 +3148,31 @@
               "title": "事件时间线",
               "body": "# 事件时间线\n\n| 数据字段 | 值 |\n| --- | --- |\n| incident_detail.timeline | time=2026-07-16T14:30:00Z, event=SOC收到终端防病毒软件告警，疑似勒索软件行为, time=2026-07-16T14:32:00Z, event=安全分析师确认文件加密后缀为.locked，通知断网, time=2026-07-16T14:35:00Z, event=网络隔离完成，开始取证, time=2026-07-16T15:10:00Z, event=确认感染来源为钓鱼邮件附件，攻击者IP 203.0.113.99, time=2026-07-16T16:00:00Z, event=从备份恢复数据，系统恢复运行 |",
               "data_source_mapping": {
-                "incident_detail.timeline": "time=2026-07-16T14:30:00Z, event=SOC收到终端防病毒软件告警，疑似勒索软件行为, time=2026-07-16T14:32:00Z, event=安全分析师确认文件加密后缀为.locked，通知断网, time=2026-07-16T14:35:00Z, event=网络隔离完成，开始取证, time=2026-07-16T15:10:00Z, event=确认感染来源为钓鱼邮件附件，攻击者IP 203.0.113.99, time=2026-07-16T16:00:00Z, event=从备份恢复数据，系统恢复运行"
+                "incident_detail.timeline": "incident_detail.timeline"
+              },
+              "data_values": {
+                "incident_detail.timeline": [
+                  {
+                    "time": "2026-07-16T14:30:00Z",
+                    "event": "SOC收到终端防病毒软件告警，疑似勒索软件行为"
+                  },
+                  {
+                    "time": "2026-07-16T14:32:00Z",
+                    "event": "安全分析师确认文件加密后缀为.locked，通知断网"
+                  },
+                  {
+                    "time": "2026-07-16T14:35:00Z",
+                    "event": "网络隔离完成，开始取证"
+                  },
+                  {
+                    "time": "2026-07-16T15:10:00Z",
+                    "event": "确认感染来源为钓鱼邮件附件，攻击者IP 203.0.113.99"
+                  },
+                  {
+                    "time": "2026-07-16T16:00:00Z",
+                    "event": "从备份恢复数据，系统恢复运行"
+                  }
+                ]
               }
             },
             {
@@ -2296,6 +3180,9 @@
               "title": "根因分析",
               "body": "# 根因分析\n\n分析事件发生的根本原因。incident_detail.root_cause：员工点击恶意宏文档，本地防病毒特征库过期导致未拦截。",
               "data_source_mapping": {
+                "incident_detail.root_cause": "incident_detail.root_cause"
+              },
+              "data_values": {
                 "incident_detail.root_cause": "员工点击恶意宏文档，本地防病毒特征库过期导致未拦截"
               }
             },
@@ -2304,8 +3191,20 @@
               "title": "处置措施与改进计划",
               "body": "# 处置措施与改进计划\n\n- incident_detail.taken_actions：隔离受感染终端, 全网推送防病毒更新, 重置受影响用户凭据\n- incident_detail.improvement_plan：强制启用邮件附件沙箱检测, 实施终端EDR替换传统AV, 每月进行针对性钓鱼测试",
               "data_source_mapping": {
-                "incident_detail.taken_actions": "隔离受感染终端, 全网推送防病毒更新, 重置受影响用户凭据",
-                "incident_detail.improvement_plan": "强制启用邮件附件沙箱检测, 实施终端EDR替换传统AV, 每月进行针对性钓鱼测试"
+                "incident_detail.taken_actions": "incident_detail.taken_actions",
+                "incident_detail.improvement_plan": "incident_detail.improvement_plan"
+              },
+              "data_values": {
+                "incident_detail.taken_actions": [
+                  "隔离受感染终端",
+                  "全网推送防病毒更新",
+                  "重置受影响用户凭据"
+                ],
+                "incident_detail.improvement_plan": [
+                  "强制启用邮件附件沙箱检测",
+                  "实施终端EDR替换传统AV",
+                  "每月进行针对性钓鱼测试"
+                ]
               }
             }
           ]
@@ -2334,7 +3233,7 @@
             {
               "metric": "事件ID",
               "source_value": "INC-2026-0716-005",
-              "mappings": [
+              "data_values": [
                 "INC-2026-0716-005"
               ]
             }
@@ -2356,7 +3255,8 @@
               "root_cause",
               "actions_improvement"
             ],
-            "placeholders": []
+            "placeholders": [],
+            "missing_required_data": []
           }
         },
         "format_compliance": {
@@ -2427,7 +3327,10 @@
               "title": "总体战果",
               "body": "# 总体战果\n\n总防护成功率和关键数据。hw_summary.defense_success_rate：98%。",
               "data_source_mapping": {
-                "hw_summary.defense_success_rate": "98%"
+                "hw_summary.defense_success_rate": "hw_summary.defense_success_rate"
+              },
+              "data_values": {
+                "hw_summary.defense_success_rate": 0.98
               }
             },
             {
@@ -2435,7 +3338,19 @@
               "title": "攻击源 TOP10",
               "body": "# 攻击源 TOP10\n\n| 数据字段 | 值 |\n| --- | --- |\n| hw_summary.attack_sources_top10 | ip=203.0.113.77, attack_count=1240, ip=198.51.100.44, attack_count=987 |",
               "data_source_mapping": {
-                "hw_summary.attack_sources_top10": "ip=203.0.113.77, attack_count=1240, ip=198.51.100.44, attack_count=987"
+                "hw_summary.attack_sources_top10": "hw_summary.attack_sources_top10"
+              },
+              "data_values": {
+                "hw_summary.attack_sources_top10": [
+                  {
+                    "ip": "203.0.113.77",
+                    "attack_count": 1240
+                  },
+                  {
+                    "ip": "198.51.100.44",
+                    "attack_count": 987
+                  }
+                ]
               }
             },
             {
@@ -2443,7 +3358,19 @@
               "title": "各阶段发现",
               "body": "# 各阶段发现\n\n- hw_summary.stages：phase=准备阶段, key_findings=暴露面梳理发现2个未备案对外服务, phase=攻防对抗, key_findings=成功阻断99%攻击，1台服务器因弱口令被突破但及时隔离",
               "data_source_mapping": {
-                "hw_summary.stages": "phase=准备阶段, key_findings=暴露面梳理发现2个未备案对外服务, phase=攻防对抗, key_findings=成功阻断99%攻击，1台服务器因弱口令被突破但及时隔离"
+                "hw_summary.stages": "hw_summary.stages"
+              },
+              "data_values": {
+                "hw_summary.stages": [
+                  {
+                    "phase": "准备阶段",
+                    "key_findings": "暴露面梳理发现2个未备案对外服务"
+                  },
+                  {
+                    "phase": "攻防对抗",
+                    "key_findings": "成功阻断99%攻击，1台服务器因弱口令被突破但及时隔离"
+                  }
+                ]
               }
             },
             {
@@ -2451,14 +3378,26 @@
               "title": "参与人员",
               "body": "# 参与人员\n\n| 数据字段 | 值 |\n| --- | --- |\n| hw_summary.team_members | name=张三, role=总指挥, name=李四, role=蓝队队长 |",
               "data_source_mapping": {
-                "hw_summary.team_members": "name=张三, role=总指挥, name=李四, role=蓝队队长"
+                "hw_summary.team_members": "hw_summary.team_members"
+              },
+              "data_values": {
+                "hw_summary.team_members": [
+                  {
+                    "name": "张三",
+                    "role": "总指挥"
+                  },
+                  {
+                    "name": "李四",
+                    "role": "蓝队队长"
+                  }
+                ]
               }
             }
           ]
         },
         "masking_applied": [],
         "metadata": {
-          "generated_at": "2026-07T00:00:00+00:00",
+          "generated_at": "2026-07-01T00:00:00+00:00",
           "data_sources_used": [
             "hw_summary"
           ],
@@ -2480,8 +3419,8 @@
             {
               "metric": "防护成功率",
               "source_value": 0.98,
-              "mappings": [
-                "98%"
+              "data_values": [
+                0.98
               ]
             }
           ]
@@ -2502,7 +3441,8 @@
               "stages",
               "personnel"
             ],
-            "placeholders": []
+            "placeholders": [],
+            "missing_required_data": []
           }
         },
         "format_compliance": {
@@ -2571,10 +3511,47 @@
             {
               "section_id": "status_summary",
               "title": "整改进度总览",
-              "body": "# 整改进度总览\n\n统计各状态的数量和整体进度。remediation_items：id=R-001, description=核心业务部服务器存在未修复高危漏洞 CVE-2026-19876, severity=高, responsible_dept=核心业务部, status=进行中, due_date=2026-07-20, id=R-002, description=研发中心代码仓库访问权限未定期复核, severity=中, responsible_dept=研发中心, status=未启动, due_date=2026-08-01, id=R-003, description=财务部终端防病毒软件安装率低于90%, severity=高, responsible_dept=财务部, status=延期, due_date=2026-07-10, id=R-004, description=运维部堡垒机审计日志保留不足1年, severity=中, responsible_dept=运维部, status=已完成, due_date=2026-07-15。",
+              "body": "# 整改进度总览\n\n统计各状态的数量和整体进度。remediation_items：id=R-001, description=核心业务部服务器存在未修复高危漏洞 CVE-2026-19876, severity=高, responsible_dept=核心业务部, status=进行中, due_date=2026-07-20, id=R-002, description=研发中心代码仓库访问权限未定期复核, severity=中, responsible_dept=研发中心, status=未启动, due_date=2026-08-01, id=R-003, description=财务部终端防病毒软件安装率低于90%, severity=高, responsible_dept=财务部, status=延期, due_date=2026-07-10, id=R-004, description=运维部堡垒机审计日志保留不足1年, severity=中, responsible_dept=运维部, status=已完成, due_date=2026-07-15。\nremediation_items.length：4。",
               "data_source_mapping": {
-                "remediation_items": "id=R-001, description=核心业务部服务器存在未修复高危漏洞 CVE-2026-19876, severity=高, responsible_dept=核心业务部, status=进行中, due_date=2026-07-20, id=R-002, description=研发中心代码仓库访问权限未定期复核, severity=中, responsible_dept=研发中心, status=未启动, due_date=2026-08-01, id=R-003, description=财务部终端防病毒软件安装率低于90%, severity=高, responsible_dept=财务部, status=延期, due_date=2026-07-10, id=R-004, description=运维部堡垒机审计日志保留不足1年, severity=中, responsible_dept=运维部, status=已完成, due_date=2026-07-15",
-                "remediation_items.length": "4"
+                "remediation_items": "remediation_items",
+                "remediation_items.length": "remediation_items.length"
+              },
+              "data_values": {
+                "remediation_items": [
+                  {
+                    "id": "R-001",
+                    "description": "核心业务部服务器存在未修复高危漏洞 CVE-2026-19876",
+                    "severity": "高",
+                    "responsible_dept": "核心业务部",
+                    "status": "进行中",
+                    "due_date": "2026-07-20"
+                  },
+                  {
+                    "id": "R-002",
+                    "description": "研发中心代码仓库访问权限未定期复核",
+                    "severity": "中",
+                    "responsible_dept": "研发中心",
+                    "status": "未启动",
+                    "due_date": "2026-08-01"
+                  },
+                  {
+                    "id": "R-003",
+                    "description": "财务部终端防病毒软件安装率低于90%",
+                    "severity": "高",
+                    "responsible_dept": "财务部",
+                    "status": "延期",
+                    "due_date": "2026-07-10"
+                  },
+                  {
+                    "id": "R-004",
+                    "description": "运维部堡垒机审计日志保留不足1年",
+                    "severity": "中",
+                    "responsible_dept": "运维部",
+                    "status": "已完成",
+                    "due_date": "2026-07-15"
+                  }
+                ],
+                "remediation_items.length": 4
               }
             },
             {
@@ -2582,7 +3559,43 @@
               "title": "整改项清单",
               "body": "# 整改项清单\n\n| 数据字段 | 值 |\n| --- | --- |\n| remediation_items | id=R-001, description=核心业务部服务器存在未修复高危漏洞 CVE-2026-19876, severity=高, responsible_dept=核心业务部, status=进行中, due_date=2026-07-20, id=R-002, description=研发中心代码仓库访问权限未定期复核, severity=中, responsible_dept=研发中心, status=未启动, due_date=2026-08-01, id=R-003, description=财务部终端防病毒软件安装率低于90%, severity=高, responsible_dept=财务部, status=延期, due_date=2026-07-10, id=R-004, description=运维部堡垒机审计日志保留不足1年, severity=中, responsible_dept=运维部, status=已完成, due_date=2026-07-15 |",
               "data_source_mapping": {
-                "remediation_items": "id=R-001, description=核心业务部服务器存在未修复高危漏洞 CVE-2026-19876, severity=高, responsible_dept=核心业务部, status=进行中, due_date=2026-07-20, id=R-002, description=研发中心代码仓库访问权限未定期复核, severity=中, responsible_dept=研发中心, status=未启动, due_date=2026-08-01, id=R-003, description=财务部终端防病毒软件安装率低于90%, severity=高, responsible_dept=财务部, status=延期, due_date=2026-07-10, id=R-004, description=运维部堡垒机审计日志保留不足1年, severity=中, responsible_dept=运维部, status=已完成, due_date=2026-07-15"
+                "remediation_items": "remediation_items"
+              },
+              "data_values": {
+                "remediation_items": [
+                  {
+                    "id": "R-001",
+                    "description": "核心业务部服务器存在未修复高危漏洞 CVE-2026-19876",
+                    "severity": "高",
+                    "responsible_dept": "核心业务部",
+                    "status": "进行中",
+                    "due_date": "2026-07-20"
+                  },
+                  {
+                    "id": "R-002",
+                    "description": "研发中心代码仓库访问权限未定期复核",
+                    "severity": "中",
+                    "responsible_dept": "研发中心",
+                    "status": "未启动",
+                    "due_date": "2026-08-01"
+                  },
+                  {
+                    "id": "R-003",
+                    "description": "财务部终端防病毒软件安装率低于90%",
+                    "severity": "高",
+                    "responsible_dept": "财务部",
+                    "status": "延期",
+                    "due_date": "2026-07-10"
+                  },
+                  {
+                    "id": "R-004",
+                    "description": "运维部堡垒机审计日志保留不足1年",
+                    "severity": "中",
+                    "responsible_dept": "运维部",
+                    "status": "已完成",
+                    "due_date": "2026-07-15"
+                  }
+                ]
               }
             }
           ]
@@ -2611,8 +3624,8 @@
             {
               "metric": "整改项总数",
               "source_value": 4,
-              "mappings": [
-                "4"
+              "data_values": [
+                4
               ]
             }
           ]
@@ -2629,7 +3642,8 @@
               "status_summary",
               "remediation_table"
             ],
-            "placeholders": []
+            "placeholders": [],
+            "missing_required_data": []
           }
         },
         "format_compliance": {
@@ -2700,14 +3714,17 @@
               "title": "安全态势摘要",
               "body": "# 安全态势摘要\n\n概述告警总量和主要威胁来源（不应出现具体IP/资产）。weekly_summary.total_alerts：1042。 未脱敏原始数据：203.0.113.88。",
               "data_source_mapping": {
-                "weekly_summary.total_alerts": "1042"
+                "weekly_summary.total_alerts": "weekly_summary.total_alerts"
+              },
+              "data_values": {
+                "weekly_summary.total_alerts": 1042
               }
             }
           ]
         },
         "masking_applied": [],
         "metadata": {
-          "generated_at": "2026-W29T00:00:00+00:00",
+          "generated_at": "2026-07-13T00:00:00+00:00",
           "data_sources_used": [
             "weekly_summary"
           ],
@@ -2729,8 +3746,8 @@
             {
               "metric": "告警总数",
               "source_value": 1042,
-              "mappings": [
-                "1042"
+              "data_values": [
+                1042
               ]
             }
           ]
@@ -2745,7 +3762,8 @@
             "section_ids": [
               "summary"
             ],
-            "placeholders": []
+            "placeholders": [],
+            "missing_required_data": []
           }
         },
         "format_compliance": {
@@ -2816,7 +3834,10 @@
               "title": "摘要",
               "body": "# 摘要\n\n告警总数。alert_stats.total：50。",
               "data_source_mapping": {
-                "alert_stats.total": "50"
+                "alert_stats.total": "alert_stats.total"
+              },
+              "data_values": {
+                "alert_stats.total": 50
               }
             }
           ]
@@ -2845,8 +3866,8 @@
             {
               "metric": "告警总数",
               "source_value": 50,
-              "mappings": [
-                "50"
+              "data_values": [
+                50
               ]
             }
           ]
@@ -2861,7 +3882,8 @@
             "section_ids": [
               "sum"
             ],
-            "placeholders": []
+            "placeholders": [],
+            "missing_required_data": []
           }
         },
         "format_compliance": {

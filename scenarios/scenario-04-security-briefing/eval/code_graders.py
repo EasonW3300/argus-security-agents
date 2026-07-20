@@ -42,26 +42,8 @@ def _value_at(data, path):
     return value
 
 
-def _rendered_output(output):
-    return json.dumps(output, ensure_ascii=False, sort_keys=True, default=str)
-
-
-def _numeric_present(rendered, expected):
-    if isinstance(expected, bool) or not isinstance(expected, Number):
-        return str(expected) in rendered
-    if 0 <= expected <= 1:
-        target = float(expected) * 100
-        return any(abs(float(value) - target) <= 0.1 + 1e-9 for value in _PERCENT.findall(rendered))
-    target = float(expected)
-    return any(abs(float(value) - target) <= 1e-9 for value in re.findall(r"(?<![\d.])-?\d+(?:\.\d+)?", rendered))
-
-
-def _section_mappings(output, path):
-    sections = output.get("content", {}).get("sections", []) if isinstance(output, dict) else []
-    return [section["data_source_mapping"][path] for section in sections if isinstance(section, dict) and isinstance(section.get("data_source_mapping"), dict) and path in section["data_source_mapping"]]
-
-
 def _mapping_matches(value, expected):
+    """Check a single rendered metric declaration against its actual source value."""
     rendered = str(value)
     if isinstance(expected, bool):
         return rendered == str(expected)
@@ -83,86 +65,112 @@ def _mapping_matches(value, expected):
     return rendered == str(expected)
 
 
-def _source_numbers(value):
-    if isinstance(value, Number) and not isinstance(value, bool):
-        return [float(value)]
-    if isinstance(value, dict):
-        return [number for item in value.values() for number in _source_numbers(item)]
-    if isinstance(value, (list, tuple)):
-        return [float(len(value))] + [number for item in value for number in _source_numbers(item)]
-    if isinstance(value, str):
-        return [float(number) for number in re.findall(r"(?<![\d.])-?\d+(?:\.\d+)?", value)]
-    return []
+def _sections(output):
+    content = output.get("content", {}) if isinstance(output, dict) else {}
+    return content.get("sections", []) if isinstance(content, dict) else []
 
 
-def _body_has_unmapped_number(body, source, derived_expected):
-    allowed = _source_numbers(source)
-    for value in _PERCENT.findall(body):
-        percent = float(value)
-        if any(
-            abs(percent - number * 100) <= 0.1 + 1e-9 if 0 <= number <= 1 else abs(percent - abs(number)) <= 1e-9
-            for number in allowed
-        ):
-            continue
-        if derived_expected is not None and abs(percent - derived_expected * 100) <= 0.1 + 1e-9:
-            continue
-        return value + "%"
-    raw_without_percent = _PERCENT.sub("", body)
-    for token in re.findall(r"(?<![\d.])-?\d+(?:\.\d+)?", raw_without_percent):
-        number = float(token)
-        if not any(abs(number - candidate) <= 1e-9 for candidate in allowed):
-            return token
-    return None
+def _entries(section):
+    mapping = section.get("data_source_mapping") if isinstance(section, dict) else None
+    values = section.get("data_values") if isinstance(section, dict) else None
+    if not isinstance(mapping, dict) or not isinstance(values, dict):
+        return []
+    return [(metric, path, values.get(metric)) for metric, path in mapping.items() if metric in values]
+
+
+def _body_has_metric_value(section, metric, expected, output):
+    body = section.get("body", "") if isinstance(section, dict) else ""
+    if not isinstance(body, str) or metric not in body:
+        return False
+    # Container values are bound by their exact JSON audit value; requiring the
+    # marker in prose avoids pretending an unordered container has one display.
+    if isinstance(expected, (dict, list)):
+        return True
+    lines = [
+        re.split(r"[；;。]", line.split(metric, 1)[1], maxsplit=1)[0]
+        for line in body.splitlines() if metric in line
+    ]
+    if isinstance(expected, str):
+        return any(expected in line for line in lines)
+    if any(_mapping_matches(line, expected) for line in lines):
+        return True
+    rendered = str(expected)
+    for record in output.get("masking_applied", []) if isinstance(output, dict) else []:
+        if isinstance(record, dict) and record.get("original") == rendered:
+            return any(record.get("masked") in line for line in lines)
+    return False
+
+
+def _required_data_failures(output, case):
+    section_by_id = {
+        section.get("section_id"): section for section in _sections(output) if isinstance(section, dict)
+    }
+    failures = []
+    for template in case.get("template_definition", {}).get("sections", []):
+        section_id = template.get("section_id") if isinstance(template, dict) else None
+        section = section_by_id.get(section_id)
+        for path in template.get("required_data", []) if isinstance(template, dict) else []:
+            source_value = _value_at(case.get("mock_source_data", {}), path)
+            matching = [entry for entry in _entries(section) if entry[1] == path]
+            if not matching or not all(entry[2] == source_value for entry in matching):
+                failures.append("%s:%s" % (section_id, path))
+                continue
+            if not any(_body_has_metric_value(section, metric, source_value, output) for metric, _, _ in matching):
+                failures.append("%s:%s body" % (section_id, path))
+    return failures
 
 
 def _data_accuracy(output, case):
     source = case.get("mock_source_data", {})
     checks = case.get("ground_truth", {}).get("data_accuracy_checks", [])
-    failures = []
+    failures = _required_data_failures(output, case)
     actual = []
-    derived_expected = None
     for check in checks:
-        path = check.get("source_path")
-        expected = check.get("expected_value")
+        path, expected = check.get("source_path"), check.get("expected_value")
         if path == "衍生计算":
-            # The scenario specifies 34 / 156; validate the reported percentage,
-            # with the documented absolute ±0.1 percentage-point tolerance.
             related = _value_at(source, "alert_stats.vuln_related_alerts")
             total = _value_at(source, "alert_stats.total")
-            computed = related / total if isinstance(related, Number) and total else None
-            source_ok = computed is not None and abs(computed - float(expected)) <= 0.001
-            derived_expected = float(expected)
-            bodies = [
-                section.get("body", "")
-                for section in output.get("content", {}).get("sections", [])
-                if isinstance(section, dict)
-                and "alert_stats.vuln_related_alerts" in section.get("data_source_mapping", {})
+            source_value = related / total if isinstance(related, Number) and total else None
+            matching = [
+                (section, metric, value)
+                for section in _sections(output) if isinstance(section, dict)
+                for metric, source_path, value in _entries(section)
+                if metric == path and source_path.startswith("derived:")
             ]
-            shown = [float(value) / 100 for body in bodies for value in _PERCENT.findall(body)]
-            matching = [value for value in shown if abs(value - float(expected)) <= 0.001 + 1e-9]
-            contradictory = [value * 100 for value in shown if abs(value - float(expected)) > 0.001 + 1e-9]
-            output_ok = bool(matching) and not contradictory
-            observed = {"computed": computed, "reported_percentages": [value * 100 for value in shown]}
+            value_ok = source_value is not None and abs(source_value - float(expected)) <= 0.001
+            output_ok = bool(matching) and all(
+                isinstance(value, Number) and abs(value - source_value) <= 0.001
+                and _body_has_metric_value(section, metric, value, output)
+                for section, metric, value in matching
+            )
+            observed = {"computed": source_value, "data_values": [value for _, _, value in matching]}
         else:
             source_value = _value_at(source, path)
-            source_ok = source_value == expected
-            mappings = _section_mappings(output, path)
-            matching = [value for value in mappings if _mapping_matches(value, expected)]
-            output_ok = bool(matching) and len(matching) == len(mappings)
-            observed = {"source_value": source_value, "mappings": mappings}
+            matching = [
+                (section, metric, value)
+                for section in _sections(output) if isinstance(section, dict)
+                for metric, source_path, value in _entries(section)
+                if source_path == path
+            ]
+            value_ok = source_value == expected
+            output_ok = bool(matching) and all(
+                value == source_value and _body_has_metric_value(section, metric, source_value, output)
+                for section, metric, value in matching
+            )
+            observed = {"source_value": source_value, "data_values": [value for _, _, value in matching]}
         actual.append({"metric": check.get("metric"), **observed})
-        if not (source_ok and output_ok):
+        if not (value_ok and output_ok):
             failures.append(check.get("metric", path))
-    for section in output.get("content", {}).get("sections", []) if isinstance(output, dict) else []:
-        if isinstance(section, dict) and isinstance(section.get("body"), str):
-            # Section titles can legitimately contain a presentation ordinal such
-            # as "TOP10"; only validate declared Markdown body content.
-            content_body = re.sub(r"^\s*#{1,6}\s+.*(?:\n|$)", "", section["body"], count=1)
-            for path in section.get("data_source_mapping", {}):
-                content_body = content_body.replace(path, "")
-            contradiction = _body_has_unmapped_number(content_body, source, derived_expected)
-            if contradiction:
-                failures.append("unmapped body number %s" % contradiction)
+    for section in _sections(output):
+        if not isinstance(section, dict) or not isinstance(section.get("body"), str):
+            continue
+        metric_names = [metric for metric, _, _ in _entries(section)]
+        for line in section["body"].splitlines():
+            if line.lstrip().startswith("#") or not re.search(r"\d", line):
+                continue
+            if "：" in line or ":" in line:
+                if not any(metric in line for metric in metric_names):
+                    failures.append("unbound body declaration " + line.strip())
     return _result(not failures, "all declared metrics match source data" if not failures else "metric mismatch: " + ", ".join(failures), checks, actual)
 
 
@@ -172,8 +180,9 @@ def _template_completeness(output, case):
     ids = [item.get("section_id") for item in sections if isinstance(item, dict)]
     nonempty = all(isinstance(item, dict) and isinstance(item.get("body"), str) and item["body"].strip() for item in sections)
     placeholders = [item.get("section_id") for item in sections if isinstance(item, dict) and _PLACEHOLDER.search(item.get("body", ""))]
-    passed = ids == expected and nonempty and not placeholders
-    return _result(passed, "all required sections are present and complete" if passed else "section ids, bodies, or placeholders are invalid", expected, {"section_ids": ids, "placeholders": placeholders})
+    missing_data = _required_data_failures(output, case)
+    passed = ids == expected and nonempty and not placeholders and not missing_data
+    return _result(passed, "all required sections are present and complete" if passed else "section ids, bodies, placeholders, or required data are invalid", expected, {"section_ids": ids, "placeholders": placeholders, "missing_required_data": missing_data})
 
 
 def _format_compliance(output, case):
@@ -201,7 +210,24 @@ def _format_compliance(output, case):
 
 def _masking_check(output, case):
     gt = case.get("ground_truth", {})
-    rendered = _rendered_output(output)
+    sections = _sections(output)
+    # ``data_values`` and ``masking_applied.original`` are internal audit
+    # records.  They are deliberately not part of the management-visible report
+    # scan; otherwise a compliant masking audit would be falsely flagged.
+    management_view = {
+        "report_title": output.get("report_title") if isinstance(output, dict) else None,
+        "target_recipients": output.get("target_recipients") if isinstance(output, dict) else None,
+        "content": [
+            {
+                "title": section.get("title"),
+                "body": section.get("body"),
+                "data_source_mapping": section.get("data_source_mapping"),
+            }
+            for section in sections if isinstance(section, dict)
+        ],
+        "metadata": output.get("metadata") if isinstance(output, dict) else None,
+    }
+    rendered = json.dumps(management_view, ensure_ascii=False, sort_keys=True, default=str)
     audience = case.get("target_audience")
     if audience == "management":
         patterns = [item.get("pattern", "") for item in gt.get("sensitive_patterns", []) if item.get("should_be_masked", True)]

@@ -20,10 +20,18 @@
           "title": "漏洞发现与修复趋势",
           "body": "# 漏洞发现与修复趋势\n\n对比本月和上月的新增漏洞数、修复率。vulnerability_monthly.new_total：45；vulnerability_monthly.fix_rate：71%；vulnerability_monthly.prev_month：new_total=38, fix_rate=68%, avg_fix_days_critical=9。",
           "data_source_mapping": {
-            "vulnerability_monthly.new_total": "45",
-            "vulnerability_monthly.fix_rate": "71%",
-            "vulnerability_monthly.prev_month": "new_total=38, fix_rate=68%, avg_fix_days_critical=9",
-            "vulnerability_monthly.avg_fix_days_critical": "7"
+            "vulnerability_monthly.new_total": "vulnerability_monthly.new_total",
+            "vulnerability_monthly.fix_rate": "vulnerability_monthly.fix_rate",
+            "vulnerability_monthly.prev_month": "vulnerability_monthly.prev_month"
+          },
+          "data_values": {
+            "vulnerability_monthly.new_total": 45,
+            "vulnerability_monthly.fix_rate": 0.71,
+            "vulnerability_monthly.prev_month": {
+              "new_total": 38,
+              "fix_rate": 0.68,
+              "avg_fix_days_critical": 9
+            }
           }
         },
         {
@@ -31,7 +39,10 @@
           "title": "高危漏洞平均修复时间",
           "body": "# 高危漏洞平均修复时间\n\n报告高危漏洞的平均修复天数及与上月对比。vulnerability_monthly.avg_fix_days_critical：7天。",
           "data_source_mapping": {
-            "vulnerability_monthly.avg_fix_days_critical": "7天"
+            "vulnerability_monthly.avg_fix_days_critical": "vulnerability_monthly.avg_fix_days_critical"
+          },
+          "data_values": {
+            "vulnerability_monthly.avg_fix_days_critical": 7
           }
         },
         {
@@ -39,16 +50,22 @@
           "title": "积压漏洞数量",
           "body": "# 积压漏洞数量\n\n| 数据字段 | 值 |\n| --- | --- |\n| vulnerability_monthly.backlog | critical=2, high=5, medium=10, low=6 |",
           "data_source_mapping": {
-            "vulnerability_monthly.backlog": "critical=2, high=5, medium=10, low=6"
+            "vulnerability_monthly.backlog": "vulnerability_monthly.backlog"
+          },
+          "data_values": {
+            "vulnerability_monthly.backlog": {
+              "critical": 2,
+              "high": 5,
+              "medium": 10,
+              "low": 6
+            }
           }
         }
       ]
     },
-    "masking_applied": [
-      "management masking rules applied"
-    ],
+    "masking_applied": [],
     "metadata": {
-      "generated_at": "2026-07T00:00:00+00:00",
+      "generated_at": "2026-07-01T00:00:00+00:00",
       "data_sources_used": [
         "vulnerability_monthly"
       ],
@@ -75,16 +92,15 @@
         {
           "metric": "本月新增漏洞",
           "source_value": 45,
-          "mappings": [
-            "45"
+          "data_values": [
+            45
           ]
         },
         {
           "metric": "高危平均修复天数",
           "source_value": 7,
-          "mappings": [
-            "7",
-            "7天"
+          "data_values": [
+            7
           ]
         }
       ]
@@ -103,7 +119,8 @@
           "critical_fix_time",
           "backlog"
         ],
-        "placeholders": []
+        "placeholders": [],
+        "missing_required_data": []
       }
     },
     "format_compliance": {
@@ -147,5 +164,28 @@
   "calls": [],
   "overall_pass": true,
   "error_type": null,
-  "error_message": null
+  "error_message": null,
+  "run_provenance": {
+    "dataset_sha256": "649a00fd34d4d65188498c83dca61342356ab900089ceddd512b96137c24a46c",
+    "agent_mode": "mock",
+    "agent": {
+      "provider": "mock",
+      "model": "scenario-04-mock",
+      "base_url": null,
+      "response_mode": "prompt_json",
+      "temperature": 0.0,
+      "max_tokens": 4096,
+      "timeout_seconds": 90.0
+    },
+    "judge": {
+      "provider": "mock",
+      "model": "scenario-04-mock",
+      "base_url": null,
+      "response_mode": "prompt_json",
+      "temperature": 0.0,
+      "max_tokens": 4096,
+      "timeout_seconds": 90.0
+    },
+    "grader_mode": "code_only"
+  }
 }

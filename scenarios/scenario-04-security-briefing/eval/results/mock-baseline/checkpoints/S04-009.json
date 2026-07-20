@@ -20,8 +20,12 @@
           "title": "告警总体趋势",
           "body": "# 告警总体趋势\n\n用通俗语言概述告警变化，不提及具体规则名或IP。alert_stats_current_week.total：1042；alert_stats_previous_week.total：978。",
           "data_source_mapping": {
-            "alert_stats_current_week.total": "1042",
-            "alert_stats_previous_week.total": "978"
+            "alert_stats_current_week.total": "alert_stats_current_week.total",
+            "alert_stats_previous_week.total": "alert_stats_previous_week.total"
+          },
+          "data_values": {
+            "alert_stats_current_week.total": 1042,
+            "alert_stats_previous_week.total": 978
           }
         },
         {
@@ -29,8 +33,22 @@
           "title": "告警级别变化",
           "body": "# 告警级别变化\n\n| 数据字段 | 值 |\n| --- | --- |\n| alert_stats_current_week.by_severity | critical=18, high=167, medium=521, low=336 |\n| alert_stats_previous_week.by_severity | critical=12, high=145, medium=502, low=319 |",
           "data_source_mapping": {
-            "alert_stats_current_week.by_severity": "critical=18, high=167, medium=521, low=336",
-            "alert_stats_previous_week.by_severity": "critical=12, high=145, medium=502, low=319"
+            "alert_stats_current_week.by_severity": "alert_stats_current_week.by_severity",
+            "alert_stats_previous_week.by_severity": "alert_stats_previous_week.by_severity"
+          },
+          "data_values": {
+            "alert_stats_current_week.by_severity": {
+              "critical": 18,
+              "high": 167,
+              "medium": 521,
+              "low": 336
+            },
+            "alert_stats_previous_week.by_severity": {
+              "critical": 12,
+              "high": 145,
+              "medium": 502,
+              "low": 319
+            }
           }
         },
         {
@@ -38,7 +56,36 @@
           "title": "主要威胁类型",
           "body": "# 主要威胁类型\n\n- alert_stats_current_week.top_rules：rule_name=暴力破解检测, count=287, change_vs_prev=+15%, rule_name=DNS 隧道检测, count=198, change_vs_prev=+42%, rule_name=异常登录检测, count=176, change_vs_prev=-8%, rule_name=Outbound Connection to Known C2, count=123, change_vs_prev=+20%, rule_name=Malware Detected on Endpoint, count=98, change_vs_prev=-5%",
           "data_source_mapping": {
-            "alert_stats_current_week.top_rules": "rule_name=暴力破解检测, count=287, change_vs_prev=+15%, rule_name=DNS 隧道检测, count=198, change_vs_prev=+42%, rule_name=异常登录检测, count=176, change_vs_prev=-8%, rule_name=Outbound Connection to Known C2, count=123, change_vs_prev=+20%, rule_name=Malware Detected on Endpoint, count=98, change_vs_prev=-5%"
+            "alert_stats_current_week.top_rules": "alert_stats_current_week.top_rules"
+          },
+          "data_values": {
+            "alert_stats_current_week.top_rules": [
+              {
+                "rule_name": "SSH Brute Force Detection",
+                "count": 287,
+                "change_vs_prev": "+15%"
+              },
+              {
+                "rule_name": "Suspicious DNS Tunneling",
+                "count": 198,
+                "change_vs_prev": "+42%"
+              },
+              {
+                "rule_name": "Multiple Failed Logins from Same Source",
+                "count": 176,
+                "change_vs_prev": "-8%"
+              },
+              {
+                "rule_name": "Outbound Connection to Known C2",
+                "count": 123,
+                "change_vs_prev": "+20%"
+              },
+              {
+                "rule_name": "Malware Detected on Endpoint",
+                "count": 98,
+                "change_vs_prev": "-5%"
+              }
+            ]
           }
         },
         {
@@ -46,16 +93,54 @@
           "title": "外部攻击概况",
           "body": "# 外部攻击概况\n\n用“外部攻击源”替代具体IP，只保留攻击次数和类型趋势。alert_stats_current_week.external_threat_ips：ip=外部攻击源, attack_count=345, threat_type=SSH暴力破解, ip=外部攻击源, attack_count=267, threat_type=DNS隧道。",
           "data_source_mapping": {
-            "alert_stats_current_week.external_threat_ips": "ip=外部攻击源, attack_count=345, threat_type=SSH暴力破解, ip=外部攻击源, attack_count=267, threat_type=DNS隧道"
+            "alert_stats_current_week.external_threat_ips": "alert_stats_current_week.external_threat_ips"
+          },
+          "data_values": {
+            "alert_stats_current_week.external_threat_ips": [
+              {
+                "ip": "203.0.113.88",
+                "attack_count": 345,
+                "threat_type": "SSH暴力破解"
+              },
+              {
+                "ip": "198.51.100.123",
+                "attack_count": 267,
+                "threat_type": "DNS隧道"
+              }
+            ]
           }
         }
       ]
     },
     "masking_applied": [
-      "management masking rules applied"
+      {
+        "original": "SSH Brute Force Detection",
+        "masked": "暴力破解检测",
+        "rule": "SSH Brute Force Detection"
+      },
+      {
+        "original": "Suspicious DNS Tunneling",
+        "masked": "DNS 隧道检测",
+        "rule": "Suspicious DNS Tunneling"
+      },
+      {
+        "original": "Multiple Failed Logins from Same Source",
+        "masked": "异常登录检测",
+        "rule": "Multiple Failed Logins from Same Source"
+      },
+      {
+        "original": "203.0.113.88",
+        "masked": "外部攻击源",
+        "rule": "203\\.0\\.113\\.88"
+      },
+      {
+        "original": "198.51.100.123",
+        "masked": "外部攻击源",
+        "rule": "198\\.51\\.100\\.123"
+      }
     ],
     "metadata": {
-      "generated_at": "2026-W29T00:00:00+00:00",
+      "generated_at": "2026-07-13T00:00:00+00:00",
       "data_sources_used": [
         "alert_stats_current_week",
         "alert_stats_previous_week"
@@ -78,8 +163,8 @@
         {
           "metric": "本周告警总数",
           "source_value": 1042,
-          "mappings": [
-            "1042"
+          "data_values": [
+            1042
           ]
         }
       ]
@@ -100,7 +185,8 @@
           "top_threats",
           "external_sources"
         ],
-        "placeholders": []
+        "placeholders": [],
+        "missing_required_data": []
       }
     },
     "format_compliance": {
@@ -144,5 +230,28 @@
   "calls": [],
   "overall_pass": true,
   "error_type": null,
-  "error_message": null
+  "error_message": null,
+  "run_provenance": {
+    "dataset_sha256": "649a00fd34d4d65188498c83dca61342356ab900089ceddd512b96137c24a46c",
+    "agent_mode": "mock",
+    "agent": {
+      "provider": "mock",
+      "model": "scenario-04-mock",
+      "base_url": null,
+      "response_mode": "prompt_json",
+      "temperature": 0.0,
+      "max_tokens": 4096,
+      "timeout_seconds": 90.0
+    },
+    "judge": {
+      "provider": "mock",
+      "model": "scenario-04-mock",
+      "base_url": null,
+      "response_mode": "prompt_json",
+      "temperature": 0.0,
+      "max_tokens": 4096,
+      "timeout_seconds": 90.0
+    },
+    "grader_mode": "code_only"
+  }
 }

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import re
+from datetime import date
 
 
 def _get_path(data, path):
@@ -32,7 +33,23 @@ def _format_value(value):
     return str(value)
 
 
-def _mask(value, patterns):
+def _generated_at(report_period):
+    """Turn the dataset's date, ISO week, month, or quarter into an ISO instant."""
+    if re.fullmatch(r"\d{4}-\d{2}-\d{2}", report_period):
+        return report_period + "T00:00:00+00:00"
+    week = re.fullmatch(r"(\d{4})-W(\d{2})", report_period)
+    if week:
+        return date.fromisocalendar(int(week.group(1)), int(week.group(2)), 1).isoformat() + "T00:00:00+00:00"
+    month = re.fullmatch(r"(\d{4})-(\d{2})", report_period)
+    if month:
+        return "%s-%s-01T00:00:00+00:00" % month.groups()
+    quarter = re.fullmatch(r"(\d{4})-Q([1-4])", report_period)
+    if quarter:
+        return "%s-%02d-01T00:00:00+00:00" % (quarter.group(1), (int(quarter.group(2)) - 1) * 3 + 1)
+    raise ValueError("report_date must be an ISO date, week, month, or quarter")
+
+
+def _mask(value, patterns, records=None):
     rendered = _format_value(value)
     aliases = {
         "SSH Brute Force Detection": "暴力破解检测",
@@ -56,7 +73,13 @@ def _mask(value, patterns):
     }
     for pattern in patterns:
         matched = re.search(pattern, rendered)
-        rendered = re.sub(pattern, aliases.get(matched.group(0), "***") if matched else "***", rendered)
+        if matched:
+            original = matched.group(0)
+            masked = aliases.get(original, "***")
+            rendered = re.sub(pattern, masked, rendered)
+            record = {"original": original, "masked": masked, "rule": pattern}
+            if records is not None and record not in records:
+                records.append(record)
     return rendered
 
 
@@ -95,25 +118,29 @@ def run_mock_case(case: dict) -> dict:
     leak_negative = case.get("test_case_id") == "S04-019"
     patterns = [] if leak_negative else sensitive_patterns if masking_enabled else []
     sections = []
+    masking_records = []
     for section in case["template_definition"]["sections"]:
-        mappings = {}
+        mappings, data_values, display_values = {}, {}, {}
         for path in section.get("required_data", []):
             value = _get_path(case.get("mock_source_data", {}), path)
-            rendered = _mask(value, patterns)
-            mappings[path] = rendered + ("天" if "days" in path.rsplit(".", 1)[-1] else "")
-        body = "# %s\n\n%s" % (section["title"], _section_body(section, mappings))
+            rendered = _mask(value, patterns, masking_records)
+            mappings[path] = path
+            data_values[path] = value
+            display_values[path] = rendered + ("天" if "days" in path.rsplit(".", 1)[-1] else "")
+        body = "# %s\n\n%s" % (section["title"], _section_body(section, display_values))
         if "vuln_related_alerts / total" in section.get("description", ""):
             related = _get_path(case["mock_source_data"], "alert_stats.vuln_related_alerts")
             total = _get_path(case["mock_source_data"], "alert_stats.total")
             if related is not None and total:
                 body += " 关联比例：%.1f%%。" % (related / total * 100)
         if patterns:
-            body = _mask(body, patterns)
+            body = _mask(body, patterns, masking_records)
         sections.append({
             "section_id": section["section_id"],
             "title": section["title"],
             "body": body,
             "data_source_mapping": mappings,
+            "data_values": data_values,
         })
     # Ground Truth may declare a metric more granular than a template's required
     # source path (for example ``items[0].ip``).  Emit it explicitly so graders
@@ -124,10 +151,21 @@ def run_mock_case(case: dict) -> dict:
             related = _get_path(case["mock_source_data"], "alert_stats.vuln_related_alerts")
             total = _get_path(case["mock_source_data"], "alert_stats.total")
             if related is not None and total:
-                sections[0]["data_source_mapping"][path] = "%.1f%%" % (related / total * 100)
+                target = next(
+                    (section for section in sections if {
+                        "alert_stats.vuln_related_alerts", "alert_stats.total"
+                    }.issubset(set(section["data_source_mapping"].values()))),
+                    sections[0],
+                )
+                target["data_source_mapping"][path] = "derived:alert_stats.vuln_related_alerts/alert_stats.total"
+                target["data_values"][path] = related / total
+                target["body"] += "\n%s：%.1f%%。" % (path, related / total * 100)
             continue
         value = _get_path(case.get("mock_source_data", {}), path)
-        sections[0]["data_source_mapping"][path] = _mask(value, patterns)
+        if not any(path in section["data_source_mapping"].values() for section in sections):
+            sections[0]["data_source_mapping"][path] = path
+            sections[0]["data_values"][path] = value
+            sections[0]["body"] += "\n%s：%s。" % (path, _mask(value, patterns, masking_records))
     if leak_negative:
         leaked = _first_sensitive_value(case.get("mock_source_data", {}), sensitive_patterns)
         if leaked:
@@ -144,7 +182,7 @@ def run_mock_case(case: dict) -> dict:
         "target_channel": case["push_config"]["channel"],
         "target_recipients": recipients,
         "content": {"sections": sections},
-        "masking_applied": ["management masking rules applied"] if masking_enabled and not leak_negative else [],
-        "metadata": {"generated_at": "%sT00:00:00+00:00" % report_date, "data_sources_used": list(case.get("mock_source_data", {}).keys()), "push_status": "draft"},
+        "masking_applied": masking_records,
+        "metadata": {"generated_at": _generated_at(report_date), "data_sources_used": list(case.get("mock_source_data", {}).keys()), "push_status": "draft"},
     }
     return {"status": "completed", "final_output": final_output, "transcript": [], "calls": []}

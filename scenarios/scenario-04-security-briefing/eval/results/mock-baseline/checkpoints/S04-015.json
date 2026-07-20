@@ -18,10 +18,14 @@
         {
           "section_id": "executive_summary",
           "title": "执行摘要",
-          "body": "# 执行摘要\n\n两段话概括本季度安全形势。。",
+          "body": "# 执行摘要\n\n两段话概括本季度安全形势。。\nquarterly_data.vulnerability_trend.fix_rate：76.6%。\nquarterly_data.industry_benchmark.company_disposal_rate：91%。",
           "data_source_mapping": {
-            "quarterly_data.vulnerability_trend.fix_rate": "76.6%",
-            "quarterly_data.industry_benchmark.company_disposal_rate": "91%"
+            "quarterly_data.vulnerability_trend.fix_rate": "quarterly_data.vulnerability_trend.fix_rate",
+            "quarterly_data.industry_benchmark.company_disposal_rate": "quarterly_data.industry_benchmark.company_disposal_rate"
+          },
+          "data_values": {
+            "quarterly_data.vulnerability_trend.fix_rate": 0.766,
+            "quarterly_data.industry_benchmark.company_disposal_rate": 0.91
           }
         },
         {
@@ -29,8 +33,36 @@
           "title": "告警与漏洞趋势",
           "body": "# 告警与漏洞趋势\n\n分析告警和漏洞的发展趋势。quarterly_data.alert_trend：months=month=4月, total=3200, change=+5%, month=5月, total=3450, change=+7.8%, month=6月, total=3120, change=-9.6%, description=季度前期告警上升，6月因防火墙策略优化下降；quarterly_data.vulnerability_trend：quarter_new=128, quarter_fixed=98, fix_rate=76.6%, description=修复率较上季度提升4个百分点。",
           "data_source_mapping": {
-            "quarterly_data.alert_trend": "months=month=4月, total=3200, change=+5%, month=5月, total=3450, change=+7.8%, month=6月, total=3120, change=-9.6%, description=季度前期告警上升，6月因防火墙策略优化下降",
-            "quarterly_data.vulnerability_trend": "quarter_new=128, quarter_fixed=98, fix_rate=76.6%, description=修复率较上季度提升4个百分点"
+            "quarterly_data.alert_trend": "quarterly_data.alert_trend",
+            "quarterly_data.vulnerability_trend": "quarterly_data.vulnerability_trend"
+          },
+          "data_values": {
+            "quarterly_data.alert_trend": {
+              "months": [
+                {
+                  "month": "4月",
+                  "total": 3200,
+                  "change": "+5%"
+                },
+                {
+                  "month": "5月",
+                  "total": 3450,
+                  "change": "+7.8%"
+                },
+                {
+                  "month": "6月",
+                  "total": 3120,
+                  "change": "-9.6%"
+                }
+              ],
+              "description": "季度前期告警上升，6月因防火墙策略优化下降"
+            },
+            "quarterly_data.vulnerability_trend": {
+              "quarter_new": 128,
+              "quarter_fixed": 98,
+              "fix_rate": 0.766,
+              "description": "修复率较上季度提升4个百分点"
+            }
           }
         },
         {
@@ -38,8 +70,23 @@
           "title": "事件与威胁情报",
           "body": "# 事件与威胁情报\n\n总结事件响应效率和主要威胁类型。quarterly_data.incident_trend：total=45, avg_response_minutes=22, closure_rate=92%；quarterly_data.threat_intel_trend：top_categories=C2, phishing, ransomware, description=钓鱼攻击占比显著上升，勒索软件活跃度持平。",
           "data_source_mapping": {
-            "quarterly_data.incident_trend": "total=45, avg_response_minutes=22, closure_rate=92%",
-            "quarterly_data.threat_intel_trend": "top_categories=C2, phishing, ransomware, description=钓鱼攻击占比显著上升，勒索软件活跃度持平"
+            "quarterly_data.incident_trend": "quarterly_data.incident_trend",
+            "quarterly_data.threat_intel_trend": "quarterly_data.threat_intel_trend"
+          },
+          "data_values": {
+            "quarterly_data.incident_trend": {
+              "total": 45,
+              "avg_response_minutes": 22,
+              "closure_rate": 0.92
+            },
+            "quarterly_data.threat_intel_trend": {
+              "top_categories": [
+                "C2",
+                "phishing",
+                "ransomware"
+              ],
+              "description": "钓鱼攻击占比显著上升，勒索软件活跃度持平"
+            }
           }
         },
         {
@@ -47,7 +94,15 @@
           "title": "行业对标",
           "body": "# 行业对标\n\n| 数据字段 | 值 |\n| --- | --- |\n| quarterly_data.industry_benchmark | industry_avg_alert_disposal_rate=85%, company_disposal_rate=91%, industry_avg_fix_rate=70%, company_fix_rate=76.6% |",
           "data_source_mapping": {
-            "quarterly_data.industry_benchmark": "industry_avg_alert_disposal_rate=85%, company_disposal_rate=91%, industry_avg_fix_rate=70%, company_fix_rate=76.6%"
+            "quarterly_data.industry_benchmark": "quarterly_data.industry_benchmark"
+          },
+          "data_values": {
+            "quarterly_data.industry_benchmark": {
+              "industry_avg_alert_disposal_rate": 0.85,
+              "company_disposal_rate": 0.91,
+              "industry_avg_fix_rate": 0.7,
+              "company_fix_rate": 0.766
+            }
           }
         },
         {
@@ -55,7 +110,14 @@
           "title": "下季度风险预测",
           "body": "# 下季度风险预测\n\n- quarterly_data.risk_forecast：零日漏洞利用可能在下季度增长，建议增加虚拟补丁投入, 内部员工钓鱼点击率季度环比上升10%，需加强安全意识培训, 供应链攻击风险随第三方接入增加而上升，应启动供应商安全审核",
           "data_source_mapping": {
-            "quarterly_data.risk_forecast": "零日漏洞利用可能在下季度增长，建议增加虚拟补丁投入, 内部员工钓鱼点击率季度环比上升10%，需加强安全意识培训, 供应链攻击风险随第三方接入增加而上升，应启动供应商安全审核"
+            "quarterly_data.risk_forecast": "quarterly_data.risk_forecast"
+          },
+          "data_values": {
+            "quarterly_data.risk_forecast": [
+              "零日漏洞利用可能在下季度增长，建议增加虚拟补丁投入",
+              "内部员工钓鱼点击率季度环比上升10%，需加强安全意识培训",
+              "供应链攻击风险随第三方接入增加而上升，应启动供应商安全审核"
+            ]
           }
         },
         {
@@ -63,16 +125,17 @@
           "title": "资源规划建议",
           "body": "# 资源规划建议\n\n给出人员、工具和培训建议。quarterly_data.resource_planning：建议下季度新增2名安全分析师，追加预算购买APT检测工具，并安排一次全公司钓鱼演练。",
           "data_source_mapping": {
+            "quarterly_data.resource_planning": "quarterly_data.resource_planning"
+          },
+          "data_values": {
             "quarterly_data.resource_planning": "建议下季度新增2名安全分析师，追加预算购买APT检测工具，并安排一次全公司钓鱼演练"
           }
         }
       ]
     },
-    "masking_applied": [
-      "management masking rules applied"
-    ],
+    "masking_applied": [],
     "metadata": {
-      "generated_at": "2026-Q2T00:00:00+00:00",
+      "generated_at": "2026-04-01T00:00:00+00:00",
       "data_sources_used": [
         "quarterly_data"
       ],
@@ -99,15 +162,15 @@
         {
           "metric": "季度漏洞修复率",
           "source_value": 0.766,
-          "mappings": [
-            "76.6%"
+          "data_values": [
+            0.766
           ]
         },
         {
           "metric": "公司处置率",
           "source_value": 0.91,
-          "mappings": [
-            "91%"
+          "data_values": [
+            0.91
           ]
         }
       ]
@@ -132,7 +195,8 @@
           "forecast",
           "resource"
         ],
-        "placeholders": []
+        "placeholders": [],
+        "missing_required_data": []
       }
     },
     "format_compliance": {
@@ -176,5 +240,28 @@
   "calls": [],
   "overall_pass": true,
   "error_type": null,
-  "error_message": null
+  "error_message": null,
+  "run_provenance": {
+    "dataset_sha256": "649a00fd34d4d65188498c83dca61342356ab900089ceddd512b96137c24a46c",
+    "agent_mode": "mock",
+    "agent": {
+      "provider": "mock",
+      "model": "scenario-04-mock",
+      "base_url": null,
+      "response_mode": "prompt_json",
+      "temperature": 0.0,
+      "max_tokens": 4096,
+      "timeout_seconds": 90.0
+    },
+    "judge": {
+      "provider": "mock",
+      "model": "scenario-04-mock",
+      "base_url": null,
+      "response_mode": "prompt_json",
+      "temperature": 0.0,
+      "max_tokens": 4096,
+      "timeout_seconds": 90.0
+    },
+    "grader_mode": "code_only"
+  }
 }

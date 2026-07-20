@@ -20,19 +20,34 @@
           "title": "告警态势",
           "body": "# 告警态势\n\n今日告警总量、处置率和各级别分布。alert_stats.total：156；alert_stats.by_severity：critical=3, high=23, medium=78, low=52；alert_stats.disposal_rate：87%。",
           "data_source_mapping": {
-            "alert_stats.total": "156",
-            "alert_stats.by_severity": "critical=3, high=23, medium=78, low=52",
-            "alert_stats.disposal_rate": "87%",
-            "衍生计算": "21.8%"
+            "alert_stats.total": "alert_stats.total",
+            "alert_stats.by_severity": "alert_stats.by_severity",
+            "alert_stats.disposal_rate": "alert_stats.disposal_rate"
+          },
+          "data_values": {
+            "alert_stats.total": 156,
+            "alert_stats.by_severity": {
+              "critical": 3,
+              "high": 23,
+              "medium": 78,
+              "low": 52
+            },
+            "alert_stats.disposal_rate": 0.87
           }
         },
         {
           "section_id": "derived_metric",
           "title": "告警与漏洞关联分析",
-          "body": "# 告警与漏洞关联分析\n\n计算并展示告警中已关联到已知漏洞的比例（vuln_related_alerts / total）。alert_stats.vuln_related_alerts：34；alert_stats.total：156。 关联比例：21.8%。",
+          "body": "# 告警与漏洞关联分析\n\n计算并展示告警中已关联到已知漏洞的比例（vuln_related_alerts / total）。alert_stats.vuln_related_alerts：34；alert_stats.total：156。 关联比例：21.8%。\n衍生计算：21.8%。",
           "data_source_mapping": {
-            "alert_stats.vuln_related_alerts": "34",
-            "alert_stats.total": "156"
+            "alert_stats.vuln_related_alerts": "alert_stats.vuln_related_alerts",
+            "alert_stats.total": "alert_stats.total",
+            "衍生计算": "derived:alert_stats.vuln_related_alerts/alert_stats.total"
+          },
+          "data_values": {
+            "alert_stats.vuln_related_alerts": 34,
+            "alert_stats.total": 156,
+            "衍生计算": 0.21794871794871795
           }
         },
         {
@@ -40,9 +55,27 @@
           "title": "漏洞与事件摘要",
           "body": "# 漏洞与事件摘要\n\n汇总漏洞修复进度和事件闭环概况。vulnerability_stats.new_total：12；vulnerability_stats.fixed_total：8；incident_list：incident_id=INC-2026-0716-001, type=phishing, severity=high, status=closed, incident_id=INC-2026-0716-002, type=c2, severity=critical, status=containing。",
           "data_source_mapping": {
-            "vulnerability_stats.new_total": "12",
-            "vulnerability_stats.fixed_total": "8",
-            "incident_list": "incident_id=INC-2026-0716-001, type=phishing, severity=high, status=closed, incident_id=INC-2026-0716-002, type=c2, severity=critical, status=containing"
+            "vulnerability_stats.new_total": "vulnerability_stats.new_total",
+            "vulnerability_stats.fixed_total": "vulnerability_stats.fixed_total",
+            "incident_list": "incident_list"
+          },
+          "data_values": {
+            "vulnerability_stats.new_total": 12,
+            "vulnerability_stats.fixed_total": 8,
+            "incident_list": [
+              {
+                "incident_id": "INC-2026-0716-001",
+                "type": "phishing",
+                "severity": "high",
+                "status": "closed"
+              },
+              {
+                "incident_id": "INC-2026-0716-002",
+                "type": "c2",
+                "severity": "critical",
+                "status": "containing"
+              }
+            ]
           }
         }
       ]
@@ -73,8 +106,8 @@
         {
           "metric": "告警关联漏洞比例",
           "computed": 0.21794871794871795,
-          "reported_percentages": [
-            21.8
+          "data_values": [
+            0.21794871794871795
           ]
         }
       ]
@@ -93,7 +126,8 @@
           "derived_metric",
           "vuln_and_incident"
         ],
-        "placeholders": []
+        "placeholders": [],
+        "missing_required_data": []
       }
     },
     "format_compliance": {
@@ -141,5 +175,28 @@
   "calls": [],
   "overall_pass": true,
   "error_type": null,
-  "error_message": null
+  "error_message": null,
+  "run_provenance": {
+    "dataset_sha256": "649a00fd34d4d65188498c83dca61342356ab900089ceddd512b96137c24a46c",
+    "agent_mode": "mock",
+    "agent": {
+      "provider": "mock",
+      "model": "scenario-04-mock",
+      "base_url": null,
+      "response_mode": "prompt_json",
+      "temperature": 0.0,
+      "max_tokens": 4096,
+      "timeout_seconds": 90.0
+    },
+    "judge": {
+      "provider": "mock",
+      "model": "scenario-04-mock",
+      "base_url": null,
+      "response_mode": "prompt_json",
+      "temperature": 0.0,
+      "max_tokens": 4096,
+      "timeout_seconds": 90.0
+    },
+    "grader_mode": "code_only"
+  }
 }

@@ -18,12 +18,39 @@
         {
           "section_id": "alert_trend",
           "title": "告警月度趋势",
-          "body": "# 告警月度趋势\n\n| 数据字段 | 值 |\n| --- | --- |\n| monthly_kpi.weekly_alerts | week=W27, total=987, disposal_rate=89%, week=W28, total=978, disposal_rate=90%, week=W29, total=1042, disposal_rate=91%, week=W30, total=1005, disposal_rate=92% |",
+          "body": "# 告警月度趋势\n\n| 数据字段 | 值 |\n| --- | --- |\n| monthly_kpi.weekly_alerts | week=W27, total=987, disposal_rate=89%, week=W28, total=978, disposal_rate=90%, week=W29, total=1042, disposal_rate=91%, week=W30, total=1005, disposal_rate=92% |\nmonthly_kpi.weekly_alerts[2].total：1042。\nmonthly_kpi.vulnerability_stats_monthly.fix_rate：71%。\nmonthly_kpi.incident_stats_monthly.closure_rate：85.7%。",
           "data_source_mapping": {
-            "monthly_kpi.weekly_alerts": "week=W27, total=987, disposal_rate=89%, week=W28, total=978, disposal_rate=90%, week=W29, total=1042, disposal_rate=91%, week=W30, total=1005, disposal_rate=92%",
-            "monthly_kpi.weekly_alerts[2].total": "1042",
-            "monthly_kpi.vulnerability_stats_monthly.fix_rate": "71%",
-            "monthly_kpi.incident_stats_monthly.closure_rate": "85.7%"
+            "monthly_kpi.weekly_alerts": "monthly_kpi.weekly_alerts",
+            "monthly_kpi.weekly_alerts[2].total": "monthly_kpi.weekly_alerts[2].total",
+            "monthly_kpi.vulnerability_stats_monthly.fix_rate": "monthly_kpi.vulnerability_stats_monthly.fix_rate",
+            "monthly_kpi.incident_stats_monthly.closure_rate": "monthly_kpi.incident_stats_monthly.closure_rate"
+          },
+          "data_values": {
+            "monthly_kpi.weekly_alerts": [
+              {
+                "week": "W27",
+                "total": 987,
+                "disposal_rate": 0.89
+              },
+              {
+                "week": "W28",
+                "total": 978,
+                "disposal_rate": 0.9
+              },
+              {
+                "week": "W29",
+                "total": 1042,
+                "disposal_rate": 0.91
+              },
+              {
+                "week": "W30",
+                "total": 1005,
+                "disposal_rate": 0.92
+              }
+            ],
+            "monthly_kpi.weekly_alerts[2].total": 1042,
+            "monthly_kpi.vulnerability_stats_monthly.fix_rate": 0.71,
+            "monthly_kpi.incident_stats_monthly.closure_rate": 0.857
           }
         },
         {
@@ -31,7 +58,16 @@
           "title": "漏洞修复KPI",
           "body": "# 漏洞修复KPI\n\n修复率及与上月对比。monthly_kpi.vulnerability_stats_monthly：new_total=45, fixed_total=32, fix_rate=71%, prev_month_new_total=38, prev_month_fix_rate=68%。",
           "data_source_mapping": {
-            "monthly_kpi.vulnerability_stats_monthly": "new_total=45, fixed_total=32, fix_rate=71%, prev_month_new_total=38, prev_month_fix_rate=68%"
+            "monthly_kpi.vulnerability_stats_monthly": "monthly_kpi.vulnerability_stats_monthly"
+          },
+          "data_values": {
+            "monthly_kpi.vulnerability_stats_monthly": {
+              "new_total": 45,
+              "fixed_total": 32,
+              "fix_rate": 0.71,
+              "prev_month_new_total": 38,
+              "prev_month_fix_rate": 0.68
+            }
           }
         },
         {
@@ -39,16 +75,22 @@
           "title": "事件闭环率",
           "body": "# 事件闭环率\n\n事件总量、闭环率和环比。monthly_kpi.incident_stats_monthly：total_incidents=28, closed_incidents=24, closure_rate=85.7%, prev_month_closure_rate=82%。",
           "data_source_mapping": {
-            "monthly_kpi.incident_stats_monthly": "total_incidents=28, closed_incidents=24, closure_rate=85.7%, prev_month_closure_rate=82%"
+            "monthly_kpi.incident_stats_monthly": "monthly_kpi.incident_stats_monthly"
+          },
+          "data_values": {
+            "monthly_kpi.incident_stats_monthly": {
+              "total_incidents": 28,
+              "closed_incidents": 24,
+              "closure_rate": 0.857,
+              "prev_month_closure_rate": 0.82
+            }
           }
         }
       ]
     },
-    "masking_applied": [
-      "management masking rules applied"
-    ],
+    "masking_applied": [],
     "metadata": {
-      "generated_at": "2026-07T00:00:00+00:00",
+      "generated_at": "2026-07-01T00:00:00+00:00",
       "data_sources_used": [
         "monthly_kpi"
       ],
@@ -80,22 +122,22 @@
         {
           "metric": "W29告警数",
           "source_value": 1042,
-          "mappings": [
-            "1042"
+          "data_values": [
+            1042
           ]
         },
         {
           "metric": "月度漏洞修复率",
           "source_value": 0.71,
-          "mappings": [
-            "71%"
+          "data_values": [
+            0.71
           ]
         },
         {
           "metric": "事件闭环率",
           "source_value": 0.857,
-          "mappings": [
-            "85.7%"
+          "data_values": [
+            0.857
           ]
         }
       ]
@@ -114,7 +156,8 @@
           "vuln_kpi",
           "incident_kpi"
         ],
-        "placeholders": []
+        "placeholders": [],
+        "missing_required_data": []
       }
     },
     "format_compliance": {
@@ -158,5 +201,28 @@
   "calls": [],
   "overall_pass": true,
   "error_type": null,
-  "error_message": null
+  "error_message": null,
+  "run_provenance": {
+    "dataset_sha256": "649a00fd34d4d65188498c83dca61342356ab900089ceddd512b96137c24a46c",
+    "agent_mode": "mock",
+    "agent": {
+      "provider": "mock",
+      "model": "scenario-04-mock",
+      "base_url": null,
+      "response_mode": "prompt_json",
+      "temperature": 0.0,
+      "max_tokens": 4096,
+      "timeout_seconds": 90.0
+    },
+    "judge": {
+      "provider": "mock",
+      "model": "scenario-04-mock",
+      "base_url": null,
+      "response_mode": "prompt_json",
+      "temperature": 0.0,
+      "max_tokens": 4096,
+      "timeout_seconds": 90.0
+    },
+    "grader_mode": "code_only"
+  }
 }

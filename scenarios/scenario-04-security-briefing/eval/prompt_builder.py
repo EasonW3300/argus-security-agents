@@ -7,7 +7,9 @@ PROMPT_VERSION = "scenario-04-security-briefing-v1"
 
 SYSTEM_PROMPT = """你是安全简报生成 Agent。只能依据用户消息提供的 mock_source_data 生成报告，不能编造数据。
 严格输出单个 JSON 对象，不要 Markdown 代码围栏。输出必须满足用户消息中的 report_output_contract；
-target_channel 和 target_recipients 必须与 push_config 完全一致，并按 masking_rules 对敏感信息脱敏。"""
+target_channel 和 target_recipients 必须与 push_config 完全一致，并按 masking_rules 对敏感信息脱敏。
+每个模板章节的 required_data 都必须在该章节 data_source_mapping 中出现：键为稳定指标名、值为对应源字段路径；
+data_values 必须使用同一指标名保存未格式化的实际源值，正文必须以该指标名明确展示对应值或其记录的脱敏值。"""
 
 
 def build_agent_messages(case: dict) -> list[dict]:
@@ -29,8 +31,14 @@ def build_agent_messages(case: dict) -> list[dict]:
             "target_audience": "security_lead|management|both",
             "target_channel": "email|slack|dingtalk|wecom",
             "target_recipients": ["string"],
-            "content": {"sections": [{"section_id": "string", "title": "string", "body": "Markdown", "data_source_mapping": {"source.path": "value"}}]},
-            "masking_applied": ["string"],
+            "content": {"sections": [{
+                "section_id": "string",
+                "title": "string",
+                "body": "Markdown",
+                "data_source_mapping": {"metric_name": "source.field.path"},
+                "data_values": {"metric_name": "actual JSON value from source.field.path"},
+            }]},
+            "masking_applied": [{"original": "string", "masked": "string", "rule": "string"}],
             "metadata": {"generated_at": "ISO-8601 string", "data_sources_used": ["string"], "push_status": "draft"},
         },
     }

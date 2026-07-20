@@ -20,7 +20,10 @@
           "title": "总体战果",
           "body": "# 总体战果\n\n总防护成功率和关键数据。hw_summary.defense_success_rate：98%。",
           "data_source_mapping": {
-            "hw_summary.defense_success_rate": "98%"
+            "hw_summary.defense_success_rate": "hw_summary.defense_success_rate"
+          },
+          "data_values": {
+            "hw_summary.defense_success_rate": 0.98
           }
         },
         {
@@ -28,7 +31,19 @@
           "title": "攻击源 TOP10",
           "body": "# 攻击源 TOP10\n\n| 数据字段 | 值 |\n| --- | --- |\n| hw_summary.attack_sources_top10 | ip=203.0.113.77, attack_count=1240, ip=198.51.100.44, attack_count=987 |",
           "data_source_mapping": {
-            "hw_summary.attack_sources_top10": "ip=203.0.113.77, attack_count=1240, ip=198.51.100.44, attack_count=987"
+            "hw_summary.attack_sources_top10": "hw_summary.attack_sources_top10"
+          },
+          "data_values": {
+            "hw_summary.attack_sources_top10": [
+              {
+                "ip": "203.0.113.77",
+                "attack_count": 1240
+              },
+              {
+                "ip": "198.51.100.44",
+                "attack_count": 987
+              }
+            ]
           }
         },
         {
@@ -36,7 +51,19 @@
           "title": "各阶段发现",
           "body": "# 各阶段发现\n\n- hw_summary.stages：phase=准备阶段, key_findings=暴露面梳理发现2个未备案对外服务, phase=攻防对抗, key_findings=成功阻断99%攻击，1台服务器因弱口令被突破但及时隔离",
           "data_source_mapping": {
-            "hw_summary.stages": "phase=准备阶段, key_findings=暴露面梳理发现2个未备案对外服务, phase=攻防对抗, key_findings=成功阻断99%攻击，1台服务器因弱口令被突破但及时隔离"
+            "hw_summary.stages": "hw_summary.stages"
+          },
+          "data_values": {
+            "hw_summary.stages": [
+              {
+                "phase": "准备阶段",
+                "key_findings": "暴露面梳理发现2个未备案对外服务"
+              },
+              {
+                "phase": "攻防对抗",
+                "key_findings": "成功阻断99%攻击，1台服务器因弱口令被突破但及时隔离"
+              }
+            ]
           }
         },
         {
@@ -44,14 +71,26 @@
           "title": "参与人员",
           "body": "# 参与人员\n\n| 数据字段 | 值 |\n| --- | --- |\n| hw_summary.team_members | name=张三, role=总指挥, name=李四, role=蓝队队长 |",
           "data_source_mapping": {
-            "hw_summary.team_members": "name=张三, role=总指挥, name=李四, role=蓝队队长"
+            "hw_summary.team_members": "hw_summary.team_members"
+          },
+          "data_values": {
+            "hw_summary.team_members": [
+              {
+                "name": "张三",
+                "role": "总指挥"
+              },
+              {
+                "name": "李四",
+                "role": "蓝队队长"
+              }
+            ]
           }
         }
       ]
     },
     "masking_applied": [],
     "metadata": {
-      "generated_at": "2026-07T00:00:00+00:00",
+      "generated_at": "2026-07-01T00:00:00+00:00",
       "data_sources_used": [
         "hw_summary"
       ],
@@ -73,8 +112,8 @@
         {
           "metric": "防护成功率",
           "source_value": 0.98,
-          "mappings": [
-            "98%"
+          "data_values": [
+            0.98
           ]
         }
       ]
@@ -95,7 +134,8 @@
           "stages",
           "personnel"
         ],
-        "placeholders": []
+        "placeholders": [],
+        "missing_required_data": []
       }
     },
     "format_compliance": {
@@ -142,5 +182,28 @@
   "calls": [],
   "overall_pass": true,
   "error_type": null,
-  "error_message": null
+  "error_message": null,
+  "run_provenance": {
+    "dataset_sha256": "649a00fd34d4d65188498c83dca61342356ab900089ceddd512b96137c24a46c",
+    "agent_mode": "mock",
+    "agent": {
+      "provider": "mock",
+      "model": "scenario-04-mock",
+      "base_url": null,
+      "response_mode": "prompt_json",
+      "temperature": 0.0,
+      "max_tokens": 4096,
+      "timeout_seconds": 90.0
+    },
+    "judge": {
+      "provider": "mock",
+      "model": "scenario-04-mock",
+      "base_url": null,
+      "response_mode": "prompt_json",
+      "temperature": 0.0,
+      "max_tokens": 4096,
+      "timeout_seconds": 90.0
+    },
+    "grader_mode": "code_only"
+  }
 }

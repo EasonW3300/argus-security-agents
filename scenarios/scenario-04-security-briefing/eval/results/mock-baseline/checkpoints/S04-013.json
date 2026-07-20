@@ -18,10 +18,39 @@
         {
           "section_id": "dept_ranking",
           "title": "各部门安全评分排名",
-          "body": "# 各部门安全评分排名\n\n| 数据字段 | 值 |\n| --- | --- |\n| department_scores | department=部门 A, security_score=85, rank=1, trend=up, department=部门 B, security_score=78, rank=2, trend=stable, department=部门 C, security_score=72, rank=3, trend=down, department=部门 D, security_score=68, rank=4, trend=down |",
+          "body": "# 各部门安全评分排名\n\n| 数据字段 | 值 |\n| --- | --- |\n| department_scores | department=部门 A, security_score=85, rank=1, trend=up, department=部门 B, security_score=78, rank=2, trend=stable, department=部门 C, security_score=72, rank=3, trend=down, department=部门 D, security_score=68, rank=4, trend=down |\ndepartment_scores[0].security_score：85。",
           "data_source_mapping": {
-            "department_scores": "department=部门 A, security_score=85, rank=1, trend=up, department=部门 B, security_score=78, rank=2, trend=stable, department=部门 C, security_score=72, rank=3, trend=down, department=部门 D, security_score=68, rank=4, trend=down",
-            "department_scores[0].security_score": "85"
+            "department_scores": "department_scores",
+            "department_scores[0].security_score": "department_scores[0].security_score"
+          },
+          "data_values": {
+            "department_scores": [
+              {
+                "department": "核心业务部",
+                "security_score": 85,
+                "rank": 1,
+                "trend": "up"
+              },
+              {
+                "department": "运维部",
+                "security_score": 78,
+                "rank": 2,
+                "trend": "stable"
+              },
+              {
+                "department": "研发中心",
+                "security_score": 72,
+                "rank": 3,
+                "trend": "down"
+              },
+              {
+                "department": "财务部",
+                "security_score": 68,
+                "rank": 4,
+                "trend": "down"
+              }
+            ],
+            "department_scores[0].security_score": 85
           }
         },
         {
@@ -29,16 +58,53 @@
           "title": "整改优先级矩阵",
           "body": "# 整改优先级矩阵\n\n| 数据字段 | 值 |\n| --- | --- |\n| compliance_findings | finding_id=F-001, description=部门 A服务器存在未修复高危漏洞, risk_level=高, remediation_cost=中, priority=P1, finding_id=F-002, description=部门 C代码仓库访问权限未定期复核, risk_level=中, remediation_cost=低, priority=P2 |",
           "data_source_mapping": {
-            "compliance_findings": "finding_id=F-001, description=部门 A服务器存在未修复高危漏洞, risk_level=高, remediation_cost=中, priority=P1, finding_id=F-002, description=部门 C代码仓库访问权限未定期复核, risk_level=中, remediation_cost=低, priority=P2"
+            "compliance_findings": "compliance_findings"
+          },
+          "data_values": {
+            "compliance_findings": [
+              {
+                "finding_id": "F-001",
+                "description": "核心业务部服务器存在未修复高危漏洞",
+                "risk_level": "高",
+                "remediation_cost": "中",
+                "priority": "P1"
+              },
+              {
+                "finding_id": "F-002",
+                "description": "研发中心代码仓库访问权限未定期复核",
+                "risk_level": "中",
+                "remediation_cost": "低",
+                "priority": "P2"
+              }
+            ]
           }
         }
       ]
     },
     "masking_applied": [
-      "management masking rules applied"
+      {
+        "original": "核心业务部",
+        "masked": "部门 A",
+        "rule": "核心业务部"
+      },
+      {
+        "original": "运维部",
+        "masked": "部门 B",
+        "rule": "运维部"
+      },
+      {
+        "original": "研发中心",
+        "masked": "部门 C",
+        "rule": "研发中心"
+      },
+      {
+        "original": "财务部",
+        "masked": "部门 D",
+        "rule": "财务部"
+      }
     ],
     "metadata": {
-      "generated_at": "2026-07T00:00:00+00:00",
+      "generated_at": "2026-07-01T00:00:00+00:00",
       "data_sources_used": [
         "department_scores",
         "compliance_findings"
@@ -61,8 +127,8 @@
         {
           "metric": "核心业务部分数",
           "source_value": 85,
-          "mappings": [
-            "85"
+          "data_values": [
+            85
           ]
         }
       ]
@@ -79,7 +145,8 @@
           "dept_ranking",
           "remediation_matrix"
         ],
-        "placeholders": []
+        "placeholders": [],
+        "missing_required_data": []
       }
     },
     "format_compliance": {
@@ -123,5 +190,28 @@
   "calls": [],
   "overall_pass": true,
   "error_type": null,
-  "error_message": null
+  "error_message": null,
+  "run_provenance": {
+    "dataset_sha256": "649a00fd34d4d65188498c83dca61342356ab900089ceddd512b96137c24a46c",
+    "agent_mode": "mock",
+    "agent": {
+      "provider": "mock",
+      "model": "scenario-04-mock",
+      "base_url": null,
+      "response_mode": "prompt_json",
+      "temperature": 0.0,
+      "max_tokens": 4096,
+      "timeout_seconds": 90.0
+    },
+    "judge": {
+      "provider": "mock",
+      "model": "scenario-04-mock",
+      "base_url": null,
+      "response_mode": "prompt_json",
+      "temperature": 0.0,
+      "max_tokens": 4096,
+      "timeout_seconds": 90.0
+    },
+    "grader_mode": "code_only"
+  }
 }

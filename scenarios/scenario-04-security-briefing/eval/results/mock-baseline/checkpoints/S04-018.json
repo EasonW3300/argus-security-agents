@@ -18,10 +18,47 @@
         {
           "section_id": "status_summary",
           "title": "整改进度总览",
-          "body": "# 整改进度总览\n\n统计各状态的数量和整体进度。remediation_items：id=R-001, description=核心业务部服务器存在未修复高危漏洞 CVE-2026-19876, severity=高, responsible_dept=核心业务部, status=进行中, due_date=2026-07-20, id=R-002, description=研发中心代码仓库访问权限未定期复核, severity=中, responsible_dept=研发中心, status=未启动, due_date=2026-08-01, id=R-003, description=财务部终端防病毒软件安装率低于90%, severity=高, responsible_dept=财务部, status=延期, due_date=2026-07-10, id=R-004, description=运维部堡垒机审计日志保留不足1年, severity=中, responsible_dept=运维部, status=已完成, due_date=2026-07-15。",
+          "body": "# 整改进度总览\n\n统计各状态的数量和整体进度。remediation_items：id=R-001, description=核心业务部服务器存在未修复高危漏洞 CVE-2026-19876, severity=高, responsible_dept=核心业务部, status=进行中, due_date=2026-07-20, id=R-002, description=研发中心代码仓库访问权限未定期复核, severity=中, responsible_dept=研发中心, status=未启动, due_date=2026-08-01, id=R-003, description=财务部终端防病毒软件安装率低于90%, severity=高, responsible_dept=财务部, status=延期, due_date=2026-07-10, id=R-004, description=运维部堡垒机审计日志保留不足1年, severity=中, responsible_dept=运维部, status=已完成, due_date=2026-07-15。\nremediation_items.length：4。",
           "data_source_mapping": {
-            "remediation_items": "id=R-001, description=核心业务部服务器存在未修复高危漏洞 CVE-2026-19876, severity=高, responsible_dept=核心业务部, status=进行中, due_date=2026-07-20, id=R-002, description=研发中心代码仓库访问权限未定期复核, severity=中, responsible_dept=研发中心, status=未启动, due_date=2026-08-01, id=R-003, description=财务部终端防病毒软件安装率低于90%, severity=高, responsible_dept=财务部, status=延期, due_date=2026-07-10, id=R-004, description=运维部堡垒机审计日志保留不足1年, severity=中, responsible_dept=运维部, status=已完成, due_date=2026-07-15",
-            "remediation_items.length": "4"
+            "remediation_items": "remediation_items",
+            "remediation_items.length": "remediation_items.length"
+          },
+          "data_values": {
+            "remediation_items": [
+              {
+                "id": "R-001",
+                "description": "核心业务部服务器存在未修复高危漏洞 CVE-2026-19876",
+                "severity": "高",
+                "responsible_dept": "核心业务部",
+                "status": "进行中",
+                "due_date": "2026-07-20"
+              },
+              {
+                "id": "R-002",
+                "description": "研发中心代码仓库访问权限未定期复核",
+                "severity": "中",
+                "responsible_dept": "研发中心",
+                "status": "未启动",
+                "due_date": "2026-08-01"
+              },
+              {
+                "id": "R-003",
+                "description": "财务部终端防病毒软件安装率低于90%",
+                "severity": "高",
+                "responsible_dept": "财务部",
+                "status": "延期",
+                "due_date": "2026-07-10"
+              },
+              {
+                "id": "R-004",
+                "description": "运维部堡垒机审计日志保留不足1年",
+                "severity": "中",
+                "responsible_dept": "运维部",
+                "status": "已完成",
+                "due_date": "2026-07-15"
+              }
+            ],
+            "remediation_items.length": 4
           }
         },
         {
@@ -29,7 +66,43 @@
           "title": "整改项清单",
           "body": "# 整改项清单\n\n| 数据字段 | 值 |\n| --- | --- |\n| remediation_items | id=R-001, description=核心业务部服务器存在未修复高危漏洞 CVE-2026-19876, severity=高, responsible_dept=核心业务部, status=进行中, due_date=2026-07-20, id=R-002, description=研发中心代码仓库访问权限未定期复核, severity=中, responsible_dept=研发中心, status=未启动, due_date=2026-08-01, id=R-003, description=财务部终端防病毒软件安装率低于90%, severity=高, responsible_dept=财务部, status=延期, due_date=2026-07-10, id=R-004, description=运维部堡垒机审计日志保留不足1年, severity=中, responsible_dept=运维部, status=已完成, due_date=2026-07-15 |",
           "data_source_mapping": {
-            "remediation_items": "id=R-001, description=核心业务部服务器存在未修复高危漏洞 CVE-2026-19876, severity=高, responsible_dept=核心业务部, status=进行中, due_date=2026-07-20, id=R-002, description=研发中心代码仓库访问权限未定期复核, severity=中, responsible_dept=研发中心, status=未启动, due_date=2026-08-01, id=R-003, description=财务部终端防病毒软件安装率低于90%, severity=高, responsible_dept=财务部, status=延期, due_date=2026-07-10, id=R-004, description=运维部堡垒机审计日志保留不足1年, severity=中, responsible_dept=运维部, status=已完成, due_date=2026-07-15"
+            "remediation_items": "remediation_items"
+          },
+          "data_values": {
+            "remediation_items": [
+              {
+                "id": "R-001",
+                "description": "核心业务部服务器存在未修复高危漏洞 CVE-2026-19876",
+                "severity": "高",
+                "responsible_dept": "核心业务部",
+                "status": "进行中",
+                "due_date": "2026-07-20"
+              },
+              {
+                "id": "R-002",
+                "description": "研发中心代码仓库访问权限未定期复核",
+                "severity": "中",
+                "responsible_dept": "研发中心",
+                "status": "未启动",
+                "due_date": "2026-08-01"
+              },
+              {
+                "id": "R-003",
+                "description": "财务部终端防病毒软件安装率低于90%",
+                "severity": "高",
+                "responsible_dept": "财务部",
+                "status": "延期",
+                "due_date": "2026-07-10"
+              },
+              {
+                "id": "R-004",
+                "description": "运维部堡垒机审计日志保留不足1年",
+                "severity": "中",
+                "responsible_dept": "运维部",
+                "status": "已完成",
+                "due_date": "2026-07-15"
+              }
+            ]
           }
         }
       ]
@@ -58,8 +131,8 @@
         {
           "metric": "整改项总数",
           "source_value": 4,
-          "mappings": [
-            "4"
+          "data_values": [
+            4
           ]
         }
       ]
@@ -76,7 +149,8 @@
           "status_summary",
           "remediation_table"
         ],
-        "placeholders": []
+        "placeholders": [],
+        "missing_required_data": []
       }
     },
     "format_compliance": {
@@ -123,5 +197,28 @@
   "calls": [],
   "overall_pass": true,
   "error_type": null,
-  "error_message": null
+  "error_message": null,
+  "run_provenance": {
+    "dataset_sha256": "649a00fd34d4d65188498c83dca61342356ab900089ceddd512b96137c24a46c",
+    "agent_mode": "mock",
+    "agent": {
+      "provider": "mock",
+      "model": "scenario-04-mock",
+      "base_url": null,
+      "response_mode": "prompt_json",
+      "temperature": 0.0,
+      "max_tokens": 4096,
+      "timeout_seconds": 90.0
+    },
+    "judge": {
+      "provider": "mock",
+      "model": "scenario-04-mock",
+      "base_url": null,
+      "response_mode": "prompt_json",
+      "temperature": 0.0,
+      "max_tokens": 4096,
+      "timeout_seconds": 90.0
+    },
+    "grader_mode": "code_only"
+  }
 }

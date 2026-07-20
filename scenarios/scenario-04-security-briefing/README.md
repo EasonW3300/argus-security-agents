@@ -32,7 +32,7 @@ python3 run_eval.py --mock-agent --run-dir results/mock-baseline
 ```
 
 输出写入 `eval/results/mock-baseline/`：`eval_results.json` 包含逐用例明细，
-`eval_summary.csv` 方便快速筛选，另有运行清单与可恢复运行的 checkpoints。
+`eval_summary.csv` 方便快速筛选，另有运行清单与可恢复运行的 checkpoints。运行清单会在处理前写入数据集 SHA-256、mock/real 模式、Agent/Judge provider/model/response mode 和 grader mode；`--resume` 只会复用 provenance 完全相同的 completed checkpoint。
 
 ## 真实模型运行
 
@@ -49,6 +49,10 @@ python3 run_eval.py --run-dir results/real-model-run
 `.env.example` 提供 Qwen、DeepSeek 和其他 OpenAI 兼容端点的配置形式。真实模型运行会调用
 Agent 与模型评分器；可通过 `--case-id S04-001`、`--limit 1` 进行小范围验证，或用
 `--resume` 从已有 checkpoints 继续。
+
+## 输出审计契约
+
+每个章节使用 `data_source_mapping` 保存“指标名 → 源字段路径”，并用同名 `data_values` 保存该路径的实际 JSON 值。每个模板 `required_data` 都必须位于对应章节映射中，正文也必须明确展示该指标和值。`masking_applied` 的每项为 `{original, masked, rule}`；原值审计字段和 `data_values` 仅用于内部评分，管理层泄漏扫描不将它们视作可见报告内容。
 
 ## 负例与结果解读
 

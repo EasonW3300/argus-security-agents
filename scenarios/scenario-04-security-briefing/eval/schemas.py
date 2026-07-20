@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+from datetime import datetime
 from dataclasses import dataclass, field, fields, is_dataclass
 from pathlib import Path
 from typing import Dict, List, Optional
@@ -50,6 +51,31 @@ def _dataset_error(message: str) -> ValueError:
 def _require(value: object, name: str, expected_type: type) -> None:
     if not isinstance(value, expected_type):
         raise ValueError("%s must be %s" % (name, expected_type.__name__))
+
+
+def _json_value(value: object, name: str) -> None:
+    """Accept only JSON-shaped audit values, recursively validating map keys."""
+    if value is None or isinstance(value, (str, int, float, bool)):
+        return
+    if isinstance(value, list):
+        for index, item in enumerate(value):
+            _json_value(item, "%s[%d]" % (name, index))
+        return
+    if isinstance(value, dict):
+        for key, item in value.items():
+            if not isinstance(key, str) or not key:
+                raise ValueError("%s keys must be non-empty strings" % name)
+            _json_value(item, "%s.%s" % (name, key))
+        return
+    raise ValueError("%s must contain JSON values" % name)
+
+
+def _iso8601(value: str) -> bool:
+    try:
+        datetime.fromisoformat(value.replace("Z", "+00:00"))
+    except ValueError:
+        return False
+    return True
 
 
 def _validate_case(case: object, index: int) -> None:
@@ -156,13 +182,29 @@ class ReportOutput:
         for index, section in enumerate(sections):
             if not isinstance(section, dict):
                 raise ValueError("content.sections[%d] must be an object" % index)
-            for name in ("section_id", "title", "body", "data_source_mapping"):
+            for name in ("section_id", "title", "body", "data_source_mapping", "data_values"):
                 if name not in section:
                     raise ValueError("content.sections[%d] missing %s" % (index, name))
             _require(section["section_id"], "content.sections[%d].section_id" % index, str)
             _require(section["title"], "content.sections[%d].title" % index, str)
             _require(section["body"], "content.sections[%d].body" % index, str)
             _require(section["data_source_mapping"], "content.sections[%d].data_source_mapping" % index, dict)
+            _require(section["data_values"], "content.sections[%d].data_values" % index, dict)
+            if not section["title"]:
+                raise ValueError("content.sections[%d].title must be non-empty" % index)
+            mapping = section["data_source_mapping"]
+            values = section["data_values"]
+            if set(mapping) != set(values):
+                raise ValueError("content.sections[%d] data_source_mapping and data_values keys must match" % index)
+            for metric, source_path in mapping.items():
+                if not isinstance(metric, str) or not metric:
+                    raise ValueError("content.sections[%d].data_source_mapping keys must be non-empty strings" % index)
+                if not isinstance(source_path, str) or not source_path:
+                    raise ValueError("content.sections[%d].data_source_mapping values must be non-empty strings" % index)
+            for metric, value in values.items():
+                if not isinstance(metric, str) or not metric:
+                    raise ValueError("content.sections[%d].data_values keys must be non-empty strings" % index)
+                _json_value(value, "content.sections[%d].data_values.%s" % (index, metric))
             section_ids.append(section["section_id"])
         if expected_section_ids is not None and section_ids != expected_section_ids:
             raise ValueError("content section ids must exactly match expected_section_ids")
@@ -173,8 +215,22 @@ class ReportOutput:
                 raise ValueError("metadata missing " + name)
         _require(metadata["generated_at"], "metadata.generated_at", str)
         _require(metadata["data_sources_used"], "metadata.data_sources_used", list)
+        if not _iso8601(metadata["generated_at"]):
+            raise ValueError("metadata.generated_at must be ISO-8601")
+        if not metadata["data_sources_used"] or not all(
+            isinstance(item, str) and item for item in metadata["data_sources_used"]
+        ):
+            raise ValueError("metadata.data_sources_used must be a non-empty string list")
         if metadata["push_status"] not in PUSH_STATUSES:
             raise ValueError("metadata.push_status must be one of " + ", ".join(sorted(PUSH_STATUSES)))
+        for index, item in enumerate(output["masking_applied"]):
+            if not isinstance(item, dict):
+                raise ValueError("masking_applied[%d] must be an object" % index)
+            if set(item) != {"original", "masked", "rule"}:
+                raise ValueError("masking_applied[%d] must contain original, masked, and rule only" % index)
+            for name in ("original", "masked", "rule"):
+                if not isinstance(item[name], str) or not item[name]:
+                    raise ValueError("masking_applied[%d].%s must be a non-empty string" % (index, name))
         return output
 
 

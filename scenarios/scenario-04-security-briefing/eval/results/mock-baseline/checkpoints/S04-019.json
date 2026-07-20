@@ -20,14 +20,17 @@
           "title": "安全态势摘要",
           "body": "# 安全态势摘要\n\n概述告警总量和主要威胁来源（不应出现具体IP/资产）。weekly_summary.total_alerts：1042。 未脱敏原始数据：203.0.113.88。",
           "data_source_mapping": {
-            "weekly_summary.total_alerts": "1042"
+            "weekly_summary.total_alerts": "weekly_summary.total_alerts"
+          },
+          "data_values": {
+            "weekly_summary.total_alerts": 1042
           }
         }
       ]
     },
     "masking_applied": [],
     "metadata": {
-      "generated_at": "2026-W29T00:00:00+00:00",
+      "generated_at": "2026-07-13T00:00:00+00:00",
       "data_sources_used": [
         "weekly_summary"
       ],
@@ -49,8 +52,8 @@
         {
           "metric": "告警总数",
           "source_value": 1042,
-          "mappings": [
-            "1042"
+          "data_values": [
+            1042
           ]
         }
       ]
@@ -65,7 +68,8 @@
         "section_ids": [
           "summary"
         ],
-        "placeholders": []
+        "placeholders": [],
+        "missing_required_data": []
       }
     },
     "format_compliance": {
@@ -112,5 +116,28 @@
   "calls": [],
   "overall_pass": false,
   "error_type": null,
-  "error_message": null
+  "error_message": null,
+  "run_provenance": {
+    "dataset_sha256": "649a00fd34d4d65188498c83dca61342356ab900089ceddd512b96137c24a46c",
+    "agent_mode": "mock",
+    "agent": {
+      "provider": "mock",
+      "model": "scenario-04-mock",
+      "base_url": null,
+      "response_mode": "prompt_json",
+      "temperature": 0.0,
+      "max_tokens": 4096,
+      "timeout_seconds": 90.0
+    },
+    "judge": {
+      "provider": "mock",
+      "model": "scenario-04-mock",
+      "base_url": null,
+      "response_mode": "prompt_json",
+      "temperature": 0.0,
+      "max_tokens": 4096,
+      "timeout_seconds": 90.0
+    },
+    "grader_mode": "code_only"
+  }
 }

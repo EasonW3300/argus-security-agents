@@ -2,6 +2,7 @@ import json
 import sys
 import tempfile
 import unittest
+from copy import deepcopy
 from pathlib import Path
 
 
@@ -62,6 +63,41 @@ class RunnerResumeTests(unittest.TestCase):
             (checkpoint_dir / "S04-001.json").write_text("not json", encoding="utf-8")
 
             self.assertEqual(load_checkpoint_results(run_dir), {})
+
+    def test_resume_recomputes_completed_checkpoint_when_dataset_changes(self):
+        with tempfile.TemporaryDirectory() as directory, tempfile.TemporaryDirectory() as data_directory:
+            run_dir = Path(directory)
+            data_path = Path(data_directory) / "EvalsData.json"
+            cases = json.loads(DATA_PATH.read_text(encoding="utf-8"))
+            data_path.write_text(json.dumps(cases), encoding="utf-8")
+            self.assertEqual(run_eval(data_path, run_dir, self._config(), case_id="S04-001", mock_agent=True), 0)
+            checkpoint = run_dir / "checkpoints" / "S04-001.json"
+            first = json.loads(checkpoint.read_text(encoding="utf-8"))
+
+            cases[0]["mock_source_data"]["alert_stats"]["total"] = 157
+            data_path.write_text(json.dumps(cases), encoding="utf-8")
+            self.assertEqual(run_eval(data_path, run_dir, self._config(), case_id="S04-001", mock_agent=True, resume=True), 0)
+            second = json.loads(checkpoint.read_text(encoding="utf-8"))
+
+        self.assertNotEqual(first["run_provenance"]["dataset_sha256"], second["run_provenance"]["dataset_sha256"])
+        self.assertEqual(second["final_output"]["content"]["sections"][0]["data_values"]["alert_stats.total"], 157)
+
+    def test_resume_recomputes_completed_checkpoint_when_agent_mode_changes(self):
+        with tempfile.TemporaryDirectory() as directory:
+            run_dir = Path(directory)
+            self.assertEqual(run_eval(DATA_PATH, run_dir, self._config(), case_id="S04-001", mock_agent=True), 0)
+            checkpoint = run_dir / "checkpoints" / "S04-001.json"
+            first = json.loads(checkpoint.read_text(encoding="utf-8"))
+            output = first["final_output"]
+
+            class AgentClient:
+                def generate_json(self, messages, label):
+                    return type("Call", (), {"parsed": output, "raw_text": json.dumps(output), "to_dict": lambda self: {"label": label}})()
+
+            self.assertEqual(run_eval(DATA_PATH, run_dir, self._config(), case_id="S04-001", mock_agent=False, skip_model_graders=True, resume=True, agent_client=AgentClient()), 0)
+            second = json.loads(checkpoint.read_text(encoding="utf-8"))
+
+        self.assertNotEqual(first["run_provenance"]["agent_mode"], second["run_provenance"]["agent_mode"])
 
     def test_csv_report_uses_lf_line_endings(self):
         with tempfile.TemporaryDirectory() as directory:

@@ -28,6 +28,7 @@ class DatasetAndSchemaTests(unittest.TestCase):
                         "title": section_id,
                         "body": "内容",
                         "data_source_mapping": {},
+                        "data_values": {},
                     }
                     for section_id in case["ground_truth"]["expected_sections"]
                 ]
@@ -98,6 +99,17 @@ class DatasetAndSchemaTests(unittest.TestCase):
         output["target_recipients"] = []
 
         with self.assertRaisesRegex(ValueError, "target_recipients"):
+            ReportOutput.validate(output, expected_section_ids=["summary", "severity_breakdown", "top_rules", "disposal_metrics"])
+
+    def test_report_output_rejects_invalid_nested_audit_contract(self):
+        output = self._valid_output()
+        output["content"]["sections"][0]["data_source_mapping"] = {"total": 156}
+        output["content"]["sections"][0]["data_values"] = {"total": 156}
+        output["masking_applied"] = [{"original": "x", "masked": "***"}]
+        output["metadata"]["generated_at"] = "yesterday"
+        output["metadata"]["data_sources_used"] = [1]
+
+        with self.assertRaisesRegex(ValueError, "data_source_mapping"):
             ReportOutput.validate(output, expected_section_ids=["summary", "severity_breakdown", "top_rules", "disposal_metrics"])
 
     def test_dataset_rejects_non_object_or_blank_template_section_id(self):

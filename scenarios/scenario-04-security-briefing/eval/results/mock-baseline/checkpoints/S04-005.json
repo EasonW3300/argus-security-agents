@@ -18,11 +18,33 @@
         {
           "section_id": "critical_alerts",
           "title": "重点告警详情",
-          "body": "# 重点告警详情\n\n| 数据字段 | 值 |\n| --- | --- |\n| hw_daily_stats.top_critical_alerts | alert_id=HW-ALERT-001, rule=Cobalt Strike Beacon Detected, severity=critical, source_ip=203.0.113.77, target_asset=域控制器 DC-Main-01, disposal_status=已隔离, alert_id=HW-ALERT-002, rule=Privilege Escalation Attempt, severity=critical, source_ip=198.51.100.44, target_asset=Jump Server JS-02, disposal_status=调查中 |",
+          "body": "# 重点告警详情\n\n| 数据字段 | 值 |\n| --- | --- |\n| hw_daily_stats.top_critical_alerts | alert_id=HW-ALERT-001, rule=Cobalt Strike Beacon Detected, severity=critical, source_ip=203.0.113.77, target_asset=域控制器 DC-Main-01, disposal_status=已隔离, alert_id=HW-ALERT-002, rule=Privilege Escalation Attempt, severity=critical, source_ip=198.51.100.44, target_asset=Jump Server JS-02, disposal_status=调查中 |\nhw_daily_stats.top_attack_sources[0].ip：203.0.113.77。\nhw_daily_stats.top_attack_sources[0].attack_count：124。",
           "data_source_mapping": {
-            "hw_daily_stats.top_critical_alerts": "alert_id=HW-ALERT-001, rule=Cobalt Strike Beacon Detected, severity=critical, source_ip=203.0.113.77, target_asset=域控制器 DC-Main-01, disposal_status=已隔离, alert_id=HW-ALERT-002, rule=Privilege Escalation Attempt, severity=critical, source_ip=198.51.100.44, target_asset=Jump Server JS-02, disposal_status=调查中",
+            "hw_daily_stats.top_critical_alerts": "hw_daily_stats.top_critical_alerts",
+            "hw_daily_stats.top_attack_sources[0].ip": "hw_daily_stats.top_attack_sources[0].ip",
+            "hw_daily_stats.top_attack_sources[0].attack_count": "hw_daily_stats.top_attack_sources[0].attack_count"
+          },
+          "data_values": {
+            "hw_daily_stats.top_critical_alerts": [
+              {
+                "alert_id": "HW-ALERT-001",
+                "rule": "Cobalt Strike Beacon Detected",
+                "severity": "critical",
+                "source_ip": "203.0.113.77",
+                "target_asset": "域控制器 DC-Main-01",
+                "disposal_status": "已隔离"
+              },
+              {
+                "alert_id": "HW-ALERT-002",
+                "rule": "Privilege Escalation Attempt",
+                "severity": "critical",
+                "source_ip": "198.51.100.44",
+                "target_asset": "Jump Server JS-02",
+                "disposal_status": "调查中"
+              }
+            ],
             "hw_daily_stats.top_attack_sources[0].ip": "203.0.113.77",
-            "hw_daily_stats.top_attack_sources[0].attack_count": "124"
+            "hw_daily_stats.top_attack_sources[0].attack_count": 124
           }
         },
         {
@@ -30,6 +52,9 @@
           "title": "处置进展",
           "body": "# 处置进展\n\n描述当日整体处置成果。hw_daily_stats.disposal_summary：今日成功处置12起攻击事件，封禁恶意IP 8个，修复高危漏洞3个。",
           "data_source_mapping": {
+            "hw_daily_stats.disposal_summary": "hw_daily_stats.disposal_summary"
+          },
+          "data_values": {
             "hw_daily_stats.disposal_summary": "今日成功处置12起攻击事件，封禁恶意IP 8个，修复高危漏洞3个"
           }
         },
@@ -38,7 +63,36 @@
           "title": "攻击源 TOP 5",
           "body": "# 攻击源 TOP 5\n\n| 数据字段 | 值 |\n| --- | --- |\n| hw_daily_stats.top_attack_sources | ip=203.0.113.77, attack_count=124, country=俄罗斯, ip=198.51.100.44, attack_count=89, country=朝鲜, ip=192.0.2.155, attack_count=67, country=美国, ip=203.0.113.201, attack_count=52, country=未知, ip=198.51.100.10, attack_count=41, country=中国 |",
           "data_source_mapping": {
-            "hw_daily_stats.top_attack_sources": "ip=203.0.113.77, attack_count=124, country=俄罗斯, ip=198.51.100.44, attack_count=89, country=朝鲜, ip=192.0.2.155, attack_count=67, country=美国, ip=203.0.113.201, attack_count=52, country=未知, ip=198.51.100.10, attack_count=41, country=中国"
+            "hw_daily_stats.top_attack_sources": "hw_daily_stats.top_attack_sources"
+          },
+          "data_values": {
+            "hw_daily_stats.top_attack_sources": [
+              {
+                "ip": "203.0.113.77",
+                "attack_count": 124,
+                "country": "俄罗斯"
+              },
+              {
+                "ip": "198.51.100.44",
+                "attack_count": 89,
+                "country": "朝鲜"
+              },
+              {
+                "ip": "192.0.2.155",
+                "attack_count": 67,
+                "country": "美国"
+              },
+              {
+                "ip": "203.0.113.201",
+                "attack_count": 52,
+                "country": "未知"
+              },
+              {
+                "ip": "198.51.100.10",
+                "attack_count": 41,
+                "country": "中国"
+              }
+            ]
           }
         }
       ]
@@ -72,15 +126,15 @@
         {
           "metric": "攻击源TOP1 IP",
           "source_value": "203.0.113.77",
-          "mappings": [
+          "data_values": [
             "203.0.113.77"
           ]
         },
         {
           "metric": "攻击源TOP1 次数",
           "source_value": 124,
-          "mappings": [
-            "124"
+          "data_values": [
+            124
           ]
         }
       ]
@@ -99,7 +153,8 @@
           "disposal_progress",
           "attack_sources"
         ],
-        "placeholders": []
+        "placeholders": [],
+        "missing_required_data": []
       }
     },
     "format_compliance": {
@@ -147,5 +202,28 @@
   "calls": [],
   "overall_pass": true,
   "error_type": null,
-  "error_message": null
+  "error_message": null,
+  "run_provenance": {
+    "dataset_sha256": "649a00fd34d4d65188498c83dca61342356ab900089ceddd512b96137c24a46c",
+    "agent_mode": "mock",
+    "agent": {
+      "provider": "mock",
+      "model": "scenario-04-mock",
+      "base_url": null,
+      "response_mode": "prompt_json",
+      "temperature": 0.0,
+      "max_tokens": 4096,
+      "timeout_seconds": 90.0
+    },
+    "judge": {
+      "provider": "mock",
+      "model": "scenario-04-mock",
+      "base_url": null,
+      "response_mode": "prompt_json",
+      "temperature": 0.0,
+      "max_tokens": 4096,
+      "timeout_seconds": 90.0
+    },
+    "grader_mode": "code_only"
+  }
 }

@@ -1,5 +1,6 @@
 import sys
 import unittest
+from copy import deepcopy
 from pathlib import Path
 
 
@@ -57,6 +58,38 @@ class CodeGraderTests(unittest.TestCase):
 
         self.assertFalse(run_code_graders(output, case)["data_accuracy"].passed)
 
+    def test_data_accuracy_accepts_ground_truth_string_declared_with_punctuation(self):
+        case = self.cases[15]
+        output = run_mock_case(case)["final_output"]
+
+        self.assertTrue(run_code_graders(output, case)["data_accuracy"].passed)
+
+    def test_required_template_data_must_remain_in_its_section_mapping(self):
+        case = self.cases[0]
+        output = run_mock_case(case)["final_output"]
+        section = next(item for item in output["content"]["sections"] if item["section_id"] == "summary")
+        for path in ("alert_stats.by_severity", "alert_stats.disposal_rate"):
+            section["data_source_mapping"].pop(path, None)
+            section["data_values"].pop(path, None)
+
+        results = run_code_graders(output, case)
+
+        self.assertFalse(results["data_accuracy"].passed)
+        self.assertFalse(results["template_completeness"].passed)
+
+    def test_data_accuracy_binds_body_mapping_and_actual_value_to_the_same_path(self):
+        case = self.cases[0]
+        output = run_mock_case(case)["final_output"]
+        section = next(item for item in output["content"]["sections"] if item["section_id"] == "summary")
+        section["data_source_mapping"]["alert_stats.total"] = "alert_stats.avg_disposal_minutes"
+        section["data_values"]["alert_stats.total"] = 23
+        section["body"] = section["body"].replace("alert_stats.total：156", "alert_stats.total：23")
+
+        results = run_code_graders(output, case)
+
+        self.assertFalse(results["data_accuracy"].passed)
+        self.assertFalse(results["template_completeness"].passed)
+
     def test_management_sensitive_leak_fails_masking_check(self):
         case = self.cases[18]
         output = run_mock_case(case)["final_output"]
@@ -108,6 +141,17 @@ class CodeGraderTests(unittest.TestCase):
 
         self.assertFalse(results["format_compliance"].passed)
         self.assertFalse(results["output_schema"].passed)
+
+    def test_schema_rejects_invalid_nested_mappings_masking_and_metadata(self):
+        case = self.cases[0]
+        output = run_mock_case(case)["final_output"]
+        output["content"]["sections"][0]["data_source_mapping"] = {"metric": 123}
+        output["content"]["sections"][0]["data_values"] = []
+        output["masking_applied"] = ["not an audit object"]
+        output["metadata"]["generated_at"] = "not-a-date"
+        output["metadata"]["data_sources_used"] = [123]
+
+        self.assertFalse(run_code_graders(output, case)["output_schema"].passed)
 
     def test_section_body_requires_markdown_heading(self):
         case = self.cases[0]
