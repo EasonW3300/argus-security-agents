@@ -77,6 +77,17 @@ class CodeGraderTests(unittest.TestCase):
         self.assertFalse(results["data_accuracy"].passed)
         self.assertFalse(results["template_completeness"].passed)
 
+    def test_required_container_data_must_render_top_rule_leaf_values(self):
+        case = self.cases[0]
+        output = run_mock_case(case)["final_output"]
+        section = next(item for item in output["content"]["sections"] if item["section_id"] == "top_rules")
+        section["body"] = "# TOP 3 告警规则\n\n- alert_stats.top_rules：已生成。"
+
+        results = run_code_graders(output, case)
+
+        self.assertFalse(results["data_accuracy"].passed)
+        self.assertFalse(results["template_completeness"].passed)
+
     def test_data_accuracy_binds_body_mapping_and_actual_value_to_the_same_path(self):
         case = self.cases[0]
         output = run_mock_case(case)["final_output"]

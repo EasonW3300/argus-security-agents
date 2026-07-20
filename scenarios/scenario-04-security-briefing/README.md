@@ -52,7 +52,7 @@ Agent 与模型评分器；可通过 `--case-id S04-001`、`--limit 1` 进行小
 
 ## 输出审计契约
 
-每个章节使用 `data_source_mapping` 保存“指标名 → 源字段路径”，并用同名 `data_values` 保存该路径的实际 JSON 值。每个模板 `required_data` 都必须位于对应章节映射中，正文也必须明确展示该指标和值。`masking_applied` 的每项为 `{original, masked, rule}`；原值审计字段和 `data_values` 仅用于内部评分，管理层泄漏扫描不将它们视作可见报告内容。
+每个章节使用 `data_source_mapping` 保存“指标名 → 源字段路径”，并用同名 `data_values` 保存该路径的实际 JSON 值。每个模板 `required_data` 都必须位于对应章节映射中，正文也必须明确展示该指标和值；对象和数组不能只显示路径，必须包含每个标量叶子值（管理层敏感叶子可显示已记录的脱敏值）。`masking_applied` 的每项为 `{original, masked, rule}`；原值审计字段和 `data_values` 仅用于内部评分，管理层泄漏扫描不将它们视作可见报告内容。
 
 ## 负例与结果解读
 

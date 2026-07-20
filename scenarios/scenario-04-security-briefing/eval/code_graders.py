@@ -78,14 +78,55 @@ def _entries(section):
     return [(metric, path, values.get(metric)) for metric, path in mapping.items() if metric in values]
 
 
+def _scalar_leaves(value):
+    """Yield every scalar in a JSON container so content cannot hide behind a path."""
+    if isinstance(value, dict):
+        for item in value.values():
+            yield from _scalar_leaves(item)
+    elif isinstance(value, (list, tuple)):
+        for item in value:
+            yield from _scalar_leaves(item)
+    else:
+        yield value
+
+
+def _numeric_present(body, expected):
+    # Dataset ratios are floats; an integer ``1`` is a count and must not be
+    # mistaken for 100% merely because it lies in the unit interval.
+    if isinstance(expected, float) and 0 <= expected <= 1:
+        target = float(expected) * 100
+        return any(abs(float(value) - target) <= 0.1 + 1e-9 for value in _PERCENT.findall(body))
+    return any(
+        abs(float(value) - float(expected)) <= 1e-9
+        for value in re.findall(r"(?<![\d.])-?\d+(?:\.\d+)?", _PERCENT.sub("", body))
+    )
+
+
+def _leaf_is_rendered(body, leaf, output):
+    """Accept a source leaf or its documented management-view masking replacement."""
+    if isinstance(leaf, Number) and not isinstance(leaf, bool):
+        return _numeric_present(body, leaf)
+    rendered = str(leaf)
+    if rendered in body:
+        return True
+    masked = rendered
+    applied = False
+    for record in output.get("masking_applied", []) if isinstance(output, dict) else []:
+        if not isinstance(record, dict):
+            continue
+        original, replacement = record.get("original"), record.get("masked")
+        if isinstance(original, str) and isinstance(replacement, str) and original in masked:
+            masked = masked.replace(original, replacement)
+            applied = True
+    return applied and masked in body
+
+
 def _body_has_metric_value(section, metric, expected, output):
     body = section.get("body", "") if isinstance(section, dict) else ""
     if not isinstance(body, str) or metric not in body:
         return False
-    # Container values are bound by their exact JSON audit value; requiring the
-    # marker in prose avoids pretending an unordered container has one display.
     if isinstance(expected, (dict, list)):
-        return True
+        return all(_leaf_is_rendered(body, leaf, output) for leaf in _scalar_leaves(expected))
     lines = [
         re.split(r"[；;。]", line.split(metric, 1)[1], maxsplit=1)[0]
         for line in body.splitlines() if metric in line
