@@ -25,6 +25,24 @@ TARGET_CHANNELS = {"email", "slack", "dingtalk", "wecom"}
 PUSH_STATUSES = {"sent", "queued", "draft"}
 
 
+@dataclass
+class GraderResult:
+    """A serializable outcome for a deterministic evaluation check."""
+
+    passed: bool
+    reason: str
+    expected: object = None
+    actual: object = None
+
+    def to_dict(self) -> dict:
+        return {
+            "passed": self.passed,
+            "reason": self.reason,
+            "expected": self.expected,
+            "actual": self.actual,
+        }
+
+
 def _dataset_error(message: str) -> ValueError:
     return ValueError("dataset validation failed: " + message)
 

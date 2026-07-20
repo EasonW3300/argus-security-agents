@@ -1,0 +1,83 @@
+import sys
+import unittest
+from pathlib import Path
+
+
+ROOT = Path(__file__).resolve().parents[1]
+DATA_PATH = ROOT.parent / "EvalsData.json"
+sys.path.insert(0, str(ROOT))
+
+from code_graders import CODE_CHECKS, run_code_graders
+from mock_agent import run_mock_case
+from schemas import load_cases
+
+
+class CodeGraderTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.cases = load_cases(DATA_PATH)
+
+    def test_mock_positive_case_passes_all_code_graders(self):
+        case = self.cases[0]
+        output = run_mock_case(case)["final_output"]
+
+        results = run_code_graders(output, case)
+
+        self.assertEqual(tuple(results), CODE_CHECKS)
+        self.assertTrue(all(item.passed for item in results.values()))
+
+    def test_management_sensitive_leak_fails_masking_check(self):
+        case = self.cases[18]
+        output = run_mock_case(case)["final_output"]
+
+        result = run_code_graders(output, case)["masking_check"]
+
+        self.assertFalse(result.passed)
+        self.assertIn("203.0.113.88", result.actual["leaks"])
+
+    def test_wrong_recipient_fails_push_target(self):
+        case = self.cases[19]
+        output = run_mock_case(case)["final_output"]
+
+        result = run_code_graders(output, case)["push_target"]
+
+        self.assertFalse(result.passed)
+        self.assertEqual(result.expected["recipients"], ["security-lead@company.com"])
+        self.assertEqual(result.actual["recipients"], ["all-staff@company.com"])
+
+    def test_derived_percentage_accepts_point_one_percent_tolerance(self):
+        case = self.cases[3]
+        output = run_mock_case(case)["final_output"]
+        section = next(item for item in output["content"]["sections"] if item["section_id"] == "derived_metric")
+        section["body"] = section["body"].replace("21.8%", "21.7%")
+
+        self.assertTrue(run_code_graders(output, case)["data_accuracy"].passed)
+
+    def test_security_lead_required_technical_value_cannot_be_removed(self):
+        case = self.cases[4]
+        output = run_mock_case(case)["final_output"]
+        rendered = str(output["content"])
+        self.assertIn("203.0.113.77", rendered)
+        for section in output["content"]["sections"]:
+            section["body"] = section["body"].replace("203.0.113.77", "外部攻击源")
+            section["data_source_mapping"] = {
+                key: value.replace("203.0.113.77", "外部攻击源")
+                for key, value in section["data_source_mapping"].items()
+            }
+
+        self.assertFalse(run_code_graders(output, case)["masking_check"].passed)
+
+    def test_schema_and_markdown_defects_are_reported(self):
+        case = self.cases[0]
+        output = run_mock_case(case)["final_output"]
+        output["content"]["sections"][1]["body"] = "| a | b |\n| --- | --- |\n| 1 |"
+        del output["metadata"]["push_status"]
+
+        results = run_code_graders(output, case)
+
+        self.assertFalse(results["format_compliance"].passed)
+        self.assertFalse(results["output_schema"].passed)
+
+
+if __name__ == "__main__":
+    unittest.main()
