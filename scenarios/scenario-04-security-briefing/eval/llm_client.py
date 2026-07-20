@@ -5,6 +5,7 @@ import signal
 import threading
 import time
 from dataclasses import asdict, dataclass
+from queue import Empty, Queue
 from typing import Optional
 
 from openai import OpenAI
@@ -40,8 +41,25 @@ class _HardTimeout(TimeoutError):
 
 def _call_with_hard_timeout(callable_, timeout_seconds: float):
     """Interrupt a synchronous SDK call at the configured wall-clock deadline."""
-    if timeout_seconds <= 0 or threading.current_thread() is not threading.main_thread():
+    if timeout_seconds <= 0:
         return callable_()
+    if threading.current_thread() is not threading.main_thread():
+        outcomes = Queue(maxsize=1)
+
+        def invoke():
+            try:
+                outcomes.put((True, callable_()))
+            except BaseException as exc:
+                outcomes.put((False, exc))
+
+        threading.Thread(target=invoke, daemon=True).start()
+        try:
+            succeeded, outcome = outcomes.get(timeout=timeout_seconds)
+        except Empty as exc:
+            raise _HardTimeout("request exceeded %.1fs hard timeout" % timeout_seconds) from exc
+        if succeeded:
+            return outcome
+        raise outcome
     previous = signal.getsignal(signal.SIGALRM)
 
     def on_timeout(_signum, _frame):

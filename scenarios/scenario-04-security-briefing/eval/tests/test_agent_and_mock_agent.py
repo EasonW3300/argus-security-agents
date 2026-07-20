@@ -1,8 +1,11 @@
 import json
 import sys
+import threading
+import time
 import unittest
 from pathlib import Path
 from types import SimpleNamespace
+from queue import Queue
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -10,7 +13,7 @@ DATA_PATH = ROOT.parent / "EvalsData.json"
 sys.path.insert(0, str(ROOT))
 
 from agent_loop import run_agent_case
-from llm_client import OpenAICompatibleLLMClient
+from llm_client import OpenAICompatibleLLMClient, _HardTimeout, _call_with_hard_timeout
 from mock_agent import run_mock_case
 from prompt_builder import build_agent_messages
 from schemas import load_cases
@@ -86,6 +89,42 @@ class AgentAndMockAgentTests(unittest.TestCase):
         self.assertEqual(result.parsed, {"ok": True})
         self.assertEqual(result.attempts, 2)
         self.assertEqual(completions.kwargs["response_format"], {"type": "json_object"})
+
+    def test_hard_timeout_interrupts_slow_call_on_main_thread(self):
+        with self.assertRaises(_HardTimeout):
+            _call_with_hard_timeout(lambda: time.sleep(0.2), 0.02)
+
+    def test_hard_timeout_interrupts_slow_call_on_worker_thread(self):
+        results = Queue()
+
+        def target():
+            started = time.monotonic()
+            try:
+                _call_with_hard_timeout(lambda: time.sleep(0.2), 0.02)
+            except Exception as exc:
+                results.put((exc, time.monotonic() - started))
+
+        worker = threading.Thread(target=target, daemon=True)
+        worker.start()
+        worker.join(0.1)
+
+        self.assertFalse(worker.is_alive(), "worker must not be blocked by the slow call")
+        exc, elapsed = results.get_nowait()
+        self.assertIsInstance(exc, _HardTimeout)
+        self.assertLess(elapsed, 0.1)
+
+    def test_hard_timeout_returns_successful_worker_thread_result(self):
+        results = Queue()
+
+        def target():
+            results.put(_call_with_hard_timeout(lambda: {"ok": True}, 0.1))
+
+        worker = threading.Thread(target=target)
+        worker.start()
+        worker.join(0.2)
+
+        self.assertFalse(worker.is_alive())
+        self.assertEqual(results.get_nowait(), {"ok": True})
 
 
 if __name__ == "__main__":
