@@ -6,9 +6,17 @@ import re
 def _get_path(data, path):
     value = data
     for part in path.split("."):
-        if not isinstance(value, dict) or part not in value:
+        if part == "length":
+            return len(value) if isinstance(value, (dict, list, tuple, str)) else None
+        matched = re.fullmatch(r"([^\[]+)(?:\[(\d+)\])?", part)
+        if not matched or not isinstance(value, dict) or matched.group(1) not in value:
             return None
-        value = value[part]
+        value = value[matched.group(1)]
+        if matched.group(2) is not None:
+            index = int(matched.group(2))
+            if not isinstance(value, list) or index >= len(value):
+                return None
+            value = value[index]
     return value
 
 
@@ -93,7 +101,7 @@ def run_mock_case(case: dict) -> dict:
             value = _get_path(case.get("mock_source_data", {}), path)
             rendered = _mask(value, patterns)
             mappings[path] = rendered + ("天" if "days" in path.rsplit(".", 1)[-1] else "")
-        body = _section_body(section, mappings)
+        body = "# %s\n\n%s" % (section["title"], _section_body(section, mappings))
         if "vuln_related_alerts / total" in section.get("description", ""):
             related = _get_path(case["mock_source_data"], "alert_stats.vuln_related_alerts")
             total = _get_path(case["mock_source_data"], "alert_stats.total")
@@ -107,6 +115,19 @@ def run_mock_case(case: dict) -> dict:
             "body": body,
             "data_source_mapping": mappings,
         })
+    # Ground Truth may declare a metric more granular than a template's required
+    # source path (for example ``items[0].ip``).  Emit it explicitly so graders
+    # can compare the agent's declared value rather than merely searching prose.
+    for check in case.get("ground_truth", {}).get("data_accuracy_checks", []):
+        path = check.get("source_path")
+        if path == "衍生计算":
+            related = _get_path(case["mock_source_data"], "alert_stats.vuln_related_alerts")
+            total = _get_path(case["mock_source_data"], "alert_stats.total")
+            if related is not None and total:
+                sections[0]["data_source_mapping"][path] = "%.1f%%" % (related / total * 100)
+            continue
+        value = _get_path(case.get("mock_source_data", {}), path)
+        sections[0]["data_source_mapping"][path] = _mask(value, patterns)
     if leak_negative:
         leaked = _first_sensitive_value(case.get("mock_source_data", {}), sensitive_patterns)
         if leaked:

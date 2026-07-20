@@ -25,6 +25,30 @@ class CodeGraderTests(unittest.TestCase):
 
         self.assertEqual(tuple(results), CODE_CHECKS)
         self.assertTrue(all(item.passed for item in results.values()))
+        self.assertTrue(all(section["body"].startswith("# ") for section in output["content"]["sections"]))
+
+    def test_data_accuracy_rejects_unmapped_contradictory_number(self):
+        case = self.cases[0]
+        output = run_mock_case(case)["final_output"]
+        output["content"]["sections"][0]["body"] += "\n告警总数：999"
+
+        self.assertFalse(run_code_graders(output, case)["data_accuracy"].passed)
+
+    def test_data_accuracy_rejects_missing_list_length_mapping(self):
+        case = self.cases[2]
+        output = run_mock_case(case)["final_output"]
+        for section in output["content"]["sections"]:
+            section["data_source_mapping"].pop("incident_list.length", None)
+
+        self.assertFalse(run_code_graders(output, case)["data_accuracy"].passed)
+
+    def test_data_accuracy_rejects_missing_indexed_string_mapping(self):
+        case = self.cases[4]
+        output = run_mock_case(case)["final_output"]
+        for section in output["content"]["sections"]:
+            section["data_source_mapping"].pop("hw_daily_stats.top_attack_sources[0].ip", None)
+
+        self.assertFalse(run_code_graders(output, case)["data_accuracy"].passed)
 
     def test_management_sensitive_leak_fails_masking_check(self):
         case = self.cases[18]
@@ -77,6 +101,13 @@ class CodeGraderTests(unittest.TestCase):
 
         self.assertFalse(results["format_compliance"].passed)
         self.assertFalse(results["output_schema"].passed)
+
+    def test_section_body_requires_markdown_heading(self):
+        case = self.cases[0]
+        output = run_mock_case(case)["final_output"]
+        output["content"]["sections"][0]["body"] = output["content"]["sections"][0]["body"].removeprefix("# 总体摘要\n\n")
+
+        self.assertFalse(run_code_graders(output, case)["format_compliance"].passed)
 
 
 if __name__ == "__main__":

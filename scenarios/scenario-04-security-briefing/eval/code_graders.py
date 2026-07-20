@@ -56,12 +56,58 @@ def _numeric_present(rendered, expected):
     return any(abs(float(value) - target) <= 1e-9 for value in re.findall(r"(?<![\d.])-?\d+(?:\.\d+)?", rendered))
 
 
+def _section_mappings(output, path):
+    sections = output.get("content", {}).get("sections", []) if isinstance(output, dict) else []
+    return [section["data_source_mapping"][path] for section in sections if isinstance(section, dict) and isinstance(section.get("data_source_mapping"), dict) and path in section["data_source_mapping"]]
+
+
+def _mapping_matches(value, expected):
+    rendered = str(value)
+    if isinstance(expected, bool):
+        return rendered == str(expected)
+    if isinstance(expected, Number):
+        return _numeric_present(rendered, expected)
+    return str(expected) in rendered
+
+
+def _source_numbers(value):
+    if isinstance(value, Number) and not isinstance(value, bool):
+        return [float(value)]
+    if isinstance(value, dict):
+        return [number for item in value.values() for number in _source_numbers(item)]
+    if isinstance(value, (list, tuple)):
+        return [float(len(value))] + [number for item in value for number in _source_numbers(item)]
+    if isinstance(value, str):
+        return [float(number) for number in re.findall(r"(?<![\d.])-?\d+(?:\.\d+)?", value)]
+    return []
+
+
+def _body_has_unmapped_number(body, source, derived_expected):
+    allowed = _source_numbers(source)
+    for value in _PERCENT.findall(body):
+        percent = float(value)
+        if any(
+            abs(percent - number * 100) <= 0.1 + 1e-9 if 0 <= number <= 1 else abs(percent - abs(number)) <= 1e-9
+            for number in allowed
+        ):
+            continue
+        if derived_expected is not None and abs(percent - derived_expected * 100) <= 0.1 + 1e-9:
+            continue
+        return value + "%"
+    raw_without_percent = _PERCENT.sub("", body)
+    for token in re.findall(r"(?<![\d.])-?\d+(?:\.\d+)?", raw_without_percent):
+        number = float(token)
+        if not any(abs(number - candidate) <= 1e-9 for candidate in allowed):
+            return token
+    return None
+
+
 def _data_accuracy(output, case):
     source = case.get("mock_source_data", {})
     checks = case.get("ground_truth", {}).get("data_accuracy_checks", [])
-    rendered = _rendered_output(output)
     failures = []
     actual = []
+    derived_expected = None
     for check in checks:
         path = check.get("source_path")
         expected = check.get("expected_value")
@@ -72,26 +118,38 @@ def _data_accuracy(output, case):
             total = _value_at(source, "alert_stats.total")
             computed = related / total if isinstance(related, Number) and total else None
             source_ok = computed is not None and abs(computed - float(expected)) <= 0.001
-            shown = [float(value) / 100 for value in _PERCENT.findall(rendered)]
-            output_ok = any(abs(value - float(expected)) <= 0.001 + 1e-9 for value in shown)
+            derived_expected = float(expected)
+            bodies = [
+                section.get("body", "")
+                for section in output.get("content", {}).get("sections", [])
+                if isinstance(section, dict)
+                and "alert_stats.vuln_related_alerts" in section.get("data_source_mapping", {})
+            ]
+            shown = [float(value) / 100 for body in bodies for value in _PERCENT.findall(body)]
+            matching = [value for value in shown if abs(value - float(expected)) <= 0.001 + 1e-9]
+            contradictory = [value * 100 for value in shown if abs(value - float(expected)) > 0.001 + 1e-9]
+            output_ok = bool(matching) and not contradictory
             observed = {"computed": computed, "reported_percentages": [value * 100 for value in shown]}
         else:
             source_value = _value_at(source, path)
             source_ok = source_value == expected
-            # ``.length`` is represented by the mapped collection, not necessarily
-            # by a literal count, so the presence of the source mapping is enough.
-            # Numeric metrics must be rendered.  A declared string identifier may
-            # be omitted by a template (for example an incident id represented by
-            # the report title), but if present it must agree with Ground Truth.
-            output_ok = (
-                path.endswith(".length")
-                or not isinstance(expected, Number)
-                or _numeric_present(rendered, expected)
-            )
-            observed = {"source_value": source_value, "rendered": output_ok}
+            mappings = _section_mappings(output, path)
+            matching = [value for value in mappings if _mapping_matches(value, expected)]
+            output_ok = bool(matching) and len(matching) == len(mappings)
+            observed = {"source_value": source_value, "mappings": mappings}
         actual.append({"metric": check.get("metric"), **observed})
         if not (source_ok and output_ok):
             failures.append(check.get("metric", path))
+    for section in output.get("content", {}).get("sections", []) if isinstance(output, dict) else []:
+        if isinstance(section, dict) and isinstance(section.get("body"), str):
+            # Section titles can legitimately contain a presentation ordinal such
+            # as "TOP10"; only validate declared Markdown body content.
+            content_body = re.sub(r"^\s*#{1,6}\s+.*(?:\n|$)", "", section["body"], count=1)
+            for path in section.get("data_source_mapping", {}):
+                content_body = content_body.replace(path, "")
+            contradiction = _body_has_unmapped_number(content_body, source, derived_expected)
+            if contradiction:
+                failures.append("unmapped body number %s" % contradiction)
     return _result(not failures, "all declared metrics match source data" if not failures else "metric mismatch: " + ", ".join(failures), checks, actual)
 
 
@@ -116,6 +174,8 @@ def _format_compliance(output, case):
         if body.count("```") % 2:
             errors.append("unbalanced code fence in %s" % section.get("section_id"))
         headings = [len(match.group(1)) for match in re.finditer(r"^\s*(#{1,6})\s+\S", body, re.M)]
+        if not headings:
+            errors.append("missing Markdown heading in %s" % section.get("section_id"))
         if any(next_level > level + 1 for level, next_level in zip(headings, headings[1:])):
             errors.append("skipped heading level in %s" % section.get("section_id"))
         table_rows = [line for line in body.splitlines() if line.strip().startswith("|")]

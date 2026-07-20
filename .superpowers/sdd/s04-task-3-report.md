@@ -25,3 +25,19 @@ retention, and malformed Markdown/schema output.
 Verification: `python3 -m unittest discover -s tests -v` passed 23 tests.
 All S04-001 through S04-018 mock positive cases pass every code grader;
 S04-019 fails only `masking_check`, and S04-020 fails only `push_target`.
+
+## Review follow-up
+
+`data_accuracy` now validates each Ground Truth source path against its actual
+`data_source_mapping` declaration, including `.length`, indexed paths, and
+non-numeric strings. It also rejects untraceable contradictory numbers in the
+body while ignoring section headings and mapping labels. Derived ratios are
+checked in their own mapped section and reject a second, contradictory ratio.
+The mock agent now resolves those source paths and emits explicit declarations
+when Ground Truth is more granular than the template's source path. It also
+emits a level-one Markdown heading from every template title.
+
+New regressions cover S04-001's appended `999`, the absent S04-003 count
+mapping, the absent S04-005 indexed IP mapping, and a missing body heading.
+Final verification: `python3 -m unittest discover -s tests -v` passed 27
+tests; all S04-001 through S04-018 mock positive cases pass every code grader.
