@@ -4,7 +4,7 @@
 
 本仓库用于沉淀四个网安运营场景的 Eval 测试集、Eval Harness、基线实验结果和 Agent 初始架构设计，帮助前场人员按照统一契约实现真实 Agent，并使用同一批测试持续回归。
 
-当前已完成场景一：安全告警分析与处置建议；场景二：安全文档 RAG。
+当前已完成场景一：安全告警分析与处置建议；场景二：安全文档 RAG；场景三：安全工具调用。
 
 职责边界如下：
 
@@ -207,5 +207,19 @@ python3 run_eval.py --run-id mock-full-baseline --mock-agent
 基线说明：场景二 Eval Harness 已能跑通并暴露 RAG 原型的关键问题，尤其是引用必须为原文连续子串、负例置信度需要受控。该结果不代表真实 RAG 检索已经实现。
 
 # 场景三：安全工具调用
+
+场景三是第一个需要多轮工具调用循环的场景，关注工具选择、参数准确性、多工具编排、错误恢复和权限边界。当前已提供 20 条 Eval、JSON 协议 Agent Loop、Deterministic Mock Agent、Mock Tool Server、7 个 Code Grader、2 个 Model Grader 和报告输出。
+
+场景三目录入口：[scenarios/scenario-03-security-tool-calling/](scenarios/scenario-03-security-tool-calling/)。
+
+离线运行：
+
+```bash
+cd scenarios/scenario-03-security-tool-calling/eval
+python3 run_tests.py
+python3 run_eval.py --mock-agent --run-dir results/mock-baseline
+```
+
+
 
 # 场景四：任务简报生成及推送

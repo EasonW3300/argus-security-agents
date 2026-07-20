@@ -1,0 +1,4 @@
+﻿test_case_id,status,type,difficulty,overall_pass,tool_sequence,tool_sequence_consistency,argument_correctness,permission_boundary,branch_consistency,output_schema,audit_log
+S03-001,completed,single_tool_single_step,easy,True,True,True,True,True,True,True,True
+S03-002,completed,single_tool_single_step,easy,False,True,True,True,True,True,False,True
+S03-003,completed,single_tool_single_step,easy,True,True,True,True,True,True,True,True
