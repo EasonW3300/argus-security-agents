@@ -54,3 +54,26 @@ git diff --check
 Result: configuration smoke test printed `config smoke OK`; compilation and
 whitespace checks exited successfully. `PYTHONPYCACHEPREFIX` is required in
 this sandbox because the system Python cache path is not writable.
+
+## Review Fixes
+
+The harness contract was tightened after review:
+
+- `ReportOutput.validate()` now rejects an empty `target_recipients` list,
+  rather than accepting it through vacuous list validation.
+- `load_cases()` now rejects an empty `ground_truth.expected_sections` list.
+- `load_cases()` now rejects each malformed template section at its source:
+  the section must be an object and its `section_id` must be a non-empty
+  string.
+
+Added regression coverage for all of those cases.
+
+Verification after the fixes:
+
+```bash
+cd scenarios/scenario-04-security-briefing/eval
+python3 -m unittest tests.test_dataset_and_schema -v
+git diff --check
+```
+
+Result: `Ran 8 tests` / `OK`; whitespace check exited successfully.

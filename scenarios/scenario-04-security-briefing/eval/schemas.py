@@ -56,9 +56,23 @@ def _validate_case(case: object, index: int) -> None:
     expected_sections = case["ground_truth"].get("expected_sections")
     if not isinstance(sections, list) or not sections:
         raise _dataset_error("%s.template_definition.sections must be a non-empty list" % case_id)
-    if not isinstance(expected_sections, list) or not all(isinstance(item, str) for item in expected_sections):
-        raise _dataset_error("%s.ground_truth.expected_sections must be a string list" % case_id)
-    template_ids = [section.get("section_id") for section in sections if isinstance(section, dict)]
+    if (
+        not isinstance(expected_sections, list)
+        or not expected_sections
+        or not all(isinstance(item, str) and item for item in expected_sections)
+    ):
+        raise _dataset_error("%s.ground_truth.expected_sections must be a non-empty string list" % case_id)
+    template_ids = []
+    for section_index, section in enumerate(sections):
+        if not isinstance(section, dict):
+            raise _dataset_error("%s.template_definition.sections[%d] must be an object" % (case_id, section_index))
+        section_id = section.get("section_id")
+        if not isinstance(section_id, str) or not section_id:
+            raise _dataset_error(
+                "%s.template_definition.sections[%d].section_id must be a non-empty string"
+                % (case_id, section_index)
+            )
+        template_ids.append(section_id)
     if template_ids != expected_sections:
         raise _dataset_error("%s template section ids must match expected_sections" % case_id)
     if not all(isinstance(grader, dict) and grader.get("check") for grader in case["graders"]):
@@ -112,7 +126,9 @@ class ReportOutput:
             raise ValueError("target_audience must be one of " + ", ".join(sorted(TARGET_AUDIENCES)))
         if output["target_channel"] not in TARGET_CHANNELS:
             raise ValueError("target_channel must be one of " + ", ".join(sorted(TARGET_CHANNELS)))
-        if not all(isinstance(item, str) and item for item in output["target_recipients"]):
+        if not output["target_recipients"] or not all(
+            isinstance(item, str) and item for item in output["target_recipients"]
+        ):
             raise ValueError("target_recipients must be a non-empty string list")
 
         sections = output["content"].get("sections")
