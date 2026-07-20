@@ -130,7 +130,7 @@ Agent 必须返回：
 }
 ```
 
-`section_id` 是评测稳定匹配章节的主键。`title` 用于展示，`body` 用于 Markdown 合规和数据准确性检查。`data_source_mapping` 固定为“指标名 → 源字段路径”，`data_values` 必须使用相同指标名保存该路径的未格式化实际 JSON 值；每个模板 `required_data` 都必须在对应章节中出现。对象和数组必须在正文中逐一展示所有标量叶子值，或展示 `masking_applied` 中记录的敏感叶子脱敏值；仅出现来源路径不构成内容完整性。评分器会将正文中同名指标、映射路径和审计值逐一绑定，不能用其他路径的碰巧数值替代。
+`section_id` 是评测稳定匹配章节的主键。`title` 用于展示，`body` 用于 Markdown 合规和数据准确性检查。`data_source_mapping` 固定为“指标名 → 源字段路径”，`data_values` 必须使用相同指标名保存该路径的未格式化实际 JSON 值；每个模板 `required_data` 都必须在对应章节中出现。对象和数组必须在正文中逐一展示所有标量叶子值，或展示 `masking_applied` 中记录的敏感叶子脱敏值；仅出现来源路径不构成内容完整性。脱敏替换仅适用于 `management` 受众且用例已启用脱敏，且 record 的 `original` 必须匹配 `ground_truth.sensitive_patterns` 中 `should_be_masked=true` 的模式、`rule` 必须等于该模式；安全负责人和未启用脱敏的用例始终要求原值。评分器会将正文中同名指标、映射路径和审计值逐一绑定，不能用其他路径的碰巧数值替代。
 
 ## 5. 脱敏语义
 

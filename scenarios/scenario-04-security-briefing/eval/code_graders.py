@@ -102,44 +102,65 @@ def _numeric_present(body, expected):
     )
 
 
-def _leaf_is_rendered(body, leaf, output):
-    """Accept a source leaf or its documented management-view masking replacement."""
+def _valid_masked_leaf(leaf, output, case):
+    """Return the rendered replacement only for a genuine management masking audit."""
+    if case.get("target_audience") != "management":
+        return None
+    if not case.get("push_config", {}).get("masking_rules", {}).get("enabled"):
+        return None
+    sensitive_rules = {
+        item.get("pattern") for item in case.get("ground_truth", {}).get("sensitive_patterns", [])
+        if isinstance(item, dict) and item.get("should_be_masked", True) and isinstance(item.get("pattern"), str)
+    }
+    masked = str(leaf)
+    applied = False
+    for record in output.get("masking_applied", []) if isinstance(output, dict) else []:
+        if not isinstance(record, dict):
+            continue
+        original, replacement, rule = record.get("original"), record.get("masked"), record.get("rule")
+        if (
+            not isinstance(original, str)
+            or not isinstance(replacement, str)
+            or not isinstance(rule, str)
+            or rule not in sensitive_rules
+            or not original
+            or original == replacement
+            or original not in masked
+        ):
+            continue
+        try:
+            rule_matches_original = re.search(rule, original) is not None
+        except re.error:
+            rule_matches_original = False
+        if not rule_matches_original:
+            continue
+        masked = masked.replace(original, replacement)
+        applied = True
+    return masked if applied else None
+
+
+def _leaf_is_rendered(body, leaf, output, case):
+    """Accept a source leaf or a validated management-view masking replacement."""
     if isinstance(leaf, Number) and not isinstance(leaf, bool):
         return _numeric_present(body, leaf)
     rendered = str(leaf)
     if rendered in body:
         return True
-    masked = rendered
-    applied = False
-    for record in output.get("masking_applied", []) if isinstance(output, dict) else []:
-        if not isinstance(record, dict):
-            continue
-        original, replacement = record.get("original"), record.get("masked")
-        if isinstance(original, str) and isinstance(replacement, str) and original in masked:
-            masked = masked.replace(original, replacement)
-            applied = True
-    return applied and masked in body
+    masked = _valid_masked_leaf(leaf, output, case)
+    return masked is not None and masked in body
 
 
-def _body_has_metric_value(section, metric, expected, output):
+def _body_has_metric_value(section, metric, expected, output, case):
     body = section.get("body", "") if isinstance(section, dict) else ""
     if not isinstance(body, str) or metric not in body:
         return False
     if isinstance(expected, (dict, list)):
-        return all(_leaf_is_rendered(body, leaf, output) for leaf in _scalar_leaves(expected))
+        return all(_leaf_is_rendered(body, leaf, output, case) for leaf in _scalar_leaves(expected))
     lines = [
         re.split(r"[；;。]", line.split(metric, 1)[1], maxsplit=1)[0]
         for line in body.splitlines() if metric in line
     ]
-    if isinstance(expected, str):
-        return any(expected in line for line in lines)
-    if any(_mapping_matches(line, expected) for line in lines):
-        return True
-    rendered = str(expected)
-    for record in output.get("masking_applied", []) if isinstance(output, dict) else []:
-        if isinstance(record, dict) and record.get("original") == rendered:
-            return any(record.get("masked") in line for line in lines)
-    return False
+    return _leaf_is_rendered("\n".join(lines), expected, output, case)
 
 
 def _required_data_failures(output, case):
@@ -156,7 +177,7 @@ def _required_data_failures(output, case):
             if not matching or not all(entry[2] == source_value for entry in matching):
                 failures.append("%s:%s" % (section_id, path))
                 continue
-            if not any(_body_has_metric_value(section, metric, source_value, output) for metric, _, _ in matching):
+            if not any(_body_has_metric_value(section, metric, source_value, output, case) for metric, _, _ in matching):
                 failures.append("%s:%s body" % (section_id, path))
     return failures
 
@@ -181,7 +202,7 @@ def _data_accuracy(output, case):
             value_ok = source_value is not None and abs(source_value - float(expected)) <= 0.001
             output_ok = bool(matching) and all(
                 isinstance(value, Number) and abs(value - source_value) <= 0.001
-                and _body_has_metric_value(section, metric, value, output)
+                and _body_has_metric_value(section, metric, value, output, case)
                 for section, metric, value in matching
             )
             observed = {"computed": source_value, "data_values": [value for _, _, value in matching]}
@@ -195,7 +216,7 @@ def _data_accuracy(output, case):
             ]
             value_ok = source_value == expected
             output_ok = bool(matching) and all(
-                value == source_value and _body_has_metric_value(section, metric, source_value, output)
+                value == source_value and _body_has_metric_value(section, metric, source_value, output, case)
                 for section, metric, value in matching
             )
             observed = {"source_value": source_value, "data_values": [value for _, _, value in matching]}

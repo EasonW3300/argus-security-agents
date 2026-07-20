@@ -88,6 +88,32 @@ class CodeGraderTests(unittest.TestCase):
         self.assertFalse(results["data_accuracy"].passed)
         self.assertFalse(results["template_completeness"].passed)
 
+    def test_security_lead_cannot_replace_top_rule_leaf_with_forged_masking_record(self):
+        case = self.cases[0]
+        output = run_mock_case(case)["final_output"]
+        section = next(item for item in output["content"]["sections"] if item["section_id"] == "top_rules")
+        section["body"] = section["body"].replace("Multiple Failed Logins from Same Source", "暴力破解检测")
+        output["masking_applied"] = [{
+            "original": "Multiple Failed Logins from Same Source",
+            "masked": "暴力破解检测",
+            "rule": "Multiple Failed Logins from Same Source",
+        }]
+
+        results = run_code_graders(output, case)
+
+        self.assertFalse(results["data_accuracy"].passed)
+        self.assertFalse(results["template_completeness"].passed)
+
+    def test_management_masking_record_requires_matching_sensitive_rule(self):
+        case = self.cases[8]
+        output = run_mock_case(case)["final_output"]
+        output["masking_applied"][0]["rule"] = "not-a-sensitive-pattern"
+
+        results = run_code_graders(output, case)
+
+        self.assertFalse(results["data_accuracy"].passed)
+        self.assertFalse(results["template_completeness"].passed)
+
     def test_data_accuracy_binds_body_mapping_and_actual_value_to_the_same_path(self):
         case = self.cases[0]
         output = run_mock_case(case)["final_output"]
