@@ -66,8 +66,21 @@ def _mapping_matches(value, expected):
     if isinstance(expected, bool):
         return rendered == str(expected)
     if isinstance(expected, Number):
-        return _numeric_present(rendered, expected)
-    return str(expected) in rendered
+        percentages = [float(token) for token in _PERCENT.findall(rendered)]
+        plain_tokens = [
+            float(token)
+            for token in re.findall(r"(?<![\d.])-?\d+(?:\.\d+)?", _PERCENT.sub("", rendered))
+        ]
+        # A mapping is a declaration, not prose: it must contain exactly one
+        # numeric value.  This rejects values such as ``156 999`` even though
+        # they contain a correct token.
+        if len(percentages) + len(plain_tokens) != 1:
+            return False
+        if percentages:
+            target = float(expected) * 100 if 0 <= expected <= 1 else float(expected)
+            return abs(percentages[0] - target) <= 0.1 + 1e-9
+        return abs(plain_tokens[0] - float(expected)) <= 1e-9
+    return rendered == str(expected)
 
 
 def _source_numbers(value):

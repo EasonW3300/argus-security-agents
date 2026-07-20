@@ -41,3 +41,12 @@ New regressions cover S04-001's appended `999`, the absent S04-003 count
 mapping, the absent S04-005 indexed IP mapping, and a missing body heading.
 Final verification: `python3 -m unittest discover -s tests -v` passed 27
 tests; all S04-001 through S04-018 mock positive cases pass every code grader.
+
+## Second review follow-up
+
+Numeric mapping declarations now use closed parsing: a mapping must contain
+exactly one numeric token (or one percentage token) and that token must match
+the expected value within the applicable tolerance. A mapping such as
+`156 999` therefore fails even though it includes the expected `156` token.
+String declarations use exact equality. Added the corresponding S04-001
+regression; final verification passed 28 tests.

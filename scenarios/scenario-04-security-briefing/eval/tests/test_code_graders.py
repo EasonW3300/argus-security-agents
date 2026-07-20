@@ -34,6 +34,13 @@ class CodeGraderTests(unittest.TestCase):
 
         self.assertFalse(run_code_graders(output, case)["data_accuracy"].passed)
 
+    def test_data_accuracy_rejects_mapping_with_correct_and_contradictory_numbers(self):
+        case = self.cases[0]
+        output = run_mock_case(case)["final_output"]
+        output["content"]["sections"][0]["data_source_mapping"]["alert_stats.total"] = "156 999"
+
+        self.assertFalse(run_code_graders(output, case)["data_accuracy"].passed)
+
     def test_data_accuracy_rejects_missing_list_length_mapping(self):
         case = self.cases[2]
         output = run_mock_case(case)["final_output"]
