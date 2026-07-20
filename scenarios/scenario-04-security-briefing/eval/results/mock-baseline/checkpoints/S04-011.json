@@ -1,0 +1,127 @@
+{
+  "test_case_id": "S04-011",
+  "scenario": "基于S04-008相同数据生成管理层脱敏版威胁情报周报，脱敏具体IOC和APT攻击手法",
+  "type": "weekly_report",
+  "difficulty": "hard",
+  "is_positive": true,
+  "status": "completed",
+  "final_output": {
+    "report_title": "威胁情报周报（管理层版） —— 2026-W29",
+    "report_type": "weekly",
+    "target_audience": "management",
+    "target_channel": "email",
+    "target_recipients": [
+      "management@company.com"
+    ],
+    "content": {
+      "sections": [
+        {
+          "section_id": "threat_trend",
+          "title": "威胁趋势概览",
+          "body": "# 威胁趋势概览\n\n概括本周威胁情报数量和命中告警数，不出现具体IOC值。threat_intel_summary.new_iocs：ip=45, domain=23, url=12, hash=8；threat_intel_summary.iocs_hit_alerts：7。",
+          "data_source_mapping": {
+            "threat_intel_summary.new_iocs": "ip=45, domain=23, url=12, hash=8",
+            "threat_intel_summary.iocs_hit_alerts": "7",
+            "threat_intel_summary.new_iocs.ip": "45"
+          }
+        },
+        {
+          "section_id": "apt_summary",
+          "title": "活跃攻击组织",
+          "body": "# 活跃攻击组织\n\n- threat_intel_summary.active_apt_groups：name=APT28, targeting_sector=政府/军工, recent_activity=利用CVE-2026-12345漏洞针对国防机构发起定向钓鱼活动，投放自定义恶意软件恶意软件, name=APT41, targeting_sector=金融/科技, recent_activity=对多个金融机构的VPN设备进行暴力破解并部署Webshell，C2域名包括 某C2域名 和 某C2域名",
+          "data_source_mapping": {
+            "threat_intel_summary.active_apt_groups": "name=APT28, targeting_sector=政府/军工, recent_activity=利用CVE-2026-12345漏洞针对国防机构发起定向钓鱼活动，投放自定义恶意软件恶意软件, name=APT41, targeting_sector=金融/科技, recent_activity=对多个金融机构的VPN设备进行暴力破解并部署Webshell，C2域名包括 某C2域名 和 某C2域名"
+          }
+        }
+      ]
+    },
+    "masking_applied": [
+      "management masking rules applied"
+    ],
+    "metadata": {
+      "generated_at": "2026-W29T00:00:00+00:00",
+      "data_sources_used": [
+        "threat_intel_summary"
+      ],
+      "push_status": "draft"
+    }
+  },
+  "code_graders": {
+    "data_accuracy": {
+      "passed": true,
+      "reason": "all declared metrics match source data",
+      "expected": [
+        {
+          "metric": "新增IP型IOC",
+          "source_path": "threat_intel_summary.new_iocs.ip",
+          "expected_value": 45
+        }
+      ],
+      "actual": [
+        {
+          "metric": "新增IP型IOC",
+          "source_value": 45,
+          "mappings": [
+            "45"
+          ]
+        }
+      ]
+    },
+    "template_completeness": {
+      "passed": true,
+      "reason": "all required sections are present and complete",
+      "expected": [
+        "threat_trend",
+        "apt_summary"
+      ],
+      "actual": {
+        "section_ids": [
+          "threat_trend",
+          "apt_summary"
+        ],
+        "placeholders": []
+      }
+    },
+    "format_compliance": {
+      "passed": true,
+      "reason": "Markdown structure is compliant",
+      "expected": "balanced fences, non-skipping headings, consistent table columns",
+      "actual": []
+    },
+    "masking_check": {
+      "passed": true,
+      "reason": "management sensitive values are masked",
+      "expected": "no sensitive patterns",
+      "actual": {
+        "leaks": []
+      }
+    },
+    "push_target": {
+      "passed": true,
+      "reason": "push target exactly matches configuration",
+      "expected": {
+        "channel": "email",
+        "recipients": [
+          "management@company.com"
+        ]
+      },
+      "actual": {
+        "channel": "email",
+        "recipients": [
+          "management@company.com"
+        ]
+      }
+    },
+    "output_schema": {
+      "passed": true,
+      "reason": "output schema valid",
+      "expected": "ReportOutput contract",
+      "actual": "valid"
+    }
+  },
+  "model_scores": null,
+  "calls": [],
+  "overall_pass": true,
+  "error_type": null,
+  "error_message": null
+}

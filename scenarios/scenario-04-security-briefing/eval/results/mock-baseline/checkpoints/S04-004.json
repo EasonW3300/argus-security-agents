@@ -1,0 +1,145 @@
+{
+  "test_case_id": "S04-004",
+  "scenario": "安全负责人需要一份多源聚合日报，综合告警、漏洞和事件数据计算衍生指标",
+  "type": "daily_report",
+  "difficulty": "medium",
+  "is_positive": true,
+  "status": "completed",
+  "final_output": {
+    "report_title": "安全运营综合日报 —— 2026-07-16",
+    "report_type": "daily",
+    "target_audience": "security_lead",
+    "target_channel": "email",
+    "target_recipients": [
+      "security-lead@company.com"
+    ],
+    "content": {
+      "sections": [
+        {
+          "section_id": "alert_summary",
+          "title": "告警态势",
+          "body": "# 告警态势\n\n今日告警总量、处置率和各级别分布。alert_stats.total：156；alert_stats.by_severity：critical=3, high=23, medium=78, low=52；alert_stats.disposal_rate：87%。",
+          "data_source_mapping": {
+            "alert_stats.total": "156",
+            "alert_stats.by_severity": "critical=3, high=23, medium=78, low=52",
+            "alert_stats.disposal_rate": "87%",
+            "衍生计算": "21.8%"
+          }
+        },
+        {
+          "section_id": "derived_metric",
+          "title": "告警与漏洞关联分析",
+          "body": "# 告警与漏洞关联分析\n\n计算并展示告警中已关联到已知漏洞的比例（vuln_related_alerts / total）。alert_stats.vuln_related_alerts：34；alert_stats.total：156。 关联比例：21.8%。",
+          "data_source_mapping": {
+            "alert_stats.vuln_related_alerts": "34",
+            "alert_stats.total": "156"
+          }
+        },
+        {
+          "section_id": "vuln_and_incident",
+          "title": "漏洞与事件摘要",
+          "body": "# 漏洞与事件摘要\n\n汇总漏洞修复进度和事件闭环概况。vulnerability_stats.new_total：12；vulnerability_stats.fixed_total：8；incident_list：incident_id=INC-2026-0716-001, type=phishing, severity=high, status=closed, incident_id=INC-2026-0716-002, type=c2, severity=critical, status=containing。",
+          "data_source_mapping": {
+            "vulnerability_stats.new_total": "12",
+            "vulnerability_stats.fixed_total": "8",
+            "incident_list": "incident_id=INC-2026-0716-001, type=phishing, severity=high, status=closed, incident_id=INC-2026-0716-002, type=c2, severity=critical, status=containing"
+          }
+        }
+      ]
+    },
+    "masking_applied": [],
+    "metadata": {
+      "generated_at": "2026-07-16T00:00:00+00:00",
+      "data_sources_used": [
+        "alert_stats",
+        "vulnerability_stats",
+        "incident_list"
+      ],
+      "push_status": "draft"
+    }
+  },
+  "code_graders": {
+    "data_accuracy": {
+      "passed": true,
+      "reason": "all declared metrics match source data",
+      "expected": [
+        {
+          "metric": "告警关联漏洞比例",
+          "source_path": "衍生计算",
+          "expected_value": 0.2179
+        }
+      ],
+      "actual": [
+        {
+          "metric": "告警关联漏洞比例",
+          "computed": 0.21794871794871795,
+          "reported_percentages": [
+            21.8
+          ]
+        }
+      ]
+    },
+    "template_completeness": {
+      "passed": true,
+      "reason": "all required sections are present and complete",
+      "expected": [
+        "alert_summary",
+        "derived_metric",
+        "vuln_and_incident"
+      ],
+      "actual": {
+        "section_ids": [
+          "alert_summary",
+          "derived_metric",
+          "vuln_and_incident"
+        ],
+        "placeholders": []
+      }
+    },
+    "format_compliance": {
+      "passed": true,
+      "reason": "Markdown structure is compliant",
+      "expected": "balanced fences, non-skipping headings, consistent table columns",
+      "actual": []
+    },
+    "masking_check": {
+      "passed": true,
+      "reason": "security-lead technical values retained",
+      "expected": [
+        "21.8%",
+        "34",
+        "156"
+      ],
+      "actual": {
+        "removed": []
+      }
+    },
+    "push_target": {
+      "passed": true,
+      "reason": "push target exactly matches configuration",
+      "expected": {
+        "channel": "email",
+        "recipients": [
+          "security-lead@company.com"
+        ]
+      },
+      "actual": {
+        "channel": "email",
+        "recipients": [
+          "security-lead@company.com"
+        ]
+      }
+    },
+    "output_schema": {
+      "passed": true,
+      "reason": "output schema valid",
+      "expected": "ReportOutput contract",
+      "actual": "valid"
+    }
+  },
+  "model_scores": null,
+  "calls": [],
+  "overall_pass": true,
+  "error_type": null,
+  "error_message": null
+}

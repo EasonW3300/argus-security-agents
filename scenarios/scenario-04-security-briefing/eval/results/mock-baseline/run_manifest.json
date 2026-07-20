@@ -1,0 +1,29 @@
+{
+  "started_at": "2026-07-20T08:46:06.715473+00:00",
+  "dataset_sha256": "649a00fd34d4d65188498c83dca61342356ab900089ceddd512b96137c24a46c",
+  "agent": {
+    "provider": "mock",
+    "model": "scenario-04-mock",
+    "base_url": null,
+    "response_mode": "prompt_json",
+    "temperature": 0.0,
+    "max_tokens": 4096,
+    "timeout_seconds": 90.0
+  },
+  "judge": {
+    "provider": "mock",
+    "model": "scenario-04-mock",
+    "base_url": null,
+    "response_mode": "prompt_json",
+    "temperature": 0.0,
+    "max_tokens": 4096,
+    "timeout_seconds": 90.0
+  },
+  "options": {
+    "mock_agent": true,
+    "skip_model_graders": true,
+    "case_id": null,
+    "limit": null,
+    "request_timeout_seconds": null
+  }
+}

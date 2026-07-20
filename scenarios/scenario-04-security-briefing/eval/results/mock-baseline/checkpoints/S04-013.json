@@ -1,0 +1,127 @@
+{
+  "test_case_id": "S04-013",
+  "scenario": "管理层需要月度安全运营报告，包含各部门安全评分排名（脱敏）和整改优先级矩阵",
+  "type": "monthly_report",
+  "difficulty": "hard",
+  "is_positive": true,
+  "status": "completed",
+  "final_output": {
+    "report_title": "月度安全运营报告 —— 2026-07",
+    "report_type": "monthly",
+    "target_audience": "management",
+    "target_channel": "email",
+    "target_recipients": [
+      "management@company.com"
+    ],
+    "content": {
+      "sections": [
+        {
+          "section_id": "dept_ranking",
+          "title": "各部门安全评分排名",
+          "body": "# 各部门安全评分排名\n\n| 数据字段 | 值 |\n| --- | --- |\n| department_scores | department=部门 A, security_score=85, rank=1, trend=up, department=部门 B, security_score=78, rank=2, trend=stable, department=部门 C, security_score=72, rank=3, trend=down, department=部门 D, security_score=68, rank=4, trend=down |",
+          "data_source_mapping": {
+            "department_scores": "department=部门 A, security_score=85, rank=1, trend=up, department=部门 B, security_score=78, rank=2, trend=stable, department=部门 C, security_score=72, rank=3, trend=down, department=部门 D, security_score=68, rank=4, trend=down",
+            "department_scores[0].security_score": "85"
+          }
+        },
+        {
+          "section_id": "remediation_matrix",
+          "title": "整改优先级矩阵",
+          "body": "# 整改优先级矩阵\n\n| 数据字段 | 值 |\n| --- | --- |\n| compliance_findings | finding_id=F-001, description=部门 A服务器存在未修复高危漏洞, risk_level=高, remediation_cost=中, priority=P1, finding_id=F-002, description=部门 C代码仓库访问权限未定期复核, risk_level=中, remediation_cost=低, priority=P2 |",
+          "data_source_mapping": {
+            "compliance_findings": "finding_id=F-001, description=部门 A服务器存在未修复高危漏洞, risk_level=高, remediation_cost=中, priority=P1, finding_id=F-002, description=部门 C代码仓库访问权限未定期复核, risk_level=中, remediation_cost=低, priority=P2"
+          }
+        }
+      ]
+    },
+    "masking_applied": [
+      "management masking rules applied"
+    ],
+    "metadata": {
+      "generated_at": "2026-07T00:00:00+00:00",
+      "data_sources_used": [
+        "department_scores",
+        "compliance_findings"
+      ],
+      "push_status": "draft"
+    }
+  },
+  "code_graders": {
+    "data_accuracy": {
+      "passed": true,
+      "reason": "all declared metrics match source data",
+      "expected": [
+        {
+          "metric": "核心业务部分数",
+          "source_path": "department_scores[0].security_score",
+          "expected_value": 85
+        }
+      ],
+      "actual": [
+        {
+          "metric": "核心业务部分数",
+          "source_value": 85,
+          "mappings": [
+            "85"
+          ]
+        }
+      ]
+    },
+    "template_completeness": {
+      "passed": true,
+      "reason": "all required sections are present and complete",
+      "expected": [
+        "dept_ranking",
+        "remediation_matrix"
+      ],
+      "actual": {
+        "section_ids": [
+          "dept_ranking",
+          "remediation_matrix"
+        ],
+        "placeholders": []
+      }
+    },
+    "format_compliance": {
+      "passed": true,
+      "reason": "Markdown structure is compliant",
+      "expected": "balanced fences, non-skipping headings, consistent table columns",
+      "actual": []
+    },
+    "masking_check": {
+      "passed": true,
+      "reason": "management sensitive values are masked",
+      "expected": "no sensitive patterns",
+      "actual": {
+        "leaks": []
+      }
+    },
+    "push_target": {
+      "passed": true,
+      "reason": "push target exactly matches configuration",
+      "expected": {
+        "channel": "email",
+        "recipients": [
+          "management@company.com"
+        ]
+      },
+      "actual": {
+        "channel": "email",
+        "recipients": [
+          "management@company.com"
+        ]
+      }
+    },
+    "output_schema": {
+      "passed": true,
+      "reason": "output schema valid",
+      "expected": "ReportOutput contract",
+      "actual": "valid"
+    }
+  },
+  "model_scores": null,
+  "calls": [],
+  "overall_pass": true,
+  "error_type": null,
+  "error_message": null
+}

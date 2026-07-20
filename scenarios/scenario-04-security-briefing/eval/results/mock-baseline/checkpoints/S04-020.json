@@ -1,0 +1,115 @@
+{
+  "test_case_id": "S04-020",
+  "scenario": "负例：推送目标错误，预期发送给security-lead但实际输出为all-staff",
+  "type": "negative",
+  "difficulty": "easy",
+  "is_positive": false,
+  "status": "completed",
+  "final_output": {
+    "report_title": "安全日报",
+    "report_type": "daily",
+    "target_audience": "security_lead",
+    "target_channel": "email",
+    "target_recipients": [
+      "all-staff@company.com"
+    ],
+    "content": {
+      "sections": [
+        {
+          "section_id": "sum",
+          "title": "摘要",
+          "body": "# 摘要\n\n告警总数。alert_stats.total：50。",
+          "data_source_mapping": {
+            "alert_stats.total": "50"
+          }
+        }
+      ]
+    },
+    "masking_applied": [],
+    "metadata": {
+      "generated_at": "2026-07-16T00:00:00+00:00",
+      "data_sources_used": [
+        "alert_stats"
+      ],
+      "push_status": "draft"
+    }
+  },
+  "code_graders": {
+    "data_accuracy": {
+      "passed": true,
+      "reason": "all declared metrics match source data",
+      "expected": [
+        {
+          "metric": "告警总数",
+          "source_path": "alert_stats.total",
+          "expected_value": 50
+        }
+      ],
+      "actual": [
+        {
+          "metric": "告警总数",
+          "source_value": 50,
+          "mappings": [
+            "50"
+          ]
+        }
+      ]
+    },
+    "template_completeness": {
+      "passed": true,
+      "reason": "all required sections are present and complete",
+      "expected": [
+        "sum"
+      ],
+      "actual": {
+        "section_ids": [
+          "sum"
+        ],
+        "placeholders": []
+      }
+    },
+    "format_compliance": {
+      "passed": true,
+      "reason": "Markdown structure is compliant",
+      "expected": "balanced fences, non-skipping headings, consistent table columns",
+      "actual": []
+    },
+    "masking_check": {
+      "passed": true,
+      "reason": "security-lead technical values retained",
+      "expected": [
+        "50"
+      ],
+      "actual": {
+        "removed": []
+      }
+    },
+    "push_target": {
+      "passed": false,
+      "reason": "push target mismatch",
+      "expected": {
+        "channel": "email",
+        "recipients": [
+          "security-lead@company.com"
+        ]
+      },
+      "actual": {
+        "channel": "email",
+        "recipients": [
+          "all-staff@company.com"
+        ]
+      }
+    },
+    "output_schema": {
+      "passed": true,
+      "reason": "output schema valid",
+      "expected": "ReportOutput contract",
+      "actual": "valid"
+    }
+  },
+  "model_scores": null,
+  "calls": [],
+  "overall_pass": false,
+  "error_type": null,
+  "error_message": null
+}

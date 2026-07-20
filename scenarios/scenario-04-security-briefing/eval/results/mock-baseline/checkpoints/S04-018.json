@@ -1,0 +1,127 @@
+{
+  "test_case_id": "S04-018",
+  "scenario": "安全负责人需要整改跟踪报告，展示所有等保/内部审计发现的问题及整改状态",
+  "type": "special_report",
+  "difficulty": "medium",
+  "is_positive": true,
+  "status": "completed",
+  "final_output": {
+    "report_title": "整改跟踪报告 —— 2026-07-16",
+    "report_type": "special",
+    "target_audience": "security_lead",
+    "target_channel": "email",
+    "target_recipients": [
+      "security-lead@company.com"
+    ],
+    "content": {
+      "sections": [
+        {
+          "section_id": "status_summary",
+          "title": "整改进度总览",
+          "body": "# 整改进度总览\n\n统计各状态的数量和整体进度。remediation_items：id=R-001, description=核心业务部服务器存在未修复高危漏洞 CVE-2026-19876, severity=高, responsible_dept=核心业务部, status=进行中, due_date=2026-07-20, id=R-002, description=研发中心代码仓库访问权限未定期复核, severity=中, responsible_dept=研发中心, status=未启动, due_date=2026-08-01, id=R-003, description=财务部终端防病毒软件安装率低于90%, severity=高, responsible_dept=财务部, status=延期, due_date=2026-07-10, id=R-004, description=运维部堡垒机审计日志保留不足1年, severity=中, responsible_dept=运维部, status=已完成, due_date=2026-07-15。",
+          "data_source_mapping": {
+            "remediation_items": "id=R-001, description=核心业务部服务器存在未修复高危漏洞 CVE-2026-19876, severity=高, responsible_dept=核心业务部, status=进行中, due_date=2026-07-20, id=R-002, description=研发中心代码仓库访问权限未定期复核, severity=中, responsible_dept=研发中心, status=未启动, due_date=2026-08-01, id=R-003, description=财务部终端防病毒软件安装率低于90%, severity=高, responsible_dept=财务部, status=延期, due_date=2026-07-10, id=R-004, description=运维部堡垒机审计日志保留不足1年, severity=中, responsible_dept=运维部, status=已完成, due_date=2026-07-15",
+            "remediation_items.length": "4"
+          }
+        },
+        {
+          "section_id": "remediation_table",
+          "title": "整改项清单",
+          "body": "# 整改项清单\n\n| 数据字段 | 值 |\n| --- | --- |\n| remediation_items | id=R-001, description=核心业务部服务器存在未修复高危漏洞 CVE-2026-19876, severity=高, responsible_dept=核心业务部, status=进行中, due_date=2026-07-20, id=R-002, description=研发中心代码仓库访问权限未定期复核, severity=中, responsible_dept=研发中心, status=未启动, due_date=2026-08-01, id=R-003, description=财务部终端防病毒软件安装率低于90%, severity=高, responsible_dept=财务部, status=延期, due_date=2026-07-10, id=R-004, description=运维部堡垒机审计日志保留不足1年, severity=中, responsible_dept=运维部, status=已完成, due_date=2026-07-15 |",
+          "data_source_mapping": {
+            "remediation_items": "id=R-001, description=核心业务部服务器存在未修复高危漏洞 CVE-2026-19876, severity=高, responsible_dept=核心业务部, status=进行中, due_date=2026-07-20, id=R-002, description=研发中心代码仓库访问权限未定期复核, severity=中, responsible_dept=研发中心, status=未启动, due_date=2026-08-01, id=R-003, description=财务部终端防病毒软件安装率低于90%, severity=高, responsible_dept=财务部, status=延期, due_date=2026-07-10, id=R-004, description=运维部堡垒机审计日志保留不足1年, severity=中, responsible_dept=运维部, status=已完成, due_date=2026-07-15"
+          }
+        }
+      ]
+    },
+    "masking_applied": [],
+    "metadata": {
+      "generated_at": "2026-07-16T00:00:00+00:00",
+      "data_sources_used": [
+        "remediation_items"
+      ],
+      "push_status": "draft"
+    }
+  },
+  "code_graders": {
+    "data_accuracy": {
+      "passed": true,
+      "reason": "all declared metrics match source data",
+      "expected": [
+        {
+          "metric": "整改项总数",
+          "source_path": "remediation_items.length",
+          "expected_value": 4
+        }
+      ],
+      "actual": [
+        {
+          "metric": "整改项总数",
+          "source_value": 4,
+          "mappings": [
+            "4"
+          ]
+        }
+      ]
+    },
+    "template_completeness": {
+      "passed": true,
+      "reason": "all required sections are present and complete",
+      "expected": [
+        "status_summary",
+        "remediation_table"
+      ],
+      "actual": {
+        "section_ids": [
+          "status_summary",
+          "remediation_table"
+        ],
+        "placeholders": []
+      }
+    },
+    "format_compliance": {
+      "passed": true,
+      "reason": "Markdown structure is compliant",
+      "expected": "balanced fences, non-skipping headings, consistent table columns",
+      "actual": []
+    },
+    "masking_check": {
+      "passed": true,
+      "reason": "security-lead technical values retained",
+      "expected": [
+        "CVE-2026-19876",
+        "未启动"
+      ],
+      "actual": {
+        "removed": []
+      }
+    },
+    "push_target": {
+      "passed": true,
+      "reason": "push target exactly matches configuration",
+      "expected": {
+        "channel": "email",
+        "recipients": [
+          "security-lead@company.com"
+        ]
+      },
+      "actual": {
+        "channel": "email",
+        "recipients": [
+          "security-lead@company.com"
+        ]
+      }
+    },
+    "output_schema": {
+      "passed": true,
+      "reason": "output schema valid",
+      "expected": "ReportOutput contract",
+      "actual": "valid"
+    }
+  },
+  "model_scores": null,
+  "calls": [],
+  "overall_pass": true,
+  "error_type": null,
+  "error_message": null
+}

@@ -1,0 +1,151 @@
+{
+  "test_case_id": "S04-014",
+  "scenario": "管理层需要月度漏洞管理报告，展示漏洞发现与修复趋势、高危漏洞平均修复时间和积压情况",
+  "type": "monthly_report",
+  "difficulty": "medium",
+  "is_positive": true,
+  "status": "completed",
+  "final_output": {
+    "report_title": "月度漏洞管理报告 —— 2026-07",
+    "report_type": "monthly",
+    "target_audience": "management",
+    "target_channel": "email",
+    "target_recipients": [
+      "management@company.com"
+    ],
+    "content": {
+      "sections": [
+        {
+          "section_id": "vuln_trend",
+          "title": "漏洞发现与修复趋势",
+          "body": "# 漏洞发现与修复趋势\n\n对比本月和上月的新增漏洞数、修复率。vulnerability_monthly.new_total：45；vulnerability_monthly.fix_rate：71%；vulnerability_monthly.prev_month：new_total=38, fix_rate=68%, avg_fix_days_critical=9。",
+          "data_source_mapping": {
+            "vulnerability_monthly.new_total": "45",
+            "vulnerability_monthly.fix_rate": "71%",
+            "vulnerability_monthly.prev_month": "new_total=38, fix_rate=68%, avg_fix_days_critical=9",
+            "vulnerability_monthly.avg_fix_days_critical": "7"
+          }
+        },
+        {
+          "section_id": "critical_fix_time",
+          "title": "高危漏洞平均修复时间",
+          "body": "# 高危漏洞平均修复时间\n\n报告高危漏洞的平均修复天数及与上月对比。vulnerability_monthly.avg_fix_days_critical：7天。",
+          "data_source_mapping": {
+            "vulnerability_monthly.avg_fix_days_critical": "7天"
+          }
+        },
+        {
+          "section_id": "backlog",
+          "title": "积压漏洞数量",
+          "body": "# 积压漏洞数量\n\n| 数据字段 | 值 |\n| --- | --- |\n| vulnerability_monthly.backlog | critical=2, high=5, medium=10, low=6 |",
+          "data_source_mapping": {
+            "vulnerability_monthly.backlog": "critical=2, high=5, medium=10, low=6"
+          }
+        }
+      ]
+    },
+    "masking_applied": [
+      "management masking rules applied"
+    ],
+    "metadata": {
+      "generated_at": "2026-07T00:00:00+00:00",
+      "data_sources_used": [
+        "vulnerability_monthly"
+      ],
+      "push_status": "draft"
+    }
+  },
+  "code_graders": {
+    "data_accuracy": {
+      "passed": true,
+      "reason": "all declared metrics match source data",
+      "expected": [
+        {
+          "metric": "本月新增漏洞",
+          "source_path": "vulnerability_monthly.new_total",
+          "expected_value": 45
+        },
+        {
+          "metric": "高危平均修复天数",
+          "source_path": "vulnerability_monthly.avg_fix_days_critical",
+          "expected_value": 7
+        }
+      ],
+      "actual": [
+        {
+          "metric": "本月新增漏洞",
+          "source_value": 45,
+          "mappings": [
+            "45"
+          ]
+        },
+        {
+          "metric": "高危平均修复天数",
+          "source_value": 7,
+          "mappings": [
+            "7",
+            "7天"
+          ]
+        }
+      ]
+    },
+    "template_completeness": {
+      "passed": true,
+      "reason": "all required sections are present and complete",
+      "expected": [
+        "vuln_trend",
+        "critical_fix_time",
+        "backlog"
+      ],
+      "actual": {
+        "section_ids": [
+          "vuln_trend",
+          "critical_fix_time",
+          "backlog"
+        ],
+        "placeholders": []
+      }
+    },
+    "format_compliance": {
+      "passed": true,
+      "reason": "Markdown structure is compliant",
+      "expected": "balanced fences, non-skipping headings, consistent table columns",
+      "actual": []
+    },
+    "masking_check": {
+      "passed": true,
+      "reason": "management sensitive values are masked",
+      "expected": "no sensitive patterns",
+      "actual": {
+        "leaks": []
+      }
+    },
+    "push_target": {
+      "passed": true,
+      "reason": "push target exactly matches configuration",
+      "expected": {
+        "channel": "email",
+        "recipients": [
+          "management@company.com"
+        ]
+      },
+      "actual": {
+        "channel": "email",
+        "recipients": [
+          "management@company.com"
+        ]
+      }
+    },
+    "output_schema": {
+      "passed": true,
+      "reason": "output schema valid",
+      "expected": "ReportOutput contract",
+      "actual": "valid"
+    }
+  },
+  "model_scores": null,
+  "calls": [],
+  "overall_pass": true,
+  "error_type": null,
+  "error_message": null
+}

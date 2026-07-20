@@ -1,0 +1,116 @@
+{
+  "test_case_id": "S04-019",
+  "scenario": "负例：管理层版简报未脱敏，预期不应包含具体IP和资产名",
+  "type": "negative",
+  "difficulty": "medium",
+  "is_positive": false,
+  "status": "completed",
+  "final_output": {
+    "report_title": "管理层安全简报 —— 2026-W29",
+    "report_type": "weekly",
+    "target_audience": "management",
+    "target_channel": "email",
+    "target_recipients": [
+      "management@company.com"
+    ],
+    "content": {
+      "sections": [
+        {
+          "section_id": "summary",
+          "title": "安全态势摘要",
+          "body": "# 安全态势摘要\n\n概述告警总量和主要威胁来源（不应出现具体IP/资产）。weekly_summary.total_alerts：1042。 未脱敏原始数据：203.0.113.88。",
+          "data_source_mapping": {
+            "weekly_summary.total_alerts": "1042"
+          }
+        }
+      ]
+    },
+    "masking_applied": [],
+    "metadata": {
+      "generated_at": "2026-W29T00:00:00+00:00",
+      "data_sources_used": [
+        "weekly_summary"
+      ],
+      "push_status": "draft"
+    }
+  },
+  "code_graders": {
+    "data_accuracy": {
+      "passed": true,
+      "reason": "all declared metrics match source data",
+      "expected": [
+        {
+          "metric": "告警总数",
+          "source_path": "weekly_summary.total_alerts",
+          "expected_value": 1042
+        }
+      ],
+      "actual": [
+        {
+          "metric": "告警总数",
+          "source_value": 1042,
+          "mappings": [
+            "1042"
+          ]
+        }
+      ]
+    },
+    "template_completeness": {
+      "passed": true,
+      "reason": "all required sections are present and complete",
+      "expected": [
+        "summary"
+      ],
+      "actual": {
+        "section_ids": [
+          "summary"
+        ],
+        "placeholders": []
+      }
+    },
+    "format_compliance": {
+      "passed": true,
+      "reason": "Markdown structure is compliant",
+      "expected": "balanced fences, non-skipping headings, consistent table columns",
+      "actual": []
+    },
+    "masking_check": {
+      "passed": false,
+      "reason": "sensitive values leaked",
+      "expected": "no sensitive patterns",
+      "actual": {
+        "leaks": [
+          "203.0.113.88",
+          "203.0.113.88"
+        ]
+      }
+    },
+    "push_target": {
+      "passed": true,
+      "reason": "push target exactly matches configuration",
+      "expected": {
+        "channel": "email",
+        "recipients": [
+          "management@company.com"
+        ]
+      },
+      "actual": {
+        "channel": "email",
+        "recipients": [
+          "management@company.com"
+        ]
+      }
+    },
+    "output_schema": {
+      "passed": true,
+      "reason": "output schema valid",
+      "expected": "ReportOutput contract",
+      "actual": "valid"
+    }
+  },
+  "model_scores": null,
+  "calls": [],
+  "overall_pass": false,
+  "error_type": null,
+  "error_message": null
+}

@@ -10,6 +10,7 @@ DATA_PATH = ROOT.parent / "EvalsData.json"
 sys.path.insert(0, str(ROOT))
 
 from config import load_config
+from report import write_reports
 from run_eval import load_checkpoint_results, run_eval
 
 
@@ -61,6 +62,25 @@ class RunnerResumeTests(unittest.TestCase):
             (checkpoint_dir / "S04-001.json").write_text("not json", encoding="utf-8")
 
             self.assertEqual(load_checkpoint_results(run_dir), {})
+
+    def test_csv_report_uses_lf_line_endings(self):
+        with tempfile.TemporaryDirectory() as directory:
+            run_dir = Path(directory)
+            write_reports(
+                run_dir,
+                {"run": "test"},
+                [{
+                    "test_case_id": "S04-001",
+                    "status": "completed",
+                    "type": "daily_report",
+                    "difficulty": "easy",
+                    "overall_pass": True,
+                    "code_graders": {},
+                }],
+            )
+            contents = (run_dir / "eval_summary.csv").read_bytes()
+
+        self.assertNotIn(b"\r\n", contents)
 
 
 if __name__ == "__main__":

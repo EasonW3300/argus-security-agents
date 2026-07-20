@@ -1,0 +1,180 @@
+{
+  "test_case_id": "S04-015",
+  "scenario": "管理层需要季度安全态势白皮书，多维度趋势分析、行业对标、风险预测和资源规划",
+  "type": "monthly_report",
+  "difficulty": "expert",
+  "is_positive": true,
+  "status": "completed",
+  "final_output": {
+    "report_title": "季度安全态势白皮书 —— 2026-Q2",
+    "report_type": "special",
+    "target_audience": "management",
+    "target_channel": "email",
+    "target_recipients": [
+      "management@company.com"
+    ],
+    "content": {
+      "sections": [
+        {
+          "section_id": "executive_summary",
+          "title": "执行摘要",
+          "body": "# 执行摘要\n\n两段话概括本季度安全形势。。",
+          "data_source_mapping": {
+            "quarterly_data.vulnerability_trend.fix_rate": "76.6%",
+            "quarterly_data.industry_benchmark.company_disposal_rate": "91%"
+          }
+        },
+        {
+          "section_id": "alert_vuln_trend",
+          "title": "告警与漏洞趋势",
+          "body": "# 告警与漏洞趋势\n\n分析告警和漏洞的发展趋势。quarterly_data.alert_trend：months=month=4月, total=3200, change=+5%, month=5月, total=3450, change=+7.8%, month=6月, total=3120, change=-9.6%, description=季度前期告警上升，6月因防火墙策略优化下降；quarterly_data.vulnerability_trend：quarter_new=128, quarter_fixed=98, fix_rate=76.6%, description=修复率较上季度提升4个百分点。",
+          "data_source_mapping": {
+            "quarterly_data.alert_trend": "months=month=4月, total=3200, change=+5%, month=5月, total=3450, change=+7.8%, month=6月, total=3120, change=-9.6%, description=季度前期告警上升，6月因防火墙策略优化下降",
+            "quarterly_data.vulnerability_trend": "quarter_new=128, quarter_fixed=98, fix_rate=76.6%, description=修复率较上季度提升4个百分点"
+          }
+        },
+        {
+          "section_id": "incident_intel",
+          "title": "事件与威胁情报",
+          "body": "# 事件与威胁情报\n\n总结事件响应效率和主要威胁类型。quarterly_data.incident_trend：total=45, avg_response_minutes=22, closure_rate=92%；quarterly_data.threat_intel_trend：top_categories=C2, phishing, ransomware, description=钓鱼攻击占比显著上升，勒索软件活跃度持平。",
+          "data_source_mapping": {
+            "quarterly_data.incident_trend": "total=45, avg_response_minutes=22, closure_rate=92%",
+            "quarterly_data.threat_intel_trend": "top_categories=C2, phishing, ransomware, description=钓鱼攻击占比显著上升，勒索软件活跃度持平"
+          }
+        },
+        {
+          "section_id": "benchmark",
+          "title": "行业对标",
+          "body": "# 行业对标\n\n| 数据字段 | 值 |\n| --- | --- |\n| quarterly_data.industry_benchmark | industry_avg_alert_disposal_rate=85%, company_disposal_rate=91%, industry_avg_fix_rate=70%, company_fix_rate=76.6% |",
+          "data_source_mapping": {
+            "quarterly_data.industry_benchmark": "industry_avg_alert_disposal_rate=85%, company_disposal_rate=91%, industry_avg_fix_rate=70%, company_fix_rate=76.6%"
+          }
+        },
+        {
+          "section_id": "forecast",
+          "title": "下季度风险预测",
+          "body": "# 下季度风险预测\n\n- quarterly_data.risk_forecast：零日漏洞利用可能在下季度增长，建议增加虚拟补丁投入, 内部员工钓鱼点击率季度环比上升10%，需加强安全意识培训, 供应链攻击风险随第三方接入增加而上升，应启动供应商安全审核",
+          "data_source_mapping": {
+            "quarterly_data.risk_forecast": "零日漏洞利用可能在下季度增长，建议增加虚拟补丁投入, 内部员工钓鱼点击率季度环比上升10%，需加强安全意识培训, 供应链攻击风险随第三方接入增加而上升，应启动供应商安全审核"
+          }
+        },
+        {
+          "section_id": "resource",
+          "title": "资源规划建议",
+          "body": "# 资源规划建议\n\n给出人员、工具和培训建议。quarterly_data.resource_planning：建议下季度新增2名安全分析师，追加预算购买APT检测工具，并安排一次全公司钓鱼演练。",
+          "data_source_mapping": {
+            "quarterly_data.resource_planning": "建议下季度新增2名安全分析师，追加预算购买APT检测工具，并安排一次全公司钓鱼演练"
+          }
+        }
+      ]
+    },
+    "masking_applied": [
+      "management masking rules applied"
+    ],
+    "metadata": {
+      "generated_at": "2026-Q2T00:00:00+00:00",
+      "data_sources_used": [
+        "quarterly_data"
+      ],
+      "push_status": "draft"
+    }
+  },
+  "code_graders": {
+    "data_accuracy": {
+      "passed": true,
+      "reason": "all declared metrics match source data",
+      "expected": [
+        {
+          "metric": "季度漏洞修复率",
+          "source_path": "quarterly_data.vulnerability_trend.fix_rate",
+          "expected_value": 0.766
+        },
+        {
+          "metric": "公司处置率",
+          "source_path": "quarterly_data.industry_benchmark.company_disposal_rate",
+          "expected_value": 0.91
+        }
+      ],
+      "actual": [
+        {
+          "metric": "季度漏洞修复率",
+          "source_value": 0.766,
+          "mappings": [
+            "76.6%"
+          ]
+        },
+        {
+          "metric": "公司处置率",
+          "source_value": 0.91,
+          "mappings": [
+            "91%"
+          ]
+        }
+      ]
+    },
+    "template_completeness": {
+      "passed": true,
+      "reason": "all required sections are present and complete",
+      "expected": [
+        "executive_summary",
+        "alert_vuln_trend",
+        "incident_intel",
+        "benchmark",
+        "forecast",
+        "resource"
+      ],
+      "actual": {
+        "section_ids": [
+          "executive_summary",
+          "alert_vuln_trend",
+          "incident_intel",
+          "benchmark",
+          "forecast",
+          "resource"
+        ],
+        "placeholders": []
+      }
+    },
+    "format_compliance": {
+      "passed": true,
+      "reason": "Markdown structure is compliant",
+      "expected": "balanced fences, non-skipping headings, consistent table columns",
+      "actual": []
+    },
+    "masking_check": {
+      "passed": true,
+      "reason": "management sensitive values are masked",
+      "expected": "no sensitive patterns",
+      "actual": {
+        "leaks": []
+      }
+    },
+    "push_target": {
+      "passed": true,
+      "reason": "push target exactly matches configuration",
+      "expected": {
+        "channel": "email",
+        "recipients": [
+          "management@company.com"
+        ]
+      },
+      "actual": {
+        "channel": "email",
+        "recipients": [
+          "management@company.com"
+        ]
+      }
+    },
+    "output_schema": {
+      "passed": true,
+      "reason": "output schema valid",
+      "expected": "ReportOutput contract",
+      "actual": "valid"
+    }
+  },
+  "model_scores": null,
+  "calls": [],
+  "overall_pass": true,
+  "error_type": null,
+  "error_message": null
+}

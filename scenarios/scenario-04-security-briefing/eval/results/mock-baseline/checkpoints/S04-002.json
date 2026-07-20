@@ -1,0 +1,152 @@
+{
+  "test_case_id": "S04-002",
+  "scenario": "安全负责人需要一份漏洞扫描日报，展示新增漏洞分布、修复进度和待处理高危漏洞",
+  "type": "daily_report",
+  "difficulty": "easy",
+  "is_positive": true,
+  "status": "completed",
+  "final_output": {
+    "report_title": "漏洞扫描日报 —— 2026-07-16",
+    "report_type": "daily",
+    "target_audience": "security_lead",
+    "target_channel": "email",
+    "target_recipients": [
+      "security-lead@company.com"
+    ],
+    "content": {
+      "sections": [
+        {
+          "section_id": "overview",
+          "title": "今日扫描概况",
+          "body": "# 今日扫描概况\n\n总结今日新增漏洞数量、严重度分布和修复率。vulnerability_stats.new_total：12；vulnerability_stats.by_severity：critical=1, high=3, medium=5, low=3；vulnerability_stats.fix_rate：67%。",
+          "data_source_mapping": {
+            "vulnerability_stats.new_total": "12",
+            "vulnerability_stats.by_severity": "critical=1, high=3, medium=5, low=3",
+            "vulnerability_stats.fix_rate": "67%"
+          }
+        },
+        {
+          "section_id": "critical_pending",
+          "title": "待处理高危漏洞",
+          "body": "# 待处理高危漏洞\n\n| 数据字段 | 值 |\n| --- | --- |\n| vulnerability_stats.pending_critical | cve_id=CVE-2026-19876, affected_asset=核心交易数据库 DB-Master-01, cvss_score=9.8, days_open=5 |",
+          "data_source_mapping": {
+            "vulnerability_stats.pending_critical": "cve_id=CVE-2026-19876, affected_asset=核心交易数据库 DB-Master-01, cvss_score=9.8, days_open=5"
+          }
+        },
+        {
+          "section_id": "fix_metrics",
+          "title": "修复指标",
+          "body": "# 修复指标\n\n说明已修复数量和平均修复时间。vulnerability_stats.fixed_total：8；vulnerability_stats.avg_fix_days：12天。",
+          "data_source_mapping": {
+            "vulnerability_stats.fixed_total": "8",
+            "vulnerability_stats.avg_fix_days": "12天"
+          }
+        }
+      ]
+    },
+    "masking_applied": [],
+    "metadata": {
+      "generated_at": "2026-07-16T00:00:00+00:00",
+      "data_sources_used": [
+        "vulnerability_stats"
+      ],
+      "push_status": "draft"
+    }
+  },
+  "code_graders": {
+    "data_accuracy": {
+      "passed": true,
+      "reason": "all declared metrics match source data",
+      "expected": [
+        {
+          "metric": "新增漏洞总数",
+          "source_path": "vulnerability_stats.new_total",
+          "expected_value": 12
+        },
+        {
+          "metric": "修复率",
+          "source_path": "vulnerability_stats.fix_rate",
+          "expected_value": 0.67
+        }
+      ],
+      "actual": [
+        {
+          "metric": "新增漏洞总数",
+          "source_value": 12,
+          "mappings": [
+            "12"
+          ]
+        },
+        {
+          "metric": "修复率",
+          "source_value": 0.67,
+          "mappings": [
+            "67%"
+          ]
+        }
+      ]
+    },
+    "template_completeness": {
+      "passed": true,
+      "reason": "all required sections are present and complete",
+      "expected": [
+        "overview",
+        "critical_pending",
+        "fix_metrics"
+      ],
+      "actual": {
+        "section_ids": [
+          "overview",
+          "critical_pending",
+          "fix_metrics"
+        ],
+        "placeholders": []
+      }
+    },
+    "format_compliance": {
+      "passed": true,
+      "reason": "Markdown structure is compliant",
+      "expected": "balanced fences, non-skipping headings, consistent table columns",
+      "actual": []
+    },
+    "masking_check": {
+      "passed": true,
+      "reason": "security-lead technical values retained",
+      "expected": [
+        "CVE-2026-19876",
+        "DB-Master-01",
+        "9.8"
+      ],
+      "actual": {
+        "removed": []
+      }
+    },
+    "push_target": {
+      "passed": true,
+      "reason": "push target exactly matches configuration",
+      "expected": {
+        "channel": "email",
+        "recipients": [
+          "security-lead@company.com"
+        ]
+      },
+      "actual": {
+        "channel": "email",
+        "recipients": [
+          "security-lead@company.com"
+        ]
+      }
+    },
+    "output_schema": {
+      "passed": true,
+      "reason": "output schema valid",
+      "expected": "ReportOutput contract",
+      "actual": "valid"
+    }
+  },
+  "model_scores": null,
+  "calls": [],
+  "overall_pass": true,
+  "error_type": null,
+  "error_message": null
+}

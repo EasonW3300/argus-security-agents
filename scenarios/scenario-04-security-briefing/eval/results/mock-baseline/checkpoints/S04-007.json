@@ -1,0 +1,140 @@
+{
+  "test_case_id": "S04-007",
+  "scenario": "安全负责人需要处置效率周报，展示平均处置时长、超时工单和分析师绩效排名",
+  "type": "weekly_report",
+  "difficulty": "medium",
+  "is_positive": true,
+  "status": "completed",
+  "final_output": {
+    "report_title": "处置效率周报 —— 2026-W29",
+    "report_type": "weekly",
+    "target_audience": "security_lead",
+    "target_channel": "email",
+    "target_recipients": [
+      "security-lead@company.com"
+    ],
+    "content": {
+      "sections": [
+        {
+          "section_id": "efficiency_summary",
+          "title": "处置效率摘要",
+          "body": "# 处置效率摘要\n\n本周平均处置时间和超时工单数量。weekly_efficiency.avg_disposal_minutes：27；weekly_efficiency.timeout_count：8。",
+          "data_source_mapping": {
+            "weekly_efficiency.avg_disposal_minutes": "27",
+            "weekly_efficiency.timeout_count": "8",
+            "weekly_efficiency.analysts[0].disposal_count": "145"
+          }
+        },
+        {
+          "section_id": "analyst_ranking",
+          "title": "分析师绩效排名",
+          "body": "# 分析师绩效排名\n\n| 数据字段 | 值 |\n| --- | --- |\n| weekly_efficiency.analysts | name=张三, team=安全运营一组, disposal_count=145, disposal_rate=94%, timeout_count=1, name=李四, team=安全运营一组, disposal_count=132, disposal_rate=91%, timeout_count=2, name=王五, team=安全运营二组, disposal_count=118, disposal_rate=88%, timeout_count=3 |",
+          "data_source_mapping": {
+            "weekly_efficiency.analysts": "name=张三, team=安全运营一组, disposal_count=145, disposal_rate=94%, timeout_count=1, name=李四, team=安全运营一组, disposal_count=132, disposal_rate=91%, timeout_count=2, name=王五, team=安全运营二组, disposal_count=118, disposal_rate=88%, timeout_count=3"
+          }
+        }
+      ]
+    },
+    "masking_applied": [],
+    "metadata": {
+      "generated_at": "2026-W29T00:00:00+00:00",
+      "data_sources_used": [
+        "weekly_efficiency"
+      ],
+      "push_status": "draft"
+    }
+  },
+  "code_graders": {
+    "data_accuracy": {
+      "passed": true,
+      "reason": "all declared metrics match source data",
+      "expected": [
+        {
+          "metric": "平均处置分钟",
+          "source_path": "weekly_efficiency.avg_disposal_minutes",
+          "expected_value": 27
+        },
+        {
+          "metric": "张三处置量",
+          "source_path": "weekly_efficiency.analysts[0].disposal_count",
+          "expected_value": 145
+        }
+      ],
+      "actual": [
+        {
+          "metric": "平均处置分钟",
+          "source_value": 27,
+          "mappings": [
+            "27"
+          ]
+        },
+        {
+          "metric": "张三处置量",
+          "source_value": 145,
+          "mappings": [
+            "145"
+          ]
+        }
+      ]
+    },
+    "template_completeness": {
+      "passed": true,
+      "reason": "all required sections are present and complete",
+      "expected": [
+        "efficiency_summary",
+        "analyst_ranking"
+      ],
+      "actual": {
+        "section_ids": [
+          "efficiency_summary",
+          "analyst_ranking"
+        ],
+        "placeholders": []
+      }
+    },
+    "format_compliance": {
+      "passed": true,
+      "reason": "Markdown structure is compliant",
+      "expected": "balanced fences, non-skipping headings, consistent table columns",
+      "actual": []
+    },
+    "masking_check": {
+      "passed": true,
+      "reason": "security-lead technical values retained",
+      "expected": [
+        "张三",
+        "安全运营一组"
+      ],
+      "actual": {
+        "removed": []
+      }
+    },
+    "push_target": {
+      "passed": true,
+      "reason": "push target exactly matches configuration",
+      "expected": {
+        "channel": "email",
+        "recipients": [
+          "security-lead@company.com"
+        ]
+      },
+      "actual": {
+        "channel": "email",
+        "recipients": [
+          "security-lead@company.com"
+        ]
+      }
+    },
+    "output_schema": {
+      "passed": true,
+      "reason": "output schema valid",
+      "expected": "ReportOutput contract",
+      "actual": "valid"
+    }
+  },
+  "model_scores": null,
+  "calls": [],
+  "overall_pass": true,
+  "error_type": null,
+  "error_message": null
+}

@@ -1,0 +1,150 @@
+{
+  "test_case_id": "S04-016",
+  "scenario": "安全负责人需要一份安全事件复盘报告，包含完整时间线、根因分析和改进计划",
+  "type": "special_report",
+  "difficulty": "medium",
+  "is_positive": true,
+  "status": "completed",
+  "final_output": {
+    "report_title": "安全事件复盘报告 - {incident_id}",
+    "report_type": "special",
+    "target_audience": "security_lead",
+    "target_channel": "email",
+    "target_recipients": [
+      "security-lead@company.com"
+    ],
+    "content": {
+      "sections": [
+        {
+          "section_id": "event_overview",
+          "title": "事件概述",
+          "body": "# 事件概述\n\n简述事件类型、严重级别和影响范围。incident_detail.type：ransomware；incident_detail.severity：critical；incident_detail.affected_assets：财务系统终端 FIN-PC-12。",
+          "data_source_mapping": {
+            "incident_detail.type": "ransomware",
+            "incident_detail.severity": "critical",
+            "incident_detail.affected_assets": "财务系统终端 FIN-PC-12",
+            "incident_detail.incident_id": "INC-2026-0716-005"
+          }
+        },
+        {
+          "section_id": "timeline",
+          "title": "事件时间线",
+          "body": "# 事件时间线\n\n| 数据字段 | 值 |\n| --- | --- |\n| incident_detail.timeline | time=2026-07-16T14:30:00Z, event=SOC收到终端防病毒软件告警，疑似勒索软件行为, time=2026-07-16T14:32:00Z, event=安全分析师确认文件加密后缀为.locked，通知断网, time=2026-07-16T14:35:00Z, event=网络隔离完成，开始取证, time=2026-07-16T15:10:00Z, event=确认感染来源为钓鱼邮件附件，攻击者IP 203.0.113.99, time=2026-07-16T16:00:00Z, event=从备份恢复数据，系统恢复运行 |",
+          "data_source_mapping": {
+            "incident_detail.timeline": "time=2026-07-16T14:30:00Z, event=SOC收到终端防病毒软件告警，疑似勒索软件行为, time=2026-07-16T14:32:00Z, event=安全分析师确认文件加密后缀为.locked，通知断网, time=2026-07-16T14:35:00Z, event=网络隔离完成，开始取证, time=2026-07-16T15:10:00Z, event=确认感染来源为钓鱼邮件附件，攻击者IP 203.0.113.99, time=2026-07-16T16:00:00Z, event=从备份恢复数据，系统恢复运行"
+          }
+        },
+        {
+          "section_id": "root_cause",
+          "title": "根因分析",
+          "body": "# 根因分析\n\n分析事件发生的根本原因。incident_detail.root_cause：员工点击恶意宏文档，本地防病毒特征库过期导致未拦截。",
+          "data_source_mapping": {
+            "incident_detail.root_cause": "员工点击恶意宏文档，本地防病毒特征库过期导致未拦截"
+          }
+        },
+        {
+          "section_id": "actions_improvement",
+          "title": "处置措施与改进计划",
+          "body": "# 处置措施与改进计划\n\n- incident_detail.taken_actions：隔离受感染终端, 全网推送防病毒更新, 重置受影响用户凭据\n- incident_detail.improvement_plan：强制启用邮件附件沙箱检测, 实施终端EDR替换传统AV, 每月进行针对性钓鱼测试",
+          "data_source_mapping": {
+            "incident_detail.taken_actions": "隔离受感染终端, 全网推送防病毒更新, 重置受影响用户凭据",
+            "incident_detail.improvement_plan": "强制启用邮件附件沙箱检测, 实施终端EDR替换传统AV, 每月进行针对性钓鱼测试"
+          }
+        }
+      ]
+    },
+    "masking_applied": [],
+    "metadata": {
+      "generated_at": "2026-07-16T00:00:00+00:00",
+      "data_sources_used": [
+        "incident_detail"
+      ],
+      "push_status": "draft"
+    }
+  },
+  "code_graders": {
+    "data_accuracy": {
+      "passed": true,
+      "reason": "all declared metrics match source data",
+      "expected": [
+        {
+          "metric": "事件ID",
+          "source_path": "incident_detail.incident_id",
+          "expected_value": "INC-2026-0716-005"
+        }
+      ],
+      "actual": [
+        {
+          "metric": "事件ID",
+          "source_value": "INC-2026-0716-005",
+          "mappings": [
+            "INC-2026-0716-005"
+          ]
+        }
+      ]
+    },
+    "template_completeness": {
+      "passed": true,
+      "reason": "all required sections are present and complete",
+      "expected": [
+        "event_overview",
+        "timeline",
+        "root_cause",
+        "actions_improvement"
+      ],
+      "actual": {
+        "section_ids": [
+          "event_overview",
+          "timeline",
+          "root_cause",
+          "actions_improvement"
+        ],
+        "placeholders": []
+      }
+    },
+    "format_compliance": {
+      "passed": true,
+      "reason": "Markdown structure is compliant",
+      "expected": "balanced fences, non-skipping headings, consistent table columns",
+      "actual": []
+    },
+    "masking_check": {
+      "passed": true,
+      "reason": "security-lead technical values retained",
+      "expected": [
+        "203.0.113.99",
+        "恶意宏文档"
+      ],
+      "actual": {
+        "removed": []
+      }
+    },
+    "push_target": {
+      "passed": true,
+      "reason": "push target exactly matches configuration",
+      "expected": {
+        "channel": "email",
+        "recipients": [
+          "security-lead@company.com"
+        ]
+      },
+      "actual": {
+        "channel": "email",
+        "recipients": [
+          "security-lead@company.com"
+        ]
+      }
+    },
+    "output_schema": {
+      "passed": true,
+      "reason": "output schema valid",
+      "expected": "ReportOutput contract",
+      "actual": "valid"
+    }
+  },
+  "model_scores": null,
+  "calls": [],
+  "overall_pass": true,
+  "error_type": null,
+  "error_message": null
+}

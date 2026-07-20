@@ -1,0 +1,126 @@
+{
+  "test_case_id": "S04-010",
+  "scenario": "基于S04-007相同数据生成管理层脱敏版周报，脱敏分析师姓名和团队名称",
+  "type": "weekly_report",
+  "difficulty": "hard",
+  "is_positive": true,
+  "status": "completed",
+  "final_output": {
+    "report_title": "处置效率周报（管理层版） —— 2026-W29",
+    "report_type": "weekly",
+    "target_audience": "management",
+    "target_channel": "email",
+    "target_recipients": [
+      "management@company.com"
+    ],
+    "content": {
+      "sections": [
+        {
+          "section_id": "efficiency_summary",
+          "title": "整体处置效率",
+          "body": "# 整体处置效率\n\n概述平均处置时间和超时情况。weekly_efficiency.avg_disposal_minutes：27；weekly_efficiency.timeout_count：8。",
+          "data_source_mapping": {
+            "weekly_efficiency.avg_disposal_minutes": "27",
+            "weekly_efficiency.timeout_count": "8"
+          }
+        },
+        {
+          "section_id": "team_performance",
+          "title": "团队效能概览",
+          "body": "# 团队效能概览\n\n| 数据字段 | 值 |\n| --- | --- |\n| weekly_efficiency.analysts | name=分析师 A, team=安全运营团队, disposal_count=145, disposal_rate=94%, timeout_count=1, name=分析师 B, team=安全运营团队, disposal_count=132, disposal_rate=91%, timeout_count=2, name=分析师 C, team=安全运营团队, disposal_count=118, disposal_rate=88%, timeout_count=3 |",
+          "data_source_mapping": {
+            "weekly_efficiency.analysts": "name=分析师 A, team=安全运营团队, disposal_count=145, disposal_rate=94%, timeout_count=1, name=分析师 B, team=安全运营团队, disposal_count=132, disposal_rate=91%, timeout_count=2, name=分析师 C, team=安全运营团队, disposal_count=118, disposal_rate=88%, timeout_count=3"
+          }
+        }
+      ]
+    },
+    "masking_applied": [
+      "management masking rules applied"
+    ],
+    "metadata": {
+      "generated_at": "2026-W29T00:00:00+00:00",
+      "data_sources_used": [
+        "weekly_efficiency"
+      ],
+      "push_status": "draft"
+    }
+  },
+  "code_graders": {
+    "data_accuracy": {
+      "passed": true,
+      "reason": "all declared metrics match source data",
+      "expected": [
+        {
+          "metric": "平均处置分钟",
+          "source_path": "weekly_efficiency.avg_disposal_minutes",
+          "expected_value": 27
+        }
+      ],
+      "actual": [
+        {
+          "metric": "平均处置分钟",
+          "source_value": 27,
+          "mappings": [
+            "27"
+          ]
+        }
+      ]
+    },
+    "template_completeness": {
+      "passed": true,
+      "reason": "all required sections are present and complete",
+      "expected": [
+        "efficiency_summary",
+        "team_performance"
+      ],
+      "actual": {
+        "section_ids": [
+          "efficiency_summary",
+          "team_performance"
+        ],
+        "placeholders": []
+      }
+    },
+    "format_compliance": {
+      "passed": true,
+      "reason": "Markdown structure is compliant",
+      "expected": "balanced fences, non-skipping headings, consistent table columns",
+      "actual": []
+    },
+    "masking_check": {
+      "passed": true,
+      "reason": "management sensitive values are masked",
+      "expected": "no sensitive patterns",
+      "actual": {
+        "leaks": []
+      }
+    },
+    "push_target": {
+      "passed": true,
+      "reason": "push target exactly matches configuration",
+      "expected": {
+        "channel": "email",
+        "recipients": [
+          "management@company.com"
+        ]
+      },
+      "actual": {
+        "channel": "email",
+        "recipients": [
+          "management@company.com"
+        ]
+      }
+    },
+    "output_schema": {
+      "passed": true,
+      "reason": "output schema valid",
+      "expected": "ReportOutput contract",
+      "actual": "valid"
+    }
+  },
+  "model_scores": null,
+  "calls": [],
+  "overall_pass": true,
+  "error_type": null,
+  "error_message": null
+}

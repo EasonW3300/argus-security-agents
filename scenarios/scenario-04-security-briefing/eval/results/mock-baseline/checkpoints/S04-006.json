@@ -1,0 +1,161 @@
+{
+  "test_case_id": "S04-006",
+  "scenario": "安全负责人需要安全态势周报，对比本周与上周告警趋势和TOP规则变化",
+  "type": "weekly_report",
+  "difficulty": "medium",
+  "is_positive": true,
+  "status": "completed",
+  "final_output": {
+    "report_title": "安全态势周报 —— 2026-W29",
+    "report_type": "weekly",
+    "target_audience": "security_lead",
+    "target_channel": "email",
+    "target_recipients": [
+      "security-lead@company.com"
+    ],
+    "content": {
+      "sections": [
+        {
+          "section_id": "overall_trend",
+          "title": "告警总体趋势",
+          "body": "# 告警总体趋势\n\n对比本周与上周告警总量及变化率。alert_stats_current_week.total：1042；alert_stats_previous_week.total：978。",
+          "data_source_mapping": {
+            "alert_stats_current_week.total": "1042",
+            "alert_stats_previous_week.total": "978"
+          }
+        },
+        {
+          "section_id": "severity_trend",
+          "title": "告警级别变化",
+          "body": "# 告警级别变化\n\n| 数据字段 | 值 |\n| --- | --- |\n| alert_stats_current_week.by_severity | critical=18, high=167, medium=521, low=336 |\n| alert_stats_previous_week.by_severity | critical=12, high=145, medium=502, low=319 |",
+          "data_source_mapping": {
+            "alert_stats_current_week.by_severity": "critical=18, high=167, medium=521, low=336",
+            "alert_stats_previous_week.by_severity": "critical=12, high=145, medium=502, low=319"
+          }
+        },
+        {
+          "section_id": "top_rules_changes",
+          "title": "TOP 5 规则变化",
+          "body": "# TOP 5 规则变化\n\n| 数据字段 | 值 |\n| --- | --- |\n| alert_stats_current_week.top_rules | rule_name=SSH Brute Force Detection, count=287, change_vs_prev=+15%, rule_name=Suspicious DNS Tunneling, count=198, change_vs_prev=+42%, rule_name=Multiple Failed Logins from Same Source, count=176, change_vs_prev=-8%, rule_name=Outbound Connection to Known C2, count=123, change_vs_prev=+20%, rule_name=Malware Detected on Endpoint, count=98, change_vs_prev=-5% |",
+          "data_source_mapping": {
+            "alert_stats_current_week.top_rules": "rule_name=SSH Brute Force Detection, count=287, change_vs_prev=+15%, rule_name=Suspicious DNS Tunneling, count=198, change_vs_prev=+42%, rule_name=Multiple Failed Logins from Same Source, count=176, change_vs_prev=-8%, rule_name=Outbound Connection to Known C2, count=123, change_vs_prev=+20%, rule_name=Malware Detected on Endpoint, count=98, change_vs_prev=-5%"
+          }
+        },
+        {
+          "section_id": "external_threats",
+          "title": "外部威胁来源",
+          "body": "# 外部威胁来源\n\n- alert_stats_current_week.external_threat_ips：ip=203.0.113.88, attack_count=345, threat_type=SSH暴力破解, ip=198.51.100.123, attack_count=267, threat_type=DNS隧道",
+          "data_source_mapping": {
+            "alert_stats_current_week.external_threat_ips": "ip=203.0.113.88, attack_count=345, threat_type=SSH暴力破解, ip=198.51.100.123, attack_count=267, threat_type=DNS隧道"
+          }
+        }
+      ]
+    },
+    "masking_applied": [],
+    "metadata": {
+      "generated_at": "2026-W29T00:00:00+00:00",
+      "data_sources_used": [
+        "alert_stats_current_week",
+        "alert_stats_previous_week"
+      ],
+      "push_status": "draft"
+    }
+  },
+  "code_graders": {
+    "data_accuracy": {
+      "passed": true,
+      "reason": "all declared metrics match source data",
+      "expected": [
+        {
+          "metric": "本周告警总数",
+          "source_path": "alert_stats_current_week.total",
+          "expected_value": 1042
+        },
+        {
+          "metric": "上周告警总数",
+          "source_path": "alert_stats_previous_week.total",
+          "expected_value": 978
+        }
+      ],
+      "actual": [
+        {
+          "metric": "本周告警总数",
+          "source_value": 1042,
+          "mappings": [
+            "1042"
+          ]
+        },
+        {
+          "metric": "上周告警总数",
+          "source_value": 978,
+          "mappings": [
+            "978"
+          ]
+        }
+      ]
+    },
+    "template_completeness": {
+      "passed": true,
+      "reason": "all required sections are present and complete",
+      "expected": [
+        "overall_trend",
+        "severity_trend",
+        "top_rules_changes",
+        "external_threats"
+      ],
+      "actual": {
+        "section_ids": [
+          "overall_trend",
+          "severity_trend",
+          "top_rules_changes",
+          "external_threats"
+        ],
+        "placeholders": []
+      }
+    },
+    "format_compliance": {
+      "passed": true,
+      "reason": "Markdown structure is compliant",
+      "expected": "balanced fences, non-skipping headings, consistent table columns",
+      "actual": []
+    },
+    "masking_check": {
+      "passed": true,
+      "reason": "security-lead technical values retained",
+      "expected": [
+        "SSH Brute Force Detection",
+        "203.0.113.88"
+      ],
+      "actual": {
+        "removed": []
+      }
+    },
+    "push_target": {
+      "passed": true,
+      "reason": "push target exactly matches configuration",
+      "expected": {
+        "channel": "email",
+        "recipients": [
+          "security-lead@company.com"
+        ]
+      },
+      "actual": {
+        "channel": "email",
+        "recipients": [
+          "security-lead@company.com"
+        ]
+      }
+    },
+    "output_schema": {
+      "passed": true,
+      "reason": "output schema valid",
+      "expected": "ReportOutput contract",
+      "actual": "valid"
+    }
+  },
+  "model_scores": null,
+  "calls": [],
+  "overall_pass": true,
+  "error_type": null,
+  "error_message": null
+}

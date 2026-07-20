@@ -50,7 +50,7 @@ def write_reports(run_dir, manifest, results):
     columns = ["test_case_id", "status", "type", "difficulty", "overall_pass"] + list(CODE_CHECKS)
     csv_path = run_dir / "eval_summary.csv"
     with csv_path.open("w", newline="", encoding="utf-8-sig") as handle:
-        writer = csv.DictWriter(handle, fieldnames=columns)
+        writer = csv.DictWriter(handle, fieldnames=columns, lineterminator="\n")
         writer.writeheader()
         for row in rows:
             graders = _dump(row.get("code_graders") or {})

@@ -1,0 +1,138 @@
+{
+  "test_case_id": "S04-003",
+  "scenario": "安全负责人需要一份安全事件日报，列出当日所有安全事件详情和闭环状态",
+  "type": "daily_report",
+  "difficulty": "medium",
+  "is_positive": true,
+  "status": "completed",
+  "final_output": {
+    "report_title": "安全事件日报 —— 2026-07-16",
+    "report_type": "daily",
+    "target_audience": "security_lead",
+    "target_channel": "email",
+    "target_recipients": [
+      "security-lead@company.com"
+    ],
+    "content": {
+      "sections": [
+        {
+          "section_id": "incident_summary",
+          "title": "事件概览",
+          "body": "# 事件概览\n\n简述事件总数、严重度分布和闭环率。incident_list：incident_id=INC-2026-0716-001, type=phishing, severity=high, affected_asset=核心邮件服务器 EXCH-02, status=closed, opened_at=2026-07-16T08:15:00Z, closed_at=2026-07-16T09:30:00Z, response_time_minutes=15, assignee=张三, incident_id=INC-2026-0716-002, type=c2, severity=critical, affected_asset=业务前置机 Web-Proxy-01, status=containing, opened_at=2026-07-16T10:20:00Z, closed_at=None, response_time_minutes=5, assignee=李四, incident_id=INC-2026-0716-003, type=unauthorized_access, severity=medium, affected_asset=研发代码仓库 GitLab-03, status=investigating, opened_at=2026-07-16T13:45:00Z, closed_at=None, response_time_minutes=12, assignee=王五, incident_id=INC-2026-0716-004, type=data_leak, severity=high, affected_asset=文件共享服务器 NAS-01, status=closed, opened_at=2026-07-16T09:00:00Z, closed_at=2026-07-16T14:00:00Z, response_time_minutes=20, assignee=张三, incident_id=INC-2026-0716-005, type=ransomware, severity=critical, affected_asset=财务系统终端 FIN-PC-12, status=remediating, opened_at=2026-07-16T14:30:00Z, closed_at=None, response_time_minutes=8, assignee=李四。",
+          "data_source_mapping": {
+            "incident_list": "incident_id=INC-2026-0716-001, type=phishing, severity=high, affected_asset=核心邮件服务器 EXCH-02, status=closed, opened_at=2026-07-16T08:15:00Z, closed_at=2026-07-16T09:30:00Z, response_time_minutes=15, assignee=张三, incident_id=INC-2026-0716-002, type=c2, severity=critical, affected_asset=业务前置机 Web-Proxy-01, status=containing, opened_at=2026-07-16T10:20:00Z, closed_at=None, response_time_minutes=5, assignee=李四, incident_id=INC-2026-0716-003, type=unauthorized_access, severity=medium, affected_asset=研发代码仓库 GitLab-03, status=investigating, opened_at=2026-07-16T13:45:00Z, closed_at=None, response_time_minutes=12, assignee=王五, incident_id=INC-2026-0716-004, type=data_leak, severity=high, affected_asset=文件共享服务器 NAS-01, status=closed, opened_at=2026-07-16T09:00:00Z, closed_at=2026-07-16T14:00:00Z, response_time_minutes=20, assignee=张三, incident_id=INC-2026-0716-005, type=ransomware, severity=critical, affected_asset=财务系统终端 FIN-PC-12, status=remediating, opened_at=2026-07-16T14:30:00Z, closed_at=None, response_time_minutes=8, assignee=李四",
+            "incident_list.length": "5"
+          }
+        },
+        {
+          "section_id": "incident_table",
+          "title": "事件清单",
+          "body": "# 事件清单\n\n| 数据字段 | 值 |\n| --- | --- |\n| incident_list | incident_id=INC-2026-0716-001, type=phishing, severity=high, affected_asset=核心邮件服务器 EXCH-02, status=closed, opened_at=2026-07-16T08:15:00Z, closed_at=2026-07-16T09:30:00Z, response_time_minutes=15, assignee=张三, incident_id=INC-2026-0716-002, type=c2, severity=critical, affected_asset=业务前置机 Web-Proxy-01, status=containing, opened_at=2026-07-16T10:20:00Z, closed_at=None, response_time_minutes=5, assignee=李四, incident_id=INC-2026-0716-003, type=unauthorized_access, severity=medium, affected_asset=研发代码仓库 GitLab-03, status=investigating, opened_at=2026-07-16T13:45:00Z, closed_at=None, response_time_minutes=12, assignee=王五, incident_id=INC-2026-0716-004, type=data_leak, severity=high, affected_asset=文件共享服务器 NAS-01, status=closed, opened_at=2026-07-16T09:00:00Z, closed_at=2026-07-16T14:00:00Z, response_time_minutes=20, assignee=张三, incident_id=INC-2026-0716-005, type=ransomware, severity=critical, affected_asset=财务系统终端 FIN-PC-12, status=remediating, opened_at=2026-07-16T14:30:00Z, closed_at=None, response_time_minutes=8, assignee=李四 |",
+          "data_source_mapping": {
+            "incident_list": "incident_id=INC-2026-0716-001, type=phishing, severity=high, affected_asset=核心邮件服务器 EXCH-02, status=closed, opened_at=2026-07-16T08:15:00Z, closed_at=2026-07-16T09:30:00Z, response_time_minutes=15, assignee=张三, incident_id=INC-2026-0716-002, type=c2, severity=critical, affected_asset=业务前置机 Web-Proxy-01, status=containing, opened_at=2026-07-16T10:20:00Z, closed_at=None, response_time_minutes=5, assignee=李四, incident_id=INC-2026-0716-003, type=unauthorized_access, severity=medium, affected_asset=研发代码仓库 GitLab-03, status=investigating, opened_at=2026-07-16T13:45:00Z, closed_at=None, response_time_minutes=12, assignee=王五, incident_id=INC-2026-0716-004, type=data_leak, severity=high, affected_asset=文件共享服务器 NAS-01, status=closed, opened_at=2026-07-16T09:00:00Z, closed_at=2026-07-16T14:00:00Z, response_time_minutes=20, assignee=张三, incident_id=INC-2026-0716-005, type=ransomware, severity=critical, affected_asset=财务系统终端 FIN-PC-12, status=remediating, opened_at=2026-07-16T14:30:00Z, closed_at=None, response_time_minutes=8, assignee=李四"
+          }
+        },
+        {
+          "section_id": "unclosed_incidents",
+          "title": "未闭环事件",
+          "body": "# 未闭环事件\n\n- incident_list：incident_id=INC-2026-0716-001, type=phishing, severity=high, affected_asset=核心邮件服务器 EXCH-02, status=closed, opened_at=2026-07-16T08:15:00Z, closed_at=2026-07-16T09:30:00Z, response_time_minutes=15, assignee=张三, incident_id=INC-2026-0716-002, type=c2, severity=critical, affected_asset=业务前置机 Web-Proxy-01, status=containing, opened_at=2026-07-16T10:20:00Z, closed_at=None, response_time_minutes=5, assignee=李四, incident_id=INC-2026-0716-003, type=unauthorized_access, severity=medium, affected_asset=研发代码仓库 GitLab-03, status=investigating, opened_at=2026-07-16T13:45:00Z, closed_at=None, response_time_minutes=12, assignee=王五, incident_id=INC-2026-0716-004, type=data_leak, severity=high, affected_asset=文件共享服务器 NAS-01, status=closed, opened_at=2026-07-16T09:00:00Z, closed_at=2026-07-16T14:00:00Z, response_time_minutes=20, assignee=张三, incident_id=INC-2026-0716-005, type=ransomware, severity=critical, affected_asset=财务系统终端 FIN-PC-12, status=remediating, opened_at=2026-07-16T14:30:00Z, closed_at=None, response_time_minutes=8, assignee=李四",
+          "data_source_mapping": {
+            "incident_list": "incident_id=INC-2026-0716-001, type=phishing, severity=high, affected_asset=核心邮件服务器 EXCH-02, status=closed, opened_at=2026-07-16T08:15:00Z, closed_at=2026-07-16T09:30:00Z, response_time_minutes=15, assignee=张三, incident_id=INC-2026-0716-002, type=c2, severity=critical, affected_asset=业务前置机 Web-Proxy-01, status=containing, opened_at=2026-07-16T10:20:00Z, closed_at=None, response_time_minutes=5, assignee=李四, incident_id=INC-2026-0716-003, type=unauthorized_access, severity=medium, affected_asset=研发代码仓库 GitLab-03, status=investigating, opened_at=2026-07-16T13:45:00Z, closed_at=None, response_time_minutes=12, assignee=王五, incident_id=INC-2026-0716-004, type=data_leak, severity=high, affected_asset=文件共享服务器 NAS-01, status=closed, opened_at=2026-07-16T09:00:00Z, closed_at=2026-07-16T14:00:00Z, response_time_minutes=20, assignee=张三, incident_id=INC-2026-0716-005, type=ransomware, severity=critical, affected_asset=财务系统终端 FIN-PC-12, status=remediating, opened_at=2026-07-16T14:30:00Z, closed_at=None, response_time_minutes=8, assignee=李四"
+          }
+        }
+      ]
+    },
+    "masking_applied": [],
+    "metadata": {
+      "generated_at": "2026-07-16T00:00:00+00:00",
+      "data_sources_used": [
+        "incident_list"
+      ],
+      "push_status": "draft"
+    }
+  },
+  "code_graders": {
+    "data_accuracy": {
+      "passed": true,
+      "reason": "all declared metrics match source data",
+      "expected": [
+        {
+          "metric": "事件总数",
+          "source_path": "incident_list.length",
+          "expected_value": 5
+        }
+      ],
+      "actual": [
+        {
+          "metric": "事件总数",
+          "source_value": 5,
+          "mappings": [
+            "5"
+          ]
+        }
+      ]
+    },
+    "template_completeness": {
+      "passed": true,
+      "reason": "all required sections are present and complete",
+      "expected": [
+        "incident_summary",
+        "incident_table",
+        "unclosed_incidents"
+      ],
+      "actual": {
+        "section_ids": [
+          "incident_summary",
+          "incident_table",
+          "unclosed_incidents"
+        ],
+        "placeholders": []
+      }
+    },
+    "format_compliance": {
+      "passed": true,
+      "reason": "Markdown structure is compliant",
+      "expected": "balanced fences, non-skipping headings, consistent table columns",
+      "actual": []
+    },
+    "masking_check": {
+      "passed": true,
+      "reason": "security-lead technical values retained",
+      "expected": [
+        "INC-2026-0716-001",
+        "phishing",
+        "EXCH-02"
+      ],
+      "actual": {
+        "removed": []
+      }
+    },
+    "push_target": {
+      "passed": true,
+      "reason": "push target exactly matches configuration",
+      "expected": {
+        "channel": "email",
+        "recipients": [
+          "security-lead@company.com"
+        ]
+      },
+      "actual": {
+        "channel": "email",
+        "recipients": [
+          "security-lead@company.com"
+        ]
+      }
+    },
+    "output_schema": {
+      "passed": true,
+      "reason": "output schema valid",
+      "expected": "ReportOutput contract",
+      "actual": "valid"
+    }
+  },
+  "model_scores": null,
+  "calls": [],
+  "overall_pass": true,
+  "error_type": null,
+  "error_message": null
+}

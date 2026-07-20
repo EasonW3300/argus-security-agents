@@ -1,0 +1,146 @@
+{
+  "test_case_id": "S04-017",
+  "scenario": "安全负责人需要护网行动总结报告，包含攻击源TOP10、防护成功率和红蓝对抗发现",
+  "type": "special_report",
+  "difficulty": "medium",
+  "is_positive": true,
+  "status": "completed",
+  "final_output": {
+    "report_title": "护网行动总结报告 —— 2026-07",
+    "report_type": "special",
+    "target_audience": "security_lead",
+    "target_channel": "email",
+    "target_recipients": [
+      "security-lead@company.com"
+    ],
+    "content": {
+      "sections": [
+        {
+          "section_id": "overview",
+          "title": "总体战果",
+          "body": "# 总体战果\n\n总防护成功率和关键数据。hw_summary.defense_success_rate：98%。",
+          "data_source_mapping": {
+            "hw_summary.defense_success_rate": "98%"
+          }
+        },
+        {
+          "section_id": "attack_sources",
+          "title": "攻击源 TOP10",
+          "body": "# 攻击源 TOP10\n\n| 数据字段 | 值 |\n| --- | --- |\n| hw_summary.attack_sources_top10 | ip=203.0.113.77, attack_count=1240, ip=198.51.100.44, attack_count=987 |",
+          "data_source_mapping": {
+            "hw_summary.attack_sources_top10": "ip=203.0.113.77, attack_count=1240, ip=198.51.100.44, attack_count=987"
+          }
+        },
+        {
+          "section_id": "stages",
+          "title": "各阶段发现",
+          "body": "# 各阶段发现\n\n- hw_summary.stages：phase=准备阶段, key_findings=暴露面梳理发现2个未备案对外服务, phase=攻防对抗, key_findings=成功阻断99%攻击，1台服务器因弱口令被突破但及时隔离",
+          "data_source_mapping": {
+            "hw_summary.stages": "phase=准备阶段, key_findings=暴露面梳理发现2个未备案对外服务, phase=攻防对抗, key_findings=成功阻断99%攻击，1台服务器因弱口令被突破但及时隔离"
+          }
+        },
+        {
+          "section_id": "personnel",
+          "title": "参与人员",
+          "body": "# 参与人员\n\n| 数据字段 | 值 |\n| --- | --- |\n| hw_summary.team_members | name=张三, role=总指挥, name=李四, role=蓝队队长 |",
+          "data_source_mapping": {
+            "hw_summary.team_members": "name=张三, role=总指挥, name=李四, role=蓝队队长"
+          }
+        }
+      ]
+    },
+    "masking_applied": [],
+    "metadata": {
+      "generated_at": "2026-07T00:00:00+00:00",
+      "data_sources_used": [
+        "hw_summary"
+      ],
+      "push_status": "draft"
+    }
+  },
+  "code_graders": {
+    "data_accuracy": {
+      "passed": true,
+      "reason": "all declared metrics match source data",
+      "expected": [
+        {
+          "metric": "防护成功率",
+          "source_path": "hw_summary.defense_success_rate",
+          "expected_value": 0.98
+        }
+      ],
+      "actual": [
+        {
+          "metric": "防护成功率",
+          "source_value": 0.98,
+          "mappings": [
+            "98%"
+          ]
+        }
+      ]
+    },
+    "template_completeness": {
+      "passed": true,
+      "reason": "all required sections are present and complete",
+      "expected": [
+        "overview",
+        "attack_sources",
+        "stages",
+        "personnel"
+      ],
+      "actual": {
+        "section_ids": [
+          "overview",
+          "attack_sources",
+          "stages",
+          "personnel"
+        ],
+        "placeholders": []
+      }
+    },
+    "format_compliance": {
+      "passed": true,
+      "reason": "Markdown structure is compliant",
+      "expected": "balanced fences, non-skipping headings, consistent table columns",
+      "actual": []
+    },
+    "masking_check": {
+      "passed": true,
+      "reason": "security-lead technical values retained",
+      "expected": [
+        "203.0.113.77",
+        "张三"
+      ],
+      "actual": {
+        "removed": []
+      }
+    },
+    "push_target": {
+      "passed": true,
+      "reason": "push target exactly matches configuration",
+      "expected": {
+        "channel": "email",
+        "recipients": [
+          "security-lead@company.com"
+        ]
+      },
+      "actual": {
+        "channel": "email",
+        "recipients": [
+          "security-lead@company.com"
+        ]
+      }
+    },
+    "output_schema": {
+      "passed": true,
+      "reason": "output schema valid",
+      "expected": "ReportOutput contract",
+      "actual": "valid"
+    }
+  },
+  "model_scores": null,
+  "calls": [],
+  "overall_pass": true,
+  "error_type": null,
+  "error_message": null
+}

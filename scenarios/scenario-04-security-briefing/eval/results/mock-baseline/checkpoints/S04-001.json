@@ -1,0 +1,164 @@
+{
+  "test_case_id": "S04-001",
+  "scenario": "安全负责人需要一份日常告警态势日报，展示告警总数、级别分布、TOP3规则及处置率",
+  "type": "daily_report",
+  "difficulty": "easy",
+  "is_positive": true,
+  "status": "completed",
+  "final_output": {
+    "report_title": "安全态势日报 —— 2026-07-16",
+    "report_type": "daily",
+    "target_audience": "security_lead",
+    "target_channel": "email",
+    "target_recipients": [
+      "security-lead@company.com"
+    ],
+    "content": {
+      "sections": [
+        {
+          "section_id": "summary",
+          "title": "总体摘要",
+          "body": "# 总体摘要\n\n一段话概括今日告警总数、级别分布和处置率。alert_stats.total：156；alert_stats.by_severity：critical=3, high=23, medium=78, low=52；alert_stats.disposal_rate：87%。",
+          "data_source_mapping": {
+            "alert_stats.total": "156",
+            "alert_stats.by_severity": "critical=3, high=23, medium=78, low=52",
+            "alert_stats.disposal_rate": "87%"
+          }
+        },
+        {
+          "section_id": "severity_breakdown",
+          "title": "告警级别分布",
+          "body": "# 告警级别分布\n\n| 数据字段 | 值 |\n| --- | --- |\n| alert_stats.by_severity | critical=3, high=23, medium=78, low=52 |",
+          "data_source_mapping": {
+            "alert_stats.by_severity": "critical=3, high=23, medium=78, low=52"
+          }
+        },
+        {
+          "section_id": "top_rules",
+          "title": "TOP 3 告警规则",
+          "body": "# TOP 3 告警规则\n\n- alert_stats.top_rules：rule_name=Multiple Failed Logins from Same Source, count=45, change=+8%, rule_name=Suspicious Outbound Data Transfer, count=32, change=+5%, rule_name=Malware Detected on Endpoint, count=18, change=-2%",
+          "data_source_mapping": {
+            "alert_stats.top_rules": "rule_name=Multiple Failed Logins from Same Source, count=45, change=+8%, rule_name=Suspicious Outbound Data Transfer, count=32, change=+5%, rule_name=Malware Detected on Endpoint, count=18, change=-2%"
+          }
+        },
+        {
+          "section_id": "disposal_metrics",
+          "title": "处置效率",
+          "body": "# 处置效率\n\n描述处置率、平均处置时间和待处理队列。alert_stats.disposal_rate：87%；alert_stats.avg_disposal_minutes：23；alert_stats.pending_queue：12。",
+          "data_source_mapping": {
+            "alert_stats.disposal_rate": "87%",
+            "alert_stats.avg_disposal_minutes": "23",
+            "alert_stats.pending_queue": "12"
+          }
+        }
+      ]
+    },
+    "masking_applied": [],
+    "metadata": {
+      "generated_at": "2026-07-16T00:00:00+00:00",
+      "data_sources_used": [
+        "alert_stats"
+      ],
+      "push_status": "draft"
+    }
+  },
+  "code_graders": {
+    "data_accuracy": {
+      "passed": true,
+      "reason": "all declared metrics match source data",
+      "expected": [
+        {
+          "metric": "告警总数",
+          "source_path": "alert_stats.total",
+          "expected_value": 156
+        },
+        {
+          "metric": "处置率",
+          "source_path": "alert_stats.disposal_rate",
+          "expected_value": 0.87
+        }
+      ],
+      "actual": [
+        {
+          "metric": "告警总数",
+          "source_value": 156,
+          "mappings": [
+            "156"
+          ]
+        },
+        {
+          "metric": "处置率",
+          "source_value": 0.87,
+          "mappings": [
+            "87%",
+            "87%"
+          ]
+        }
+      ]
+    },
+    "template_completeness": {
+      "passed": true,
+      "reason": "all required sections are present and complete",
+      "expected": [
+        "summary",
+        "severity_breakdown",
+        "top_rules",
+        "disposal_metrics"
+      ],
+      "actual": {
+        "section_ids": [
+          "summary",
+          "severity_breakdown",
+          "top_rules",
+          "disposal_metrics"
+        ],
+        "placeholders": []
+      }
+    },
+    "format_compliance": {
+      "passed": true,
+      "reason": "Markdown structure is compliant",
+      "expected": "balanced fences, non-skipping headings, consistent table columns",
+      "actual": []
+    },
+    "masking_check": {
+      "passed": true,
+      "reason": "security-lead technical values retained",
+      "expected": [
+        "156",
+        "87%",
+        "Multiple Failed Logins"
+      ],
+      "actual": {
+        "removed": []
+      }
+    },
+    "push_target": {
+      "passed": true,
+      "reason": "push target exactly matches configuration",
+      "expected": {
+        "channel": "email",
+        "recipients": [
+          "security-lead@company.com"
+        ]
+      },
+      "actual": {
+        "channel": "email",
+        "recipients": [
+          "security-lead@company.com"
+        ]
+      }
+    },
+    "output_schema": {
+      "passed": true,
+      "reason": "output schema valid",
+      "expected": "ReportOutput contract",
+      "actual": "valid"
+    }
+  },
+  "model_scores": null,
+  "calls": [],
+  "overall_pass": true,
+  "error_type": null,
+  "error_message": null
+}
