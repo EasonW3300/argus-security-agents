@@ -129,7 +129,9 @@ def _valid_masked_leaf(leaf, output, case):
         ):
             continue
         try:
-            rule_matches_original = re.search(rule, original) is not None
+            # A record may replace only the sensitive fragment matched by its
+            # declared rule, never an entire surrounding source leaf.
+            rule_matches_original = re.fullmatch(rule, original) is not None
         except re.error:
             rule_matches_original = False
         if not rule_matches_original:

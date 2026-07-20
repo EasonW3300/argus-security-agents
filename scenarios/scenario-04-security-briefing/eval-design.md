@@ -95,7 +95,7 @@
 }
 ```
 
-`data_source_mapping` 始终保存“指标名 → 源字段路径”，不能存放数值；`data_values` 以相同指标名保存实际值。每个模板章节的 `required_data` 都必须在该章节映射中出现，正文还要显式声明对应指标和值。若值为对象或数组，正文必须包含每一个标量叶子值；仅当受众为管理层、用例启用脱敏，并且 `{original, masked, rule}` 中 `original` 与 `rule` 同时匹配 `should_be_masked=true` 敏感模式时，敏感叶子才可改为 record 的脱敏值。不能仅输出来源路径或伪造 audit record。
+`data_source_mapping` 始终保存“指标名 → 源字段路径”，不能存放数值；`data_values` 以相同指标名保存实际值。每个模板章节的 `required_data` 都必须在该章节映射中出现，正文还要显式声明对应指标和值。若值为对象或数组，正文必须包含每一个标量叶子值；仅当受众为管理层、用例启用脱敏，并且 `{original, masked, rule}` 中 `original` 被 `rule` 全串匹配、`rule` 等于 `should_be_masked=true` 敏感模式时，敏感叶子才可局部改为 record 的脱敏值。不能仅输出来源路径、伪造 audit record，或用敏感片段遮蔽整条叶子。
 
 `data_values` 和 `masking_applied.original` 是评分审计字段，不属于管理层可见简报；脱敏 Grader 因此扫描正文、展示标题、来源路径映射和元数据，而不把合规审计字段视作泄漏。
 

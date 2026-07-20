@@ -114,6 +114,22 @@ class CodeGraderTests(unittest.TestCase):
         self.assertFalse(results["data_accuracy"].passed)
         self.assertFalse(results["template_completeness"].passed)
 
+    def test_management_masking_cannot_replace_an_entire_leaf_for_one_sensitive_fragment(self):
+        case = self.cases[12]
+        output = run_mock_case(case)["final_output"]
+        section = next(item for item in output["content"]["sections"] if item["section_id"] == "remediation_matrix")
+        section["body"] = section["body"].replace("部门 A服务器存在未修复高危漏洞", "HIDDEN")
+        output["masking_applied"].insert(0, {
+            "original": "核心业务部服务器存在未修复高危漏洞",
+            "masked": "HIDDEN",
+            "rule": "核心业务部",
+        })
+
+        results = run_code_graders(output, case)
+
+        self.assertFalse(results["data_accuracy"].passed)
+        self.assertFalse(results["template_completeness"].passed)
+
     def test_data_accuracy_binds_body_mapping_and_actual_value_to_the_same_path(self):
         case = self.cases[0]
         output = run_mock_case(case)["final_output"]
