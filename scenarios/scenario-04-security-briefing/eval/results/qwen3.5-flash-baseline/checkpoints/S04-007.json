@@ -1,0 +1,319 @@
+{
+  "test_case_id": "S04-007",
+  "scenario": "安全负责人需要处置效率周报，展示平均处置时长、超时工单和分析师绩效排名",
+  "type": "weekly_report",
+  "difficulty": "medium",
+  "is_positive": true,
+  "status": "completed",
+  "final_output": {
+    "report_title": "处置效率周报 —— 2026-W29",
+    "report_type": "weekly",
+    "target_audience": "security_lead",
+    "target_channel": "email",
+    "target_recipients": [
+      "security-lead@company.com"
+    ],
+    "content": {
+      "sections": [
+        {
+          "section_id": "efficiency_summary",
+          "title": "处置效率摘要",
+          "body": "本周平均处置时间为27分钟，超时工单数量为8个。",
+          "data_source_mapping": {
+            "avg_disposal_minutes": "weekly_efficiency.avg_disposal_minutes",
+            "timeout_count": "weekly_efficiency.timeout_count"
+          },
+          "data_values": {
+            "avg_disposal_minutes": 27,
+            "timeout_count": 8
+          }
+        },
+        {
+          "section_id": "analyst_ranking",
+          "title": "分析师绩效排名",
+          "body": "| 姓名 | 团队 | 处置量 | 处置率 | 超时数 |\n|------|------|--------|--------|--------|\n| 张三 | 安全运营一组 | 145 | 0.94 | 1 |\n| 李四 | 安全运营一组 | 132 | 0.91 | 2 |\n| 王五 | 安全运营二组 | 118 | 0.88 | 3 |",
+          "data_source_mapping": {
+            "analysts": "weekly_efficiency.analysts"
+          },
+          "data_values": {
+            "analysts": [
+              {
+                "name": "张三",
+                "team": "安全运营一组",
+                "disposal_count": 145,
+                "disposal_rate": 0.94,
+                "timeout_count": 1
+              },
+              {
+                "name": "李四",
+                "team": "安全运营一组",
+                "disposal_count": 132,
+                "disposal_rate": 0.91,
+                "timeout_count": 2
+              },
+              {
+                "name": "王五",
+                "team": "安全运营二组",
+                "disposal_count": 118,
+                "disposal_rate": 0.88,
+                "timeout_count": 3
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "masking_applied": [],
+    "metadata": {
+      "generated_at": "2026-07-15T10:30:00Z",
+      "data_sources_used": [
+        "weekly_efficiency"
+      ],
+      "push_status": "draft"
+    }
+  },
+  "code_graders": {
+    "data_accuracy": {
+      "passed": false,
+      "reason": "metric mismatch: efficiency_summary:weekly_efficiency.avg_disposal_minutes body, efficiency_summary:weekly_efficiency.timeout_count body, analyst_ranking:weekly_efficiency.analysts body, 平均处置分钟, 张三处置量",
+      "expected": [
+        {
+          "metric": "平均处置分钟",
+          "source_path": "weekly_efficiency.avg_disposal_minutes",
+          "expected_value": 27
+        },
+        {
+          "metric": "张三处置量",
+          "source_path": "weekly_efficiency.analysts[0].disposal_count",
+          "expected_value": 145
+        }
+      ],
+      "actual": [
+        {
+          "metric": "平均处置分钟",
+          "source_value": 27,
+          "data_values": [
+            27
+          ]
+        },
+        {
+          "metric": "张三处置量",
+          "source_value": 145,
+          "data_values": []
+        }
+      ]
+    },
+    "template_completeness": {
+      "passed": false,
+      "reason": "section ids, bodies, placeholders, or required data are invalid",
+      "expected": [
+        "efficiency_summary",
+        "analyst_ranking"
+      ],
+      "actual": {
+        "section_ids": [
+          "efficiency_summary",
+          "analyst_ranking"
+        ],
+        "placeholders": [],
+        "missing_required_data": [
+          "efficiency_summary:weekly_efficiency.avg_disposal_minutes body",
+          "efficiency_summary:weekly_efficiency.timeout_count body",
+          "analyst_ranking:weekly_efficiency.analysts body"
+        ]
+      }
+    },
+    "format_compliance": {
+      "passed": false,
+      "reason": "missing Markdown heading in efficiency_summary; missing Markdown heading in analyst_ranking",
+      "expected": "balanced fences, non-skipping headings, consistent table columns",
+      "actual": [
+        "missing Markdown heading in efficiency_summary",
+        "missing Markdown heading in analyst_ranking"
+      ]
+    },
+    "masking_check": {
+      "passed": true,
+      "reason": "security-lead technical values retained",
+      "expected": [
+        "张三",
+        "安全运营一组"
+      ],
+      "actual": {
+        "removed": []
+      }
+    },
+    "push_target": {
+      "passed": true,
+      "reason": "push target exactly matches configuration",
+      "expected": {
+        "channel": "email",
+        "recipients": [
+          "security-lead@company.com"
+        ]
+      },
+      "actual": {
+        "channel": "email",
+        "recipients": [
+          "security-lead@company.com"
+        ]
+      }
+    },
+    "output_schema": {
+      "passed": true,
+      "reason": "output schema valid",
+      "expected": "ReportOutput contract",
+      "actual": "valid"
+    }
+  },
+  "model_scores": {
+    "language_quality": {
+      "score": 5,
+      "reason": "文本专业简洁，使用标准安全运营术语（如'超时工单'、'处置率'），数据呈现清晰，完全适配安全负责人的决策需求。",
+      "errors": []
+    },
+    "insight_quality": {
+      "score": 1,
+      "reason": "简报内容仅为原始数据罗列（平均处置时间、超时数量、分析师排名表），缺乏历史趋势对比、异常根因分析及针对安全负责人的可执行建议，未达到数据解读与决策支持的要求。",
+      "errors": []
+    }
+  },
+  "calls": [
+    {
+      "label": "agent",
+      "parsed": {
+        "report_title": "处置效率周报 —— 2026-W29",
+        "report_type": "weekly",
+        "target_audience": "security_lead",
+        "target_channel": "email",
+        "target_recipients": [
+          "security-lead@company.com"
+        ],
+        "content": {
+          "sections": [
+            {
+              "section_id": "efficiency_summary",
+              "title": "处置效率摘要",
+              "body": "本周平均处置时间为27分钟，超时工单数量为8个。",
+              "data_source_mapping": {
+                "avg_disposal_minutes": "weekly_efficiency.avg_disposal_minutes",
+                "timeout_count": "weekly_efficiency.timeout_count"
+              },
+              "data_values": {
+                "avg_disposal_minutes": 27,
+                "timeout_count": 8
+              }
+            },
+            {
+              "section_id": "analyst_ranking",
+              "title": "分析师绩效排名",
+              "body": "| 姓名 | 团队 | 处置量 | 处置率 | 超时数 |\n|------|------|--------|--------|--------|\n| 张三 | 安全运营一组 | 145 | 0.94 | 1 |\n| 李四 | 安全运营一组 | 132 | 0.91 | 2 |\n| 王五 | 安全运营二组 | 118 | 0.88 | 3 |",
+              "data_source_mapping": {
+                "analysts": "weekly_efficiency.analysts"
+              },
+              "data_values": {
+                "analysts": [
+                  {
+                    "name": "张三",
+                    "team": "安全运营一组",
+                    "disposal_count": 145,
+                    "disposal_rate": 0.94,
+                    "timeout_count": 1
+                  },
+                  {
+                    "name": "李四",
+                    "team": "安全运营一组",
+                    "disposal_count": 132,
+                    "disposal_rate": 0.91,
+                    "timeout_count": 2
+                  },
+                  {
+                    "name": "王五",
+                    "team": "安全运营二组",
+                    "disposal_count": 118,
+                    "disposal_rate": 0.88,
+                    "timeout_count": 3
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "masking_applied": [],
+        "metadata": {
+          "generated_at": "2026-07-15T10:30:00Z",
+          "data_sources_used": [
+            "weekly_efficiency"
+          ],
+          "push_status": "draft"
+        }
+      },
+      "raw_text": "{\n  \"report_title\": \"处置效率周报 —— 2026-W29\",\n  \"report_type\": \"weekly\",\n  \"target_audience\": \"security_lead\",\n  \"target_channel\": \"email\",\n  \"target_recipients\": [\n    \"security-lead@company.com\"\n  ],\n  \"content\": {\n    \"sections\": [\n      {\n        \"section_id\": \"efficiency_summary\",\n        \"title\": \"处置效率摘要\",\n        \"body\": \"本周平均处置时间为27分钟，超时工单数量为8个。\",\n        \"data_source_mapping\": {\n          \"avg_disposal_minutes\": \"weekly_efficiency.avg_disposal_minutes\",\n          \"timeout_count\": \"weekly_efficiency.timeout_count\"\n        },\n        \"data_values\": {\n          \"avg_disposal_minutes\": 27,\n          \"timeout_count\": 8\n        }\n      },\n      {\n        \"section_id\": \"analyst_ranking\",\n        \"title\": \"分析师绩效排名\",\n        \"body\": \"| 姓名 | 团队 | 处置量 | 处置率 | 超时数 |\\n|------|------|--------|--------|--------|\\n| 张三 | 安全运营一组 | 145 | 0.94 | 1 |\\n| 李四 | 安全运营一组 | 132 | 0.91 | 2 |\\n| 王五 | 安全运营二组 | 118 | 0.88 | 3 |\",\n        \"data_source_mapping\": {\n          \"analysts\": \"weekly_efficiency.analysts\"\n        },\n        \"data_values\": {\n          \"analysts\": [\n            {\n              \"name\": \"张三\",\n              \"team\": \"安全运营一组\",\n              \"disposal_count\": 145,\n              \"disposal_rate\": 0.94,\n              \"timeout_count\": 1\n            },\n            {\n              \"name\": \"李四\",\n              \"team\": \"安全运营一组\",\n              \"disposal_count\": 132,\n              \"disposal_rate\": 0.91,\n              \"timeout_count\": 2\n            },\n            {\n              \"name\": \"王五\",\n              \"team\": \"安全运营二组\",\n              \"disposal_count\": 118,\n              \"disposal_rate\": 0.88,\n              \"timeout_count\": 3\n            }\n          ]\n        }\n      }\n    ]\n  },\n  \"masking_applied\": [],\n  \"metadata\": {\n    \"generated_at\": \"2026-07-15T10:30:00Z\",\n    \"data_sources_used\": [\n      \"weekly_efficiency\"\n    ],\n    \"push_status\": \"draft\"\n  }\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1077,
+      "output_tokens": 1447,
+      "latency_ms": 13332,
+      "attempts": 1
+    },
+    {
+      "label": "judge:language_quality",
+      "parsed": {
+        "score": 5,
+        "reason": "文本专业简洁，使用标准安全运营术语（如'超时工单'、'处置率'），数据呈现清晰，完全适配安全负责人的决策需求。",
+        "errors": []
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"文本专业简洁，使用标准安全运营术语（如'超时工单'、'处置率'），数据呈现清晰，完全适配安全负责人的决策需求。\",\n  \"errors\": []\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 607,
+      "output_tokens": 1589,
+      "latency_ms": 14843,
+      "attempts": 1
+    },
+    {
+      "label": "judge:insight_quality",
+      "parsed": {
+        "score": 1,
+        "reason": "简报内容仅为原始数据罗列（平均处置时间、超时数量、分析师排名表），缺乏历史趋势对比、异常根因分析及针对安全负责人的可执行建议，未达到数据解读与决策支持的要求。",
+        "errors": []
+      },
+      "raw_text": "{\n  \"score\": 1,\n  \"reason\": \"简报内容仅为原始数据罗列（平均处置时间、超时数量、分析师排名表），缺乏历史趋势对比、异常根因分析及针对安全负责人的可执行建议，未达到数据解读与决策支持的要求。\",\n  \"errors\": []\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 615,
+      "output_tokens": 2580,
+      "latency_ms": 24761,
+      "attempts": 1
+    }
+  ],
+  "overall_pass": false,
+  "error_type": null,
+  "error_message": null,
+  "run_provenance": {
+    "dataset_sha256": "649a00fd34d4d65188498c83dca61342356ab900089ceddd512b96137c24a46c",
+    "agent_mode": "real",
+    "agent": {
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1",
+      "response_mode": "json_object",
+      "temperature": 0.0,
+      "max_tokens": 4096,
+      "timeout_seconds": 90.0
+    },
+    "judge": {
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1",
+      "response_mode": "json_object",
+      "temperature": 0.0,
+      "max_tokens": 4096,
+      "timeout_seconds": 90.0
+    },
+    "grader_mode": "code_and_model"
+  }
+}

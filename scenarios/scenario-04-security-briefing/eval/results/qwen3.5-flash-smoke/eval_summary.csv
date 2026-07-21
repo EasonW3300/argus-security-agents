@@ -1,0 +1,4 @@
+﻿test_case_id,status,type,difficulty,overall_pass,data_accuracy,template_completeness,format_compliance,masking_check,push_target,output_schema
+S04-001,completed,daily_report,easy,False,False,False,False,True,True,True
+S04-002,completed,daily_report,easy,False,False,False,False,True,True,True
+S04-003,completed,daily_report,medium,False,False,False,False,True,True,True

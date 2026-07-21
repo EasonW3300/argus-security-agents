@@ -1,0 +1,372 @@
+{
+  "test_case_id": "S04-017",
+  "scenario": "安全负责人需要护网行动总结报告，包含攻击源TOP10、防护成功率和红蓝对抗发现",
+  "type": "special_report",
+  "difficulty": "medium",
+  "is_positive": true,
+  "status": "completed",
+  "final_output": {
+    "report_title": "护网行动总结报告 —— 2026-07",
+    "report_type": "special",
+    "target_audience": "security_lead",
+    "target_channel": "email",
+    "target_recipients": [
+      "security-lead@company.com"
+    ],
+    "content": {
+      "sections": [
+        {
+          "section_id": "overview",
+          "title": "总体战果",
+          "body": "本次护网行动总体防护成功率为 0.98。",
+          "data_source_mapping": {
+            "defense_success_rate": "hw_summary.defense_success_rate"
+          },
+          "data_values": {
+            "defense_success_rate": 0.98
+          }
+        },
+        {
+          "section_id": "attack_sources",
+          "title": "攻击源 TOP10",
+          "body": "| IP | 攻击次数 |\n| --- | --- |\n| 203.0.113.77 | 1240 |\n| 198.51.100.44 | 987 |",
+          "data_source_mapping": {
+            "attack_sources_top10": "hw_summary.attack_sources_top10"
+          },
+          "data_values": {
+            "attack_sources_top10": [
+              {
+                "ip": "203.0.113.77",
+                "attack_count": 1240
+              },
+              {
+                "ip": "198.51.100.44",
+                "attack_count": 987
+              }
+            ]
+          }
+        },
+        {
+          "section_id": "stages",
+          "title": "各阶段发现",
+          "body": "- **准备阶段**: 暴露面梳理发现2个未备案对外服务\n- **攻防对抗**: 成功阻断99%攻击，1台服务器因弱口令被突破但及时隔离",
+          "data_source_mapping": {
+            "stages": "hw_summary.stages"
+          },
+          "data_values": {
+            "stages": [
+              {
+                "phase": "准备阶段",
+                "key_findings": "暴露面梳理发现2个未备案对外服务"
+              },
+              {
+                "phase": "攻防对抗",
+                "key_findings": "成功阻断99%攻击，1台服务器因弱口令被突破但及时隔离"
+              }
+            ]
+          }
+        },
+        {
+          "section_id": "personnel",
+          "title": "参与人员",
+          "body": "| 姓名 | 角色 |\n| --- | --- |\n| 张三 | 总指挥 |\n| 李四 | 蓝队队长 |",
+          "data_source_mapping": {
+            "team_members": "hw_summary.team_members"
+          },
+          "data_values": {
+            "team_members": [
+              {
+                "name": "张三",
+                "role": "总指挥"
+              },
+              {
+                "name": "李四",
+                "role": "蓝队队长"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "masking_applied": [],
+    "metadata": {
+      "generated_at": "2026-07-21T00:00:00Z",
+      "data_sources_used": [
+        "hw_summary"
+      ],
+      "push_status": "draft"
+    }
+  },
+  "code_graders": {
+    "data_accuracy": {
+      "passed": false,
+      "reason": "metric mismatch: overview:hw_summary.defense_success_rate body, attack_sources:hw_summary.attack_sources_top10 body, stages:hw_summary.stages body, personnel:hw_summary.team_members body, 防护成功率, unbound body declaration - **准备阶段**: 暴露面梳理发现2个未备案对外服务, unbound body declaration - **攻防对抗**: 成功阻断99%攻击，1台服务器因弱口令被突破但及时隔离",
+      "expected": [
+        {
+          "metric": "防护成功率",
+          "source_path": "hw_summary.defense_success_rate",
+          "expected_value": 0.98
+        }
+      ],
+      "actual": [
+        {
+          "metric": "防护成功率",
+          "source_value": 0.98,
+          "data_values": [
+            0.98
+          ]
+        }
+      ]
+    },
+    "template_completeness": {
+      "passed": false,
+      "reason": "section ids, bodies, placeholders, or required data are invalid",
+      "expected": [
+        "overview",
+        "attack_sources",
+        "stages",
+        "personnel"
+      ],
+      "actual": {
+        "section_ids": [
+          "overview",
+          "attack_sources",
+          "stages",
+          "personnel"
+        ],
+        "placeholders": [],
+        "missing_required_data": [
+          "overview:hw_summary.defense_success_rate body",
+          "attack_sources:hw_summary.attack_sources_top10 body",
+          "stages:hw_summary.stages body",
+          "personnel:hw_summary.team_members body"
+        ]
+      }
+    },
+    "format_compliance": {
+      "passed": false,
+      "reason": "missing Markdown heading in overview; missing Markdown heading in attack_sources; missing Markdown heading in stages; missing Markdown heading in personnel",
+      "expected": "balanced fences, non-skipping headings, consistent table columns",
+      "actual": [
+        "missing Markdown heading in overview",
+        "missing Markdown heading in attack_sources",
+        "missing Markdown heading in stages",
+        "missing Markdown heading in personnel"
+      ]
+    },
+    "masking_check": {
+      "passed": true,
+      "reason": "security-lead technical values retained",
+      "expected": [
+        "203.0.113.77",
+        "张三"
+      ],
+      "actual": {
+        "removed": []
+      }
+    },
+    "push_target": {
+      "passed": true,
+      "reason": "push target exactly matches configuration",
+      "expected": {
+        "channel": "email",
+        "recipients": [
+          "security-lead@company.com"
+        ]
+      },
+      "actual": {
+        "channel": "email",
+        "recipients": [
+          "security-lead@company.com"
+        ]
+      }
+    },
+    "output_schema": {
+      "passed": true,
+      "reason": "output schema valid",
+      "expected": "ReportOutput contract",
+      "actual": "valid"
+    }
+  },
+  "model_scores": {
+    "language_quality": {
+      "score": 5,
+      "reason": "语言专业简洁，术语使用准确（如暴露面、弱口令），结构清晰，符合安全负责人阅读偏好。",
+      "errors": []
+    },
+    "insight_quality": {
+      "score": 2,
+      "reason": "报告缺乏深度分析，仅罗列基础数据。指标存在矛盾（总体 0.98 与阶段 99%），关键漏洞事件（弱口令）无根因及影响评估，未提供改进建议，无法满足安全负责人决策需求。",
+      "errors": [
+        "指标不一致：总体防护成功率 0.98 与攻防对抗阶段阻断率 99% 冲突",
+        "关键信息缺失：被突破服务器未说明是否发生数据泄露或横向移动"
+      ]
+    }
+  },
+  "calls": [
+    {
+      "label": "agent",
+      "parsed": {
+        "report_title": "护网行动总结报告 —— 2026-07",
+        "report_type": "special",
+        "target_audience": "security_lead",
+        "target_channel": "email",
+        "target_recipients": [
+          "security-lead@company.com"
+        ],
+        "content": {
+          "sections": [
+            {
+              "section_id": "overview",
+              "title": "总体战果",
+              "body": "本次护网行动总体防护成功率为 0.98。",
+              "data_source_mapping": {
+                "defense_success_rate": "hw_summary.defense_success_rate"
+              },
+              "data_values": {
+                "defense_success_rate": 0.98
+              }
+            },
+            {
+              "section_id": "attack_sources",
+              "title": "攻击源 TOP10",
+              "body": "| IP | 攻击次数 |\n| --- | --- |\n| 203.0.113.77 | 1240 |\n| 198.51.100.44 | 987 |",
+              "data_source_mapping": {
+                "attack_sources_top10": "hw_summary.attack_sources_top10"
+              },
+              "data_values": {
+                "attack_sources_top10": [
+                  {
+                    "ip": "203.0.113.77",
+                    "attack_count": 1240
+                  },
+                  {
+                    "ip": "198.51.100.44",
+                    "attack_count": 987
+                  }
+                ]
+              }
+            },
+            {
+              "section_id": "stages",
+              "title": "各阶段发现",
+              "body": "- **准备阶段**: 暴露面梳理发现2个未备案对外服务\n- **攻防对抗**: 成功阻断99%攻击，1台服务器因弱口令被突破但及时隔离",
+              "data_source_mapping": {
+                "stages": "hw_summary.stages"
+              },
+              "data_values": {
+                "stages": [
+                  {
+                    "phase": "准备阶段",
+                    "key_findings": "暴露面梳理发现2个未备案对外服务"
+                  },
+                  {
+                    "phase": "攻防对抗",
+                    "key_findings": "成功阻断99%攻击，1台服务器因弱口令被突破但及时隔离"
+                  }
+                ]
+              }
+            },
+            {
+              "section_id": "personnel",
+              "title": "参与人员",
+              "body": "| 姓名 | 角色 |\n| --- | --- |\n| 张三 | 总指挥 |\n| 李四 | 蓝队队长 |",
+              "data_source_mapping": {
+                "team_members": "hw_summary.team_members"
+              },
+              "data_values": {
+                "team_members": [
+                  {
+                    "name": "张三",
+                    "role": "总指挥"
+                  },
+                  {
+                    "name": "李四",
+                    "role": "蓝队队长"
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "masking_applied": [],
+        "metadata": {
+          "generated_at": "2026-07-21T00:00:00Z",
+          "data_sources_used": [
+            "hw_summary"
+          ],
+          "push_status": "draft"
+        }
+      },
+      "raw_text": "{\n  \"report_title\": \"护网行动总结报告 —— 2026-07\",\n  \"report_type\": \"special\",\n  \"target_audience\": \"security_lead\",\n  \"target_channel\": \"email\",\n  \"target_recipients\": [\n    \"security-lead@company.com\"\n  ],\n  \"content\": {\n    \"sections\": [\n      {\n        \"section_id\": \"overview\",\n        \"title\": \"总体战果\",\n        \"body\": \"本次护网行动总体防护成功率为 0.98。\",\n        \"data_source_mapping\": {\n          \"defense_success_rate\": \"hw_summary.defense_success_rate\"\n        },\n        \"data_values\": {\n          \"defense_success_rate\": 0.98\n        }\n      },\n      {\n        \"section_id\": \"attack_sources\",\n        \"title\": \"攻击源 TOP10\",\n        \"body\": \"| IP | 攻击次数 |\\n| --- | --- |\\n| 203.0.113.77 | 1240 |\\n| 198.51.100.44 | 987 |\",\n        \"data_source_mapping\": {\n          \"attack_sources_top10\": \"hw_summary.attack_sources_top10\"\n        },\n        \"data_values\": {\n          \"attack_sources_top10\": [\n            {\n              \"ip\": \"203.0.113.77\",\n              \"attack_count\": 1240\n            },\n            {\n              \"ip\": \"198.51.100.44\",\n              \"attack_count\": 987\n            }\n          ]\n        }\n      },\n      {\n        \"section_id\": \"stages\",\n        \"title\": \"各阶段发现\",\n        \"body\": \"- **准备阶段**: 暴露面梳理发现2个未备案对外服务\\n- **攻防对抗**: 成功阻断99%攻击，1台服务器因弱口令被突破但及时隔离\",\n        \"data_source_mapping\": {\n          \"stages\": \"hw_summary.stages\"\n        },\n        \"data_values\": {\n          \"stages\": [\n            {\n              \"phase\": \"准备阶段\",\n              \"key_findings\": \"暴露面梳理发现2个未备案对外服务\"\n            },\n            {\n              \"phase\": \"攻防对抗\",\n              \"key_findings\": \"成功阻断99%攻击，1台服务器因弱口令被突破但及时隔离\"\n            }\n          ]\n        }\n      },\n      {\n        \"section_id\": \"personnel\",\n        \"title\": \"参与人员\",\n        \"body\": \"| 姓名 | 角色 |\\n| --- | --- |\\n| 张三 | 总指挥 |\\n| 李四 | 蓝队队长 |\",\n        \"data_source_mapping\": {\n          \"team_members\": \"hw_summary.team_members\"\n        },\n        \"data_values\": {\n          \"team_members\": [\n            {\n              \"name\": \"张三\",\n              \"role\": \"总指挥\"\n            },\n            {\n              \"name\": \"李四\",\n              \"role\": \"蓝队队长\"\n            }\n          ]\n        }\n      }\n    ]\n  },\n  \"masking_applied\": [],\n  \"metadata\": {\n    \"generated_at\": \"2026-07-21T00:00:00Z\",\n    \"data_sources_used\": [\n      \"hw_summary\"\n    ],\n    \"push_status\": \"draft\"\n  }\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1210,
+      "output_tokens": 4534,
+      "latency_ms": 38857,
+      "attempts": 1
+    },
+    {
+      "label": "judge:language_quality",
+      "parsed": {
+        "score": 5,
+        "reason": "语言专业简洁，术语使用准确（如暴露面、弱口令），结构清晰，符合安全负责人阅读偏好。",
+        "errors": []
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"语言专业简洁，术语使用准确（如暴露面、弱口令），结构清晰，符合安全负责人阅读偏好。\",\n  \"errors\": []\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 694,
+      "output_tokens": 2128,
+      "latency_ms": 19892,
+      "attempts": 1
+    },
+    {
+      "label": "judge:insight_quality",
+      "parsed": {
+        "score": 2,
+        "reason": "报告缺乏深度分析，仅罗列基础数据。指标存在矛盾（总体 0.98 与阶段 99%），关键漏洞事件（弱口令）无根因及影响评估，未提供改进建议，无法满足安全负责人决策需求。",
+        "errors": [
+          "指标不一致：总体防护成功率 0.98 与攻防对抗阶段阻断率 99% 冲突",
+          "关键信息缺失：被突破服务器未说明是否发生数据泄露或横向移动"
+        ]
+      },
+      "raw_text": "{\n  \"score\": 2,\n  \"reason\": \"报告缺乏深度分析，仅罗列基础数据。指标存在矛盾（总体 0.98 与阶段 99%），关键漏洞事件（弱口令）无根因及影响评估，未提供改进建议，无法满足安全负责人决策需求。\",\n  \"errors\": [\n    \"指标不一致：总体防护成功率 0.98 与攻防对抗阶段阻断率 99% 冲突\",\n    \"关键信息缺失：被突破服务器未说明是否发生数据泄露或横向移动\"\n  ]\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 696,
+      "output_tokens": 2852,
+      "latency_ms": 26071,
+      "attempts": 1
+    }
+  ],
+  "overall_pass": false,
+  "error_type": null,
+  "error_message": null,
+  "run_provenance": {
+    "dataset_sha256": "649a00fd34d4d65188498c83dca61342356ab900089ceddd512b96137c24a46c",
+    "agent_mode": "real",
+    "agent": {
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1",
+      "response_mode": "json_object",
+      "temperature": 0.0,
+      "max_tokens": 4096,
+      "timeout_seconds": 90.0
+    },
+    "judge": {
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1",
+      "response_mode": "json_object",
+      "temperature": 0.0,
+      "max_tokens": 4096,
+      "timeout_seconds": 90.0
+    },
+    "grader_mode": "code_and_model"
+  }
+}

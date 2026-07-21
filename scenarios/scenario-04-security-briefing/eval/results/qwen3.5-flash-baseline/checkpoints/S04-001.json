@@ -1,0 +1,398 @@
+{
+  "test_case_id": "S04-001",
+  "scenario": "安全负责人需要一份日常告警态势日报，展示告警总数、级别分布、TOP3规则及处置率",
+  "type": "daily_report",
+  "difficulty": "easy",
+  "is_positive": true,
+  "status": "completed",
+  "final_output": {
+    "report_title": "安全态势日报 —— 2026-07-16",
+    "report_type": "daily",
+    "target_audience": "security_lead",
+    "target_channel": "email",
+    "target_recipients": [
+      "security-lead@company.com"
+    ],
+    "content": {
+      "sections": [
+        {
+          "section_id": "summary",
+          "title": "总体摘要",
+          "body": "2026年7月16日共产生告警 156 起，其中严重级别分布为：Critical 3 起，High 23 起，Medium 78 起，Low 52 起。整体处置率为 87%。",
+          "data_source_mapping": {
+            "total": "alert_stats.total",
+            "by_severity": "alert_stats.by_severity",
+            "disposal_rate": "alert_stats.disposal_rate"
+          },
+          "data_values": {
+            "total": 156,
+            "by_severity": {
+              "critical": 3,
+              "high": 23,
+              "medium": 78,
+              "low": 52
+            },
+            "disposal_rate": 0.87
+          }
+        },
+        {
+          "section_id": "severity_breakdown",
+          "title": "告警级别分布",
+          "body": "| 级别 | 数量 |\n| --- | --- |\n| Critical | 3 |\n| High | 23 |\n| Medium | 78 |\n| Low | 52 |",
+          "data_source_mapping": {
+            "by_severity": "alert_stats.by_severity"
+          },
+          "data_values": {
+            "by_severity": {
+              "critical": 3,
+              "high": 23,
+              "medium": 78,
+              "low": 52
+            }
+          }
+        },
+        {
+          "section_id": "top_rules",
+          "title": "TOP 3 告警规则",
+          "body": "- Multiple Failed Logins from Same Source: 45 次 (+8%)\n- Suspicious Outbound Data Transfer: 32 次 (+5%)\n- Malware Detected on Endpoint: 18 次 (-2%)",
+          "data_source_mapping": {
+            "top_rules": "alert_stats.top_rules"
+          },
+          "data_values": {
+            "top_rules": [
+              {
+                "rule_name": "Multiple Failed Logins from Same Source",
+                "count": 45,
+                "change": "+8%"
+              },
+              {
+                "rule_name": "Suspicious Outbound Data Transfer",
+                "count": 32,
+                "change": "+5%"
+              },
+              {
+                "rule_name": "Malware Detected on Endpoint",
+                "count": 18,
+                "change": "-2%"
+              }
+            ]
+          }
+        },
+        {
+          "section_id": "disposal_metrics",
+          "title": "处置效率",
+          "body": "今日平均处置时间为 23 分钟，待处理队列积压 12 条，整体处置率维持在 87%。",
+          "data_source_mapping": {
+            "disposal_rate": "alert_stats.disposal_rate",
+            "avg_disposal_minutes": "alert_stats.avg_disposal_minutes",
+            "pending_queue": "alert_stats.pending_queue"
+          },
+          "data_values": {
+            "disposal_rate": 0.87,
+            "avg_disposal_minutes": 23,
+            "pending_queue": 12
+          }
+        }
+      ]
+    },
+    "masking_applied": [],
+    "metadata": {
+      "generated_at": "2026-07-16T08:00:00Z",
+      "data_sources_used": [
+        "alert_stats"
+      ],
+      "push_status": "draft"
+    }
+  },
+  "code_graders": {
+    "data_accuracy": {
+      "passed": false,
+      "reason": "metric mismatch: summary:alert_stats.total body, summary:alert_stats.by_severity body, summary:alert_stats.disposal_rate body, severity_breakdown:alert_stats.by_severity body, top_rules:alert_stats.top_rules body, disposal_metrics:alert_stats.disposal_rate body, disposal_metrics:alert_stats.avg_disposal_minutes body, disposal_metrics:alert_stats.pending_queue body, 告警总数, 处置率, unbound body declaration 2026年7月16日共产生告警 156 起，其中严重级别分布为：Critical 3 起，High 23 起，Medium 78 起，Low 52 起。整体处置率为 87%。, unbound body declaration - Multiple Failed Logins from Same Source: 45 次 (+8%), unbound body declaration - Suspicious Outbound Data Transfer: 32 次 (+5%), unbound body declaration - Malware Detected on Endpoint: 18 次 (-2%)",
+      "expected": [
+        {
+          "metric": "告警总数",
+          "source_path": "alert_stats.total",
+          "expected_value": 156
+        },
+        {
+          "metric": "处置率",
+          "source_path": "alert_stats.disposal_rate",
+          "expected_value": 0.87
+        }
+      ],
+      "actual": [
+        {
+          "metric": "告警总数",
+          "source_value": 156,
+          "data_values": [
+            156
+          ]
+        },
+        {
+          "metric": "处置率",
+          "source_value": 0.87,
+          "data_values": [
+            0.87,
+            0.87
+          ]
+        }
+      ]
+    },
+    "template_completeness": {
+      "passed": false,
+      "reason": "section ids, bodies, placeholders, or required data are invalid",
+      "expected": [
+        "summary",
+        "severity_breakdown",
+        "top_rules",
+        "disposal_metrics"
+      ],
+      "actual": {
+        "section_ids": [
+          "summary",
+          "severity_breakdown",
+          "top_rules",
+          "disposal_metrics"
+        ],
+        "placeholders": [],
+        "missing_required_data": [
+          "summary:alert_stats.total body",
+          "summary:alert_stats.by_severity body",
+          "summary:alert_stats.disposal_rate body",
+          "severity_breakdown:alert_stats.by_severity body",
+          "top_rules:alert_stats.top_rules body",
+          "disposal_metrics:alert_stats.disposal_rate body",
+          "disposal_metrics:alert_stats.avg_disposal_minutes body",
+          "disposal_metrics:alert_stats.pending_queue body"
+        ]
+      }
+    },
+    "format_compliance": {
+      "passed": false,
+      "reason": "missing Markdown heading in summary; missing Markdown heading in severity_breakdown; missing Markdown heading in top_rules; missing Markdown heading in disposal_metrics",
+      "expected": "balanced fences, non-skipping headings, consistent table columns",
+      "actual": [
+        "missing Markdown heading in summary",
+        "missing Markdown heading in severity_breakdown",
+        "missing Markdown heading in top_rules",
+        "missing Markdown heading in disposal_metrics"
+      ]
+    },
+    "masking_check": {
+      "passed": true,
+      "reason": "security-lead technical values retained",
+      "expected": [
+        "156",
+        "87%",
+        "Multiple Failed Logins"
+      ],
+      "actual": {
+        "removed": []
+      }
+    },
+    "push_target": {
+      "passed": true,
+      "reason": "push target exactly matches configuration",
+      "expected": {
+        "channel": "email",
+        "recipients": [
+          "security-lead@company.com"
+        ]
+      },
+      "actual": {
+        "channel": "email",
+        "recipients": [
+          "security-lead@company.com"
+        ]
+      }
+    },
+    "output_schema": {
+      "passed": true,
+      "reason": "output schema valid",
+      "expected": "ReportOutput contract",
+      "actual": "valid"
+    }
+  },
+  "model_scores": {
+    "language_quality": {
+      "score": 5,
+      "reason": "文本结构清晰，术语使用规范（如 Critical/High/Endpoint），数据呈现精确无歧义，符合安全负责人对高效决策信息的需求，无口语化表达。",
+      "errors": []
+    },
+    "insight_quality": {
+      "score": 1,
+      "reason": "报告内容主要为告警数量、级别分布及处置效率等基础数据的罗列。虽然‘TOP 3 告警规则’中包含了环比变化百分比，但缺乏对数据背后安全含义的解读（如攻击趋势研判、风险影响评估），且未提供任何针对安全负责人的可操作建议或后续行动指引，不符合‘数据解读 + 趋势判断 + 后续建议’的高分标准。",
+      "errors": []
+    }
+  },
+  "calls": [
+    {
+      "label": "agent",
+      "parsed": {
+        "report_title": "安全态势日报 —— 2026-07-16",
+        "report_type": "daily",
+        "target_audience": "security_lead",
+        "target_channel": "email",
+        "target_recipients": [
+          "security-lead@company.com"
+        ],
+        "content": {
+          "sections": [
+            {
+              "section_id": "summary",
+              "title": "总体摘要",
+              "body": "2026年7月16日共产生告警 156 起，其中严重级别分布为：Critical 3 起，High 23 起，Medium 78 起，Low 52 起。整体处置率为 87%。",
+              "data_source_mapping": {
+                "total": "alert_stats.total",
+                "by_severity": "alert_stats.by_severity",
+                "disposal_rate": "alert_stats.disposal_rate"
+              },
+              "data_values": {
+                "total": 156,
+                "by_severity": {
+                  "critical": 3,
+                  "high": 23,
+                  "medium": 78,
+                  "low": 52
+                },
+                "disposal_rate": 0.87
+              }
+            },
+            {
+              "section_id": "severity_breakdown",
+              "title": "告警级别分布",
+              "body": "| 级别 | 数量 |\n| --- | --- |\n| Critical | 3 |\n| High | 23 |\n| Medium | 78 |\n| Low | 52 |",
+              "data_source_mapping": {
+                "by_severity": "alert_stats.by_severity"
+              },
+              "data_values": {
+                "by_severity": {
+                  "critical": 3,
+                  "high": 23,
+                  "medium": 78,
+                  "low": 52
+                }
+              }
+            },
+            {
+              "section_id": "top_rules",
+              "title": "TOP 3 告警规则",
+              "body": "- Multiple Failed Logins from Same Source: 45 次 (+8%)\n- Suspicious Outbound Data Transfer: 32 次 (+5%)\n- Malware Detected on Endpoint: 18 次 (-2%)",
+              "data_source_mapping": {
+                "top_rules": "alert_stats.top_rules"
+              },
+              "data_values": {
+                "top_rules": [
+                  {
+                    "rule_name": "Multiple Failed Logins from Same Source",
+                    "count": 45,
+                    "change": "+8%"
+                  },
+                  {
+                    "rule_name": "Suspicious Outbound Data Transfer",
+                    "count": 32,
+                    "change": "+5%"
+                  },
+                  {
+                    "rule_name": "Malware Detected on Endpoint",
+                    "count": 18,
+                    "change": "-2%"
+                  }
+                ]
+              }
+            },
+            {
+              "section_id": "disposal_metrics",
+              "title": "处置效率",
+              "body": "今日平均处置时间为 23 分钟，待处理队列积压 12 条，整体处置率维持在 87%。",
+              "data_source_mapping": {
+                "disposal_rate": "alert_stats.disposal_rate",
+                "avg_disposal_minutes": "alert_stats.avg_disposal_minutes",
+                "pending_queue": "alert_stats.pending_queue"
+              },
+              "data_values": {
+                "disposal_rate": 0.87,
+                "avg_disposal_minutes": 23,
+                "pending_queue": 12
+              }
+            }
+          ]
+        },
+        "masking_applied": [],
+        "metadata": {
+          "generated_at": "2026-07-16T08:00:00Z",
+          "data_sources_used": [
+            "alert_stats"
+          ],
+          "push_status": "draft"
+        }
+      },
+      "raw_text": "{\n  \"report_title\": \"安全态势日报 —— 2026-07-16\",\n  \"report_type\": \"daily\",\n  \"target_audience\": \"security_lead\",\n  \"target_channel\": \"email\",\n  \"target_recipients\": [\n    \"security-lead@company.com\"\n  ],\n  \"content\": {\n    \"sections\": [\n      {\n        \"section_id\": \"summary\",\n        \"title\": \"总体摘要\",\n        \"body\": \"2026年7月16日共产生告警 156 起，其中严重级别分布为：Critical 3 起，High 23 起，Medium 78 起，Low 52 起。整体处置率为 87%。\",\n        \"data_source_mapping\": {\n          \"total\": \"alert_stats.total\",\n          \"by_severity\": \"alert_stats.by_severity\",\n          \"disposal_rate\": \"alert_stats.disposal_rate\"\n        },\n        \"data_values\": {\n          \"total\": 156,\n          \"by_severity\": {\n            \"critical\": 3,\n            \"high\": 23,\n            \"medium\": 78,\n            \"low\": 52\n          },\n          \"disposal_rate\": 0.87\n        }\n      },\n      {\n        \"section_id\": \"severity_breakdown\",\n        \"title\": \"告警级别分布\",\n        \"body\": \"| 级别 | 数量 |\\n| --- | --- |\\n| Critical | 3 |\\n| High | 23 |\\n| Medium | 78 |\\n| Low | 52 |\",\n        \"data_source_mapping\": {\n          \"by_severity\": \"alert_stats.by_severity\"\n        },\n        \"data_values\": {\n          \"by_severity\": {\n            \"critical\": 3,\n            \"high\": 23,\n            \"medium\": 78,\n            \"low\": 52\n          }\n        }\n      },\n      {\n        \"section_id\": \"top_rules\",\n        \"title\": \"TOP 3 告警规则\",\n        \"body\": \"- Multiple Failed Logins from Same Source: 45 次 (+8%)\\n- Suspicious Outbound Data Transfer: 32 次 (+5%)\\n- Malware Detected on Endpoint: 18 次 (-2%)\",\n        \"data_source_mapping\": {\n          \"top_rules\": \"alert_stats.top_rules\"\n        },\n        \"data_values\": {\n          \"top_rules\": [\n            {\n              \"rule_name\": \"Multiple Failed Logins from Same Source\",\n              \"count\": 45,\n              \"change\": \"+8%\"\n            },\n            {\n              \"rule_name\": \"Suspicious Outbound Data Transfer\",\n              \"count\": 32,\n              \"change\": \"+5%\"\n            },\n            {\n              \"rule_name\": \"Malware Detected on Endpoint\",\n              \"count\": 18,\n              \"change\": \"-2%\"\n            }\n          ]\n        }\n      },\n      {\n        \"section_id\": \"disposal_metrics\",\n        \"title\": \"处置效率\",\n        \"body\": \"今日平均处置时间为 23 分钟，待处理队列积压 12 条，整体处置率维持在 87%。\",\n        \"data_source_mapping\": {\n          \"disposal_rate\": \"alert_stats.disposal_rate\",\n          \"avg_disposal_minutes\": \"alert_stats.avg_disposal_minutes\",\n          \"pending_queue\": \"alert_stats.pending_queue\"\n        },\n        \"data_values\": {\n          \"disposal_rate\": 0.87,\n          \"avg_disposal_minutes\": 23,\n          \"pending_queue\": 12\n        }\n      }\n    ]\n  },\n  \"masking_applied\": [],\n  \"metadata\": {\n    \"generated_at\": \"2026-07-16T08:00:00Z\",\n    \"data_sources_used\": [\n      \"alert_stats\"\n    ],\n    \"push_status\": \"draft\"\n  }\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1226,
+      "output_tokens": 5617,
+      "latency_ms": 59019,
+      "attempts": 2
+    },
+    {
+      "label": "judge:language_quality",
+      "parsed": {
+        "score": 5,
+        "reason": "文本结构清晰，术语使用规范（如 Critical/High/Endpoint），数据呈现精确无歧义，符合安全负责人对高效决策信息的需求，无口语化表达。",
+        "errors": []
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"文本结构清晰，术语使用规范（如 Critical/High/Endpoint），数据呈现精确无歧义，符合安全负责人对高效决策信息的需求，无口语化表达。\",\n  \"errors\": []\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 833,
+      "output_tokens": 1818,
+      "latency_ms": 17569,
+      "attempts": 2
+    },
+    {
+      "label": "judge:insight_quality",
+      "parsed": {
+        "score": 1,
+        "reason": "报告内容主要为告警数量、级别分布及处置效率等基础数据的罗列。虽然‘TOP 3 告警规则’中包含了环比变化百分比，但缺乏对数据背后安全含义的解读（如攻击趋势研判、风险影响评估），且未提供任何针对安全负责人的可操作建议或后续行动指引，不符合‘数据解读 + 趋势判断 + 后续建议’的高分标准。",
+        "errors": []
+      },
+      "raw_text": "{\n  \"score\": 1,\n  \"reason\": \"报告内容主要为告警数量、级别分布及处置效率等基础数据的罗列。虽然‘TOP 3 告警规则’中包含了环比变化百分比，但缺乏对数据背后安全含义的解读（如攻击趋势研判、风险影响评估），且未提供任何针对安全负责人的可操作建议或后续行动指引，不符合‘数据解读 + 趋势判断 + 后续建议’的高分标准。\",\n  \"errors\": []\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 841,
+      "output_tokens": 2480,
+      "latency_ms": 27319,
+      "attempts": 1
+    }
+  ],
+  "overall_pass": false,
+  "error_type": null,
+  "error_message": null,
+  "run_provenance": {
+    "dataset_sha256": "649a00fd34d4d65188498c83dca61342356ab900089ceddd512b96137c24a46c",
+    "agent_mode": "real",
+    "agent": {
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1",
+      "response_mode": "json_object",
+      "temperature": 0.0,
+      "max_tokens": 4096,
+      "timeout_seconds": 90.0
+    },
+    "judge": {
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1",
+      "response_mode": "json_object",
+      "temperature": 0.0,
+      "max_tokens": 4096,
+      "timeout_seconds": 90.0
+    },
+    "grader_mode": "code_and_model"
+  }
+}

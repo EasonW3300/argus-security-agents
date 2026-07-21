@@ -1,0 +1,430 @@
+{
+  "test_case_id": "S04-006",
+  "scenario": "安全负责人需要安全态势周报，对比本周与上周告警趋势和TOP规则变化",
+  "type": "weekly_report",
+  "difficulty": "medium",
+  "is_positive": true,
+  "status": "completed",
+  "final_output": {
+    "report_title": "安全态势周报 —— 2026-W29",
+    "report_type": "weekly",
+    "target_audience": "security_lead",
+    "target_channel": "email",
+    "target_recipients": [
+      "security-lead@company.com"
+    ],
+    "content": {
+      "sections": [
+        {
+          "section_id": "overall_trend",
+          "title": "告警总体趋势",
+          "body": "本周（2026-W29）告警总量为 1042 条，较上周（2026-W28）的 978 条增长了 6.5%。",
+          "data_source_mapping": {
+            "current_total": "alert_stats_current_week.total",
+            "previous_total": "alert_stats_previous_week.total"
+          },
+          "data_values": {
+            "current_total": 1042,
+            "previous_total": 978
+          }
+        },
+        {
+          "section_id": "severity_trend",
+          "title": "告警级别变化",
+          "body": "| 级别 | 本周数量 | 上周数量 | 环比变化 |\n| --- | --- | --- | --- |\n| Critical | 18 | 12 | +50% |\n| High | 167 | 145 | +15% |\n| Medium | 521 | 502 | +4% |\n| Low | 336 | 319 | +5% |",
+          "data_source_mapping": {
+            "current_severity": "alert_stats_current_week.by_severity",
+            "previous_severity": "alert_stats_previous_week.by_severity"
+          },
+          "data_values": {
+            "current_severity": {
+              "critical": 18,
+              "high": 167,
+              "medium": 521,
+              "low": 336
+            },
+            "previous_severity": {
+              "critical": 12,
+              "high": 145,
+              "medium": 502,
+              "low": 319
+            }
+          }
+        },
+        {
+          "section_id": "top_rules_changes",
+          "title": "TOP 5 规则变化",
+          "body": "| 规则名称 | 告警数 | 环比变化 |\n| --- | --- | --- |\n| SSH Brute Force Detection | 287 | +15% |\n| Suspicious DNS Tunneling | 198 | +42% |\n| Multiple Failed Logins from Same Source | 176 | -8% |\n| Outbound Connection to Known C2 | 123 | +20% |\n| Malware Detected on Endpoint | 98 | -5% |",
+          "data_source_mapping": {
+            "top_rules": "alert_stats_current_week.top_rules"
+          },
+          "data_values": {
+            "top_rules": [
+              {
+                "rule_name": "SSH Brute Force Detection",
+                "count": 287,
+                "change_vs_prev": "+15%"
+              },
+              {
+                "rule_name": "Suspicious DNS Tunneling",
+                "count": 198,
+                "change_vs_prev": "+42%"
+              },
+              {
+                "rule_name": "Multiple Failed Logins from Same Source",
+                "count": 176,
+                "change_vs_prev": "-8%"
+              },
+              {
+                "rule_name": "Outbound Connection to Known C2",
+                "count": 123,
+                "change_vs_prev": "+20%"
+              },
+              {
+                "rule_name": "Malware Detected on Endpoint",
+                "count": 98,
+                "change_vs_prev": "-5%"
+              }
+            ]
+          }
+        },
+        {
+          "section_id": "external_threats",
+          "title": "外部威胁来源",
+          "body": "* IP: 203.0.113.88, 攻击次数: 345, 类型: SSH 暴力破解\n* IP: 198.51.100.123, 攻击次数: 267, 类型: DNS 隧道",
+          "data_source_mapping": {
+            "threat_ips": "alert_stats_current_week.external_threat_ips"
+          },
+          "data_values": {
+            "threat_ips": [
+              {
+                "ip": "203.0.113.88",
+                "attack_count": 345,
+                "threat_type": "SSH 暴力破解"
+              },
+              {
+                "ip": "198.51.100.123",
+                "attack_count": 267,
+                "threat_type": "DNS 隧道"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "masking_applied": [],
+    "metadata": {
+      "generated_at": "2026-07-20T12:00:00Z",
+      "data_sources_used": [
+        "alert_stats_current_week",
+        "alert_stats_previous_week"
+      ],
+      "push_status": "draft"
+    }
+  },
+  "code_graders": {
+    "data_accuracy": {
+      "passed": false,
+      "reason": "metric mismatch: overall_trend:alert_stats_current_week.total body, overall_trend:alert_stats_previous_week.total body, severity_trend:alert_stats_current_week.by_severity body, severity_trend:alert_stats_previous_week.by_severity body, top_rules_changes:alert_stats_current_week.top_rules body, external_threats:alert_stats_current_week.external_threat_ips, 本周告警总数, 上周告警总数, unbound body declaration * IP: 203.0.113.88, 攻击次数: 345, 类型: SSH 暴力破解, unbound body declaration * IP: 198.51.100.123, 攻击次数: 267, 类型: DNS 隧道",
+      "expected": [
+        {
+          "metric": "本周告警总数",
+          "source_path": "alert_stats_current_week.total",
+          "expected_value": 1042
+        },
+        {
+          "metric": "上周告警总数",
+          "source_path": "alert_stats_previous_week.total",
+          "expected_value": 978
+        }
+      ],
+      "actual": [
+        {
+          "metric": "本周告警总数",
+          "source_value": 1042,
+          "data_values": [
+            1042
+          ]
+        },
+        {
+          "metric": "上周告警总数",
+          "source_value": 978,
+          "data_values": [
+            978
+          ]
+        }
+      ]
+    },
+    "template_completeness": {
+      "passed": false,
+      "reason": "section ids, bodies, placeholders, or required data are invalid",
+      "expected": [
+        "overall_trend",
+        "severity_trend",
+        "top_rules_changes",
+        "external_threats"
+      ],
+      "actual": {
+        "section_ids": [
+          "overall_trend",
+          "severity_trend",
+          "top_rules_changes",
+          "external_threats"
+        ],
+        "placeholders": [],
+        "missing_required_data": [
+          "overall_trend:alert_stats_current_week.total body",
+          "overall_trend:alert_stats_previous_week.total body",
+          "severity_trend:alert_stats_current_week.by_severity body",
+          "severity_trend:alert_stats_previous_week.by_severity body",
+          "top_rules_changes:alert_stats_current_week.top_rules body",
+          "external_threats:alert_stats_current_week.external_threat_ips"
+        ]
+      }
+    },
+    "format_compliance": {
+      "passed": false,
+      "reason": "missing Markdown heading in overall_trend; missing Markdown heading in severity_trend; missing Markdown heading in top_rules_changes; missing Markdown heading in external_threats",
+      "expected": "balanced fences, non-skipping headings, consistent table columns",
+      "actual": [
+        "missing Markdown heading in overall_trend",
+        "missing Markdown heading in severity_trend",
+        "missing Markdown heading in top_rules_changes",
+        "missing Markdown heading in external_threats"
+      ]
+    },
+    "masking_check": {
+      "passed": true,
+      "reason": "security-lead technical values retained",
+      "expected": [
+        "SSH Brute Force Detection",
+        "203.0.113.88"
+      ],
+      "actual": {
+        "removed": []
+      }
+    },
+    "push_target": {
+      "passed": true,
+      "reason": "push target exactly matches configuration",
+      "expected": {
+        "channel": "email",
+        "recipients": [
+          "security-lead@company.com"
+        ]
+      },
+      "actual": {
+        "channel": "email",
+        "recipients": [
+          "security-lead@company.com"
+        ]
+      }
+    },
+    "output_schema": {
+      "passed": true,
+      "reason": "output schema valid",
+      "expected": "ReportOutput contract",
+      "actual": "valid"
+    }
+  },
+  "model_scores": {
+    "language_quality": {
+      "score": 5,
+      "reason": "文本措辞专业严谨，数据呈现清晰（表格/列表），术语使用准确（如'环比'、'态势'），无冗余信息，完美契合安全负责人对高效获取情报的需求。",
+      "errors": []
+    },
+    "insight_quality": {
+      "score": 1,
+      "reason": "The briefing consists entirely of raw data listings (alert counts, severity tables, rule statistics, threat IPs) without interpreting the significance of trends, identifying root causes, or providing actionable recommendations for the security lead.",
+      "errors": []
+    }
+  },
+  "calls": [
+    {
+      "label": "agent",
+      "parsed": {
+        "report_title": "安全态势周报 —— 2026-W29",
+        "report_type": "weekly",
+        "target_audience": "security_lead",
+        "target_channel": "email",
+        "target_recipients": [
+          "security-lead@company.com"
+        ],
+        "content": {
+          "sections": [
+            {
+              "section_id": "overall_trend",
+              "title": "告警总体趋势",
+              "body": "本周（2026-W29）告警总量为 1042 条，较上周（2026-W28）的 978 条增长了 6.5%。",
+              "data_source_mapping": {
+                "current_total": "alert_stats_current_week.total",
+                "previous_total": "alert_stats_previous_week.total"
+              },
+              "data_values": {
+                "current_total": 1042,
+                "previous_total": 978
+              }
+            },
+            {
+              "section_id": "severity_trend",
+              "title": "告警级别变化",
+              "body": "| 级别 | 本周数量 | 上周数量 | 环比变化 |\n| --- | --- | --- | --- |\n| Critical | 18 | 12 | +50% |\n| High | 167 | 145 | +15% |\n| Medium | 521 | 502 | +4% |\n| Low | 336 | 319 | +5% |",
+              "data_source_mapping": {
+                "current_severity": "alert_stats_current_week.by_severity",
+                "previous_severity": "alert_stats_previous_week.by_severity"
+              },
+              "data_values": {
+                "current_severity": {
+                  "critical": 18,
+                  "high": 167,
+                  "medium": 521,
+                  "low": 336
+                },
+                "previous_severity": {
+                  "critical": 12,
+                  "high": 145,
+                  "medium": 502,
+                  "low": 319
+                }
+              }
+            },
+            {
+              "section_id": "top_rules_changes",
+              "title": "TOP 5 规则变化",
+              "body": "| 规则名称 | 告警数 | 环比变化 |\n| --- | --- | --- |\n| SSH Brute Force Detection | 287 | +15% |\n| Suspicious DNS Tunneling | 198 | +42% |\n| Multiple Failed Logins from Same Source | 176 | -8% |\n| Outbound Connection to Known C2 | 123 | +20% |\n| Malware Detected on Endpoint | 98 | -5% |",
+              "data_source_mapping": {
+                "top_rules": "alert_stats_current_week.top_rules"
+              },
+              "data_values": {
+                "top_rules": [
+                  {
+                    "rule_name": "SSH Brute Force Detection",
+                    "count": 287,
+                    "change_vs_prev": "+15%"
+                  },
+                  {
+                    "rule_name": "Suspicious DNS Tunneling",
+                    "count": 198,
+                    "change_vs_prev": "+42%"
+                  },
+                  {
+                    "rule_name": "Multiple Failed Logins from Same Source",
+                    "count": 176,
+                    "change_vs_prev": "-8%"
+                  },
+                  {
+                    "rule_name": "Outbound Connection to Known C2",
+                    "count": 123,
+                    "change_vs_prev": "+20%"
+                  },
+                  {
+                    "rule_name": "Malware Detected on Endpoint",
+                    "count": 98,
+                    "change_vs_prev": "-5%"
+                  }
+                ]
+              }
+            },
+            {
+              "section_id": "external_threats",
+              "title": "外部威胁来源",
+              "body": "* IP: 203.0.113.88, 攻击次数: 345, 类型: SSH 暴力破解\n* IP: 198.51.100.123, 攻击次数: 267, 类型: DNS 隧道",
+              "data_source_mapping": {
+                "threat_ips": "alert_stats_current_week.external_threat_ips"
+              },
+              "data_values": {
+                "threat_ips": [
+                  {
+                    "ip": "203.0.113.88",
+                    "attack_count": 345,
+                    "threat_type": "SSH 暴力破解"
+                  },
+                  {
+                    "ip": "198.51.100.123",
+                    "attack_count": 267,
+                    "threat_type": "DNS 隧道"
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "masking_applied": [],
+        "metadata": {
+          "generated_at": "2026-07-20T12:00:00Z",
+          "data_sources_used": [
+            "alert_stats_current_week",
+            "alert_stats_previous_week"
+          ],
+          "push_status": "draft"
+        }
+      },
+      "raw_text": "{\n  \"report_title\": \"安全态势周报 —— 2026-W29\",\n  \"report_type\": \"weekly\",\n  \"target_audience\": \"security_lead\",\n  \"target_channel\": \"email\",\n  \"target_recipients\": [\n    \"security-lead@company.com\"\n  ],\n  \"content\": {\n    \"sections\": [\n      {\n        \"section_id\": \"overall_trend\",\n        \"title\": \"告警总体趋势\",\n        \"body\": \"本周（2026-W29）告警总量为 1042 条，较上周（2026-W28）的 978 条增长了 6.5%。\",\n        \"data_source_mapping\": {\n          \"current_total\": \"alert_stats_current_week.total\",\n          \"previous_total\": \"alert_stats_previous_week.total\"\n        },\n        \"data_values\": {\n          \"current_total\": 1042,\n          \"previous_total\": 978\n        }\n      },\n      {\n        \"section_id\": \"severity_trend\",\n        \"title\": \"告警级别变化\",\n        \"body\": \"| 级别 | 本周数量 | 上周数量 | 环比变化 |\\n| --- | --- | --- | --- |\\n| Critical | 18 | 12 | +50% |\\n| High | 167 | 145 | +15% |\\n| Medium | 521 | 502 | +4% |\\n| Low | 336 | 319 | +5% |\",\n        \"data_source_mapping\": {\n          \"current_severity\": \"alert_stats_current_week.by_severity\",\n          \"previous_severity\": \"alert_stats_previous_week.by_severity\"\n        },\n        \"data_values\": {\n          \"current_severity\": {\n            \"critical\": 18,\n            \"high\": 167,\n            \"medium\": 521,\n            \"low\": 336\n          },\n          \"previous_severity\": {\n            \"critical\": 12,\n            \"high\": 145,\n            \"medium\": 502,\n            \"low\": 319\n          }\n        }\n      },\n      {\n        \"section_id\": \"top_rules_changes\",\n        \"title\": \"TOP 5 规则变化\",\n        \"body\": \"| 规则名称 | 告警数 | 环比变化 |\\n| --- | --- | --- |\\n| SSH Brute Force Detection | 287 | +15% |\\n| Suspicious DNS Tunneling | 198 | +42% |\\n| Multiple Failed Logins from Same Source | 176 | -8% |\\n| Outbound Connection to Known C2 | 123 | +20% |\\n| Malware Detected on Endpoint | 98 | -5% |\",\n        \"data_source_mapping\": {\n          \"top_rules\": \"alert_stats_current_week.top_rules\"\n        },\n        \"data_values\": {\n          \"top_rules\": [\n            {\n              \"rule_name\": \"SSH Brute Force Detection\",\n              \"count\": 287,\n              \"change_vs_prev\": \"+15%\"\n            },\n            {\n              \"rule_name\": \"Suspicious DNS Tunneling\",\n              \"count\": 198,\n              \"change_vs_prev\": \"+42%\"\n            },\n            {\n              \"rule_name\": \"Multiple Failed Logins from Same Source\",\n              \"count\": 176,\n              \"change_vs_prev\": \"-8%\"\n            },\n            {\n              \"rule_name\": \"Outbound Connection to Known C2\",\n              \"count\": 123,\n              \"change_vs_prev\": \"+20%\"\n            },\n            {\n              \"rule_name\": \"Malware Detected on Endpoint\",\n              \"count\": 98,\n              \"change_vs_prev\": \"-5%\"\n            }\n          ]\n        }\n      },\n      {\n        \"section_id\": \"external_threats\",\n        \"title\": \"外部威胁来源\",\n        \"body\": \"* IP: 203.0.113.88, 攻击次数: 345, 类型: SSH 暴力破解\\n* IP: 198.51.100.123, 攻击次数: 267, 类型: DNS 隧道\",\n        \"data_source_mapping\": {\n          \"threat_ips\": \"alert_stats_current_week.external_threat_ips\"\n        },\n        \"data_values\": {\n          \"threat_ips\": [\n            {\n              \"ip\": \"203.0.113.88\",\n              \"attack_count\": 345,\n              \"threat_type\": \"SSH 暴力破解\"\n            },\n            {\n              \"ip\": \"198.51.100.123\",\n              \"attack_count\": 267,\n              \"threat_type\": \"DNS 隧道\"\n            }\n          ]\n        }\n      }\n    ]\n  },\n  \"masking_applied\": [],\n  \"metadata\": {\n    \"generated_at\": \"2026-07-20T12:00:00Z\",\n    \"data_sources_used\": [\n      \"alert_stats_current_week\",\n      \"alert_stats_previous_week\"\n    ],\n    \"push_status\": \"draft\"\n  }\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1491,
+      "output_tokens": 6396,
+      "latency_ms": 58100,
+      "attempts": 1
+    },
+    {
+      "label": "judge:language_quality",
+      "parsed": {
+        "score": 5,
+        "reason": "文本措辞专业严谨，数据呈现清晰（表格/列表），术语使用准确（如'环比'、'态势'），无冗余信息，完美契合安全负责人对高效获取情报的需求。",
+        "errors": []
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"文本措辞专业严谨，数据呈现清晰（表格/列表），术语使用准确（如'环比'、'态势'），无冗余信息，完美契合安全负责人对高效获取情报的需求。\",\n  \"errors\": []\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1094,
+      "output_tokens": 1903,
+      "latency_ms": 18566,
+      "attempts": 1
+    },
+    {
+      "label": "judge:insight_quality",
+      "parsed": {
+        "score": 1,
+        "reason": "The briefing consists entirely of raw data listings (alert counts, severity tables, rule statistics, threat IPs) without interpreting the significance of trends, identifying root causes, or providing actionable recommendations for the security lead.",
+        "errors": []
+      },
+      "raw_text": "{\n  \"score\": 1,\n  \"reason\": \"The briefing consists entirely of raw data listings (alert counts, severity tables, rule statistics, threat IPs) without interpreting the significance of trends, identifying root causes, or providing actionable recommendations for the security lead.\",\n  \"errors\": []\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1102,
+      "output_tokens": 1662,
+      "latency_ms": 16571,
+      "attempts": 1
+    }
+  ],
+  "overall_pass": false,
+  "error_type": null,
+  "error_message": null,
+  "run_provenance": {
+    "dataset_sha256": "649a00fd34d4d65188498c83dca61342356ab900089ceddd512b96137c24a46c",
+    "agent_mode": "real",
+    "agent": {
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1",
+      "response_mode": "json_object",
+      "temperature": 0.0,
+      "max_tokens": 4096,
+      "timeout_seconds": 90.0
+    },
+    "judge": {
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1",
+      "response_mode": "json_object",
+      "temperature": 0.0,
+      "max_tokens": 4096,
+      "timeout_seconds": 90.0
+    },
+    "grader_mode": "code_and_model"
+  }
+}

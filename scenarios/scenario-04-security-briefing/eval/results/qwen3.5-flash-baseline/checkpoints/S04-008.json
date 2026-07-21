@@ -1,0 +1,307 @@
+{
+  "test_case_id": "S04-008",
+  "scenario": "安全负责人需要威胁情报周报，包含本周新增IOC、命中告警的IOC数量及活跃APT组织动态",
+  "type": "weekly_report",
+  "difficulty": "medium",
+  "is_positive": true,
+  "status": "completed",
+  "final_output": {
+    "report_title": "威胁情报周报 —— 2026-W29",
+    "report_type": "weekly",
+    "target_audience": "security_lead",
+    "target_channel": "email",
+    "target_recipients": [
+      "security-lead@company.com"
+    ],
+    "content": {
+      "sections": [
+        {
+          "section_id": "ioc_summary",
+          "title": "本周 IOC 统计",
+          "body": "| 类型 | 数量 |\n| :--- | :--- |\n| IP | 45 |\n| Domain | 23 |\n| URL | 12 |\n| Hash | 8 |\n| 命中告警 IOC 数 | 7 |",
+          "data_source_mapping": {
+            "metric_new_iocs": "threat_intel_summary.new_iocs",
+            "metric_iocs_alerts": "threat_intel_summary.iocs_hit_alerts"
+          },
+          "data_values": {
+            "metric_new_iocs": {
+              "ip": 45,
+              "domain": 23,
+              "url": 12,
+              "hash": 8
+            },
+            "metric_iocs_alerts": 7
+          }
+        },
+        {
+          "section_id": "apt_activity",
+          "title": "活跃 APT 组织动态",
+          "body": "- **APT28**: 政府/军工 - 利用 CVE-2026-12345 漏洞针对国防机构发起鱼叉式钓鱼攻击，投放自定义恶意软件 X-Agent\n- **APT41**: 金融/科技 - 对多个金融机构的 VPN 设备进行暴力破解并部署 Webshell，C2 域名包括 evil-c2.xyz 和 update.defender.cc",
+          "data_source_mapping": {
+            "metric_apt_groups": "threat_intel_summary.active_apt_groups"
+          },
+          "data_values": {
+            "metric_apt_groups": [
+              {
+                "name": "APT28",
+                "targeting_sector": "政府/军工",
+                "recent_activity": "利用 CVE-2026-12345 漏洞针对国防机构发起鱼叉式钓鱼攻击，投放自定义恶意软件 X-Agent"
+              },
+              {
+                "name": "APT41",
+                "targeting_sector": "金融/科技",
+                "recent_activity": "对多个金融机构的 VPN 设备进行暴力破解并部署 Webshell，C2 域名包括 evil-c2.xyz 和 update.defender.cc"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "masking_applied": [],
+    "metadata": {
+      "generated_at": "2026-07-20T08:00:00Z",
+      "data_sources_used": [
+        "threat_intel_summary"
+      ],
+      "push_status": "draft"
+    }
+  },
+  "code_graders": {
+    "data_accuracy": {
+      "passed": false,
+      "reason": "metric mismatch: ioc_summary:threat_intel_summary.new_iocs body, ioc_summary:threat_intel_summary.iocs_hit_alerts body, apt_activity:threat_intel_summary.active_apt_groups, 新增IP型IOC, 命中告警的IOC数, unbound body declaration - **APT28**: 政府/军工 - 利用 CVE-2026-12345 漏洞针对国防机构发起鱼叉式钓鱼攻击，投放自定义恶意软件 X-Agent, unbound body declaration - **APT41**: 金融/科技 - 对多个金融机构的 VPN 设备进行暴力破解并部署 Webshell，C2 域名包括 evil-c2.xyz 和 update.defender.cc",
+      "expected": [
+        {
+          "metric": "新增IP型IOC",
+          "source_path": "threat_intel_summary.new_iocs.ip",
+          "expected_value": 45
+        },
+        {
+          "metric": "命中告警的IOC数",
+          "source_path": "threat_intel_summary.iocs_hit_alerts",
+          "expected_value": 7
+        }
+      ],
+      "actual": [
+        {
+          "metric": "新增IP型IOC",
+          "source_value": 45,
+          "data_values": []
+        },
+        {
+          "metric": "命中告警的IOC数",
+          "source_value": 7,
+          "data_values": [
+            7
+          ]
+        }
+      ]
+    },
+    "template_completeness": {
+      "passed": false,
+      "reason": "section ids, bodies, placeholders, or required data are invalid",
+      "expected": [
+        "ioc_summary",
+        "apt_activity"
+      ],
+      "actual": {
+        "section_ids": [
+          "ioc_summary",
+          "apt_activity"
+        ],
+        "placeholders": [],
+        "missing_required_data": [
+          "ioc_summary:threat_intel_summary.new_iocs body",
+          "ioc_summary:threat_intel_summary.iocs_hit_alerts body",
+          "apt_activity:threat_intel_summary.active_apt_groups"
+        ]
+      }
+    },
+    "format_compliance": {
+      "passed": false,
+      "reason": "missing Markdown heading in ioc_summary; missing Markdown heading in apt_activity",
+      "expected": "balanced fences, non-skipping headings, consistent table columns",
+      "actual": [
+        "missing Markdown heading in ioc_summary",
+        "missing Markdown heading in apt_activity"
+      ]
+    },
+    "masking_check": {
+      "passed": true,
+      "reason": "security-lead technical values retained",
+      "expected": [
+        "evil-c2.xyz",
+        "X-Agent"
+      ],
+      "actual": {
+        "removed": []
+      }
+    },
+    "push_target": {
+      "passed": true,
+      "reason": "push target exactly matches configuration",
+      "expected": {
+        "channel": "email",
+        "recipients": [
+          "security-lead@company.com"
+        ]
+      },
+      "actual": {
+        "channel": "email",
+        "recipients": [
+          "security-lead@company.com"
+        ]
+      }
+    },
+    "output_schema": {
+      "passed": true,
+      "reason": "output schema valid",
+      "expected": "ReportOutput contract",
+      "actual": "valid"
+    }
+  },
+  "model_scores": {
+    "language_quality": {
+      "score": 5,
+      "reason": "文本语言高度专业，准确使用了行业术语（如 IOC、APT、CVE、Webshell），表述简洁清晰。格式采用表格和列表，符合安全负责人快速获取关键信息的需求，无口语化或模糊表述。",
+      "errors": []
+    },
+    "insight_quality": {
+      "score": 2,
+      "reason": "简报内容主要为 IOC 数量统计和 APT 活动描述，缺乏对数据的解读（如异常波动）、趋势判断（如攻击频率变化）以及针对安全负责人的可操作建议（如处置优先级），不符合高价值情报简报标准。",
+      "errors": []
+    }
+  },
+  "calls": [
+    {
+      "label": "agent",
+      "parsed": {
+        "report_title": "威胁情报周报 —— 2026-W29",
+        "report_type": "weekly",
+        "target_audience": "security_lead",
+        "target_channel": "email",
+        "target_recipients": [
+          "security-lead@company.com"
+        ],
+        "content": {
+          "sections": [
+            {
+              "section_id": "ioc_summary",
+              "title": "本周 IOC 统计",
+              "body": "| 类型 | 数量 |\n| :--- | :--- |\n| IP | 45 |\n| Domain | 23 |\n| URL | 12 |\n| Hash | 8 |\n| 命中告警 IOC 数 | 7 |",
+              "data_source_mapping": {
+                "metric_new_iocs": "threat_intel_summary.new_iocs",
+                "metric_iocs_alerts": "threat_intel_summary.iocs_hit_alerts"
+              },
+              "data_values": {
+                "metric_new_iocs": {
+                  "ip": 45,
+                  "domain": 23,
+                  "url": 12,
+                  "hash": 8
+                },
+                "metric_iocs_alerts": 7
+              }
+            },
+            {
+              "section_id": "apt_activity",
+              "title": "活跃 APT 组织动态",
+              "body": "- **APT28**: 政府/军工 - 利用 CVE-2026-12345 漏洞针对国防机构发起鱼叉式钓鱼攻击，投放自定义恶意软件 X-Agent\n- **APT41**: 金融/科技 - 对多个金融机构的 VPN 设备进行暴力破解并部署 Webshell，C2 域名包括 evil-c2.xyz 和 update.defender.cc",
+              "data_source_mapping": {
+                "metric_apt_groups": "threat_intel_summary.active_apt_groups"
+              },
+              "data_values": {
+                "metric_apt_groups": [
+                  {
+                    "name": "APT28",
+                    "targeting_sector": "政府/军工",
+                    "recent_activity": "利用 CVE-2026-12345 漏洞针对国防机构发起鱼叉式钓鱼攻击，投放自定义恶意软件 X-Agent"
+                  },
+                  {
+                    "name": "APT41",
+                    "targeting_sector": "金融/科技",
+                    "recent_activity": "对多个金融机构的 VPN 设备进行暴力破解并部署 Webshell，C2 域名包括 evil-c2.xyz 和 update.defender.cc"
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "masking_applied": [],
+        "metadata": {
+          "generated_at": "2026-07-20T08:00:00Z",
+          "data_sources_used": [
+            "threat_intel_summary"
+          ],
+          "push_status": "draft"
+        }
+      },
+      "raw_text": "{\n  \"report_title\": \"威胁情报周报 —— 2026-W29\",\n  \"report_type\": \"weekly\",\n  \"target_audience\": \"security_lead\",\n  \"target_channel\": \"email\",\n  \"target_recipients\": [\n    \"security-lead@company.com\"\n  ],\n  \"content\": {\n    \"sections\": [\n      {\n        \"section_id\": \"ioc_summary\",\n        \"title\": \"本周 IOC 统计\",\n        \"body\": \"| 类型 | 数量 |\\n| :--- | :--- |\\n| IP | 45 |\\n| Domain | 23 |\\n| URL | 12 |\\n| Hash | 8 |\\n| 命中告警 IOC 数 | 7 |\",\n        \"data_source_mapping\": {\n          \"metric_new_iocs\": \"threat_intel_summary.new_iocs\",\n          \"metric_iocs_alerts\": \"threat_intel_summary.iocs_hit_alerts\"\n        },\n        \"data_values\": {\n          \"metric_new_iocs\": {\n            \"ip\": 45,\n            \"domain\": 23,\n            \"url\": 12,\n            \"hash\": 8\n          },\n          \"metric_iocs_alerts\": 7\n        }\n      },\n      {\n        \"section_id\": \"apt_activity\",\n        \"title\": \"活跃 APT 组织动态\",\n        \"body\": \"- **APT28**: 政府/军工 - 利用 CVE-2026-12345 漏洞针对国防机构发起鱼叉式钓鱼攻击，投放自定义恶意软件 X-Agent\\n- **APT41**: 金融/科技 - 对多个金融机构的 VPN 设备进行暴力破解并部署 Webshell，C2 域名包括 evil-c2.xyz 和 update.defender.cc\",\n        \"data_source_mapping\": {\n          \"metric_apt_groups\": \"threat_intel_summary.active_apt_groups\"\n        },\n        \"data_values\": {\n          \"metric_apt_groups\": [\n            {\n              \"name\": \"APT28\",\n              \"targeting_sector\": \"政府/军工\",\n              \"recent_activity\": \"利用 CVE-2026-12345 漏洞针对国防机构发起鱼叉式钓鱼攻击，投放自定义恶意软件 X-Agent\"\n            },\n            {\n              \"name\": \"APT41\",\n              \"targeting_sector\": \"金融/科技\",\n              \"recent_activity\": \"对多个金融机构的 VPN 设备进行暴力破解并部署 Webshell，C2 域名包括 evil-c2.xyz 和 update.defender.cc\"\n            }\n          ]\n        }\n      }\n    ]\n  },\n  \"masking_applied\": [],\n  \"metadata\": {\n    \"generated_at\": \"2026-07-20T08:00:00Z\",\n    \"data_sources_used\": [\n      \"threat_intel_summary\"\n    ],\n    \"push_status\": \"draft\"\n  }\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1088,
+      "output_tokens": 6796,
+      "latency_ms": 61519,
+      "attempts": 1
+    },
+    {
+      "label": "judge:language_quality",
+      "parsed": {
+        "score": 5,
+        "reason": "文本语言高度专业，准确使用了行业术语（如 IOC、APT、CVE、Webshell），表述简洁清晰。格式采用表格和列表，符合安全负责人快速获取关键信息的需求，无口语化或模糊表述。",
+        "errors": []
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"文本语言高度专业，准确使用了行业术语（如 IOC、APT、CVE、Webshell），表述简洁清晰。格式采用表格和列表，符合安全负责人快速获取关键信息的需求，无口语化或模糊表述。\",\n  \"errors\": []\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 650,
+      "output_tokens": 4630,
+      "latency_ms": 45005,
+      "attempts": 1
+    },
+    {
+      "label": "judge:insight_quality",
+      "parsed": {
+        "score": 2,
+        "reason": "简报内容主要为 IOC 数量统计和 APT 活动描述，缺乏对数据的解读（如异常波动）、趋势判断（如攻击频率变化）以及针对安全负责人的可操作建议（如处置优先级），不符合高价值情报简报标准。",
+        "errors": []
+      },
+      "raw_text": "{\n  \"score\": 2,\n  \"reason\": \"简报内容主要为 IOC 数量统计和 APT 活动描述，缺乏对数据的解读（如异常波动）、趋势判断（如攻击频率变化）以及针对安全负责人的可操作建议（如处置优先级），不符合高价值情报简报标准。\",\n  \"errors\": []\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 658,
+      "output_tokens": 2805,
+      "latency_ms": 26326,
+      "attempts": 1
+    }
+  ],
+  "overall_pass": false,
+  "error_type": null,
+  "error_message": null,
+  "run_provenance": {
+    "dataset_sha256": "649a00fd34d4d65188498c83dca61342356ab900089ceddd512b96137c24a46c",
+    "agent_mode": "real",
+    "agent": {
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1",
+      "response_mode": "json_object",
+      "temperature": 0.0,
+      "max_tokens": 4096,
+      "timeout_seconds": 90.0
+    },
+    "judge": {
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1",
+      "response_mode": "json_object",
+      "temperature": 0.0,
+      "max_tokens": 4096,
+      "timeout_seconds": 90.0
+    },
+    "grader_mode": "code_and_model"
+  }
+}

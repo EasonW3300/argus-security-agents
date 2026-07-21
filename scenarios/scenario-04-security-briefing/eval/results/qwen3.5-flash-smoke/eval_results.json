@@ -1,0 +1,1364 @@
+{
+  "manifest": {
+    "started_at": "2026-07-20T09:51:26.730025+00:00",
+    "dataset_sha256": "649a00fd34d4d65188498c83dca61342356ab900089ceddd512b96137c24a46c",
+    "agent": {
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1",
+      "response_mode": "json_object",
+      "temperature": 0.0,
+      "max_tokens": 4096,
+      "timeout_seconds": 90.0
+    },
+    "judge": {
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1",
+      "response_mode": "json_object",
+      "temperature": 0.0,
+      "max_tokens": 4096,
+      "timeout_seconds": 90.0
+    },
+    "options": {
+      "mock_agent": false,
+      "skip_model_graders": false,
+      "case_id": null,
+      "limit": 3,
+      "request_timeout_seconds": 90.0
+    },
+    "run_provenance": {
+      "dataset_sha256": "649a00fd34d4d65188498c83dca61342356ab900089ceddd512b96137c24a46c",
+      "agent_mode": "real",
+      "agent": {
+        "provider": "qwen",
+        "model": "qwen3.5-flash",
+        "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1",
+        "response_mode": "json_object",
+        "temperature": 0.0,
+        "max_tokens": 4096,
+        "timeout_seconds": 90.0
+      },
+      "judge": {
+        "provider": "qwen",
+        "model": "qwen3.5-flash",
+        "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1",
+        "response_mode": "json_object",
+        "temperature": 0.0,
+        "max_tokens": 4096,
+        "timeout_seconds": 90.0
+      },
+      "grader_mode": "code_and_model"
+    }
+  },
+  "summary": {
+    "total": 3,
+    "completed": 3,
+    "completion_rate": 1.0,
+    "code_grader_pass_rates": {
+      "data_accuracy": 0.0,
+      "template_completeness": 0.0,
+      "format_compliance": 0.0,
+      "masking_check": 1.0,
+      "push_target": 1.0,
+      "output_schema": 1.0
+    },
+    "code_grader_overall_pass_rate": 0.0
+  },
+  "results": [
+    {
+      "test_case_id": "S04-001",
+      "scenario": "安全负责人需要一份日常告警态势日报，展示告警总数、级别分布、TOP3规则及处置率",
+      "type": "daily_report",
+      "difficulty": "easy",
+      "is_positive": true,
+      "status": "completed",
+      "final_output": {
+        "report_title": "安全态势日报 —— 2026-07-16",
+        "report_type": "daily",
+        "target_audience": "security_lead",
+        "target_channel": "email",
+        "target_recipients": [
+          "security-lead@company.com"
+        ],
+        "content": {
+          "sections": [
+            {
+              "section_id": "summary",
+              "title": "总体摘要",
+              "body": "今日共收到 156 条安全告警，级别分布为：严重 3 条，高 23 条，中 78 条，低 52 条。整体处置率为 87%。",
+              "data_source_mapping": {
+                "total": "alert_stats.total",
+                "by_severity": "alert_stats.by_severity",
+                "disposal_rate": "alert_stats.disposal_rate"
+              },
+              "data_values": {
+                "total": 156,
+                "by_severity": {
+                  "critical": 3,
+                  "high": 23,
+                  "medium": 78,
+                  "low": 52
+                },
+                "disposal_rate": 0.87
+              }
+            },
+            {
+              "section_id": "severity_breakdown",
+              "title": "告警级别分布",
+              "body": "| 级别 | 数量 |\n| --- | --- |\n| Critical | 3 |\n| High | 23 |\n| Medium | 78 |\n| Low | 52 |",
+              "data_source_mapping": {
+                "by_severity": "alert_stats.by_severity"
+              },
+              "data_values": {
+                "by_severity": {
+                  "critical": 3,
+                  "high": 23,
+                  "medium": 78,
+                  "low": 52
+                }
+              }
+            },
+            {
+              "section_id": "top_rules",
+              "title": "TOP 3 告警规则",
+              "body": "- Multiple Failed Logins from Same Source: 45 次 (+8%)\n- Suspicious Outbound Data Transfer: 32 次 (+5%)\n-Malware Detected on Endpoint: 18 次 (-2%)",
+              "data_source_mapping": {
+                "top_rules": "alert_stats.top_rules"
+              },
+              "data_values": {
+                "top_rules": [
+                  {
+                    "rule_name": "Multiple Failed Logins from Same Source",
+                    "count": 45,
+                    "change": "+8%"
+                  },
+                  {
+                    "rule_name": "Suspicious Outbound Data Transfer",
+                    "count": 32,
+                    "change": "+5%"
+                  },
+                  {
+                    "rule_name": "Malware Detected on Endpoint",
+                    "count": 18,
+                    "change": "-2%"
+                  }
+                ]
+              }
+            },
+            {
+              "section_id": "disposal_metrics",
+              "title": "处置效率",
+              "body": "当前处置率为 87%，平均处置时间为 23 分钟，待处理队列积压 12 条。",
+              "data_source_mapping": {
+                "disposal_rate": "alert_stats.disposal_rate",
+                "avg_disposal_minutes": "alert_stats.avg_disposal_minutes",
+                "pending_queue": "alert_stats.pending_queue"
+              },
+              "data_values": {
+                "disposal_rate": 0.87,
+                "avg_disposal_minutes": 23,
+                "pending_queue": 12
+              }
+            }
+          ]
+        },
+        "masking_applied": [],
+        "metadata": {
+          "generated_at": "2026-07-16T09:00:00Z",
+          "data_sources_used": [
+            "alert_stats"
+          ],
+          "push_status": "draft"
+        }
+      },
+      "code_graders": {
+        "data_accuracy": {
+          "passed": false,
+          "reason": "metric mismatch: summary:alert_stats.total body, summary:alert_stats.by_severity body, summary:alert_stats.disposal_rate body, severity_breakdown:alert_stats.by_severity body, top_rules:alert_stats.top_rules body, disposal_metrics:alert_stats.disposal_rate body, disposal_metrics:alert_stats.avg_disposal_minutes body, disposal_metrics:alert_stats.pending_queue body, 告警总数, 处置率, unbound body declaration 今日共收到 156 条安全告警，级别分布为：严重 3 条，高 23 条，中 78 条，低 52 条。整体处置率为 87%。, unbound body declaration - Multiple Failed Logins from Same Source: 45 次 (+8%), unbound body declaration - Suspicious Outbound Data Transfer: 32 次 (+5%), unbound body declaration -Malware Detected on Endpoint: 18 次 (-2%)",
+          "expected": [
+            {
+              "metric": "告警总数",
+              "source_path": "alert_stats.total",
+              "expected_value": 156
+            },
+            {
+              "metric": "处置率",
+              "source_path": "alert_stats.disposal_rate",
+              "expected_value": 0.87
+            }
+          ],
+          "actual": [
+            {
+              "metric": "告警总数",
+              "source_value": 156,
+              "data_values": [
+                156
+              ]
+            },
+            {
+              "metric": "处置率",
+              "source_value": 0.87,
+              "data_values": [
+                0.87,
+                0.87
+              ]
+            }
+          ]
+        },
+        "template_completeness": {
+          "passed": false,
+          "reason": "section ids, bodies, placeholders, or required data are invalid",
+          "expected": [
+            "summary",
+            "severity_breakdown",
+            "top_rules",
+            "disposal_metrics"
+          ],
+          "actual": {
+            "section_ids": [
+              "summary",
+              "severity_breakdown",
+              "top_rules",
+              "disposal_metrics"
+            ],
+            "placeholders": [],
+            "missing_required_data": [
+              "summary:alert_stats.total body",
+              "summary:alert_stats.by_severity body",
+              "summary:alert_stats.disposal_rate body",
+              "severity_breakdown:alert_stats.by_severity body",
+              "top_rules:alert_stats.top_rules body",
+              "disposal_metrics:alert_stats.disposal_rate body",
+              "disposal_metrics:alert_stats.avg_disposal_minutes body",
+              "disposal_metrics:alert_stats.pending_queue body"
+            ]
+          }
+        },
+        "format_compliance": {
+          "passed": false,
+          "reason": "missing Markdown heading in summary; missing Markdown heading in severity_breakdown; missing Markdown heading in top_rules; missing Markdown heading in disposal_metrics",
+          "expected": "balanced fences, non-skipping headings, consistent table columns",
+          "actual": [
+            "missing Markdown heading in summary",
+            "missing Markdown heading in severity_breakdown",
+            "missing Markdown heading in top_rules",
+            "missing Markdown heading in disposal_metrics"
+          ]
+        },
+        "masking_check": {
+          "passed": true,
+          "reason": "security-lead technical values retained",
+          "expected": [
+            "156",
+            "87%",
+            "Multiple Failed Logins"
+          ],
+          "actual": {
+            "removed": []
+          }
+        },
+        "push_target": {
+          "passed": true,
+          "reason": "push target exactly matches configuration",
+          "expected": {
+            "channel": "email",
+            "recipients": [
+              "security-lead@company.com"
+            ]
+          },
+          "actual": {
+            "channel": "email",
+            "recipients": [
+              "security-lead@company.com"
+            ]
+          }
+        },
+        "output_schema": {
+          "passed": true,
+          "reason": "output schema valid",
+          "expected": "ReportOutput contract",
+          "actual": "valid"
+        }
+      },
+      "model_scores": {
+        "language_quality": {
+          "score": 5,
+          "reason": "文本专业简练，术语规范（如 Critical, Endpoint），数据展示直观（表格、列表），高度适配安全负责人受众，无口语化或模糊表述。",
+          "errors": []
+        },
+        "insight_quality": {
+          "score": 1,
+          "reason": "The briefing consists entirely of raw data listing (counts, percentages, rates) without interpretation. It lacks analysis on the significance of trends (e.g., why failed logins increased) and provides no actionable recommendations for the Security Lead.",
+          "errors": []
+        }
+      },
+      "calls": [
+        {
+          "label": "agent",
+          "parsed": {
+            "report_title": "安全态势日报 —— 2026-07-16",
+            "report_type": "daily",
+            "target_audience": "security_lead",
+            "target_channel": "email",
+            "target_recipients": [
+              "security-lead@company.com"
+            ],
+            "content": {
+              "sections": [
+                {
+                  "section_id": "summary",
+                  "title": "总体摘要",
+                  "body": "今日共收到 156 条安全告警，级别分布为：严重 3 条，高 23 条，中 78 条，低 52 条。整体处置率为 87%。",
+                  "data_source_mapping": {
+                    "total": "alert_stats.total",
+                    "by_severity": "alert_stats.by_severity",
+                    "disposal_rate": "alert_stats.disposal_rate"
+                  },
+                  "data_values": {
+                    "total": 156,
+                    "by_severity": {
+                      "critical": 3,
+                      "high": 23,
+                      "medium": 78,
+                      "low": 52
+                    },
+                    "disposal_rate": 0.87
+                  }
+                },
+                {
+                  "section_id": "severity_breakdown",
+                  "title": "告警级别分布",
+                  "body": "| 级别 | 数量 |\n| --- | --- |\n| Critical | 3 |\n| High | 23 |\n| Medium | 78 |\n| Low | 52 |",
+                  "data_source_mapping": {
+                    "by_severity": "alert_stats.by_severity"
+                  },
+                  "data_values": {
+                    "by_severity": {
+                      "critical": 3,
+                      "high": 23,
+                      "medium": 78,
+                      "low": 52
+                    }
+                  }
+                },
+                {
+                  "section_id": "top_rules",
+                  "title": "TOP 3 告警规则",
+                  "body": "- Multiple Failed Logins from Same Source: 45 次 (+8%)\n- Suspicious Outbound Data Transfer: 32 次 (+5%)\n-Malware Detected on Endpoint: 18 次 (-2%)",
+                  "data_source_mapping": {
+                    "top_rules": "alert_stats.top_rules"
+                  },
+                  "data_values": {
+                    "top_rules": [
+                      {
+                        "rule_name": "Multiple Failed Logins from Same Source",
+                        "count": 45,
+                        "change": "+8%"
+                      },
+                      {
+                        "rule_name": "Suspicious Outbound Data Transfer",
+                        "count": 32,
+                        "change": "+5%"
+                      },
+                      {
+                        "rule_name": "Malware Detected on Endpoint",
+                        "count": 18,
+                        "change": "-2%"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "section_id": "disposal_metrics",
+                  "title": "处置效率",
+                  "body": "当前处置率为 87%，平均处置时间为 23 分钟，待处理队列积压 12 条。",
+                  "data_source_mapping": {
+                    "disposal_rate": "alert_stats.disposal_rate",
+                    "avg_disposal_minutes": "alert_stats.avg_disposal_minutes",
+                    "pending_queue": "alert_stats.pending_queue"
+                  },
+                  "data_values": {
+                    "disposal_rate": 0.87,
+                    "avg_disposal_minutes": 23,
+                    "pending_queue": 12
+                  }
+                }
+              ]
+            },
+            "masking_applied": [],
+            "metadata": {
+              "generated_at": "2026-07-16T09:00:00Z",
+              "data_sources_used": [
+                "alert_stats"
+              ],
+              "push_status": "draft"
+            }
+          },
+          "raw_text": "{\n  \"report_title\": \"安全态势日报 —— 2026-07-16\",\n  \"report_type\": \"daily\",\n  \"target_audience\": \"security_lead\",\n  \"target_channel\": \"email\",\n  \"target_recipients\": [\n    \"security-lead@company.com\"\n  ],\n  \"content\": {\n    \"sections\": [\n      {\n        \"section_id\": \"summary\",\n        \"title\": \"总体摘要\",\n        \"body\": \"今日共收到 156 条安全告警，级别分布为：严重 3 条，高 23 条，中 78 条，低 52 条。整体处置率为 87%。\",\n        \"data_source_mapping\": {\n          \"total\": \"alert_stats.total\",\n          \"by_severity\": \"alert_stats.by_severity\",\n          \"disposal_rate\": \"alert_stats.disposal_rate\"\n        },\n        \"data_values\": {\n          \"total\": 156,\n          \"by_severity\": {\n            \"critical\": 3,\n            \"high\": 23,\n            \"medium\": 78,\n            \"low\": 52\n          },\n          \"disposal_rate\": 0.87\n        }\n      },\n      {\n        \"section_id\": \"severity_breakdown\",\n        \"title\": \"告警级别分布\",\n        \"body\": \"| 级别 | 数量 |\\n| --- | --- |\\n| Critical | 3 |\\n| High | 23 |\\n| Medium | 78 |\\n| Low | 52 |\",\n        \"data_source_mapping\": {\n          \"by_severity\": \"alert_stats.by_severity\"\n        },\n        \"data_values\": {\n          \"by_severity\": {\n            \"critical\": 3,\n            \"high\": 23,\n            \"medium\": 78,\n            \"low\": 52\n          }\n        }\n      },\n      {\n        \"section_id\": \"top_rules\",\n        \"title\": \"TOP 3 告警规则\",\n        \"body\": \"- Multiple Failed Logins from Same Source: 45 次 (+8%)\\n- Suspicious Outbound Data Transfer: 32 次 (+5%)\\n-Malware Detected on Endpoint: 18 次 (-2%)\",\n        \"data_source_mapping\": {\n          \"top_rules\": \"alert_stats.top_rules\"\n        },\n        \"data_values\": {\n          \"top_rules\": [\n            {\n              \"rule_name\": \"Multiple Failed Logins from Same Source\",\n              \"count\": 45,\n              \"change\": \"+8%\"\n            },\n            {\n              \"rule_name\": \"Suspicious Outbound Data Transfer\",\n              \"count\": 32,\n              \"change\": \"+5%\"\n            },\n            {\n              \"rule_name\": \"Malware Detected on Endpoint\",\n              \"count\": 18,\n              \"change\": \"-2%\"\n            }\n          ]\n        }\n      },\n      {\n        \"section_id\": \"disposal_metrics\",\n        \"title\": \"处置效率\",\n        \"body\": \"当前处置率为 87%，平均处置时间为 23 分钟，待处理队列积压 12 条。\",\n        \"data_source_mapping\": {\n          \"disposal_rate\": \"alert_stats.disposal_rate\",\n          \"avg_disposal_minutes\": \"alert_stats.avg_disposal_minutes\",\n          \"pending_queue\": \"alert_stats.pending_queue\"\n        },\n        \"data_values\": {\n          \"disposal_rate\": 0.87,\n          \"avg_disposal_minutes\": 23,\n          \"pending_queue\": 12\n        }\n      }\n    ]\n  },\n  \"masking_applied\": [],\n  \"metadata\": {\n    \"generated_at\": \"2026-07-16T09:00:00Z\",\n    \"data_sources_used\": [\n      \"alert_stats\"\n    ],\n    \"push_status\": \"draft\"\n  }\n}",
+          "provider": "qwen",
+          "model": "qwen3.5-flash",
+          "response_mode": "json_object",
+          "input_tokens": 1226,
+          "output_tokens": 5907,
+          "latency_ms": 57807,
+          "attempts": 3
+        },
+        {
+          "label": "judge:language_quality",
+          "parsed": {
+            "score": 5,
+            "reason": "文本专业简练，术语规范（如 Critical, Endpoint），数据展示直观（表格、列表），高度适配安全负责人受众，无口语化或模糊表述。",
+            "errors": []
+          },
+          "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"文本专业简练，术语规范（如 Critical, Endpoint），数据展示直观（表格、列表），高度适配安全负责人受众，无口语化或模糊表述。\",\n  \"errors\": []\n}",
+          "provider": "qwen",
+          "model": "qwen3.5-flash",
+          "response_mode": "json_object",
+          "input_tokens": 820,
+          "output_tokens": 4171,
+          "latency_ms": 41383,
+          "attempts": 2
+        },
+        {
+          "label": "judge:insight_quality",
+          "parsed": {
+            "score": 1,
+            "reason": "The briefing consists entirely of raw data listing (counts, percentages, rates) without interpretation. It lacks analysis on the significance of trends (e.g., why failed logins increased) and provides no actionable recommendations for the Security Lead.",
+            "errors": []
+          },
+          "raw_text": "{\n  \"score\": 1,\n  \"reason\": \"The briefing consists entirely of raw data listing (counts, percentages, rates) without interpretation. It lacks analysis on the significance of trends (e.g., why failed logins increased) and provides no actionable recommendations for the Security Lead.\",\n  \"errors\": []\n}",
+          "provider": "qwen",
+          "model": "qwen3.5-flash",
+          "response_mode": "json_object",
+          "input_tokens": 828,
+          "output_tokens": 2721,
+          "latency_ms": 26874,
+          "attempts": 1
+        }
+      ],
+      "overall_pass": false,
+      "error_type": null,
+      "error_message": null
+    },
+    {
+      "test_case_id": "S04-002",
+      "scenario": "安全负责人需要一份漏洞扫描日报，展示新增漏洞分布、修复进度和待处理高危漏洞",
+      "type": "daily_report",
+      "difficulty": "easy",
+      "is_positive": true,
+      "status": "completed",
+      "final_output": {
+        "report_title": "漏洞扫描日报 —— 2026-07-16",
+        "report_type": "daily",
+        "target_audience": "security_lead",
+        "target_channel": "email",
+        "target_recipients": [
+          "security-lead@company.com"
+        ],
+        "content": {
+          "sections": [
+            {
+              "section_id": "overview",
+              "title": "今日扫描概况",
+              "body": "今日新增漏洞总数为 12 个。严重度分布：Critical 1 个，High 3 个，Medium 5 个，Low 3 个。修复率为 0.67。",
+              "data_source_mapping": {
+                "new_total": "vulnerability_stats.new_total",
+                "by_severity": "vulnerability_stats.by_severity",
+                "fix_rate": "vulnerability_stats.fix_rate"
+              },
+              "data_values": {
+                "new_total": 12,
+                "by_severity": {
+                  "critical": 1,
+                  "high": 3,
+                  "medium": 5,
+                  "low": 3
+                },
+                "fix_rate": 0.67
+              }
+            },
+            {
+              "section_id": "critical_pending",
+              "title": "待处理高危漏洞",
+              "body": "| CVE ID | Affected Asset | CVSS Score | Days Open |\n| :--- | :--- | :--- | :--- |\n| CVE-2026-19876 | 核心交易数据库 DB-Master-01 | 9.8 | 5 |",
+              "data_source_mapping": {
+                "pending_critical": "vulnerability_stats.pending_critical"
+              },
+              "data_values": {
+                "pending_critical": [
+                  {
+                    "cve_id": "CVE-2026-19876",
+                    "affected_asset": "核心交易数据库 DB-Master-01",
+                    "cvss_score": 9.8,
+                    "days_open": 5
+                  }
+                ]
+              }
+            },
+            {
+              "section_id": "fix_metrics",
+              "title": "修复指标",
+              "body": "已修复漏洞数量为 8 个。平均修复时间为 12 天。",
+              "data_source_mapping": {
+                "fixed_total": "vulnerability_stats.fixed_total",
+                "avg_fix_days": "vulnerability_stats.avg_fix_days"
+              },
+              "data_values": {
+                "fixed_total": 8,
+                "avg_fix_days": 12
+              }
+            }
+          ]
+        },
+        "masking_applied": [],
+        "metadata": {
+          "generated_at": "2026-07-16T09:00:00Z",
+          "data_sources_used": [
+            "vulnerability_stats"
+          ],
+          "push_status": "draft"
+        }
+      },
+      "code_graders": {
+        "data_accuracy": {
+          "passed": false,
+          "reason": "metric mismatch: overview:vulnerability_stats.new_total body, overview:vulnerability_stats.by_severity body, overview:vulnerability_stats.fix_rate body, critical_pending:vulnerability_stats.pending_critical body, fix_metrics:vulnerability_stats.fixed_total body, fix_metrics:vulnerability_stats.avg_fix_days body, 新增漏洞总数, 修复率, unbound body declaration 今日新增漏洞总数为 12 个。严重度分布：Critical 1 个，High 3 个，Medium 5 个，Low 3 个。修复率为 0.67。",
+          "expected": [
+            {
+              "metric": "新增漏洞总数",
+              "source_path": "vulnerability_stats.new_total",
+              "expected_value": 12
+            },
+            {
+              "metric": "修复率",
+              "source_path": "vulnerability_stats.fix_rate",
+              "expected_value": 0.67
+            }
+          ],
+          "actual": [
+            {
+              "metric": "新增漏洞总数",
+              "source_value": 12,
+              "data_values": [
+                12
+              ]
+            },
+            {
+              "metric": "修复率",
+              "source_value": 0.67,
+              "data_values": [
+                0.67
+              ]
+            }
+          ]
+        },
+        "template_completeness": {
+          "passed": false,
+          "reason": "section ids, bodies, placeholders, or required data are invalid",
+          "expected": [
+            "overview",
+            "critical_pending",
+            "fix_metrics"
+          ],
+          "actual": {
+            "section_ids": [
+              "overview",
+              "critical_pending",
+              "fix_metrics"
+            ],
+            "placeholders": [],
+            "missing_required_data": [
+              "overview:vulnerability_stats.new_total body",
+              "overview:vulnerability_stats.by_severity body",
+              "overview:vulnerability_stats.fix_rate body",
+              "critical_pending:vulnerability_stats.pending_critical body",
+              "fix_metrics:vulnerability_stats.fixed_total body",
+              "fix_metrics:vulnerability_stats.avg_fix_days body"
+            ]
+          }
+        },
+        "format_compliance": {
+          "passed": false,
+          "reason": "missing Markdown heading in overview; missing Markdown heading in critical_pending; missing Markdown heading in fix_metrics",
+          "expected": "balanced fences, non-skipping headings, consistent table columns",
+          "actual": [
+            "missing Markdown heading in overview",
+            "missing Markdown heading in critical_pending",
+            "missing Markdown heading in fix_metrics"
+          ]
+        },
+        "masking_check": {
+          "passed": true,
+          "reason": "security-lead technical values retained",
+          "expected": [
+            "CVE-2026-19876",
+            "DB-Master-01",
+            "9.8"
+          ],
+          "actual": {
+            "removed": []
+          }
+        },
+        "push_target": {
+          "passed": true,
+          "reason": "push target exactly matches configuration",
+          "expected": {
+            "channel": "email",
+            "recipients": [
+              "security-lead@company.com"
+            ]
+          },
+          "actual": {
+            "channel": "email",
+            "recipients": [
+              "security-lead@company.com"
+            ]
+          }
+        },
+        "output_schema": {
+          "passed": true,
+          "reason": "output schema valid",
+          "expected": "ReportOutput contract",
+          "actual": "valid"
+        }
+      },
+      "model_scores": {
+        "language_quality": {
+          "score": 4,
+          "reason": "专业术语使用得当，结构清晰适配安全负责人。但修复率数值格式不直观，部分措辞可进一步精简以提升阅读效率。",
+          "errors": [
+            "修复率 0.67 应转换为百分比 67%",
+            "部分语句存在冗余词汇（如'数量为'）"
+          ]
+        },
+        "insight_quality": {
+          "score": 1,
+          "reason": "简报仅呈现原始统计数据（漏洞总数、分布、修复率及列表），缺乏与历史基线的趋势对比分析，未对关键风险（如核心交易数据库暴露）进行解读，且未提供任何具体的处置建议或优先级指引，完全符合'纯数据搬运'的评分标准。",
+          "errors": []
+        }
+      },
+      "calls": [
+        {
+          "label": "agent",
+          "parsed": {
+            "report_title": "漏洞扫描日报 —— 2026-07-16",
+            "report_type": "daily",
+            "target_audience": "security_lead",
+            "target_channel": "email",
+            "target_recipients": [
+              "security-lead@company.com"
+            ],
+            "content": {
+              "sections": [
+                {
+                  "section_id": "overview",
+                  "title": "今日扫描概况",
+                  "body": "今日新增漏洞总数为 12 个。严重度分布：Critical 1 个，High 3 个，Medium 5 个，Low 3 个。修复率为 0.67。",
+                  "data_source_mapping": {
+                    "new_total": "vulnerability_stats.new_total",
+                    "by_severity": "vulnerability_stats.by_severity",
+                    "fix_rate": "vulnerability_stats.fix_rate"
+                  },
+                  "data_values": {
+                    "new_total": 12,
+                    "by_severity": {
+                      "critical": 1,
+                      "high": 3,
+                      "medium": 5,
+                      "low": 3
+                    },
+                    "fix_rate": 0.67
+                  }
+                },
+                {
+                  "section_id": "critical_pending",
+                  "title": "待处理高危漏洞",
+                  "body": "| CVE ID | Affected Asset | CVSS Score | Days Open |\n| :--- | :--- | :--- | :--- |\n| CVE-2026-19876 | 核心交易数据库 DB-Master-01 | 9.8 | 5 |",
+                  "data_source_mapping": {
+                    "pending_critical": "vulnerability_stats.pending_critical"
+                  },
+                  "data_values": {
+                    "pending_critical": [
+                      {
+                        "cve_id": "CVE-2026-19876",
+                        "affected_asset": "核心交易数据库 DB-Master-01",
+                        "cvss_score": 9.8,
+                        "days_open": 5
+                      }
+                    ]
+                  }
+                },
+                {
+                  "section_id": "fix_metrics",
+                  "title": "修复指标",
+                  "body": "已修复漏洞数量为 8 个。平均修复时间为 12 天。",
+                  "data_source_mapping": {
+                    "fixed_total": "vulnerability_stats.fixed_total",
+                    "avg_fix_days": "vulnerability_stats.avg_fix_days"
+                  },
+                  "data_values": {
+                    "fixed_total": 8,
+                    "avg_fix_days": 12
+                  }
+                }
+              ]
+            },
+            "masking_applied": [],
+            "metadata": {
+              "generated_at": "2026-07-16T09:00:00Z",
+              "data_sources_used": [
+                "vulnerability_stats"
+              ],
+              "push_status": "draft"
+            }
+          },
+          "raw_text": "{\n  \"report_title\": \"漏洞扫描日报 —— 2026-07-16\",\n  \"report_type\": \"daily\",\n  \"target_audience\": \"security_lead\",\n  \"target_channel\": \"email\",\n  \"target_recipients\": [\n    \"security-lead@company.com\"\n  ],\n  \"content\": {\n    \"sections\": [\n      {\n        \"section_id\": \"overview\",\n        \"title\": \"今日扫描概况\",\n        \"body\": \"今日新增漏洞总数为 12 个。严重度分布：Critical 1 个，High 3 个，Medium 5 个，Low 3 个。修复率为 0.67。\",\n        \"data_source_mapping\": {\n          \"new_total\": \"vulnerability_stats.new_total\",\n          \"by_severity\": \"vulnerability_stats.by_severity\",\n          \"fix_rate\": \"vulnerability_stats.fix_rate\"\n        },\n        \"data_values\": {\n          \"new_total\": 12,\n          \"by_severity\": {\n            \"critical\": 1,\n            \"high\": 3,\n            \"medium\": 5,\n            \"low\": 3\n          },\n          \"fix_rate\": 0.67\n        }\n      },\n      {\n        \"section_id\": \"critical_pending\",\n        \"title\": \"待处理高危漏洞\",\n        \"body\": \"| CVE ID | Affected Asset | CVSS Score | Days Open |\\n| :--- | :--- | :--- | :--- |\\n| CVE-2026-19876 | 核心交易数据库 DB-Master-01 | 9.8 | 5 |\",\n        \"data_source_mapping\": {\n          \"pending_critical\": \"vulnerability_stats.pending_critical\"\n        },\n        \"data_values\": {\n          \"pending_critical\": [\n            {\n              \"cve_id\": \"CVE-2026-19876\",\n              \"affected_asset\": \"核心交易数据库 DB-Master-01\",\n              \"cvss_score\": 9.8,\n              \"days_open\": 5\n            }\n          ]\n        }\n      },\n      {\n        \"section_id\": \"fix_metrics\",\n        \"title\": \"修复指标\",\n        \"body\": \"已修复漏洞数量为 8 个。平均修复时间为 12 天。\",\n        \"data_source_mapping\": {\n          \"fixed_total\": \"vulnerability_stats.fixed_total\",\n          \"avg_fix_days\": \"vulnerability_stats.avg_fix_days\"\n        },\n        \"data_values\": {\n          \"fixed_total\": 8,\n          \"avg_fix_days\": 12\n        }\n      }\n    ]\n  },\n  \"masking_applied\": [],\n  \"metadata\": {\n    \"generated_at\": \"2026-07-16T09:00:00Z\",\n    \"data_sources_used\": [\n      \"vulnerability_stats\"\n    ],\n    \"push_status\": \"draft\"\n  }\n}",
+          "provider": "qwen",
+          "model": "qwen3.5-flash",
+          "response_mode": "json_object",
+          "input_tokens": 1110,
+          "output_tokens": 4609,
+          "latency_ms": 43574,
+          "attempts": 3
+        },
+        {
+          "label": "judge:language_quality",
+          "parsed": {
+            "score": 4,
+            "reason": "专业术语使用得当，结构清晰适配安全负责人。但修复率数值格式不直观，部分措辞可进一步精简以提升阅读效率。",
+            "errors": [
+              "修复率 0.67 应转换为百分比 67%",
+              "部分语句存在冗余词汇（如'数量为'）"
+            ]
+          },
+          "raw_text": "{\n  \"score\": 4,\n  \"reason\": \"专业术语使用得当，结构清晰适配安全负责人。但修复率数值格式不直观，部分措辞可进一步精简以提升阅读效率。\",\n  \"errors\": [\n    \"修复率 0.67 应转换为百分比 67%\",\n    \"部分语句存在冗余词汇（如'数量为'）\"\n  ]\n}",
+          "provider": "qwen",
+          "model": "qwen3.5-flash",
+          "response_mode": "json_object",
+          "input_tokens": 651,
+          "output_tokens": 1752,
+          "latency_ms": 16589,
+          "attempts": 1
+        },
+        {
+          "label": "judge:insight_quality",
+          "parsed": {
+            "score": 1,
+            "reason": "简报仅呈现原始统计数据（漏洞总数、分布、修复率及列表），缺乏与历史基线的趋势对比分析，未对关键风险（如核心交易数据库暴露）进行解读，且未提供任何具体的处置建议或优先级指引，完全符合'纯数据搬运'的评分标准。",
+            "errors": []
+          },
+          "raw_text": "{\n  \"score\": 1,\n  \"reason\": \"简报仅呈现原始统计数据（漏洞总数、分布、修复率及列表），缺乏与历史基线的趋势对比分析，未对关键风险（如核心交易数据库暴露）进行解读，且未提供任何具体的处置建议或优先级指引，完全符合'纯数据搬运'的评分标准。\",\n  \"errors\": []\n}",
+          "provider": "qwen",
+          "model": "qwen3.5-flash",
+          "response_mode": "json_object",
+          "input_tokens": 659,
+          "output_tokens": 1789,
+          "latency_ms": 19045,
+          "attempts": 1
+        }
+      ],
+      "overall_pass": false,
+      "error_type": null,
+      "error_message": null
+    },
+    {
+      "test_case_id": "S04-003",
+      "scenario": "安全负责人需要一份安全事件日报，列出当日所有安全事件详情和闭环状态",
+      "type": "daily_report",
+      "difficulty": "medium",
+      "is_positive": true,
+      "status": "completed",
+      "final_output": {
+        "report_title": "安全事件日报 —— 2026-07-16",
+        "report_type": "daily",
+        "target_audience": "security_lead",
+        "target_channel": "email",
+        "target_recipients": [
+          "security-lead@company.com"
+        ],
+        "content": {
+          "sections": [
+            {
+              "section_id": "incident_summary",
+              "title": "事件概览",
+              "body": "2026年7月16日共监测到安全事件 5 起。严重度分布：critical 2 起（C2 通信、勒索软件），high 2 起（钓鱼、数据泄露），medium 1 起（未授权访问）。当前已闭环 2 起，待处理 3 起，整体闭环率为 40%。",
+              "data_source_mapping": {
+                "incident_list": "incident_list"
+              },
+              "data_values": {
+                "incident_list": [
+                  {
+                    "incident_id": "INC-2026-0716-001",
+                    "type": "phishing",
+                    "severity": "high",
+                    "affected_asset": "核心邮件服务器 EXCH-02",
+                    "status": "closed",
+                    "opened_at": "2026-07-16T08:15:00Z",
+                    "closed_at": "2026-07-16T09:30:00Z",
+                    "response_time_minutes": 15,
+                    "assignee": "张三"
+                  },
+                  {
+                    "incident_id": "INC-2026-0716-002",
+                    "type": "c2",
+                    "severity": "critical",
+                    "affected_asset": "业务前置机 Web-Proxy-01",
+                    "status": "containing",
+                    "opened_at": "2026-07-16T10:20:00Z",
+                    "closed_at": null,
+                    "response_time_minutes": 5,
+                    "assignee": "李四"
+                  },
+                  {
+                    "incident_id": "INC-2026-0716-003",
+                    "type": "unauthorized_access",
+                    "severity": "medium",
+                    "affected_asset": "研发代码仓库 GitLab-03",
+                    "status": "investigating",
+                    "opened_at": "2026-07-16T13:45:00Z",
+                    "closed_at": null,
+                    "response_time_minutes": 12,
+                    "assignee": "王五"
+                  },
+                  {
+                    "incident_id": "INC-2026-0716-004",
+                    "type": "data_leak",
+                    "severity": "high",
+                    "affected_asset": "文件共享服务器 NAS-01",
+                    "status": "closed",
+                    "opened_at": "2026-07-16T09:00:00Z",
+                    "closed_at": "2026-07-16T14:00:00Z",
+                    "response_time_minutes": 20,
+                    "assignee": "张三"
+                  },
+                  {
+                    "incident_id": "INC-2026-0716-005",
+                    "type": "ransomware",
+                    "severity": "critical",
+                    "affected_asset": "财务系统终端 FIN-PC-12",
+                    "status": "remediating",
+                    "opened_at": "2026-07-16T14:30:00Z",
+                    "closed_at": null,
+                    "response_time_minutes": 8,
+                    "assignee": "李四"
+                  }
+                ]
+              }
+            },
+            {
+              "section_id": "incident_table",
+              "title": "事件清单",
+              "body": "| 事件 ID | 类型 | 严重度 | 受影响资产 | 状态 | 响应时间 (分钟) |\n| :--- | :--- | :--- | :--- | :--- | :--- |\n| INC-2026-0716-001 | phishing | high | 核心邮件服务器 EXCH-02 | closed | 15 |\n| INC-2026-0716-002 | c2 | critical | 业务前置机 Web-Proxy-01 | containing | 5 |\n| INC-2026-0716-003 | unauthorized_access | medium | 研发代码仓库 GitLab-03 | investigating | 12 |\n| INC-2026-0716-004 | data_leak | high | 文件共享服务器 NAS-01 | closed | 20 |\n| INC-2026-0716-005 | ransomware | critical | 财务系统终端 FIN-PC-12 | remediating | 8 |",
+              "data_source_mapping": {
+                "incident_list": "incident_list"
+              },
+              "data_values": {
+                "incident_list": [
+                  {
+                    "incident_id": "INC-2026-0716-001",
+                    "type": "phishing",
+                    "severity": "high",
+                    "affected_asset": "核心邮件服务器 EXCH-02",
+                    "status": "closed",
+                    "opened_at": "2026-07-16T08:15:00Z",
+                    "closed_at": "2026-07-16T09:30:00Z",
+                    "response_time_minutes": 15,
+                    "assignee": "张三"
+                  },
+                  {
+                    "incident_id": "INC-2026-0716-002",
+                    "type": "c2",
+                    "severity": "critical",
+                    "affected_asset": "业务前置机 Web-Proxy-01",
+                    "status": "containing",
+                    "opened_at": "2026-07-16T10:20:00Z",
+                    "closed_at": null,
+                    "response_time_minutes": 5,
+                    "assignee": "李四"
+                  },
+                  {
+                    "incident_id": "INC-2026-0716-003",
+                    "type": "unauthorized_access",
+                    "severity": "medium",
+                    "affected_asset": "研发代码仓库 GitLab-03",
+                    "status": "investigating",
+                    "opened_at": "2026-07-16T13:45:00Z",
+                    "closed_at": null,
+                    "response_time_minutes": 12,
+                    "assignee": "王五"
+                  },
+                  {
+                    "incident_id": "INC-2026-0716-004",
+                    "type": "data_leak",
+                    "severity": "high",
+                    "affected_asset": "文件共享服务器 NAS-01",
+                    "status": "closed",
+                    "opened_at": "2026-07-16T09:00:00Z",
+                    "closed_at": "2026-07-16T14:00:00Z",
+                    "response_time_minutes": 20,
+                    "assignee": "张三"
+                  },
+                  {
+                    "incident_id": "INC-2026-0716-005",
+                    "type": "ransomware",
+                    "severity": "critical",
+                    "affected_asset": "财务系统终端 FIN-PC-12",
+                    "status": "remediating",
+                    "opened_at": "2026-07-16T14:30:00Z",
+                    "closed_at": null,
+                    "response_time_minutes": 8,
+                    "assignee": "李四"
+                  }
+                ]
+              }
+            },
+            {
+              "section_id": "unclosed_incidents",
+              "title": "未闭环事件",
+              "body": "- **INC-2026-0716-002** (c2, critical): 业务前置机 Web-Proxy-01 - 状态：containing\n- **INC-2026-0716-003** (unauthorized_access, medium): 研发代码仓库 GitLab-03 - 状态：investigating\n- **INC-2026-0716-005** (ransomware, critical): 财务系统终端 FIN-PC-12 - 状态：remediating",
+              "data_source_mapping": {
+                "incident_list": "incident_list"
+              },
+              "data_values": {
+                "incident_list": [
+                  {
+                    "incident_id": "INC-2026-0716-001",
+                    "type": "phishing",
+                    "severity": "high",
+                    "affected_asset": "核心邮件服务器 EXCH-02",
+                    "status": "closed",
+                    "opened_at": "2026-07-16T08:15:00Z",
+                    "closed_at": "2026-07-16T09:30:00Z",
+                    "response_time_minutes": 15,
+                    "assignee": "张三"
+                  },
+                  {
+                    "incident_id": "INC-2026-0716-002",
+                    "type": "c2",
+                    "severity": "critical",
+                    "affected_asset": "业务前置机 Web-Proxy-01",
+                    "status": "containing",
+                    "opened_at": "2026-07-16T10:20:00Z",
+                    "closed_at": null,
+                    "response_time_minutes": 5,
+                    "assignee": "李四"
+                  },
+                  {
+                    "incident_id": "INC-2026-0716-003",
+                    "type": "unauthorized_access",
+                    "severity": "medium",
+                    "affected_asset": "研发代码仓库 GitLab-03",
+                    "status": "investigating",
+                    "opened_at": "2026-07-16T13:45:00Z",
+                    "closed_at": null,
+                    "response_time_minutes": 12,
+                    "assignee": "王五"
+                  },
+                  {
+                    "incident_id": "INC-2026-0716-004",
+                    "type": "data_leak",
+                    "severity": "high",
+                    "affected_asset": "文件共享服务器 NAS-01",
+                    "status": "closed",
+                    "opened_at": "2026-07-16T09:00:00Z",
+                    "closed_at": "2026-07-16T14:00:00Z",
+                    "response_time_minutes": 20,
+                    "assignee": "张三"
+                  },
+                  {
+                    "incident_id": "INC-2026-0716-005",
+                    "type": "ransomware",
+                    "severity": "critical",
+                    "affected_asset": "财务系统终端 FIN-PC-12",
+                    "status": "remediating",
+                    "opened_at": "2026-07-16T14:30:00Z",
+                    "closed_at": null,
+                    "response_time_minutes": 8,
+                    "assignee": "李四"
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "masking_applied": [],
+        "metadata": {
+          "generated_at": "2026-07-16T15:00:00Z",
+          "data_sources_used": [
+            "incident_list"
+          ],
+          "push_status": "draft"
+        }
+      },
+      "code_graders": {
+        "data_accuracy": {
+          "passed": false,
+          "reason": "metric mismatch: incident_summary:incident_list body, incident_table:incident_list body, unclosed_incidents:incident_list body, 事件总数, unbound body declaration 2026年7月16日共监测到安全事件 5 起。严重度分布：critical 2 起（C2 通信、勒索软件），high 2 起（钓鱼、数据泄露），medium 1 起（未授权访问）。当前已闭环 2 起，待处理 3 起，整体闭环率为 40%。, unbound body declaration - **INC-2026-0716-002** (c2, critical): 业务前置机 Web-Proxy-01 - 状态：containing, unbound body declaration - **INC-2026-0716-003** (unauthorized_access, medium): 研发代码仓库 GitLab-03 - 状态：investigating, unbound body declaration - **INC-2026-0716-005** (ransomware, critical): 财务系统终端 FIN-PC-12 - 状态：remediating",
+          "expected": [
+            {
+              "metric": "事件总数",
+              "source_path": "incident_list.length",
+              "expected_value": 5
+            }
+          ],
+          "actual": [
+            {
+              "metric": "事件总数",
+              "source_value": 5,
+              "data_values": []
+            }
+          ]
+        },
+        "template_completeness": {
+          "passed": false,
+          "reason": "section ids, bodies, placeholders, or required data are invalid",
+          "expected": [
+            "incident_summary",
+            "incident_table",
+            "unclosed_incidents"
+          ],
+          "actual": {
+            "section_ids": [
+              "incident_summary",
+              "incident_table",
+              "unclosed_incidents"
+            ],
+            "placeholders": [],
+            "missing_required_data": [
+              "incident_summary:incident_list body",
+              "incident_table:incident_list body",
+              "unclosed_incidents:incident_list body"
+            ]
+          }
+        },
+        "format_compliance": {
+          "passed": false,
+          "reason": "missing Markdown heading in incident_summary; missing Markdown heading in incident_table; missing Markdown heading in unclosed_incidents",
+          "expected": "balanced fences, non-skipping headings, consistent table columns",
+          "actual": [
+            "missing Markdown heading in incident_summary",
+            "missing Markdown heading in incident_table",
+            "missing Markdown heading in unclosed_incidents"
+          ]
+        },
+        "masking_check": {
+          "passed": true,
+          "reason": "security-lead technical values retained",
+          "expected": [
+            "INC-2026-0716-001",
+            "phishing",
+            "EXCH-02"
+          ],
+          "actual": {
+            "removed": []
+          }
+        },
+        "push_target": {
+          "passed": true,
+          "reason": "push target exactly matches configuration",
+          "expected": {
+            "channel": "email",
+            "recipients": [
+              "security-lead@company.com"
+            ]
+          },
+          "actual": {
+            "channel": "email",
+            "recipients": [
+              "security-lead@company.com"
+            ]
+          }
+        },
+        "output_schema": {
+          "passed": true,
+          "reason": "output schema valid",
+          "expected": "ReportOutput contract",
+          "actual": "valid"
+        }
+      },
+      "model_scores": {
+        "language_quality": {
+          "score": 5,
+          "reason": "文本语言专业简练，准确使用安全行业术语（如 C2、ransomware、severity levels），结构逻辑清晰（概览 - 清单 - 待办），无口语化或模糊表述。内容高度适配 Security Lead 受众，重点突出风险分布与处置进度，信息密度高且易读。",
+          "errors": []
+        },
+        "insight_quality": {
+          "score": 1,
+          "reason": "简报内容完全停留在数据统计与列表罗列层面，未提供数据背后的趋势解读（如环比变化）、风险评估或针对未闭环事件的优先级建议，符合'纯数据搬运'标准，无法满足 Security Lead 的决策支持需求。",
+          "errors": []
+        }
+      },
+      "calls": [
+        {
+          "label": "agent",
+          "parsed": {
+            "report_title": "安全事件日报 —— 2026-07-16",
+            "report_type": "daily",
+            "target_audience": "security_lead",
+            "target_channel": "email",
+            "target_recipients": [
+              "security-lead@company.com"
+            ],
+            "content": {
+              "sections": [
+                {
+                  "section_id": "incident_summary",
+                  "title": "事件概览",
+                  "body": "2026年7月16日共监测到安全事件 5 起。严重度分布：critical 2 起（C2 通信、勒索软件），high 2 起（钓鱼、数据泄露），medium 1 起（未授权访问）。当前已闭环 2 起，待处理 3 起，整体闭环率为 40%。",
+                  "data_source_mapping": {
+                    "incident_list": "incident_list"
+                  },
+                  "data_values": {
+                    "incident_list": [
+                      {
+                        "incident_id": "INC-2026-0716-001",
+                        "type": "phishing",
+                        "severity": "high",
+                        "affected_asset": "核心邮件服务器 EXCH-02",
+                        "status": "closed",
+                        "opened_at": "2026-07-16T08:15:00Z",
+                        "closed_at": "2026-07-16T09:30:00Z",
+                        "response_time_minutes": 15,
+                        "assignee": "张三"
+                      },
+                      {
+                        "incident_id": "INC-2026-0716-002",
+                        "type": "c2",
+                        "severity": "critical",
+                        "affected_asset": "业务前置机 Web-Proxy-01",
+                        "status": "containing",
+                        "opened_at": "2026-07-16T10:20:00Z",
+                        "closed_at": null,
+                        "response_time_minutes": 5,
+                        "assignee": "李四"
+                      },
+                      {
+                        "incident_id": "INC-2026-0716-003",
+                        "type": "unauthorized_access",
+                        "severity": "medium",
+                        "affected_asset": "研发代码仓库 GitLab-03",
+                        "status": "investigating",
+                        "opened_at": "2026-07-16T13:45:00Z",
+                        "closed_at": null,
+                        "response_time_minutes": 12,
+                        "assignee": "王五"
+                      },
+                      {
+                        "incident_id": "INC-2026-0716-004",
+                        "type": "data_leak",
+                        "severity": "high",
+                        "affected_asset": "文件共享服务器 NAS-01",
+                        "status": "closed",
+                        "opened_at": "2026-07-16T09:00:00Z",
+                        "closed_at": "2026-07-16T14:00:00Z",
+                        "response_time_minutes": 20,
+                        "assignee": "张三"
+                      },
+                      {
+                        "incident_id": "INC-2026-0716-005",
+                        "type": "ransomware",
+                        "severity": "critical",
+                        "affected_asset": "财务系统终端 FIN-PC-12",
+                        "status": "remediating",
+                        "opened_at": "2026-07-16T14:30:00Z",
+                        "closed_at": null,
+                        "response_time_minutes": 8,
+                        "assignee": "李四"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "section_id": "incident_table",
+                  "title": "事件清单",
+                  "body": "| 事件 ID | 类型 | 严重度 | 受影响资产 | 状态 | 响应时间 (分钟) |\n| :--- | :--- | :--- | :--- | :--- | :--- |\n| INC-2026-0716-001 | phishing | high | 核心邮件服务器 EXCH-02 | closed | 15 |\n| INC-2026-0716-002 | c2 | critical | 业务前置机 Web-Proxy-01 | containing | 5 |\n| INC-2026-0716-003 | unauthorized_access | medium | 研发代码仓库 GitLab-03 | investigating | 12 |\n| INC-2026-0716-004 | data_leak | high | 文件共享服务器 NAS-01 | closed | 20 |\n| INC-2026-0716-005 | ransomware | critical | 财务系统终端 FIN-PC-12 | remediating | 8 |",
+                  "data_source_mapping": {
+                    "incident_list": "incident_list"
+                  },
+                  "data_values": {
+                    "incident_list": [
+                      {
+                        "incident_id": "INC-2026-0716-001",
+                        "type": "phishing",
+                        "severity": "high",
+                        "affected_asset": "核心邮件服务器 EXCH-02",
+                        "status": "closed",
+                        "opened_at": "2026-07-16T08:15:00Z",
+                        "closed_at": "2026-07-16T09:30:00Z",
+                        "response_time_minutes": 15,
+                        "assignee": "张三"
+                      },
+                      {
+                        "incident_id": "INC-2026-0716-002",
+                        "type": "c2",
+                        "severity": "critical",
+                        "affected_asset": "业务前置机 Web-Proxy-01",
+                        "status": "containing",
+                        "opened_at": "2026-07-16T10:20:00Z",
+                        "closed_at": null,
+                        "response_time_minutes": 5,
+                        "assignee": "李四"
+                      },
+                      {
+                        "incident_id": "INC-2026-0716-003",
+                        "type": "unauthorized_access",
+                        "severity": "medium",
+                        "affected_asset": "研发代码仓库 GitLab-03",
+                        "status": "investigating",
+                        "opened_at": "2026-07-16T13:45:00Z",
+                        "closed_at": null,
+                        "response_time_minutes": 12,
+                        "assignee": "王五"
+                      },
+                      {
+                        "incident_id": "INC-2026-0716-004",
+                        "type": "data_leak",
+                        "severity": "high",
+                        "affected_asset": "文件共享服务器 NAS-01",
+                        "status": "closed",
+                        "opened_at": "2026-07-16T09:00:00Z",
+                        "closed_at": "2026-07-16T14:00:00Z",
+                        "response_time_minutes": 20,
+                        "assignee": "张三"
+                      },
+                      {
+                        "incident_id": "INC-2026-0716-005",
+                        "type": "ransomware",
+                        "severity": "critical",
+                        "affected_asset": "财务系统终端 FIN-PC-12",
+                        "status": "remediating",
+                        "opened_at": "2026-07-16T14:30:00Z",
+                        "closed_at": null,
+                        "response_time_minutes": 8,
+                        "assignee": "李四"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "section_id": "unclosed_incidents",
+                  "title": "未闭环事件",
+                  "body": "- **INC-2026-0716-002** (c2, critical): 业务前置机 Web-Proxy-01 - 状态：containing\n- **INC-2026-0716-003** (unauthorized_access, medium): 研发代码仓库 GitLab-03 - 状态：investigating\n- **INC-2026-0716-005** (ransomware, critical): 财务系统终端 FIN-PC-12 - 状态：remediating",
+                  "data_source_mapping": {
+                    "incident_list": "incident_list"
+                  },
+                  "data_values": {
+                    "incident_list": [
+                      {
+                        "incident_id": "INC-2026-0716-001",
+                        "type": "phishing",
+                        "severity": "high",
+                        "affected_asset": "核心邮件服务器 EXCH-02",
+                        "status": "closed",
+                        "opened_at": "2026-07-16T08:15:00Z",
+                        "closed_at": "2026-07-16T09:30:00Z",
+                        "response_time_minutes": 15,
+                        "assignee": "张三"
+                      },
+                      {
+                        "incident_id": "INC-2026-0716-002",
+                        "type": "c2",
+                        "severity": "critical",
+                        "affected_asset": "业务前置机 Web-Proxy-01",
+                        "status": "containing",
+                        "opened_at": "2026-07-16T10:20:00Z",
+                        "closed_at": null,
+                        "response_time_minutes": 5,
+                        "assignee": "李四"
+                      },
+                      {
+                        "incident_id": "INC-2026-0716-003",
+                        "type": "unauthorized_access",
+                        "severity": "medium",
+                        "affected_asset": "研发代码仓库 GitLab-03",
+                        "status": "investigating",
+                        "opened_at": "2026-07-16T13:45:00Z",
+                        "closed_at": null,
+                        "response_time_minutes": 12,
+                        "assignee": "王五"
+                      },
+                      {
+                        "incident_id": "INC-2026-0716-004",
+                        "type": "data_leak",
+                        "severity": "high",
+                        "affected_asset": "文件共享服务器 NAS-01",
+                        "status": "closed",
+                        "opened_at": "2026-07-16T09:00:00Z",
+                        "closed_at": "2026-07-16T14:00:00Z",
+                        "response_time_minutes": 20,
+                        "assignee": "张三"
+                      },
+                      {
+                        "incident_id": "INC-2026-0716-005",
+                        "type": "ransomware",
+                        "severity": "critical",
+                        "affected_asset": "财务系统终端 FIN-PC-12",
+                        "status": "remediating",
+                        "opened_at": "2026-07-16T14:30:00Z",
+                        "closed_at": null,
+                        "response_time_minutes": 8,
+                        "assignee": "李四"
+                      }
+                    ]
+                  }
+                }
+              ]
+            },
+            "masking_applied": [],
+            "metadata": {
+              "generated_at": "2026-07-16T15:00:00Z",
+              "data_sources_used": [
+                "incident_list"
+              ],
+              "push_status": "draft"
+            }
+          },
+          "raw_text": "{\n  \"report_title\": \"安全事件日报 —— 2026-07-16\",\n  \"report_type\": \"daily\",\n  \"target_audience\": \"security_lead\",\n  \"target_channel\": \"email\",\n  \"target_recipients\": [\n    \"security-lead@company.com\"\n  ],\n  \"content\": {\n    \"sections\": [\n      {\n        \"section_id\": \"incident_summary\",\n        \"title\": \"事件概览\",\n        \"body\": \"2026年7月16日共监测到安全事件 5 起。严重度分布：critical 2 起（C2 通信、勒索软件），high 2 起（钓鱼、数据泄露），medium 1 起（未授权访问）。当前已闭环 2 起，待处理 3 起，整体闭环率为 40%。\",\n        \"data_source_mapping\": {\n          \"incident_list\": \"incident_list\"\n        },\n        \"data_values\": {\n          \"incident_list\": [\n            {\n              \"incident_id\": \"INC-2026-0716-001\",\n              \"type\": \"phishing\",\n              \"severity\": \"high\",\n              \"affected_asset\": \"核心邮件服务器 EXCH-02\",\n              \"status\": \"closed\",\n              \"opened_at\": \"2026-07-16T08:15:00Z\",\n              \"closed_at\": \"2026-07-16T09:30:00Z\",\n              \"response_time_minutes\": 15,\n              \"assignee\": \"张三\"\n            },\n            {\n              \"incident_id\": \"INC-2026-0716-002\",\n              \"type\": \"c2\",\n              \"severity\": \"critical\",\n              \"affected_asset\": \"业务前置机 Web-Proxy-01\",\n              \"status\": \"containing\",\n              \"opened_at\": \"2026-07-16T10:20:00Z\",\n              \"closed_at\": null,\n              \"response_time_minutes\": 5,\n              \"assignee\": \"李四\"\n            },\n            {\n              \"incident_id\": \"INC-2026-0716-003\",\n              \"type\": \"unauthorized_access\",\n              \"severity\": \"medium\",\n              \"affected_asset\": \"研发代码仓库 GitLab-03\",\n              \"status\": \"investigating\",\n              \"opened_at\": \"2026-07-16T13:45:00Z\",\n              \"closed_at\": null,\n              \"response_time_minutes\": 12,\n              \"assignee\": \"王五\"\n            },\n            {\n              \"incident_id\": \"INC-2026-0716-004\",\n              \"type\": \"data_leak\",\n              \"severity\": \"high\",\n              \"affected_asset\": \"文件共享服务器 NAS-01\",\n              \"status\": \"closed\",\n              \"opened_at\": \"2026-07-16T09:00:00Z\",\n              \"closed_at\": \"2026-07-16T14:00:00Z\",\n              \"response_time_minutes\": 20,\n              \"assignee\": \"张三\"\n            },\n            {\n              \"incident_id\": \"INC-2026-0716-005\",\n              \"type\": \"ransomware\",\n              \"severity\": \"critical\",\n              \"affected_asset\": \"财务系统终端 FIN-PC-12\",\n              \"status\": \"remediating\",\n              \"opened_at\": \"2026-07-16T14:30:00Z\",\n              \"closed_at\": null,\n              \"response_time_minutes\": 8,\n              \"assignee\": \"李四\"\n            }\n          ]\n        }\n      },\n      {\n        \"section_id\": \"incident_table\",\n        \"title\": \"事件清单\",\n        \"body\": \"| 事件 ID | 类型 | 严重度 | 受影响资产 | 状态 | 响应时间 (分钟) |\\n| :--- | :--- | :--- | :--- | :--- | :--- |\\n| INC-2026-0716-001 | phishing | high | 核心邮件服务器 EXCH-02 | closed | 15 |\\n| INC-2026-0716-002 | c2 | critical | 业务前置机 Web-Proxy-01 | containing | 5 |\\n| INC-2026-0716-003 | unauthorized_access | medium | 研发代码仓库 GitLab-03 | investigating | 12 |\\n| INC-2026-0716-004 | data_leak | high | 文件共享服务器 NAS-01 | closed | 20 |\\n| INC-2026-0716-005 | ransomware | critical | 财务系统终端 FIN-PC-12 | remediating | 8 |\",\n        \"data_source_mapping\": {\n          \"incident_list\": \"incident_list\"\n        },\n        \"data_values\": {\n          \"incident_list\": [\n            {\n              \"incident_id\": \"INC-2026-0716-001\",\n              \"type\": \"phishing\",\n              \"severity\": \"high\",\n              \"affected_asset\": \"核心邮件服务器 EXCH-02\",\n              \"status\": \"closed\",\n              \"opened_at\": \"2026-07-16T08:15:00Z\",\n              \"closed_at\": \"2026-07-16T09:30:00Z\",\n              \"response_time_minutes\": 15,\n              \"assignee\": \"张三\"\n            },\n            {\n              \"incident_id\": \"INC-2026-0716-002\",\n              \"type\": \"c2\",\n              \"severity\": \"critical\",\n              \"affected_asset\": \"业务前置机 Web-Proxy-01\",\n              \"status\": \"containing\",\n              \"opened_at\": \"2026-07-16T10:20:00Z\",\n              \"closed_at\": null,\n              \"response_time_minutes\": 5,\n              \"assignee\": \"李四\"\n            },\n            {\n              \"incident_id\": \"INC-2026-0716-003\",\n              \"type\": \"unauthorized_access\",\n              \"severity\": \"medium\",\n              \"affected_asset\": \"研发代码仓库 GitLab-03\",\n              \"status\": \"investigating\",\n              \"opened_at\": \"2026-07-16T13:45:00Z\",\n              \"closed_at\": null,\n              \"response_time_minutes\": 12,\n              \"assignee\": \"王五\"\n            },\n            {\n              \"incident_id\": \"INC-2026-0716-004\",\n              \"type\": \"data_leak\",\n              \"severity\": \"high\",\n              \"affected_asset\": \"文件共享服务器 NAS-01\",\n              \"status\": \"closed\",\n              \"opened_at\": \"2026-07-16T09:00:00Z\",\n              \"closed_at\": \"2026-07-16T14:00:00Z\",\n              \"response_time_minutes\": 20,\n              \"assignee\": \"张三\"\n            },\n            {\n              \"incident_id\": \"INC-2026-0716-005\",\n              \"type\": \"ransomware\",\n              \"severity\": \"critical\",\n              \"affected_asset\": \"财务系统终端 FIN-PC-12\",\n              \"status\": \"remediating\",\n              \"opened_at\": \"2026-07-16T14:30:00Z\",\n              \"closed_at\": null,\n              \"response_time_minutes\": 8,\n              \"assignee\": \"李四\"\n            }\n          ]\n        }\n      },\n      {\n        \"section_id\": \"unclosed_incidents\",\n        \"title\": \"未闭环事件\",\n        \"body\": \"- **INC-2026-0716-002** (c2, critical): 业务前置机 Web-Proxy-01 - 状态：containing\\n- **INC-2026-0716-003** (unauthorized_access, medium): 研发代码仓库 GitLab-03 - 状态：investigating\\n- **INC-2026-0716-005** (ransomware, critical): 财务系统终端 FIN-PC-12 - 状态：remediating\",\n        \"data_source_mapping\": {\n          \"incident_list\": \"incident_list\"\n        },\n        \"data_values\": {\n          \"incident_list\": [\n            {\n              \"incident_id\": \"INC-2026-0716-001\",\n              \"type\": \"phishing\",\n              \"severity\": \"high\",\n              \"affected_asset\": \"核心邮件服务器 EXCH-02\",\n              \"status\": \"closed\",\n              \"opened_at\": \"2026-07-16T08:15:00Z\",\n              \"closed_at\": \"2026-07-16T09:30:00Z\",\n              \"response_time_minutes\": 15,\n              \"assignee\": \"张三\"\n            },\n            {\n              \"incident_id\": \"INC-2026-0716-002\",\n              \"type\": \"c2\",\n              \"severity\": \"critical\",\n              \"affected_asset\": \"业务前置机 Web-Proxy-01\",\n              \"status\": \"containing\",\n              \"opened_at\": \"2026-07-16T10:20:00Z\",\n              \"closed_at\": null,\n              \"response_time_minutes\": 5,\n              \"assignee\": \"李四\"\n            },\n            {\n              \"incident_id\": \"INC-2026-0716-003\",\n              \"type\": \"unauthorized_access\",\n              \"severity\": \"medium\",\n              \"affected_asset\": \"研发代码仓库 GitLab-03\",\n              \"status\": \"investigating\",\n              \"opened_at\": \"2026-07-16T13:45:00Z\",\n              \"closed_at\": null,\n              \"response_time_minutes\": 12,\n              \"assignee\": \"王五\"\n            },\n            {\n              \"incident_id\": \"INC-2026-0716-004\",\n              \"type\": \"data_leak\",\n              \"severity\": \"high\",\n              \"affected_asset\": \"文件共享服务器 NAS-01\",\n              \"status\": \"closed\",\n              \"opened_at\": \"2026-07-16T09:00:00Z\",\n              \"closed_at\": \"2026-07-16T14:00:00Z\",\n              \"response_time_minutes\": 20,\n              \"assignee\": \"张三\"\n            },\n            {\n              \"incident_id\": \"INC-2026-0716-005\",\n              \"type\": \"ransomware\",\n              \"severity\": \"critical\",\n              \"affected_asset\": \"财务系统终端 FIN-PC-12\",\n              \"status\": \"remediating\",\n              \"opened_at\": \"2026-07-16T14:30:00Z\",\n              \"closed_at\": null,\n              \"response_time_minutes\": 8,\n              \"assignee\": \"李四\"\n            }\n          ]\n        }\n      }\n    ]\n  },\n  \"masking_applied\": [],\n  \"metadata\": {\n    \"generated_at\": \"2026-07-16T15:00:00Z\",\n    \"data_sources_used\": [\n      \"incident_list\"\n    ],\n    \"push_status\": \"draft\"\n  }\n}",
+          "provider": "qwen",
+          "model": "qwen3.5-flash",
+          "response_mode": "json_object",
+          "input_tokens": 1568,
+          "output_tokens": 9477,
+          "latency_ms": 83052,
+          "attempts": 1
+        },
+        {
+          "label": "judge:language_quality",
+          "parsed": {
+            "score": 5,
+            "reason": "文本语言专业简练，准确使用安全行业术语（如 C2、ransomware、severity levels），结构逻辑清晰（概览 - 清单 - 待办），无口语化或模糊表述。内容高度适配 Security Lead 受众，重点突出风险分布与处置进度，信息密度高且易读。",
+            "errors": []
+          },
+          "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"文本语言专业简练，准确使用安全行业术语（如 C2、ransomware、severity levels），结构逻辑清晰（概览 - 清单 - 待办），无口语化或模糊表述。内容高度适配 Security Lead 受众，重点突出风险分布与处置进度，信息密度高且易读。\",\n  \"errors\": []\n}",
+          "provider": "qwen",
+          "model": "qwen3.5-flash",
+          "response_mode": "json_object",
+          "input_tokens": 2497,
+          "output_tokens": 2796,
+          "latency_ms": 27068,
+          "attempts": 2
+        },
+        {
+          "label": "judge:insight_quality",
+          "parsed": {
+            "score": 1,
+            "reason": "简报内容完全停留在数据统计与列表罗列层面，未提供数据背后的趋势解读（如环比变化）、风险评估或针对未闭环事件的优先级建议，符合'纯数据搬运'标准，无法满足 Security Lead 的决策支持需求。",
+            "errors": []
+          },
+          "raw_text": "{\n  \"score\": 1,\n  \"reason\": \"简报内容完全停留在数据统计与列表罗列层面，未提供数据背后的趋势解读（如环比变化）、风险评估或针对未闭环事件的优先级建议，符合'纯数据搬运'标准，无法满足 Security Lead 的决策支持需求。\",\n  \"errors\": []\n}",
+          "provider": "qwen",
+          "model": "qwen3.5-flash",
+          "response_mode": "json_object",
+          "input_tokens": 2505,
+          "output_tokens": 2286,
+          "latency_ms": 24543,
+          "attempts": 1
+        }
+      ],
+      "overall_pass": false,
+      "error_type": null,
+      "error_message": null
+    }
+  ]
+}

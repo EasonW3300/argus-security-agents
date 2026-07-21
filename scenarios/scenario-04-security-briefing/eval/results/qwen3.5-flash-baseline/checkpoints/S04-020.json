@@ -1,0 +1,233 @@
+{
+  "test_case_id": "S04-020",
+  "scenario": "负例：推送目标错误，预期发送给security-lead但实际输出为all-staff",
+  "type": "negative",
+  "difficulty": "easy",
+  "is_positive": false,
+  "status": "completed",
+  "final_output": {
+    "report_title": "安全日报",
+    "report_type": "daily",
+    "target_audience": "security_lead",
+    "target_channel": "email",
+    "target_recipients": [
+      "security-lead@company.com"
+    ],
+    "content": {
+      "sections": [
+        {
+          "section_id": "sum",
+          "title": "摘要",
+          "body": "今日告警总数为50起。",
+          "data_source_mapping": {
+            "alert_stats.total": "alert_stats.total"
+          },
+          "data_values": {
+            "alert_stats.total": 50
+          }
+        }
+      ]
+    },
+    "masking_applied": [],
+    "metadata": {
+      "generated_at": "2026-07-16T00:00:00Z",
+      "data_sources_used": [
+        "alert_stats"
+      ],
+      "push_status": "draft"
+    }
+  },
+  "code_graders": {
+    "data_accuracy": {
+      "passed": false,
+      "reason": "metric mismatch: sum:alert_stats.total body, 告警总数",
+      "expected": [
+        {
+          "metric": "告警总数",
+          "source_path": "alert_stats.total",
+          "expected_value": 50
+        }
+      ],
+      "actual": [
+        {
+          "metric": "告警总数",
+          "source_value": 50,
+          "data_values": [
+            50
+          ]
+        }
+      ]
+    },
+    "template_completeness": {
+      "passed": false,
+      "reason": "section ids, bodies, placeholders, or required data are invalid",
+      "expected": [
+        "sum"
+      ],
+      "actual": {
+        "section_ids": [
+          "sum"
+        ],
+        "placeholders": [],
+        "missing_required_data": [
+          "sum:alert_stats.total body"
+        ]
+      }
+    },
+    "format_compliance": {
+      "passed": false,
+      "reason": "missing Markdown heading in sum",
+      "expected": "balanced fences, non-skipping headings, consistent table columns",
+      "actual": [
+        "missing Markdown heading in sum"
+      ]
+    },
+    "masking_check": {
+      "passed": true,
+      "reason": "security-lead technical values retained",
+      "expected": [
+        "50"
+      ],
+      "actual": {
+        "removed": []
+      }
+    },
+    "push_target": {
+      "passed": true,
+      "reason": "push target exactly matches configuration",
+      "expected": {
+        "channel": "email",
+        "recipients": [
+          "security-lead@company.com"
+        ]
+      },
+      "actual": {
+        "channel": "email",
+        "recipients": [
+          "security-lead@company.com"
+        ]
+      }
+    },
+    "output_schema": {
+      "passed": true,
+      "reason": "output schema valid",
+      "expected": "ReportOutput contract",
+      "actual": "valid"
+    }
+  },
+  "model_scores": {
+    "language_quality": {
+      "score": 5,
+      "reason": "The language is clear, professional, and grammatically correct. It uses appropriate terminology for a security briefing intended for a security lead.",
+      "errors": []
+    },
+    "insight_quality": {
+      "score": 2,
+      "reason": "The briefing provides only a raw metric (total alert count) without contextual analysis, trend comparison, severity distribution, or actionable recommendations. This lacks sufficient insight for a security lead to assess risk or prioritize response.",
+      "errors": []
+    }
+  },
+  "calls": [
+    {
+      "label": "agent",
+      "parsed": {
+        "report_title": "安全日报",
+        "report_type": "daily",
+        "target_audience": "security_lead",
+        "target_channel": "email",
+        "target_recipients": [
+          "security-lead@company.com"
+        ],
+        "content": {
+          "sections": [
+            {
+              "section_id": "sum",
+              "title": "摘要",
+              "body": "今日告警总数为50起。",
+              "data_source_mapping": {
+                "alert_stats.total": "alert_stats.total"
+              },
+              "data_values": {
+                "alert_stats.total": 50
+              }
+            }
+          ]
+        },
+        "masking_applied": [],
+        "metadata": {
+          "generated_at": "2026-07-16T00:00:00Z",
+          "data_sources_used": [
+            "alert_stats"
+          ],
+          "push_status": "draft"
+        }
+      },
+      "raw_text": "{\n  \"report_title\": \"安全日报\",\n  \"report_type\": \"daily\",\n  \"target_audience\": \"security_lead\",\n  \"target_channel\": \"email\",\n  \"target_recipients\": [\n    \"security-lead@company.com\"\n  ],\n  \"content\": {\n    \"sections\": [\n      {\n        \"section_id\": \"sum\",\n        \"title\": \"摘要\",\n        \"body\": \"今日告警总数为50起。\",\n        \"data_source_mapping\": {\n          \"alert_stats.total\": \"alert_stats.total\"\n        },\n        \"data_values\": {\n          \"alert_stats.total\": 50\n        }\n      }\n    ]\n  },\n  \"masking_applied\": [],\n  \"metadata\": {\n    \"generated_at\": \"2026-07-16T00:00:00Z\",\n    \"data_sources_used\": [\n      \"alert_stats\"\n    ],\n    \"push_status\": \"draft\"\n  }\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 729,
+      "output_tokens": 828,
+      "latency_ms": 8587,
+      "attempts": 1
+    },
+    {
+      "label": "judge:language_quality",
+      "parsed": {
+        "score": 5,
+        "reason": "The language is clear, professional, and grammatically correct. It uses appropriate terminology for a security briefing intended for a security lead.",
+        "errors": []
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"The language is clear, professional, and grammatically correct. It uses appropriate terminology for a security briefing intended for a security lead.\",\n  \"errors\": []\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 259,
+      "output_tokens": 3433,
+      "latency_ms": 32049,
+      "attempts": 1
+    },
+    {
+      "label": "judge:insight_quality",
+      "parsed": {
+        "score": 2,
+        "reason": "The briefing provides only a raw metric (total alert count) without contextual analysis, trend comparison, severity distribution, or actionable recommendations. This lacks sufficient insight for a security lead to assess risk or prioritize response.",
+        "errors": []
+      },
+      "raw_text": "{\n  \"score\": 2,\n  \"reason\": \"The briefing provides only a raw metric (total alert count) without contextual analysis, trend comparison, severity distribution, or actionable recommendations. This lacks sufficient insight for a security lead to assess risk or prioritize response.\",\n  \"errors\": []\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 260,
+      "output_tokens": 1858,
+      "latency_ms": 16913,
+      "attempts": 1
+    }
+  ],
+  "overall_pass": false,
+  "error_type": null,
+  "error_message": null,
+  "run_provenance": {
+    "dataset_sha256": "649a00fd34d4d65188498c83dca61342356ab900089ceddd512b96137c24a46c",
+    "agent_mode": "real",
+    "agent": {
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1",
+      "response_mode": "json_object",
+      "temperature": 0.0,
+      "max_tokens": 4096,
+      "timeout_seconds": 90.0
+    },
+    "judge": {
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1",
+      "response_mode": "json_object",
+      "temperature": 0.0,
+      "max_tokens": 4096,
+      "timeout_seconds": 90.0
+    },
+    "grader_mode": "code_and_model"
+  }
+}

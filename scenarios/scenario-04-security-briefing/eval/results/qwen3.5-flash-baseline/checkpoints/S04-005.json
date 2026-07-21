@@ -1,0 +1,381 @@
+{
+  "test_case_id": "S04-005",
+  "scenario": "护网期间需要生成专项日报，包含重点告警、处置进展和攻击源IP TOP5",
+  "type": "daily_report",
+  "difficulty": "easy",
+  "is_positive": true,
+  "status": "completed",
+  "final_output": {
+    "report_title": "护网行动日报 —— 2026-07-16",
+    "report_type": "special",
+    "target_audience": "security_lead",
+    "target_channel": "email",
+    "target_recipients": [
+      "security-lead@company.com"
+    ],
+    "content": {
+      "sections": [
+        {
+          "section_id": "critical_alerts",
+          "title": "重点告警详情",
+          "body": "| Alert ID | Rule | Severity | Source IP | Target Asset | Disposal Status |\n| :--- | :--- | :--- | :--- | :--- | :--- |\n| HW-ALERT-001 | Cobalt Strike Beacon Detected | critical | 203.0.113.77 | 域控制器 DC-Main-01 | 已隔离 |\n| HW-ALERT-002 | Privilege Escalation Attempt | critical | 198.51.100.44 | Jump Server JS-02 | 调查中 |",
+          "data_source_mapping": {
+            "top_critical_alerts": "hw_daily_stats.top_critical_alerts"
+          },
+          "data_values": {
+            "top_critical_alerts": [
+              {
+                "alert_id": "HW-ALERT-001",
+                "rule": "Cobalt Strike Beacon Detected",
+                "severity": "critical",
+                "source_ip": "203.0.113.77",
+                "target_asset": "域控制器 DC-Main-01",
+                "disposal_status": "已隔离"
+              },
+              {
+                "alert_id": "HW-ALERT-002",
+                "rule": "Privilege Escalation Attempt",
+                "severity": "critical",
+                "source_ip": "198.51.100.44",
+                "target_asset": "Jump Server JS-02",
+                "disposal_status": "调查中"
+              }
+            ]
+          }
+        },
+        {
+          "section_id": "disposal_progress",
+          "title": "处置进展",
+          "body": "今日成功处置 12 起攻击事件，封禁恶意 IP 8 个，修复高危漏洞 3 个",
+          "data_source_mapping": {
+            "disposal_summary": "hw_daily_stats.disposal_summary"
+          },
+          "data_values": {
+            "disposal_summary": "今日成功处置 12 起攻击事件，封禁恶意 IP 8 个，修复高危漏洞 3 个"
+          }
+        },
+        {
+          "section_id": "attack_sources",
+          "title": "攻击源 TOP 5",
+          "body": "| IP Address | Attack Count | Country |\n| :--- | :--- | :--- |\n| 203.0.113.77 | 124 | 俄罗斯 |\n| 198.51.100.44 | 89 | 朝鲜 |\n| 192.0.2.155 | 67 | 美国 |\n| 203.0.113.201 | 52 | 未知 |\n| 198.51.100.10 | 41 | 中国 |",
+          "data_source_mapping": {
+            "top_attack_sources": "hw_daily_stats.top_attack_sources"
+          },
+          "data_values": {
+            "top_attack_sources": [
+              {
+                "ip": "203.0.113.77",
+                "attack_count": 124,
+                "country": "俄罗斯"
+              },
+              {
+                "ip": "198.51.100.44",
+                "attack_count": 89,
+                "country": "朝鲜"
+              },
+              {
+                "ip": "192.0.2.155",
+                "attack_count": 67,
+                "country": "美国"
+              },
+              {
+                "ip": "203.0.113.201",
+                "attack_count": 52,
+                "country": "未知"
+              },
+              {
+                "ip": "198.51.100.10",
+                "attack_count": 41,
+                "country": "中国"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "masking_applied": [],
+    "metadata": {
+      "generated_at": "2026-07-16T08:00:00Z",
+      "data_sources_used": [
+        "hw_daily_stats"
+      ],
+      "push_status": "draft"
+    }
+  },
+  "code_graders": {
+    "data_accuracy": {
+      "passed": false,
+      "reason": "metric mismatch: critical_alerts:hw_daily_stats.top_critical_alerts body, disposal_progress:hw_daily_stats.disposal_summary, attack_sources:hw_daily_stats.top_attack_sources body, 攻击源TOP1 IP, 攻击源TOP1 次数",
+      "expected": [
+        {
+          "metric": "攻击源TOP1 IP",
+          "source_path": "hw_daily_stats.top_attack_sources[0].ip",
+          "expected_value": "203.0.113.77"
+        },
+        {
+          "metric": "攻击源TOP1 次数",
+          "source_path": "hw_daily_stats.top_attack_sources[0].attack_count",
+          "expected_value": 124
+        }
+      ],
+      "actual": [
+        {
+          "metric": "攻击源TOP1 IP",
+          "source_value": "203.0.113.77",
+          "data_values": []
+        },
+        {
+          "metric": "攻击源TOP1 次数",
+          "source_value": 124,
+          "data_values": []
+        }
+      ]
+    },
+    "template_completeness": {
+      "passed": false,
+      "reason": "section ids, bodies, placeholders, or required data are invalid",
+      "expected": [
+        "critical_alerts",
+        "disposal_progress",
+        "attack_sources"
+      ],
+      "actual": {
+        "section_ids": [
+          "critical_alerts",
+          "disposal_progress",
+          "attack_sources"
+        ],
+        "placeholders": [],
+        "missing_required_data": [
+          "critical_alerts:hw_daily_stats.top_critical_alerts body",
+          "disposal_progress:hw_daily_stats.disposal_summary",
+          "attack_sources:hw_daily_stats.top_attack_sources body"
+        ]
+      }
+    },
+    "format_compliance": {
+      "passed": false,
+      "reason": "missing Markdown heading in critical_alerts; missing Markdown heading in disposal_progress; missing Markdown heading in attack_sources",
+      "expected": "balanced fences, non-skipping headings, consistent table columns",
+      "actual": [
+        "missing Markdown heading in critical_alerts",
+        "missing Markdown heading in disposal_progress",
+        "missing Markdown heading in attack_sources"
+      ]
+    },
+    "masking_check": {
+      "passed": true,
+      "reason": "security-lead technical values retained",
+      "expected": [
+        "203.0.113.77",
+        "Cobalt Strike Beacon Detected",
+        "DC-Main-01"
+      ],
+      "actual": {
+        "removed": []
+      }
+    },
+    "push_target": {
+      "passed": true,
+      "reason": "push target exactly matches configuration",
+      "expected": {
+        "channel": "email",
+        "recipients": [
+          "security-lead@company.com"
+        ]
+      },
+      "actual": {
+        "channel": "email",
+        "recipients": [
+          "security-lead@company.com"
+        ]
+      }
+    },
+    "output_schema": {
+      "passed": true,
+      "reason": "output schema valid",
+      "expected": "ReportOutput contract",
+      "actual": "valid"
+    }
+  },
+  "model_scores": {
+    "language_quality": {
+      "score": 5,
+      "reason": "文本措辞专业规范，使用了行业标准术语（如 Cobalt Strike、提权、域控制器）。结构清晰，通过表格直观呈现关键告警与攻击源数据，摘要部分量化明确。内容高度契合安全负责人的决策需求，无口语化或模糊表达。",
+      "errors": []
+    },
+    "insight_quality": {
+      "score": 1,
+      "reason": "The briefing consists entirely of raw data tables and summary statistics. It lacks data interpretation, trend analysis (e.g., comparison with previous periods), or actionable strategic recommendations required for a Security Lead.",
+      "errors": []
+    }
+  },
+  "calls": [
+    {
+      "label": "agent",
+      "parsed": {
+        "report_title": "护网行动日报 —— 2026-07-16",
+        "report_type": "special",
+        "target_audience": "security_lead",
+        "target_channel": "email",
+        "target_recipients": [
+          "security-lead@company.com"
+        ],
+        "content": {
+          "sections": [
+            {
+              "section_id": "critical_alerts",
+              "title": "重点告警详情",
+              "body": "| Alert ID | Rule | Severity | Source IP | Target Asset | Disposal Status |\n| :--- | :--- | :--- | :--- | :--- | :--- |\n| HW-ALERT-001 | Cobalt Strike Beacon Detected | critical | 203.0.113.77 | 域控制器 DC-Main-01 | 已隔离 |\n| HW-ALERT-002 | Privilege Escalation Attempt | critical | 198.51.100.44 | Jump Server JS-02 | 调查中 |",
+              "data_source_mapping": {
+                "top_critical_alerts": "hw_daily_stats.top_critical_alerts"
+              },
+              "data_values": {
+                "top_critical_alerts": [
+                  {
+                    "alert_id": "HW-ALERT-001",
+                    "rule": "Cobalt Strike Beacon Detected",
+                    "severity": "critical",
+                    "source_ip": "203.0.113.77",
+                    "target_asset": "域控制器 DC-Main-01",
+                    "disposal_status": "已隔离"
+                  },
+                  {
+                    "alert_id": "HW-ALERT-002",
+                    "rule": "Privilege Escalation Attempt",
+                    "severity": "critical",
+                    "source_ip": "198.51.100.44",
+                    "target_asset": "Jump Server JS-02",
+                    "disposal_status": "调查中"
+                  }
+                ]
+              }
+            },
+            {
+              "section_id": "disposal_progress",
+              "title": "处置进展",
+              "body": "今日成功处置 12 起攻击事件，封禁恶意 IP 8 个，修复高危漏洞 3 个",
+              "data_source_mapping": {
+                "disposal_summary": "hw_daily_stats.disposal_summary"
+              },
+              "data_values": {
+                "disposal_summary": "今日成功处置 12 起攻击事件，封禁恶意 IP 8 个，修复高危漏洞 3 个"
+              }
+            },
+            {
+              "section_id": "attack_sources",
+              "title": "攻击源 TOP 5",
+              "body": "| IP Address | Attack Count | Country |\n| :--- | :--- | :--- |\n| 203.0.113.77 | 124 | 俄罗斯 |\n| 198.51.100.44 | 89 | 朝鲜 |\n| 192.0.2.155 | 67 | 美国 |\n| 203.0.113.201 | 52 | 未知 |\n| 198.51.100.10 | 41 | 中国 |",
+              "data_source_mapping": {
+                "top_attack_sources": "hw_daily_stats.top_attack_sources"
+              },
+              "data_values": {
+                "top_attack_sources": [
+                  {
+                    "ip": "203.0.113.77",
+                    "attack_count": 124,
+                    "country": "俄罗斯"
+                  },
+                  {
+                    "ip": "198.51.100.44",
+                    "attack_count": 89,
+                    "country": "朝鲜"
+                  },
+                  {
+                    "ip": "192.0.2.155",
+                    "attack_count": 67,
+                    "country": "美国"
+                  },
+                  {
+                    "ip": "203.0.113.201",
+                    "attack_count": 52,
+                    "country": "未知"
+                  },
+                  {
+                    "ip": "198.51.100.10",
+                    "attack_count": 41,
+                    "country": "中国"
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "masking_applied": [],
+        "metadata": {
+          "generated_at": "2026-07-16T08:00:00Z",
+          "data_sources_used": [
+            "hw_daily_stats"
+          ],
+          "push_status": "draft"
+        }
+      },
+      "raw_text": "{\n  \"report_title\": \"护网行动日报 —— 2026-07-16\",\n  \"report_type\": \"special\",\n  \"target_audience\": \"security_lead\",\n  \"target_channel\": \"email\",\n  \"target_recipients\": [\n    \"security-lead@company.com\"\n  ],\n  \"content\": {\n    \"sections\": [\n      {\n        \"section_id\": \"critical_alerts\",\n        \"title\": \"重点告警详情\",\n        \"body\": \"| Alert ID | Rule | Severity | Source IP | Target Asset | Disposal Status |\\n| :--- | :--- | :--- | :--- | :--- | :--- |\\n| HW-ALERT-001 | Cobalt Strike Beacon Detected | critical | 203.0.113.77 | 域控制器 DC-Main-01 | 已隔离 |\\n| HW-ALERT-002 | Privilege Escalation Attempt | critical | 198.51.100.44 | Jump Server JS-02 | 调查中 |\",\n        \"data_source_mapping\": {\n          \"top_critical_alerts\": \"hw_daily_stats.top_critical_alerts\"\n        },\n        \"data_values\": {\n          \"top_critical_alerts\": [\n            {\n              \"alert_id\": \"HW-ALERT-001\",\n              \"rule\": \"Cobalt Strike Beacon Detected\",\n              \"severity\": \"critical\",\n              \"source_ip\": \"203.0.113.77\",\n              \"target_asset\": \"域控制器 DC-Main-01\",\n              \"disposal_status\": \"已隔离\"\n            },\n            {\n              \"alert_id\": \"HW-ALERT-002\",\n              \"rule\": \"Privilege Escalation Attempt\",\n              \"severity\": \"critical\",\n              \"source_ip\": \"198.51.100.44\",\n              \"target_asset\": \"Jump Server JS-02\",\n              \"disposal_status\": \"调查中\"\n            }\n          ]\n        }\n      },\n      {\n        \"section_id\": \"disposal_progress\",\n        \"title\": \"处置进展\",\n        \"body\": \"今日成功处置 12 起攻击事件，封禁恶意 IP 8 个，修复高危漏洞 3 个\",\n        \"data_source_mapping\": {\n          \"disposal_summary\": \"hw_daily_stats.disposal_summary\"\n        },\n        \"data_values\": {\n          \"disposal_summary\": \"今日成功处置 12 起攻击事件，封禁恶意 IP 8 个，修复高危漏洞 3 个\"\n        }\n      },\n      {\n        \"section_id\": \"attack_sources\",\n        \"title\": \"攻击源 TOP 5\",\n        \"body\": \"| IP Address | Attack Count | Country |\\n| :--- | :--- | :--- |\\n| 203.0.113.77 | 124 | 俄罗斯 |\\n| 198.51.100.44 | 89 | 朝鲜 |\\n| 192.0.2.155 | 67 | 美国 |\\n| 203.0.113.201 | 52 | 未知 |\\n| 198.51.100.10 | 41 | 中国 |\",\n        \"data_source_mapping\": {\n          \"top_attack_sources\": \"hw_daily_stats.top_attack_sources\"\n        },\n        \"data_values\": {\n          \"top_attack_sources\": [\n            {\n              \"ip\": \"203.0.113.77\",\n              \"attack_count\": 124,\n              \"country\": \"俄罗斯\"\n            },\n            {\n              \"ip\": \"198.51.100.44\",\n              \"attack_count\": 89,\n              \"country\": \"朝鲜\"\n            },\n            {\n              \"ip\": \"192.0.2.155\",\n              \"attack_count\": 67,\n              \"country\": \"美国\"\n            },\n            {\n              \"ip\": \"203.0.113.201\",\n              \"attack_count\": 52,\n              \"country\": \"未知\"\n            },\n            {\n              \"ip\": \"198.51.100.10\",\n              \"attack_count\": 41,\n              \"country\": \"中国\"\n            }\n          ]\n        }\n      }\n    ]\n  },\n  \"masking_applied\": [],\n  \"metadata\": {\n    \"generated_at\": \"2026-07-16T08:00:00Z\",\n    \"data_sources_used\": [\n      \"hw_daily_stats\"\n    ],\n    \"push_status\": \"draft\"\n  }\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1370,
+      "output_tokens": 5846,
+      "latency_ms": 53454,
+      "attempts": 2
+    },
+    {
+      "label": "judge:language_quality",
+      "parsed": {
+        "score": 5,
+        "reason": "文本措辞专业规范，使用了行业标准术语（如 Cobalt Strike、提权、域控制器）。结构清晰，通过表格直观呈现关键告警与攻击源数据，摘要部分量化明确。内容高度契合安全负责人的决策需求，无口语化或模糊表达。",
+        "errors": []
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"文本措辞专业规范，使用了行业标准术语（如 Cobalt Strike、提权、域控制器）。结构清晰，通过表格直观呈现关键告警与攻击源数据，摘要部分量化明确。内容高度契合安全负责人的决策需求，无口语化或模糊表达。\",\n  \"errors\": []\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1017,
+      "output_tokens": 2950,
+      "latency_ms": 30591,
+      "attempts": 2
+    },
+    {
+      "label": "judge:insight_quality",
+      "parsed": {
+        "score": 1,
+        "reason": "The briefing consists entirely of raw data tables and summary statistics. It lacks data interpretation, trend analysis (e.g., comparison with previous periods), or actionable strategic recommendations required for a Security Lead.",
+        "errors": []
+      },
+      "raw_text": "{\n  \"score\": 1,\n  \"reason\": \"The briefing consists entirely of raw data tables and summary statistics. It lacks data interpretation, trend analysis (e.g., comparison with previous periods), or actionable strategic recommendations required for a Security Lead.\",\n  \"errors\": []\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1025,
+      "output_tokens": 1671,
+      "latency_ms": 17094,
+      "attempts": 1
+    }
+  ],
+  "overall_pass": false,
+  "error_type": null,
+  "error_message": null,
+  "run_provenance": {
+    "dataset_sha256": "649a00fd34d4d65188498c83dca61342356ab900089ceddd512b96137c24a46c",
+    "agent_mode": "real",
+    "agent": {
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1",
+      "response_mode": "json_object",
+      "temperature": 0.0,
+      "max_tokens": 4096,
+      "timeout_seconds": 90.0
+    },
+    "judge": {
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1",
+      "response_mode": "json_object",
+      "temperature": 0.0,
+      "max_tokens": 4096,
+      "timeout_seconds": 90.0
+    },
+    "grader_mode": "code_and_model"
+  }
+}

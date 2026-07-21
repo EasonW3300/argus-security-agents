@@ -1,0 +1,385 @@
+{
+  "test_case_id": "S04-013",
+  "scenario": "管理层需要月度安全运营报告，包含各部门安全评分排名（脱敏）和整改优先级矩阵",
+  "type": "monthly_report",
+  "difficulty": "hard",
+  "is_positive": true,
+  "status": "completed",
+  "final_output": {
+    "report_title": "月度安全运营报告 —— 2026-07",
+    "report_type": "monthly",
+    "target_audience": "management",
+    "target_channel": "email",
+    "target_recipients": [
+      "management@company.com"
+    ],
+    "content": {
+      "sections": [
+        {
+          "section_id": "dept_ranking",
+          "title": "各部门安全评分排名",
+          "body": "| 部门代号 | 安全评分 | 排名 | 趋势 |\n| :--- | :--- | :--- | :--- |\n| 部门A | 85 | 1 | up |\n| 部门B | 78 | 2 | stable |\n| 部门C | 72 | 3 | down |\n| 部门D | 68 | 4 | down |",
+          "data_source_mapping": {
+            "dept_scores": "department_scores"
+          },
+          "data_values": {
+            "dept_scores": [
+              {
+                "department": "核心业务部",
+                "security_score": 85,
+                "rank": 1,
+                "trend": "up"
+              },
+              {
+                "department": "运维部",
+                "security_score": 78,
+                "rank": 2,
+                "trend": "stable"
+              },
+              {
+                "department": "研发中心",
+                "security_score": 72,
+                "rank": 3,
+                "trend": "down"
+              },
+              {
+                "department": "财务部",
+                "security_score": 68,
+                "rank": 4,
+                "trend": "down"
+              }
+            ]
+          }
+        },
+        {
+          "section_id": "remediation_matrix",
+          "title": "整改优先级矩阵",
+          "body": "| 风险等级 | 整改成本 | 优先级 | 数量 |\n| :--- | :--- | :--- | :--- |\n| 高 | 中 | P1 | 1 |\n| 中 | 低 | P2 | 1 |",
+          "data_source_mapping": {
+            "findings": "compliance_findings"
+          },
+          "data_values": {
+            "findings": [
+              {
+                "finding_id": "F-001",
+                "description": "核心业务部服务器存在未修复高危漏洞",
+                "risk_level": "高",
+                "remediation_cost": "中",
+                "priority": "P1"
+              },
+              {
+                "finding_id": "F-002",
+                "description": "研发中心代码仓库访问权限未定期复核",
+                "risk_level": "中",
+                "remediation_cost": "低",
+                "priority": "P2"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "masking_applied": [
+      {
+        "original": "核心业务部",
+        "masked": "部门A",
+        "rule": "strip_department_name"
+      },
+      {
+        "original": "运维部",
+        "masked": "部门B",
+        "rule": "strip_department_name"
+      },
+      {
+        "original": "研发中心",
+        "masked": "部门C",
+        "rule": "strip_department_name"
+      },
+      {
+        "original": "财务部",
+        "masked": "部门D",
+        "rule": "strip_department_name"
+      }
+    ],
+    "metadata": {
+      "generated_at": "2026-07-31T23:59:59Z",
+      "data_sources_used": [
+        "department_scores",
+        "compliance_findings"
+      ],
+      "push_status": "draft"
+    }
+  },
+  "code_graders": {
+    "data_accuracy": {
+      "passed": false,
+      "reason": "metric mismatch: dept_ranking:department_scores body, remediation_matrix:compliance_findings body, 核心业务部分数",
+      "expected": [
+        {
+          "metric": "核心业务部分数",
+          "source_path": "department_scores[0].security_score",
+          "expected_value": 85
+        }
+      ],
+      "actual": [
+        {
+          "metric": "核心业务部分数",
+          "source_value": 85,
+          "data_values": []
+        }
+      ]
+    },
+    "template_completeness": {
+      "passed": false,
+      "reason": "section ids, bodies, placeholders, or required data are invalid",
+      "expected": [
+        "dept_ranking",
+        "remediation_matrix"
+      ],
+      "actual": {
+        "section_ids": [
+          "dept_ranking",
+          "remediation_matrix"
+        ],
+        "placeholders": [],
+        "missing_required_data": [
+          "dept_ranking:department_scores body",
+          "remediation_matrix:compliance_findings body"
+        ]
+      }
+    },
+    "format_compliance": {
+      "passed": false,
+      "reason": "missing Markdown heading in dept_ranking; missing Markdown heading in remediation_matrix",
+      "expected": "balanced fences, non-skipping headings, consistent table columns",
+      "actual": [
+        "missing Markdown heading in dept_ranking",
+        "missing Markdown heading in remediation_matrix"
+      ]
+    },
+    "masking_check": {
+      "passed": true,
+      "reason": "management sensitive values are masked",
+      "expected": "no sensitive patterns",
+      "actual": {
+        "leaks": []
+      }
+    },
+    "push_target": {
+      "passed": true,
+      "reason": "push target exactly matches configuration",
+      "expected": {
+        "channel": "email",
+        "recipients": [
+          "management@company.com"
+        ]
+      },
+      "actual": {
+        "channel": "email",
+        "recipients": [
+          "management@company.com"
+        ]
+      }
+    },
+    "output_schema": {
+      "passed": true,
+      "reason": "output schema valid",
+      "expected": "ReportOutput contract",
+      "actual": "valid"
+    }
+  },
+  "model_scores": {
+    "language_quality": {
+      "score": 3,
+      "reason": "文本结构专业简洁，但受众适配严重失准。管理层报告应明确责任部门，当前脱敏处理使报告失去行动指导意义；部分字段混用英文状态词，正式感不足。",
+      "errors": [
+        "部门名称脱敏导致责任主体不明",
+        "趋势指标使用英文（up/down）不符合正式报告规范"
+      ]
+    },
+    "insight_quality": {
+      "score": 2,
+      "reason": "报告以表格形式呈现了安全评分和风险整改数据，虽包含趋势标签和优先级分类，但缺乏对数据背后原因的分析（如得分下降的具体诱因）及业务影响评估。同时，未提供针对管理层的具体决策建议或资源调配方案，未达到‘数据解读+趋势判断+后续建议’的高分标准。",
+      "errors": []
+    }
+  },
+  "calls": [
+    {
+      "label": "agent",
+      "parsed": {
+        "report_title": "月度安全运营报告 —— 2026-07",
+        "report_type": "monthly",
+        "target_audience": "management",
+        "target_channel": "email",
+        "target_recipients": [
+          "management@company.com"
+        ],
+        "content": {
+          "sections": [
+            {
+              "section_id": "dept_ranking",
+              "title": "各部门安全评分排名",
+              "body": "| 部门代号 | 安全评分 | 排名 | 趋势 |\n| :--- | :--- | :--- | :--- |\n| 部门A | 85 | 1 | up |\n| 部门B | 78 | 2 | stable |\n| 部门C | 72 | 3 | down |\n| 部门D | 68 | 4 | down |",
+              "data_source_mapping": {
+                "dept_scores": "department_scores"
+              },
+              "data_values": {
+                "dept_scores": [
+                  {
+                    "department": "核心业务部",
+                    "security_score": 85,
+                    "rank": 1,
+                    "trend": "up"
+                  },
+                  {
+                    "department": "运维部",
+                    "security_score": 78,
+                    "rank": 2,
+                    "trend": "stable"
+                  },
+                  {
+                    "department": "研发中心",
+                    "security_score": 72,
+                    "rank": 3,
+                    "trend": "down"
+                  },
+                  {
+                    "department": "财务部",
+                    "security_score": 68,
+                    "rank": 4,
+                    "trend": "down"
+                  }
+                ]
+              }
+            },
+            {
+              "section_id": "remediation_matrix",
+              "title": "整改优先级矩阵",
+              "body": "| 风险等级 | 整改成本 | 优先级 | 数量 |\n| :--- | :--- | :--- | :--- |\n| 高 | 中 | P1 | 1 |\n| 中 | 低 | P2 | 1 |",
+              "data_source_mapping": {
+                "findings": "compliance_findings"
+              },
+              "data_values": {
+                "findings": [
+                  {
+                    "finding_id": "F-001",
+                    "description": "核心业务部服务器存在未修复高危漏洞",
+                    "risk_level": "高",
+                    "remediation_cost": "中",
+                    "priority": "P1"
+                  },
+                  {
+                    "finding_id": "F-002",
+                    "description": "研发中心代码仓库访问权限未定期复核",
+                    "risk_level": "中",
+                    "remediation_cost": "低",
+                    "priority": "P2"
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "masking_applied": [
+          {
+            "original": "核心业务部",
+            "masked": "部门A",
+            "rule": "strip_department_name"
+          },
+          {
+            "original": "运维部",
+            "masked": "部门B",
+            "rule": "strip_department_name"
+          },
+          {
+            "original": "研发中心",
+            "masked": "部门C",
+            "rule": "strip_department_name"
+          },
+          {
+            "original": "财务部",
+            "masked": "部门D",
+            "rule": "strip_department_name"
+          }
+        ],
+        "metadata": {
+          "generated_at": "2026-07-31T23:59:59Z",
+          "data_sources_used": [
+            "department_scores",
+            "compliance_findings"
+          ],
+          "push_status": "draft"
+        }
+      },
+      "raw_text": "{\n  \"report_title\": \"月度安全运营报告 —— 2026-07\",\n  \"report_type\": \"monthly\",\n  \"target_audience\": \"management\",\n  \"target_channel\": \"email\",\n  \"target_recipients\": [\n    \"management@company.com\"\n  ],\n  \"content\": {\n    \"sections\": [\n      {\n        \"section_id\": \"dept_ranking\",\n        \"title\": \"各部门安全评分排名\",\n        \"body\": \"| 部门代号 | 安全评分 | 排名 | 趋势 |\\n| :--- | :--- | :--- | :--- |\\n| 部门A | 85 | 1 | up |\\n| 部门B | 78 | 2 | stable |\\n| 部门C | 72 | 3 | down |\\n| 部门D | 68 | 4 | down |\",\n        \"data_source_mapping\": {\n          \"dept_scores\": \"department_scores\"\n        },\n        \"data_values\": {\n          \"dept_scores\": [\n            {\n              \"department\": \"核心业务部\",\n              \"security_score\": 85,\n              \"rank\": 1,\n              \"trend\": \"up\"\n            },\n            {\n              \"department\": \"运维部\",\n              \"security_score\": 78,\n              \"rank\": 2,\n              \"trend\": \"stable\"\n            },\n            {\n              \"department\": \"研发中心\",\n              \"security_score\": 72,\n              \"rank\": 3,\n              \"trend\": \"down\"\n            },\n            {\n              \"department\": \"财务部\",\n              \"security_score\": 68,\n              \"rank\": 4,\n              \"trend\": \"down\"\n            }\n          ]\n        }\n      },\n      {\n        \"section_id\": \"remediation_matrix\",\n        \"title\": \"整改优先级矩阵\",\n        \"body\": \"| 风险等级 | 整改成本 | 优先级 | 数量 |\\n| :--- | :--- | :--- | :--- |\\n| 高 | 中 | P1 | 1 |\\n| 中 | 低 | P2 | 1 |\",\n        \"data_source_mapping\": {\n          \"findings\": \"compliance_findings\"\n        },\n        \"data_values\": {\n          \"findings\": [\n            {\n              \"finding_id\": \"F-001\",\n              \"description\": \"核心业务部服务器存在未修复高危漏洞\",\n              \"risk_level\": \"高\",\n              \"remediation_cost\": \"中\",\n              \"priority\": \"P1\"\n            },\n            {\n              \"finding_id\": \"F-002\",\n              \"description\": \"研发中心代码仓库访问权限未定期复核\",\n              \"risk_level\": \"中\",\n              \"remediation_cost\": \"低\",\n              \"priority\": \"P2\"\n            }\n          ]\n        }\n      }\n    ]\n  },\n  \"masking_applied\": [\n    {\n      \"original\": \"核心业务部\",\n      \"masked\": \"部门A\",\n      \"rule\": \"strip_department_name\"\n    },\n    {\n      \"original\": \"运维部\",\n      \"masked\": \"部门B\",\n      \"rule\": \"strip_department_name\"\n    },\n    {\n      \"original\": \"研发中心\",\n      \"masked\": \"部门C\",\n      \"rule\": \"strip_department_name\"\n    },\n    {\n      \"original\": \"财务部\",\n      \"masked\": \"部门D\",\n      \"rule\": \"strip_department_name\"\n    }\n  ],\n  \"metadata\": {\n    \"generated_at\": \"2026-07-31T23:59:59Z\",\n    \"data_sources_used\": [\n      \"department_scores\",\n      \"compliance_findings\"\n    ],\n    \"push_status\": \"draft\"\n  }\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1300,
+      "output_tokens": 5118,
+      "latency_ms": 42715,
+      "attempts": 1
+    },
+    {
+      "label": "judge:language_quality",
+      "parsed": {
+        "score": 3,
+        "reason": "文本结构专业简洁，但受众适配严重失准。管理层报告应明确责任部门，当前脱敏处理使报告失去行动指导意义；部分字段混用英文状态词，正式感不足。",
+        "errors": [
+          "部门名称脱敏导致责任主体不明",
+          "趋势指标使用英文（up/down）不符合正式报告规范"
+        ]
+      },
+      "raw_text": "{\"score\": 3, \"reason\": \"文本结构专业简洁，但受众适配严重失准。管理层报告应明确责任部门，当前脱敏处理使报告失去行动指导意义；部分字段混用英文状态词，正式感不足。\", \"errors\": [\"部门名称脱敏导致责任主体不明\", \"趋势指标使用英文（up/down）不符合正式报告规范\"]}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 762,
+      "output_tokens": 3702,
+      "latency_ms": 38937,
+      "attempts": 1
+    },
+    {
+      "label": "judge:insight_quality",
+      "parsed": {
+        "score": 2,
+        "reason": "报告以表格形式呈现了安全评分和风险整改数据，虽包含趋势标签和优先级分类，但缺乏对数据背后原因的分析（如得分下降的具体诱因）及业务影响评估。同时，未提供针对管理层的具体决策建议或资源调配方案，未达到‘数据解读+趋势判断+后续建议’的高分标准。",
+        "errors": []
+      },
+      "raw_text": "{\n  \"score\": 2,\n  \"reason\": \"报告以表格形式呈现了安全评分和风险整改数据，虽包含趋势标签和优先级分类，但缺乏对数据背后原因的分析（如得分下降的具体诱因）及业务影响评估。同时，未提供针对管理层的具体决策建议或资源调配方案，未达到‘数据解读+趋势判断+后续建议’的高分标准。\",\n  \"errors\": []\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 770,
+      "output_tokens": 3001,
+      "latency_ms": 32701,
+      "attempts": 1
+    }
+  ],
+  "overall_pass": false,
+  "error_type": null,
+  "error_message": null,
+  "run_provenance": {
+    "dataset_sha256": "649a00fd34d4d65188498c83dca61342356ab900089ceddd512b96137c24a46c",
+    "agent_mode": "real",
+    "agent": {
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1",
+      "response_mode": "json_object",
+      "temperature": 0.0,
+      "max_tokens": 4096,
+      "timeout_seconds": 90.0
+    },
+    "judge": {
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1",
+      "response_mode": "json_object",
+      "temperature": 0.0,
+      "max_tokens": 4096,
+      "timeout_seconds": 90.0
+    },
+    "grader_mode": "code_and_model"
+  }
+}

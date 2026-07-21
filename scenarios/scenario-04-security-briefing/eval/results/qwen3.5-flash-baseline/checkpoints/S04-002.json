@@ -1,0 +1,338 @@
+{
+  "test_case_id": "S04-002",
+  "scenario": "安全负责人需要一份漏洞扫描日报，展示新增漏洞分布、修复进度和待处理高危漏洞",
+  "type": "daily_report",
+  "difficulty": "easy",
+  "is_positive": true,
+  "status": "completed",
+  "final_output": {
+    "report_title": "漏洞扫描日报 —— 2026-07-16",
+    "report_type": "daily",
+    "target_audience": "security_lead",
+    "target_channel": "email",
+    "target_recipients": [
+      "security-lead@company.com"
+    ],
+    "content": {
+      "sections": [
+        {
+          "section_id": "overview",
+          "title": "今日扫描概况",
+          "body": "今日新增漏洞总数为 12 个。严重度分布：Critical 1 个，High 3 个，Medium 5 个，Low 3 个。修复率为 67%。",
+          "data_source_mapping": {
+            "vulnerability_stats.new_total": "vulnerability_stats.new_total",
+            "vulnerability_stats.by_severity": "vulnerability_stats.by_severity",
+            "vulnerability_stats.fix_rate": "vulnerability_stats.fix_rate"
+          },
+          "data_values": {
+            "vulnerability_stats.new_total": 12,
+            "vulnerability_stats.by_severity": {
+              "critical": 1,
+              "high": 3,
+              "medium": 5,
+              "low": 3
+            },
+            "vulnerability_stats.fix_rate": 0.67
+          }
+        },
+        {
+          "section_id": "critical_pending",
+          "title": "待处理高危漏洞",
+          "body": "| CVE ID | Affected Asset | CVSS Score | Days Open |\n| :--- | :--- | :--- | :--- |\n| CVE-2026-19876 | 核心交易数据库 DB-Master-01 | 9.8 | 5 |",
+          "data_source_mapping": {
+            "vulnerability_stats.pending_critical": "vulnerability_stats.pending_critical"
+          },
+          "data_values": {
+            "vulnerability_stats.pending_critical": [
+              {
+                "cve_id": "CVE-2026-19876",
+                "affected_asset": "核心交易数据库 DB-Master-01",
+                "cvss_score": 9.8,
+                "days_open": 5
+              }
+            ]
+          }
+        },
+        {
+          "section_id": "fix_metrics",
+          "title": "修复指标",
+          "body": "本期已修复漏洞 8 个，平均修复时间为 12 天。",
+          "data_source_mapping": {
+            "vulnerability_stats.fixed_total": "vulnerability_stats.fixed_total",
+            "vulnerability_stats.avg_fix_days": "vulnerability_stats.avg_fix_days"
+          },
+          "data_values": {
+            "vulnerability_stats.fixed_total": 8,
+            "vulnerability_stats.avg_fix_days": 12
+          }
+        }
+      ]
+    },
+    "masking_applied": [],
+    "metadata": {
+      "generated_at": "2026-07-16T08:00:00Z",
+      "data_sources_used": [
+        "vulnerability_stats"
+      ],
+      "push_status": "draft"
+    }
+  },
+  "code_graders": {
+    "data_accuracy": {
+      "passed": false,
+      "reason": "metric mismatch: overview:vulnerability_stats.new_total body, overview:vulnerability_stats.by_severity body, overview:vulnerability_stats.fix_rate body, critical_pending:vulnerability_stats.pending_critical body, fix_metrics:vulnerability_stats.fixed_total body, fix_metrics:vulnerability_stats.avg_fix_days body, 新增漏洞总数, 修复率, unbound body declaration 今日新增漏洞总数为 12 个。严重度分布：Critical 1 个，High 3 个，Medium 5 个，Low 3 个。修复率为 67%。",
+      "expected": [
+        {
+          "metric": "新增漏洞总数",
+          "source_path": "vulnerability_stats.new_total",
+          "expected_value": 12
+        },
+        {
+          "metric": "修复率",
+          "source_path": "vulnerability_stats.fix_rate",
+          "expected_value": 0.67
+        }
+      ],
+      "actual": [
+        {
+          "metric": "新增漏洞总数",
+          "source_value": 12,
+          "data_values": [
+            12
+          ]
+        },
+        {
+          "metric": "修复率",
+          "source_value": 0.67,
+          "data_values": [
+            0.67
+          ]
+        }
+      ]
+    },
+    "template_completeness": {
+      "passed": false,
+      "reason": "section ids, bodies, placeholders, or required data are invalid",
+      "expected": [
+        "overview",
+        "critical_pending",
+        "fix_metrics"
+      ],
+      "actual": {
+        "section_ids": [
+          "overview",
+          "critical_pending",
+          "fix_metrics"
+        ],
+        "placeholders": [],
+        "missing_required_data": [
+          "overview:vulnerability_stats.new_total body",
+          "overview:vulnerability_stats.by_severity body",
+          "overview:vulnerability_stats.fix_rate body",
+          "critical_pending:vulnerability_stats.pending_critical body",
+          "fix_metrics:vulnerability_stats.fixed_total body",
+          "fix_metrics:vulnerability_stats.avg_fix_days body"
+        ]
+      }
+    },
+    "format_compliance": {
+      "passed": false,
+      "reason": "missing Markdown heading in overview; missing Markdown heading in critical_pending; missing Markdown heading in fix_metrics",
+      "expected": "balanced fences, non-skipping headings, consistent table columns",
+      "actual": [
+        "missing Markdown heading in overview",
+        "missing Markdown heading in critical_pending",
+        "missing Markdown heading in fix_metrics"
+      ]
+    },
+    "masking_check": {
+      "passed": true,
+      "reason": "security-lead technical values retained",
+      "expected": [
+        "CVE-2026-19876",
+        "DB-Master-01",
+        "9.8"
+      ],
+      "actual": {
+        "removed": []
+      }
+    },
+    "push_target": {
+      "passed": true,
+      "reason": "push target exactly matches configuration",
+      "expected": {
+        "channel": "email",
+        "recipients": [
+          "security-lead@company.com"
+        ]
+      },
+      "actual": {
+        "channel": "email",
+        "recipients": [
+          "security-lead@company.com"
+        ]
+      }
+    },
+    "output_schema": {
+      "passed": true,
+      "reason": "output schema valid",
+      "expected": "ReportOutput contract",
+      "actual": "valid"
+    }
+  },
+  "model_scores": {
+    "language_quality": {
+      "score": 5,
+      "reason": "文案专业简练，无口语化表达。关键指标（CVE, CVSS, 修复率）表述准确，结构层次分明，完全适配安全负责人的阅读场景与决策需求。",
+      "errors": []
+    },
+    "insight_quality": {
+      "score": 1,
+      "reason": "简报仅呈现原始统计数据（总数、分布、平均时间）和漏洞列表，缺乏与历史基线的对比以体现趋势，未对关键漏洞的业务风险进行解读，且缺少针对安全负责人的具体处置建议或优先级指引，属于纯数据罗列。",
+      "errors": []
+    }
+  },
+  "calls": [
+    {
+      "label": "agent",
+      "parsed": {
+        "report_title": "漏洞扫描日报 —— 2026-07-16",
+        "report_type": "daily",
+        "target_audience": "security_lead",
+        "target_channel": "email",
+        "target_recipients": [
+          "security-lead@company.com"
+        ],
+        "content": {
+          "sections": [
+            {
+              "section_id": "overview",
+              "title": "今日扫描概况",
+              "body": "今日新增漏洞总数为 12 个。严重度分布：Critical 1 个，High 3 个，Medium 5 个，Low 3 个。修复率为 67%。",
+              "data_source_mapping": {
+                "vulnerability_stats.new_total": "vulnerability_stats.new_total",
+                "vulnerability_stats.by_severity": "vulnerability_stats.by_severity",
+                "vulnerability_stats.fix_rate": "vulnerability_stats.fix_rate"
+              },
+              "data_values": {
+                "vulnerability_stats.new_total": 12,
+                "vulnerability_stats.by_severity": {
+                  "critical": 1,
+                  "high": 3,
+                  "medium": 5,
+                  "low": 3
+                },
+                "vulnerability_stats.fix_rate": 0.67
+              }
+            },
+            {
+              "section_id": "critical_pending",
+              "title": "待处理高危漏洞",
+              "body": "| CVE ID | Affected Asset | CVSS Score | Days Open |\n| :--- | :--- | :--- | :--- |\n| CVE-2026-19876 | 核心交易数据库 DB-Master-01 | 9.8 | 5 |",
+              "data_source_mapping": {
+                "vulnerability_stats.pending_critical": "vulnerability_stats.pending_critical"
+              },
+              "data_values": {
+                "vulnerability_stats.pending_critical": [
+                  {
+                    "cve_id": "CVE-2026-19876",
+                    "affected_asset": "核心交易数据库 DB-Master-01",
+                    "cvss_score": 9.8,
+                    "days_open": 5
+                  }
+                ]
+              }
+            },
+            {
+              "section_id": "fix_metrics",
+              "title": "修复指标",
+              "body": "本期已修复漏洞 8 个，平均修复时间为 12 天。",
+              "data_source_mapping": {
+                "vulnerability_stats.fixed_total": "vulnerability_stats.fixed_total",
+                "vulnerability_stats.avg_fix_days": "vulnerability_stats.avg_fix_days"
+              },
+              "data_values": {
+                "vulnerability_stats.fixed_total": 8,
+                "vulnerability_stats.avg_fix_days": 12
+              }
+            }
+          ]
+        },
+        "masking_applied": [],
+        "metadata": {
+          "generated_at": "2026-07-16T08:00:00Z",
+          "data_sources_used": [
+            "vulnerability_stats"
+          ],
+          "push_status": "draft"
+        }
+      },
+      "raw_text": "{\n  \"report_title\": \"漏洞扫描日报 —— 2026-07-16\",\n  \"report_type\": \"daily\",\n  \"target_audience\": \"security_lead\",\n  \"target_channel\": \"email\",\n  \"target_recipients\": [\n    \"security-lead@company.com\"\n  ],\n  \"content\": {\n    \"sections\": [\n      {\n        \"section_id\": \"overview\",\n        \"title\": \"今日扫描概况\",\n        \"body\": \"今日新增漏洞总数为 12 个。严重度分布：Critical 1 个，High 3 个，Medium 5 个，Low 3 个。修复率为 67%。\",\n        \"data_source_mapping\": {\n          \"vulnerability_stats.new_total\": \"vulnerability_stats.new_total\",\n          \"vulnerability_stats.by_severity\": \"vulnerability_stats.by_severity\",\n          \"vulnerability_stats.fix_rate\": \"vulnerability_stats.fix_rate\"\n        },\n        \"data_values\": {\n          \"vulnerability_stats.new_total\": 12,\n          \"vulnerability_stats.by_severity\": {\n            \"critical\": 1,\n            \"high\": 3,\n            \"medium\": 5,\n            \"low\": 3\n          },\n          \"vulnerability_stats.fix_rate\": 0.67\n        }\n      },\n      {\n        \"section_id\": \"critical_pending\",\n        \"title\": \"待处理高危漏洞\",\n        \"body\": \"| CVE ID | Affected Asset | CVSS Score | Days Open |\\n| :--- | :--- | :--- | :--- |\\n| CVE-2026-19876 | 核心交易数据库 DB-Master-01 | 9.8 | 5 |\",\n        \"data_source_mapping\": {\n          \"vulnerability_stats.pending_critical\": \"vulnerability_stats.pending_critical\"\n        },\n        \"data_values\": {\n          \"vulnerability_stats.pending_critical\": [\n            {\n              \"cve_id\": \"CVE-2026-19876\",\n              \"affected_asset\": \"核心交易数据库 DB-Master-01\",\n              \"cvss_score\": 9.8,\n              \"days_open\": 5\n            }\n          ]\n        }\n      },\n      {\n        \"section_id\": \"fix_metrics\",\n        \"title\": \"修复指标\",\n        \"body\": \"本期已修复漏洞 8 个，平均修复时间为 12 天。\",\n        \"data_source_mapping\": {\n          \"vulnerability_stats.fixed_total\": \"vulnerability_stats.fixed_total\",\n          \"vulnerability_stats.avg_fix_days\": \"vulnerability_stats.avg_fix_days\"\n        },\n        \"data_values\": {\n          \"vulnerability_stats.fixed_total\": 8,\n          \"vulnerability_stats.avg_fix_days\": 12\n        }\n      }\n    ]\n  },\n  \"masking_applied\": [],\n  \"metadata\": {\n    \"generated_at\": \"2026-07-16T08:00:00Z\",\n    \"data_sources_used\": [\n      \"vulnerability_stats\"\n    ],\n    \"push_status\": \"draft\"\n  }\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1110,
+      "output_tokens": 5000,
+      "latency_ms": 45486,
+      "attempts": 3
+    },
+    {
+      "label": "judge:language_quality",
+      "parsed": {
+        "score": 5,
+        "reason": "文案专业简练，无口语化表达。关键指标（CVE, CVSS, 修复率）表述准确，结构层次分明，完全适配安全负责人的阅读场景与决策需求。",
+        "errors": []
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"文案专业简练，无口语化表达。关键指标（CVE, CVSS, 修复率）表述准确，结构层次分明，完全适配安全负责人的阅读场景与决策需求。\",\n  \"errors\": []\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 698,
+      "output_tokens": 2165,
+      "latency_ms": 22522,
+      "attempts": 1
+    },
+    {
+      "label": "judge:insight_quality",
+      "parsed": {
+        "score": 1,
+        "reason": "简报仅呈现原始统计数据（总数、分布、平均时间）和漏洞列表，缺乏与历史基线的对比以体现趋势，未对关键漏洞的业务风险进行解读，且缺少针对安全负责人的具体处置建议或优先级指引，属于纯数据罗列。",
+        "errors": []
+      },
+      "raw_text": "{\"score\": 1, \"reason\": \"简报仅呈现原始统计数据（总数、分布、平均时间）和漏洞列表，缺乏与历史基线的对比以体现趋势，未对关键漏洞的业务风险进行解读，且缺少针对安全负责人的具体处置建议或优先级指引，属于纯数据罗列。\", \"errors\": []}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 706,
+      "output_tokens": 1990,
+      "latency_ms": 20088,
+      "attempts": 1
+    }
+  ],
+  "overall_pass": false,
+  "error_type": null,
+  "error_message": null,
+  "run_provenance": {
+    "dataset_sha256": "649a00fd34d4d65188498c83dca61342356ab900089ceddd512b96137c24a46c",
+    "agent_mode": "real",
+    "agent": {
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1",
+      "response_mode": "json_object",
+      "temperature": 0.0,
+      "max_tokens": 4096,
+      "timeout_seconds": 90.0
+    },
+    "judge": {
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1",
+      "response_mode": "json_object",
+      "temperature": 0.0,
+      "max_tokens": 4096,
+      "timeout_seconds": 90.0
+    },
+    "grader_mode": "code_and_model"
+  }
+}

@@ -1,0 +1,386 @@
+{
+  "test_case_id": "S04-016",
+  "scenario": "安全负责人需要一份安全事件复盘报告，包含完整时间线、根因分析和改进计划",
+  "type": "special_report",
+  "difficulty": "medium",
+  "is_positive": true,
+  "status": "completed",
+  "final_output": {
+    "report_title": "安全事件复盘报告 - INC-2026-0716-005",
+    "report_type": "special",
+    "target_audience": "security_lead",
+    "target_channel": "email",
+    "target_recipients": [
+      "security-lead@company.com"
+    ],
+    "content": {
+      "sections": [
+        {
+          "section_id": "event_overview",
+          "title": "事件概述",
+          "body": "本次事件类型为 ransomware，严重级别为 critical。受影响资产包括：财务系统终端 FIN-PC-12。",
+          "data_source_mapping": {
+            "incident_detail.type": "incident_detail.type",
+            "incident_detail.severity": "incident_detail.severity",
+            "incident_detail.affected_assets": "incident_detail.affected_assets"
+          },
+          "data_values": {
+            "incident_detail.type": "ransomware",
+            "incident_detail.severity": "critical",
+            "incident_detail.affected_assets": [
+              "财务系统终端 FIN-PC-12"
+            ]
+          }
+        },
+        {
+          "section_id": "timeline",
+          "title": "事件时间线",
+          "body": "| 时间 | 事件 |\n| :--- | :--- |\n| 2026-07-16T14:30:00Z | SOC收到终端防病毒软件告警，疑似勒索软件行为 |\n| 2026-07-16T14:32:00Z | 安全分析师确认文件加密后缀为.locked，通知断网 |\n| 2026-07-16T14:35:00Z | 网络隔离完成，开始取证 |\n| 2026-07-16T15:10:00Z | 确认感染来源为钓鱼邮件附件，攻击者IP 203.0.113.99 |\n| 2026-07-16T16:00:00Z | 从备份恢复数据，系统恢复运行 |",
+          "data_source_mapping": {
+            "incident_detail.timeline": "incident_detail.timeline"
+          },
+          "data_values": {
+            "incident_detail.timeline": [
+              {
+                "time": "2026-07-16T14:30:00Z",
+                "event": "SOC收到终端防病毒软件告警，疑似勒索软件行为"
+              },
+              {
+                "time": "2026-07-16T14:32:00Z",
+                "event": "安全分析师确认文件加密后缀为.locked，通知断网"
+              },
+              {
+                "time": "2026-07-16T14:35:00Z",
+                "event": "网络隔离完成，开始取证"
+              },
+              {
+                "time": "2026-07-16T15:10:00Z",
+                "event": "确认感染来源为钓鱼邮件附件，攻击者IP 203.0.113.99"
+              },
+              {
+                "time": "2026-07-16T16:00:00Z",
+                "event": "从备份恢复数据，系统恢复运行"
+              }
+            ]
+          }
+        },
+        {
+          "section_id": "root_cause",
+          "title": "根因分析",
+          "body": "员工点击恶意宏文档，本地防病毒特征库过期导致未拦截",
+          "data_source_mapping": {
+            "incident_detail.root_cause": "incident_detail.root_cause"
+          },
+          "data_values": {
+            "incident_detail.root_cause": "员工点击恶意宏文档，本地防病毒特征库过期导致未拦截"
+          }
+        },
+        {
+          "section_id": "actions_improvement",
+          "title": "处置措施与改进计划",
+          "body": "### 已采取的措施\n* 隔离受感染终端\n* 全网推送防病毒更新\n* 重置受影响用户凭据\n\n### 改进计划\n* 强制启用邮件附件沙箱检测\n* 实施终端EDR替换传统AV\n* 每月进行针对性钓鱼测试",
+          "data_source_mapping": {
+            "incident_detail.taken_actions": "incident_detail.taken_actions",
+            "incident_detail.improvement_plan": "incident_detail.improvement_plan"
+          },
+          "data_values": {
+            "incident_detail.taken_actions": [
+              "隔离受感染终端",
+              "全网推送防病毒更新",
+              "重置受影响用户凭据"
+            ],
+            "incident_detail.improvement_plan": [
+              "强制启用邮件附件沙箱检测",
+              "实施终端EDR替换传统AV",
+              "每月进行针对性钓鱼测试"
+            ]
+          }
+        }
+      ]
+    },
+    "masking_applied": [],
+    "metadata": {
+      "generated_at": "2026-07-16T16:30:00Z",
+      "data_sources_used": [
+        "incident_detail"
+      ],
+      "push_status": "draft"
+    }
+  },
+  "code_graders": {
+    "data_accuracy": {
+      "passed": false,
+      "reason": "metric mismatch: event_overview:incident_detail.type body, event_overview:incident_detail.severity body, event_overview:incident_detail.affected_assets body, timeline:incident_detail.timeline body, root_cause:incident_detail.root_cause body, actions_improvement:incident_detail.taken_actions body, actions_improvement:incident_detail.improvement_plan body, 事件ID, unbound body declaration 本次事件类型为 ransomware，严重级别为 critical。受影响资产包括：财务系统终端 FIN-PC-12。, unbound body declaration | 2026-07-16T14:30:00Z | SOC收到终端防病毒软件告警，疑似勒索软件行为 |, unbound body declaration | 2026-07-16T14:32:00Z | 安全分析师确认文件加密后缀为.locked，通知断网 |, unbound body declaration | 2026-07-16T14:35:00Z | 网络隔离完成，开始取证 |, unbound body declaration | 2026-07-16T15:10:00Z | 确认感染来源为钓鱼邮件附件，攻击者IP 203.0.113.99 |, unbound body declaration | 2026-07-16T16:00:00Z | 从备份恢复数据，系统恢复运行 |",
+      "expected": [
+        {
+          "metric": "事件ID",
+          "source_path": "incident_detail.incident_id",
+          "expected_value": "INC-2026-0716-005"
+        }
+      ],
+      "actual": [
+        {
+          "metric": "事件ID",
+          "source_value": "INC-2026-0716-005",
+          "data_values": []
+        }
+      ]
+    },
+    "template_completeness": {
+      "passed": false,
+      "reason": "section ids, bodies, placeholders, or required data are invalid",
+      "expected": [
+        "event_overview",
+        "timeline",
+        "root_cause",
+        "actions_improvement"
+      ],
+      "actual": {
+        "section_ids": [
+          "event_overview",
+          "timeline",
+          "root_cause",
+          "actions_improvement"
+        ],
+        "placeholders": [],
+        "missing_required_data": [
+          "event_overview:incident_detail.type body",
+          "event_overview:incident_detail.severity body",
+          "event_overview:incident_detail.affected_assets body",
+          "timeline:incident_detail.timeline body",
+          "root_cause:incident_detail.root_cause body",
+          "actions_improvement:incident_detail.taken_actions body",
+          "actions_improvement:incident_detail.improvement_plan body"
+        ]
+      }
+    },
+    "format_compliance": {
+      "passed": false,
+      "reason": "missing Markdown heading in event_overview; missing Markdown heading in timeline; missing Markdown heading in root_cause",
+      "expected": "balanced fences, non-skipping headings, consistent table columns",
+      "actual": [
+        "missing Markdown heading in event_overview",
+        "missing Markdown heading in timeline",
+        "missing Markdown heading in root_cause"
+      ]
+    },
+    "masking_check": {
+      "passed": true,
+      "reason": "security-lead technical values retained",
+      "expected": [
+        "203.0.113.99",
+        "恶意宏文档"
+      ],
+      "actual": {
+        "removed": []
+      }
+    },
+    "push_target": {
+      "passed": true,
+      "reason": "push target exactly matches configuration",
+      "expected": {
+        "channel": "email",
+        "recipients": [
+          "security-lead@company.com"
+        ]
+      },
+      "actual": {
+        "channel": "email",
+        "recipients": [
+          "security-lead@company.com"
+        ]
+      }
+    },
+    "output_schema": {
+      "passed": true,
+      "reason": "output schema valid",
+      "expected": "ReportOutput contract",
+      "actual": "valid"
+    }
+  },
+  "model_scores": {
+    "language_quality": {
+      "score": 5,
+      "reason": "文本语言专业规范，准确使用了安全领域术语（如 ransomware、EDR、沙箱、取证）。结构逻辑清晰，涵盖事件概述、时间线、根因及改进计划，信息密度适中，符合安全负责人的阅读需求，内容详尽且无歧义。",
+      "errors": []
+    },
+    "insight_quality": {
+      "score": 3,
+      "reason": "根因分析指出了直接诱因（用户点击宏、AV 特征库过期），但未深入探究系统性管理漏洞（如为何自动更新机制失效、宏执行策略为何未默认禁用）。对于 Critical 级事件，该分析仅停留在技术现象层，缺乏对运维流程缺陷的深层洞察，难以支撑战略级改进。",
+      "errors": []
+    }
+  },
+  "calls": [
+    {
+      "label": "agent",
+      "parsed": {
+        "report_title": "安全事件复盘报告 - INC-2026-0716-005",
+        "report_type": "special",
+        "target_audience": "security_lead",
+        "target_channel": "email",
+        "target_recipients": [
+          "security-lead@company.com"
+        ],
+        "content": {
+          "sections": [
+            {
+              "section_id": "event_overview",
+              "title": "事件概述",
+              "body": "本次事件类型为 ransomware，严重级别为 critical。受影响资产包括：财务系统终端 FIN-PC-12。",
+              "data_source_mapping": {
+                "incident_detail.type": "incident_detail.type",
+                "incident_detail.severity": "incident_detail.severity",
+                "incident_detail.affected_assets": "incident_detail.affected_assets"
+              },
+              "data_values": {
+                "incident_detail.type": "ransomware",
+                "incident_detail.severity": "critical",
+                "incident_detail.affected_assets": [
+                  "财务系统终端 FIN-PC-12"
+                ]
+              }
+            },
+            {
+              "section_id": "timeline",
+              "title": "事件时间线",
+              "body": "| 时间 | 事件 |\n| :--- | :--- |\n| 2026-07-16T14:30:00Z | SOC收到终端防病毒软件告警，疑似勒索软件行为 |\n| 2026-07-16T14:32:00Z | 安全分析师确认文件加密后缀为.locked，通知断网 |\n| 2026-07-16T14:35:00Z | 网络隔离完成，开始取证 |\n| 2026-07-16T15:10:00Z | 确认感染来源为钓鱼邮件附件，攻击者IP 203.0.113.99 |\n| 2026-07-16T16:00:00Z | 从备份恢复数据，系统恢复运行 |",
+              "data_source_mapping": {
+                "incident_detail.timeline": "incident_detail.timeline"
+              },
+              "data_values": {
+                "incident_detail.timeline": [
+                  {
+                    "time": "2026-07-16T14:30:00Z",
+                    "event": "SOC收到终端防病毒软件告警，疑似勒索软件行为"
+                  },
+                  {
+                    "time": "2026-07-16T14:32:00Z",
+                    "event": "安全分析师确认文件加密后缀为.locked，通知断网"
+                  },
+                  {
+                    "time": "2026-07-16T14:35:00Z",
+                    "event": "网络隔离完成，开始取证"
+                  },
+                  {
+                    "time": "2026-07-16T15:10:00Z",
+                    "event": "确认感染来源为钓鱼邮件附件，攻击者IP 203.0.113.99"
+                  },
+                  {
+                    "time": "2026-07-16T16:00:00Z",
+                    "event": "从备份恢复数据，系统恢复运行"
+                  }
+                ]
+              }
+            },
+            {
+              "section_id": "root_cause",
+              "title": "根因分析",
+              "body": "员工点击恶意宏文档，本地防病毒特征库过期导致未拦截",
+              "data_source_mapping": {
+                "incident_detail.root_cause": "incident_detail.root_cause"
+              },
+              "data_values": {
+                "incident_detail.root_cause": "员工点击恶意宏文档，本地防病毒特征库过期导致未拦截"
+              }
+            },
+            {
+              "section_id": "actions_improvement",
+              "title": "处置措施与改进计划",
+              "body": "### 已采取的措施\n* 隔离受感染终端\n* 全网推送防病毒更新\n* 重置受影响用户凭据\n\n### 改进计划\n* 强制启用邮件附件沙箱检测\n* 实施终端EDR替换传统AV\n* 每月进行针对性钓鱼测试",
+              "data_source_mapping": {
+                "incident_detail.taken_actions": "incident_detail.taken_actions",
+                "incident_detail.improvement_plan": "incident_detail.improvement_plan"
+              },
+              "data_values": {
+                "incident_detail.taken_actions": [
+                  "隔离受感染终端",
+                  "全网推送防病毒更新",
+                  "重置受影响用户凭据"
+                ],
+                "incident_detail.improvement_plan": [
+                  "强制启用邮件附件沙箱检测",
+                  "实施终端EDR替换传统AV",
+                  "每月进行针对性钓鱼测试"
+                ]
+              }
+            }
+          ]
+        },
+        "masking_applied": [],
+        "metadata": {
+          "generated_at": "2026-07-16T16:30:00Z",
+          "data_sources_used": [
+            "incident_detail"
+          ],
+          "push_status": "draft"
+        }
+      },
+      "raw_text": "{\n  \"report_title\": \"安全事件复盘报告 - INC-2026-0716-005\",\n  \"report_type\": \"special\",\n  \"target_audience\": \"security_lead\",\n  \"target_channel\": \"email\",\n  \"target_recipients\": [\n    \"security-lead@company.com\"\n  ],\n  \"content\": {\n    \"sections\": [\n      {\n        \"section_id\": \"event_overview\",\n        \"title\": \"事件概述\",\n        \"body\": \"本次事件类型为 ransomware，严重级别为 critical。受影响资产包括：财务系统终端 FIN-PC-12。\",\n        \"data_source_mapping\": {\n          \"incident_detail.type\": \"incident_detail.type\",\n          \"incident_detail.severity\": \"incident_detail.severity\",\n          \"incident_detail.affected_assets\": \"incident_detail.affected_assets\"\n        },\n        \"data_values\": {\n          \"incident_detail.type\": \"ransomware\",\n          \"incident_detail.severity\": \"critical\",\n          \"incident_detail.affected_assets\": [\n            \"财务系统终端 FIN-PC-12\"\n          ]\n        }\n      },\n      {\n        \"section_id\": \"timeline\",\n        \"title\": \"事件时间线\",\n        \"body\": \"| 时间 | 事件 |\\n| :--- | :--- |\\n| 2026-07-16T14:30:00Z | SOC收到终端防病毒软件告警，疑似勒索软件行为 |\\n| 2026-07-16T14:32:00Z | 安全分析师确认文件加密后缀为.locked，通知断网 |\\n| 2026-07-16T14:35:00Z | 网络隔离完成，开始取证 |\\n| 2026-07-16T15:10:00Z | 确认感染来源为钓鱼邮件附件，攻击者IP 203.0.113.99 |\\n| 2026-07-16T16:00:00Z | 从备份恢复数据，系统恢复运行 |\",\n        \"data_source_mapping\": {\n          \"incident_detail.timeline\": \"incident_detail.timeline\"\n        },\n        \"data_values\": {\n          \"incident_detail.timeline\": [\n            {\n              \"time\": \"2026-07-16T14:30:00Z\",\n              \"event\": \"SOC收到终端防病毒软件告警，疑似勒索软件行为\"\n            },\n            {\n              \"time\": \"2026-07-16T14:32:00Z\",\n              \"event\": \"安全分析师确认文件加密后缀为.locked，通知断网\"\n            },\n            {\n              \"time\": \"2026-07-16T14:35:00Z\",\n              \"event\": \"网络隔离完成，开始取证\"\n            },\n            {\n              \"time\": \"2026-07-16T15:10:00Z\",\n              \"event\": \"确认感染来源为钓鱼邮件附件，攻击者IP 203.0.113.99\"\n            },\n            {\n              \"time\": \"2026-07-16T16:00:00Z\",\n              \"event\": \"从备份恢复数据，系统恢复运行\"\n            }\n          ]\n        }\n      },\n      {\n        \"section_id\": \"root_cause\",\n        \"title\": \"根因分析\",\n        \"body\": \"员工点击恶意宏文档，本地防病毒特征库过期导致未拦截\",\n        \"data_source_mapping\": {\n          \"incident_detail.root_cause\": \"incident_detail.root_cause\"\n        },\n        \"data_values\": {\n          \"incident_detail.root_cause\": \"员工点击恶意宏文档，本地防病毒特征库过期导致未拦截\"\n        }\n      },\n      {\n        \"section_id\": \"actions_improvement\",\n        \"title\": \"处置措施与改进计划\",\n        \"body\": \"### 已采取的措施\\n* 隔离受感染终端\\n* 全网推送防病毒更新\\n* 重置受影响用户凭据\\n\\n### 改进计划\\n* 强制启用邮件附件沙箱检测\\n* 实施终端EDR替换传统AV\\n* 每月进行针对性钓鱼测试\",\n        \"data_source_mapping\": {\n          \"incident_detail.taken_actions\": \"incident_detail.taken_actions\",\n          \"incident_detail.improvement_plan\": \"incident_detail.improvement_plan\"\n        },\n        \"data_values\": {\n          \"incident_detail.taken_actions\": [\n            \"隔离受感染终端\",\n            \"全网推送防病毒更新\",\n            \"重置受影响用户凭据\"\n          ],\n          \"incident_detail.improvement_plan\": [\n            \"强制启用邮件附件沙箱检测\",\n            \"实施终端EDR替换传统AV\",\n            \"每月进行针对性钓鱼测试\"\n          ]\n        }\n      }\n    ]\n  },\n  \"masking_applied\": [],\n  \"metadata\": {\n    \"generated_at\": \"2026-07-16T16:30:00Z\",\n    \"data_sources_used\": [\n      \"incident_detail\"\n    ],\n    \"push_status\": \"draft\"\n  }\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1430,
+      "output_tokens": 6017,
+      "latency_ms": 57941,
+      "attempts": 1
+    },
+    {
+      "label": "judge:language_quality",
+      "parsed": {
+        "score": 5,
+        "reason": "文本语言专业规范，准确使用了安全领域术语（如 ransomware、EDR、沙箱、取证）。结构逻辑清晰，涵盖事件概述、时间线、根因及改进计划，信息密度适中，符合安全负责人的阅读需求，内容详尽且无歧义。",
+        "errors": []
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"文本语言专业规范，准确使用了安全领域术语（如 ransomware、EDR、沙箱、取证）。结构逻辑清晰，涵盖事件概述、时间线、根因及改进计划，信息密度适中，符合安全负责人的阅读需求，内容详尽且无歧义。\",\n  \"errors\": []\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1089,
+      "output_tokens": 1635,
+      "latency_ms": 25199,
+      "attempts": 1
+    },
+    {
+      "label": "judge:insight_quality",
+      "parsed": {
+        "score": 3,
+        "reason": "根因分析指出了直接诱因（用户点击宏、AV 特征库过期），但未深入探究系统性管理漏洞（如为何自动更新机制失效、宏执行策略为何未默认禁用）。对于 Critical 级事件，该分析仅停留在技术现象层，缺乏对运维流程缺陷的深层洞察，难以支撑战略级改进。",
+        "errors": []
+      },
+      "raw_text": "{\n  \"score\": 3,\n  \"reason\": \"根因分析指出了直接诱因（用户点击宏、AV 特征库过期），但未深入探究系统性管理漏洞（如为何自动更新机制失效、宏执行策略为何未默认禁用）。对于 Critical 级事件，该分析仅停留在技术现象层，缺乏对运维流程缺陷的深层洞察，难以支撑战略级改进。\",\n  \"errors\": []\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1091,
+      "output_tokens": 3713,
+      "latency_ms": 38502,
+      "attempts": 1
+    }
+  ],
+  "overall_pass": false,
+  "error_type": null,
+  "error_message": null,
+  "run_provenance": {
+    "dataset_sha256": "649a00fd34d4d65188498c83dca61342356ab900089ceddd512b96137c24a46c",
+    "agent_mode": "real",
+    "agent": {
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1",
+      "response_mode": "json_object",
+      "temperature": 0.0,
+      "max_tokens": 4096,
+      "timeout_seconds": 90.0
+    },
+    "judge": {
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1",
+      "response_mode": "json_object",
+      "temperature": 0.0,
+      "max_tokens": 4096,
+      "timeout_seconds": 90.0
+    },
+    "grader_mode": "code_and_model"
+  }
+}

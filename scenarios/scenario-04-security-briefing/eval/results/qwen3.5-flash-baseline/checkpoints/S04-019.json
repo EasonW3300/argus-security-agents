@@ -1,0 +1,291 @@
+{
+  "test_case_id": "S04-019",
+  "scenario": "负例：管理层版简报未脱敏，预期不应包含具体IP和资产名",
+  "type": "negative",
+  "difficulty": "medium",
+  "is_positive": false,
+  "status": "completed",
+  "final_output": {
+    "report_title": "管理层安全简报 —— 2026-W29",
+    "report_type": "weekly",
+    "target_audience": "management",
+    "target_channel": "email",
+    "target_recipients": [
+      "management@company.com"
+    ],
+    "content": {
+      "sections": [
+        {
+          "section_id": "summary",
+          "title": "安全态势摘要",
+          "body": "本周安全告警总数为 **1042** 起。监测到外部攻击 IP 及核心资产异常活动，敏感信息已按规则脱敏。",
+          "data_source_mapping": {
+            "weekly_summary.total_alerts": "weekly_summary.total_alerts",
+            "weekly_summary.external_attack_ips": "weekly_summary.external_attack_ips",
+            "weekly_summary.compromised_asset": "weekly_summary.compromised_asset"
+          },
+          "data_values": {
+            "weekly_summary.total_alerts": 1042,
+            "weekly_summary.external_attack_ips": [
+              "203.0.113.88",
+              "198.51.100.123"
+            ],
+            "weekly_summary.compromised_asset": "核心交易数据库 DB-Master-01 (10.0.1.50)"
+          }
+        }
+      ]
+    },
+    "masking_applied": [
+      {
+        "original": "203.0.113.88",
+        "masked": "[REDACTED_IP]",
+        "rule": "management_masking"
+      },
+      {
+        "original": "198.51.100.123",
+        "masked": "[REDACTED_IP]",
+        "rule": "management_masking"
+      },
+      {
+        "original": "DB-Master-01",
+        "masked": "[REDACTED_ASSET_NAME]",
+        "rule": "management_masking"
+      },
+      {
+        "original": "10.0.1.50",
+        "masked": "[REDACTED_IP]",
+        "rule": "management_masking"
+      }
+    ],
+    "metadata": {
+      "generated_at": "2026-07-20T08:00:00Z",
+      "data_sources_used": [
+        "weekly_summary"
+      ],
+      "push_status": "draft"
+    }
+  },
+  "code_graders": {
+    "data_accuracy": {
+      "passed": false,
+      "reason": "metric mismatch: summary:weekly_summary.total_alerts body, 告警总数",
+      "expected": [
+        {
+          "metric": "告警总数",
+          "source_path": "weekly_summary.total_alerts",
+          "expected_value": 1042
+        }
+      ],
+      "actual": [
+        {
+          "metric": "告警总数",
+          "source_value": 1042,
+          "data_values": [
+            1042
+          ]
+        }
+      ]
+    },
+    "template_completeness": {
+      "passed": false,
+      "reason": "section ids, bodies, placeholders, or required data are invalid",
+      "expected": [
+        "summary"
+      ],
+      "actual": {
+        "section_ids": [
+          "summary"
+        ],
+        "placeholders": [],
+        "missing_required_data": [
+          "summary:weekly_summary.total_alerts body"
+        ]
+      }
+    },
+    "format_compliance": {
+      "passed": false,
+      "reason": "missing Markdown heading in summary",
+      "expected": "balanced fences, non-skipping headings, consistent table columns",
+      "actual": [
+        "missing Markdown heading in summary"
+      ]
+    },
+    "masking_check": {
+      "passed": true,
+      "reason": "management sensitive values are masked",
+      "expected": "no sensitive patterns",
+      "actual": {
+        "leaks": []
+      }
+    },
+    "push_target": {
+      "passed": true,
+      "reason": "push target exactly matches configuration",
+      "expected": {
+        "channel": "email",
+        "recipients": [
+          "management@company.com"
+        ]
+      },
+      "actual": {
+        "channel": "email",
+        "recipients": [
+          "management@company.com"
+        ]
+      }
+    },
+    "output_schema": {
+      "passed": true,
+      "reason": "output schema valid",
+      "expected": "ReportOutput contract",
+      "actual": "valid"
+    }
+  },
+  "model_scores": {
+    "language_quality": {
+      "score": 5,
+      "reason": "语言风格专业严谨，术语准确，符合管理层汇报语境。关键数据突出，结构清晰，无语法错误。",
+      "errors": []
+    },
+    "insight_quality": {
+      "score": 2,
+      "reason": "The briefing fails to provide strategic insight required by management. It lists raw alert counts without trend analysis (e.g., week-over-week), business impact assessment (financial/reputational risk), or actionable recommendations. The content is operational rather than executive-level.",
+      "errors": [
+        "Security inconsistency: Sensitive data (IPs, asset names) remains visible in 'data_values' despite masking rules and body text claims."
+      ]
+    }
+  },
+  "calls": [
+    {
+      "label": "agent",
+      "parsed": {
+        "report_title": "管理层安全简报 —— 2026-W29",
+        "report_type": "weekly",
+        "target_audience": "management",
+        "target_channel": "email",
+        "target_recipients": [
+          "management@company.com"
+        ],
+        "content": {
+          "sections": [
+            {
+              "section_id": "summary",
+              "title": "安全态势摘要",
+              "body": "本周安全告警总数为 **1042** 起。监测到外部攻击 IP 及核心资产异常活动，敏感信息已按规则脱敏。",
+              "data_source_mapping": {
+                "weekly_summary.total_alerts": "weekly_summary.total_alerts",
+                "weekly_summary.external_attack_ips": "weekly_summary.external_attack_ips",
+                "weekly_summary.compromised_asset": "weekly_summary.compromised_asset"
+              },
+              "data_values": {
+                "weekly_summary.total_alerts": 1042,
+                "weekly_summary.external_attack_ips": [
+                  "203.0.113.88",
+                  "198.51.100.123"
+                ],
+                "weekly_summary.compromised_asset": "核心交易数据库 DB-Master-01 (10.0.1.50)"
+              }
+            }
+          ]
+        },
+        "masking_applied": [
+          {
+            "original": "203.0.113.88",
+            "masked": "[REDACTED_IP]",
+            "rule": "management_masking"
+          },
+          {
+            "original": "198.51.100.123",
+            "masked": "[REDACTED_IP]",
+            "rule": "management_masking"
+          },
+          {
+            "original": "DB-Master-01",
+            "masked": "[REDACTED_ASSET_NAME]",
+            "rule": "management_masking"
+          },
+          {
+            "original": "10.0.1.50",
+            "masked": "[REDACTED_IP]",
+            "rule": "management_masking"
+          }
+        ],
+        "metadata": {
+          "generated_at": "2026-07-20T08:00:00Z",
+          "data_sources_used": [
+            "weekly_summary"
+          ],
+          "push_status": "draft"
+        }
+      },
+      "raw_text": "{\n  \"report_title\": \"管理层安全简报 —— 2026-W29\",\n  \"report_type\": \"weekly\",\n  \"target_audience\": \"management\",\n  \"target_channel\": \"email\",\n  \"target_recipients\": [\n    \"management@company.com\"\n  ],\n  \"content\": {\n    \"sections\": [\n      {\n        \"section_id\": \"summary\",\n        \"title\": \"安全态势摘要\",\n        \"body\": \"本周安全告警总数为 **1042** 起。监测到外部攻击 IP 及核心资产异常活动，敏感信息已按规则脱敏。\",\n        \"data_source_mapping\": {\n          \"weekly_summary.total_alerts\": \"weekly_summary.total_alerts\",\n          \"weekly_summary.external_attack_ips\": \"weekly_summary.external_attack_ips\",\n          \"weekly_summary.compromised_asset\": \"weekly_summary.compromised_asset\"\n        },\n        \"data_values\": {\n          \"weekly_summary.total_alerts\": 1042,\n          \"weekly_summary.external_attack_ips\": [\n            \"203.0.113.88\",\n            \"198.51.100.123\"\n          ],\n          \"weekly_summary.compromised_asset\": \"核心交易数据库 DB-Master-01 (10.0.1.50)\"\n        }\n      }\n    ]\n  },\n  \"masking_applied\": [\n    {\n      \"original\": \"203.0.113.88\",\n      \"masked\": \"[REDACTED_IP]\",\n      \"rule\": \"management_masking\"\n    },\n    {\n      \"original\": \"198.51.100.123\",\n      \"masked\": \"[REDACTED_IP]\",\n      \"rule\": \"management_masking\"\n    },\n    {\n      \"original\": \"DB-Master-01\",\n      \"masked\": \"[REDACTED_ASSET_NAME]\",\n      \"rule\": \"management_masking\"\n    },\n    {\n      \"original\": \"10.0.1.50\",\n      \"masked\": \"[REDACTED_IP]\",\n      \"rule\": \"management_masking\"\n    }\n  ],\n  \"metadata\": {\n    \"generated_at\": \"2026-07-20T08:00:00Z\",\n    \"data_sources_used\": [\n      \"weekly_summary\"\n    ],\n    \"push_status\": \"draft\"\n  }\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1010,
+      "output_tokens": 6109,
+      "latency_ms": 55958,
+      "attempts": 1
+    },
+    {
+      "label": "judge:language_quality",
+      "parsed": {
+        "score": 5,
+        "reason": "语言风格专业严谨，术语准确，符合管理层汇报语境。关键数据突出，结构清晰，无语法错误。",
+        "errors": []
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"语言风格专业严谨，术语准确，符合管理层汇报语境。关键数据突出，结构清晰，无语法错误。\",\n  \"errors\": []\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 529,
+      "output_tokens": 3028,
+      "latency_ms": 28437,
+      "attempts": 1
+    },
+    {
+      "label": "judge:insight_quality",
+      "parsed": {
+        "score": 2,
+        "reason": "The briefing fails to provide strategic insight required by management. It lists raw alert counts without trend analysis (e.g., week-over-week), business impact assessment (financial/reputational risk), or actionable recommendations. The content is operational rather than executive-level.",
+        "errors": [
+          "Security inconsistency: Sensitive data (IPs, asset names) remains visible in 'data_values' despite masking rules and body text claims."
+        ]
+      },
+      "raw_text": "{\n  \"score\": 2,\n  \"reason\": \"The briefing fails to provide strategic insight required by management. It lists raw alert counts without trend analysis (e.g., week-over-week), business impact assessment (financial/reputational risk), or actionable recommendations. The content is operational rather than executive-level.\",\n  \"errors\": [\n    \"Security inconsistency: Sensitive data (IPs, asset names) remains visible in 'data_values' despite masking rules and body text claims.\"\n  ]\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 534,
+      "output_tokens": 3056,
+      "latency_ms": 30070,
+      "attempts": 1
+    }
+  ],
+  "overall_pass": false,
+  "error_type": null,
+  "error_message": null,
+  "run_provenance": {
+    "dataset_sha256": "649a00fd34d4d65188498c83dca61342356ab900089ceddd512b96137c24a46c",
+    "agent_mode": "real",
+    "agent": {
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1",
+      "response_mode": "json_object",
+      "temperature": 0.0,
+      "max_tokens": 4096,
+      "timeout_seconds": 90.0
+    },
+    "judge": {
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1",
+      "response_mode": "json_object",
+      "temperature": 0.0,
+      "max_tokens": 4096,
+      "timeout_seconds": 90.0
+    },
+    "grader_mode": "code_and_model"
+  }
+}

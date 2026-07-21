@@ -1,0 +1,375 @@
+{
+  "test_case_id": "S04-012",
+  "scenario": "管理层需要月度KPI仪表盘，展示月度告警趋势、处置率、漏洞修复率和环比变化",
+  "type": "monthly_report",
+  "difficulty": "medium",
+  "is_positive": true,
+  "status": "completed",
+  "final_output": {
+    "report_title": "月度安全KPI仪表盘 —— 2026-07",
+    "report_type": "monthly",
+    "target_audience": "management",
+    "target_channel": "email",
+    "target_recipients": [
+      "management@company.com"
+    ],
+    "content": {
+      "sections": [
+        {
+          "section_id": "alert_trend",
+          "title": "告警月度趋势",
+          "body": "| Week | Total Alerts | Disposal Rate |\n| --- | --- | --- |\n| W27 | 987 | 89% |\n| W28 | 978 | 90% |\n| W29 | 1042 | 91% |\n| W30 | 1005 | 92% |",
+          "data_source_mapping": {
+            "weekly_alerts": "monthly_kpi.weekly_alerts"
+          },
+          "data_values": {
+            "weekly_alerts": [
+              {
+                "week": "W27",
+                "total": 987,
+                "disposal_rate": 0.89
+              },
+              {
+                "week": "W28",
+                "total": 978,
+                "disposal_rate": 0.9
+              },
+              {
+                "week": "W29",
+                "total": 1042,
+                "disposal_rate": 0.91
+              },
+              {
+                "week": "W30",
+                "total": 1005,
+                "disposal_rate": 0.92
+              }
+            ]
+          }
+        },
+        {
+          "section_id": "vuln_kpi",
+          "title": "漏洞修复KPI",
+          "body": "本月新增漏洞 45 个，已修复 32 个，修复率为 71%。与上月相比，新增漏洞从 38 个增加至 45 个，修复率从 68% 提升至 71%。",
+          "data_source_mapping": {
+            "new_total": "monthly_kpi.vulnerability_stats_monthly.new_total",
+            "fixed_total": "monthly_kpi.vulnerability_stats_monthly.fixed_total",
+            "fix_rate": "monthly_kpi.vulnerability_stats_monthly.fix_rate",
+            "prev_month_new_total": "monthly_kpi.vulnerability_stats_monthly.prev_month_new_total",
+            "prev_month_fix_rate": "monthly_kpi.vulnerability_stats_monthly.prev_month_fix_rate"
+          },
+          "data_values": {
+            "new_total": 45,
+            "fixed_total": 32,
+            "fix_rate": 0.71,
+            "prev_month_new_total": 38,
+            "prev_month_fix_rate": 0.68
+          }
+        },
+        {
+          "section_id": "incident_kpi",
+          "title": "事件闭环率",
+          "body": "本月共发生安全事件 28 起，已关闭 24 起，闭环率为 85.7%。环比上月（82%）有所提升。",
+          "data_source_mapping": {
+            "total_incidents": "monthly_kpi.incident_stats_monthly.total_incidents",
+            "closed_incidents": "monthly_kpi.incident_stats_monthly.closed_incidents",
+            "closure_rate": "monthly_kpi.incident_stats_monthly.closure_rate",
+            "prev_month_closure_rate": "monthly_kpi.incident_stats_monthly.prev_month_closure_rate"
+          },
+          "data_values": {
+            "total_incidents": 28,
+            "closed_incidents": 24,
+            "closure_rate": 0.857,
+            "prev_month_closure_rate": 0.82
+          }
+        }
+      ]
+    },
+    "masking_applied": [],
+    "metadata": {
+      "generated_at": "2026-08-01T00:00:00Z",
+      "data_sources_used": [
+        "monthly_kpi"
+      ],
+      "push_status": "draft"
+    }
+  },
+  "code_graders": {
+    "data_accuracy": {
+      "passed": false,
+      "reason": "metric mismatch: alert_trend:monthly_kpi.weekly_alerts body, vuln_kpi:monthly_kpi.vulnerability_stats_monthly, incident_kpi:monthly_kpi.incident_stats_monthly, W29告警数, 月度漏洞修复率, 事件闭环率",
+      "expected": [
+        {
+          "metric": "W29告警数",
+          "source_path": "monthly_kpi.weekly_alerts[2].total",
+          "expected_value": 1042
+        },
+        {
+          "metric": "月度漏洞修复率",
+          "source_path": "monthly_kpi.vulnerability_stats_monthly.fix_rate",
+          "expected_value": 0.71
+        },
+        {
+          "metric": "事件闭环率",
+          "source_path": "monthly_kpi.incident_stats_monthly.closure_rate",
+          "expected_value": 0.857
+        }
+      ],
+      "actual": [
+        {
+          "metric": "W29告警数",
+          "source_value": 1042,
+          "data_values": []
+        },
+        {
+          "metric": "月度漏洞修复率",
+          "source_value": 0.71,
+          "data_values": [
+            0.71
+          ]
+        },
+        {
+          "metric": "事件闭环率",
+          "source_value": 0.857,
+          "data_values": [
+            0.857
+          ]
+        }
+      ]
+    },
+    "template_completeness": {
+      "passed": false,
+      "reason": "section ids, bodies, placeholders, or required data are invalid",
+      "expected": [
+        "alert_trend",
+        "vuln_kpi",
+        "incident_kpi"
+      ],
+      "actual": {
+        "section_ids": [
+          "alert_trend",
+          "vuln_kpi",
+          "incident_kpi"
+        ],
+        "placeholders": [],
+        "missing_required_data": [
+          "alert_trend:monthly_kpi.weekly_alerts body",
+          "vuln_kpi:monthly_kpi.vulnerability_stats_monthly",
+          "incident_kpi:monthly_kpi.incident_stats_monthly"
+        ]
+      }
+    },
+    "format_compliance": {
+      "passed": false,
+      "reason": "missing Markdown heading in alert_trend; missing Markdown heading in vuln_kpi; missing Markdown heading in incident_kpi",
+      "expected": "balanced fences, non-skipping headings, consistent table columns",
+      "actual": [
+        "missing Markdown heading in alert_trend",
+        "missing Markdown heading in vuln_kpi",
+        "missing Markdown heading in incident_kpi"
+      ]
+    },
+    "masking_check": {
+      "passed": true,
+      "reason": "management sensitive values are masked",
+      "expected": "no sensitive patterns",
+      "actual": {
+        "leaks": []
+      }
+    },
+    "push_target": {
+      "passed": true,
+      "reason": "push target exactly matches configuration",
+      "expected": {
+        "channel": "email",
+        "recipients": [
+          "management@company.com"
+        ]
+      },
+      "actual": {
+        "channel": "email",
+        "recipients": [
+          "management@company.com"
+        ]
+      }
+    },
+    "output_schema": {
+      "passed": true,
+      "reason": "output schema valid",
+      "expected": "ReportOutput contract",
+      "actual": "valid"
+    }
+  },
+  "model_scores": {
+    "language_quality": {
+      "score": 5,
+      "reason": "文本表达专业规范，术语使用准确（如‘环比’、‘闭环率’），数据呈现清晰简洁，重点突出趋势与结果，高度适配管理层决策需求。",
+      "errors": []
+    },
+    "insight_quality": {
+      "score": 2,
+      "reason": "报告仅提供了基础数据表格及简单的环比文字说明，缺乏对趋势的深度解读（如告警波动原因、漏洞增长背景）及针对管理层的具体可操作建议。内容主要停留在数据陈述层面，未体现决策支持价值。",
+      "errors": []
+    }
+  },
+  "calls": [
+    {
+      "label": "agent",
+      "parsed": {
+        "report_title": "月度安全KPI仪表盘 —— 2026-07",
+        "report_type": "monthly",
+        "target_audience": "management",
+        "target_channel": "email",
+        "target_recipients": [
+          "management@company.com"
+        ],
+        "content": {
+          "sections": [
+            {
+              "section_id": "alert_trend",
+              "title": "告警月度趋势",
+              "body": "| Week | Total Alerts | Disposal Rate |\n| --- | --- | --- |\n| W27 | 987 | 89% |\n| W28 | 978 | 90% |\n| W29 | 1042 | 91% |\n| W30 | 1005 | 92% |",
+              "data_source_mapping": {
+                "weekly_alerts": "monthly_kpi.weekly_alerts"
+              },
+              "data_values": {
+                "weekly_alerts": [
+                  {
+                    "week": "W27",
+                    "total": 987,
+                    "disposal_rate": 0.89
+                  },
+                  {
+                    "week": "W28",
+                    "total": 978,
+                    "disposal_rate": 0.9
+                  },
+                  {
+                    "week": "W29",
+                    "total": 1042,
+                    "disposal_rate": 0.91
+                  },
+                  {
+                    "week": "W30",
+                    "total": 1005,
+                    "disposal_rate": 0.92
+                  }
+                ]
+              }
+            },
+            {
+              "section_id": "vuln_kpi",
+              "title": "漏洞修复KPI",
+              "body": "本月新增漏洞 45 个，已修复 32 个，修复率为 71%。与上月相比，新增漏洞从 38 个增加至 45 个，修复率从 68% 提升至 71%。",
+              "data_source_mapping": {
+                "new_total": "monthly_kpi.vulnerability_stats_monthly.new_total",
+                "fixed_total": "monthly_kpi.vulnerability_stats_monthly.fixed_total",
+                "fix_rate": "monthly_kpi.vulnerability_stats_monthly.fix_rate",
+                "prev_month_new_total": "monthly_kpi.vulnerability_stats_monthly.prev_month_new_total",
+                "prev_month_fix_rate": "monthly_kpi.vulnerability_stats_monthly.prev_month_fix_rate"
+              },
+              "data_values": {
+                "new_total": 45,
+                "fixed_total": 32,
+                "fix_rate": 0.71,
+                "prev_month_new_total": 38,
+                "prev_month_fix_rate": 0.68
+              }
+            },
+            {
+              "section_id": "incident_kpi",
+              "title": "事件闭环率",
+              "body": "本月共发生安全事件 28 起，已关闭 24 起，闭环率为 85.7%。环比上月（82%）有所提升。",
+              "data_source_mapping": {
+                "total_incidents": "monthly_kpi.incident_stats_monthly.total_incidents",
+                "closed_incidents": "monthly_kpi.incident_stats_monthly.closed_incidents",
+                "closure_rate": "monthly_kpi.incident_stats_monthly.closure_rate",
+                "prev_month_closure_rate": "monthly_kpi.incident_stats_monthly.prev_month_closure_rate"
+              },
+              "data_values": {
+                "total_incidents": 28,
+                "closed_incidents": 24,
+                "closure_rate": 0.857,
+                "prev_month_closure_rate": 0.82
+              }
+            }
+          ]
+        },
+        "masking_applied": [],
+        "metadata": {
+          "generated_at": "2026-08-01T00:00:00Z",
+          "data_sources_used": [
+            "monthly_kpi"
+          ],
+          "push_status": "draft"
+        }
+      },
+      "raw_text": "{\n  \"report_title\": \"月度安全KPI仪表盘 —— 2026-07\",\n  \"report_type\": \"monthly\",\n  \"target_audience\": \"management\",\n  \"target_channel\": \"email\",\n  \"target_recipients\": [\n    \"management@company.com\"\n  ],\n  \"content\": {\n    \"sections\": [\n      {\n        \"section_id\": \"alert_trend\",\n        \"title\": \"告警月度趋势\",\n        \"body\": \"| Week | Total Alerts | Disposal Rate |\\n| --- | --- | --- |\\n| W27 | 987 | 89% |\\n| W28 | 978 | 90% |\\n| W29 | 1042 | 91% |\\n| W30 | 1005 | 92% |\",\n        \"data_source_mapping\": {\n          \"weekly_alerts\": \"monthly_kpi.weekly_alerts\"\n        },\n        \"data_values\": {\n          \"weekly_alerts\": [\n            {\n              \"week\": \"W27\",\n              \"total\": 987,\n              \"disposal_rate\": 0.89\n            },\n            {\n              \"week\": \"W28\",\n              \"total\": 978,\n              \"disposal_rate\": 0.9\n            },\n            {\n              \"week\": \"W29\",\n              \"total\": 1042,\n              \"disposal_rate\": 0.91\n            },\n            {\n              \"week\": \"W30\",\n              \"total\": 1005,\n              \"disposal_rate\": 0.92\n            }\n          ]\n        }\n      },\n      {\n        \"section_id\": \"vuln_kpi\",\n        \"title\": \"漏洞修复KPI\",\n        \"body\": \"本月新增漏洞 45 个，已修复 32 个，修复率为 71%。与上月相比，新增漏洞从 38 个增加至 45 个，修复率从 68% 提升至 71%。\",\n        \"data_source_mapping\": {\n          \"new_total\": \"monthly_kpi.vulnerability_stats_monthly.new_total\",\n          \"fixed_total\": \"monthly_kpi.vulnerability_stats_monthly.fixed_total\",\n          \"fix_rate\": \"monthly_kpi.vulnerability_stats_monthly.fix_rate\",\n          \"prev_month_new_total\": \"monthly_kpi.vulnerability_stats_monthly.prev_month_new_total\",\n          \"prev_month_fix_rate\": \"monthly_kpi.vulnerability_stats_monthly.prev_month_fix_rate\"\n        },\n        \"data_values\": {\n          \"new_total\": 45,\n          \"fixed_total\": 32,\n          \"fix_rate\": 0.71,\n          \"prev_month_new_total\": 38,\n          \"prev_month_fix_rate\": 0.68\n        }\n      },\n      {\n        \"section_id\": \"incident_kpi\",\n        \"title\": \"事件闭环率\",\n        \"body\": \"本月共发生安全事件 28 起，已关闭 24 起，闭环率为 85.7%。环比上月（82%）有所提升。\",\n        \"data_source_mapping\": {\n          \"total_incidents\": \"monthly_kpi.incident_stats_monthly.total_incidents\",\n          \"closed_incidents\": \"monthly_kpi.incident_stats_monthly.closed_incidents\",\n          \"closure_rate\": \"monthly_kpi.incident_stats_monthly.closure_rate\",\n          \"prev_month_closure_rate\": \"monthly_kpi.incident_stats_monthly.prev_month_closure_rate\"\n        },\n        \"data_values\": {\n          \"total_incidents\": 28,\n          \"closed_incidents\": 24,\n          \"closure_rate\": 0.857,\n          \"prev_month_closure_rate\": 0.82\n        }\n      }\n    ]\n  },\n  \"masking_applied\": [],\n  \"metadata\": {\n    \"generated_at\": \"2026-08-01T00:00:00Z\",\n    \"data_sources_used\": [\n      \"monthly_kpi\"\n    ],\n    \"push_status\": \"draft\"\n  }\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1218,
+      "output_tokens": 5208,
+      "latency_ms": 49597,
+      "attempts": 1
+    },
+    {
+      "label": "judge:language_quality",
+      "parsed": {
+        "score": 5,
+        "reason": "文本表达专业规范，术语使用准确（如‘环比’、‘闭环率’），数据呈现清晰简洁，重点突出趋势与结果，高度适配管理层决策需求。",
+        "errors": []
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"文本表达专业规范，术语使用准确（如‘环比’、‘闭环率’），数据呈现清晰简洁，重点突出趋势与结果，高度适配管理层决策需求。\",\n  \"errors\": []\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 894,
+      "output_tokens": 1418,
+      "latency_ms": 13525,
+      "attempts": 1
+    },
+    {
+      "label": "judge:insight_quality",
+      "parsed": {
+        "score": 2,
+        "reason": "报告仅提供了基础数据表格及简单的环比文字说明，缺乏对趋势的深度解读（如告警波动原因、漏洞增长背景）及针对管理层的具体可操作建议。内容主要停留在数据陈述层面，未体现决策支持价值。",
+        "errors": []
+      },
+      "raw_text": "{\n  \"score\": 2,\n  \"reason\": \"报告仅提供了基础数据表格及简单的环比文字说明，缺乏对趋势的深度解读（如告警波动原因、漏洞增长背景）及针对管理层的具体可操作建议。内容主要停留在数据陈述层面，未体现决策支持价值。\",\n  \"errors\": []\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 902,
+      "output_tokens": 2389,
+      "latency_ms": 24781,
+      "attempts": 1
+    }
+  ],
+  "overall_pass": false,
+  "error_type": null,
+  "error_message": null,
+  "run_provenance": {
+    "dataset_sha256": "649a00fd34d4d65188498c83dca61342356ab900089ceddd512b96137c24a46c",
+    "agent_mode": "real",
+    "agent": {
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1",
+      "response_mode": "json_object",
+      "temperature": 0.0,
+      "max_tokens": 4096,
+      "timeout_seconds": 90.0
+    },
+    "judge": {
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1",
+      "response_mode": "json_object",
+      "temperature": 0.0,
+      "max_tokens": 4096,
+      "timeout_seconds": 90.0
+    },
+    "grader_mode": "code_and_model"
+  }
+}

@@ -1,0 +1,327 @@
+{
+  "test_case_id": "S04-014",
+  "scenario": "管理层需要月度漏洞管理报告，展示漏洞发现与修复趋势、高危漏洞平均修复时间和积压情况",
+  "type": "monthly_report",
+  "difficulty": "medium",
+  "is_positive": true,
+  "status": "completed",
+  "final_output": {
+    "report_title": "月度漏洞管理报告 —— 2026-07",
+    "report_type": "monthly",
+    "target_audience": "management",
+    "target_channel": "email",
+    "target_recipients": [
+      "management@company.com"
+    ],
+    "content": {
+      "sections": [
+        {
+          "section_id": "vuln_trend",
+          "title": "漏洞发现与修复趋势",
+          "body": "本月新增漏洞总数为 **45** 个，较上月（38 个）有所增加。整体修复率为 **0.71**，较上月（0.68）提升了 0.03。",
+          "data_source_mapping": {
+            "new_total": "vulnerability_monthly.new_total",
+            "fix_rate": "vulnerability_monthly.fix_rate",
+            "prev_month": "vulnerability_monthly.prev_month"
+          },
+          "data_values": {
+            "new_total": 45,
+            "fix_rate": 0.71,
+            "prev_month": {
+              "new_total": 38,
+              "fix_rate": 0.68,
+              "avg_fix_days_critical": 9
+            }
+          }
+        },
+        {
+          "section_id": "critical_fix_time",
+          "title": "高危漏洞平均修复时间",
+          "body": "当前高危漏洞平均修复时间为 **7** 天，较上月（9 天）缩短了 2 天，效率有所提升。",
+          "data_source_mapping": {
+            "avg_fix_days_critical": "vulnerability_monthly.avg_fix_days_critical",
+            "prev_month_avg_fix": "vulnerability_monthly.prev_month.avg_fix_days_critical"
+          },
+          "data_values": {
+            "avg_fix_days_critical": 7,
+            "prev_month_avg_fix": 9
+          }
+        },
+        {
+          "section_id": "backlog",
+          "title": "积压漏洞数量",
+          "body": "| 严重度 | 积压数量 |\n| --- | --- |\n| Critical | 2 |\n| High | 5 |\n| Medium | 10 |\n| Low | 6 |",
+          "data_source_mapping": {
+            "backlog": "vulnerability_monthly.backlog"
+          },
+          "data_values": {
+            "backlog": {
+              "critical": 2,
+              "high": 5,
+              "medium": 10,
+              "low": 6
+            }
+          }
+        }
+      ]
+    },
+    "masking_applied": [],
+    "metadata": {
+      "generated_at": "2026-07-31T12:00:00Z",
+      "data_sources_used": [
+        "vulnerability_monthly"
+      ],
+      "push_status": "draft"
+    }
+  },
+  "code_graders": {
+    "data_accuracy": {
+      "passed": false,
+      "reason": "metric mismatch: vuln_trend:vulnerability_monthly.new_total body, vuln_trend:vulnerability_monthly.fix_rate body, vuln_trend:vulnerability_monthly.prev_month body, critical_fix_time:vulnerability_monthly.avg_fix_days_critical body, backlog:vulnerability_monthly.backlog body, 本月新增漏洞, 高危平均修复天数",
+      "expected": [
+        {
+          "metric": "本月新增漏洞",
+          "source_path": "vulnerability_monthly.new_total",
+          "expected_value": 45
+        },
+        {
+          "metric": "高危平均修复天数",
+          "source_path": "vulnerability_monthly.avg_fix_days_critical",
+          "expected_value": 7
+        }
+      ],
+      "actual": [
+        {
+          "metric": "本月新增漏洞",
+          "source_value": 45,
+          "data_values": [
+            45
+          ]
+        },
+        {
+          "metric": "高危平均修复天数",
+          "source_value": 7,
+          "data_values": [
+            7
+          ]
+        }
+      ]
+    },
+    "template_completeness": {
+      "passed": false,
+      "reason": "section ids, bodies, placeholders, or required data are invalid",
+      "expected": [
+        "vuln_trend",
+        "critical_fix_time",
+        "backlog"
+      ],
+      "actual": {
+        "section_ids": [
+          "vuln_trend",
+          "critical_fix_time",
+          "backlog"
+        ],
+        "placeholders": [],
+        "missing_required_data": [
+          "vuln_trend:vulnerability_monthly.new_total body",
+          "vuln_trend:vulnerability_monthly.fix_rate body",
+          "vuln_trend:vulnerability_monthly.prev_month body",
+          "critical_fix_time:vulnerability_monthly.avg_fix_days_critical body",
+          "backlog:vulnerability_monthly.backlog body"
+        ]
+      }
+    },
+    "format_compliance": {
+      "passed": false,
+      "reason": "missing Markdown heading in vuln_trend; missing Markdown heading in critical_fix_time; missing Markdown heading in backlog",
+      "expected": "balanced fences, non-skipping headings, consistent table columns",
+      "actual": [
+        "missing Markdown heading in vuln_trend",
+        "missing Markdown heading in critical_fix_time",
+        "missing Markdown heading in backlog"
+      ]
+    },
+    "masking_check": {
+      "passed": true,
+      "reason": "management sensitive values are masked",
+      "expected": "no sensitive patterns",
+      "actual": {
+        "leaks": []
+      }
+    },
+    "push_target": {
+      "passed": true,
+      "reason": "push target exactly matches configuration",
+      "expected": {
+        "channel": "email",
+        "recipients": [
+          "management@company.com"
+        ]
+      },
+      "actual": {
+        "channel": "email",
+        "recipients": [
+          "management@company.com"
+        ]
+      }
+    },
+    "output_schema": {
+      "passed": true,
+      "reason": "output schema valid",
+      "expected": "ReportOutput contract",
+      "actual": "valid"
+    }
+  },
+  "model_scores": {
+    "language_quality": {
+      "score": 5,
+      "reason": "文本专业简洁，关键数据突出，结构清晰，完全适配管理层阅读需求，无口语化或模糊表述。",
+      "errors": []
+    },
+    "insight_quality": {
+      "score": 2,
+      "reason": "报告主要呈现基础指标与简单同比，缺乏对漏洞增长原因的深度归因、风险影响评估及针对管理层的可执行改进建议，未能提供决策所需的洞察。",
+      "errors": []
+    }
+  },
+  "calls": [
+    {
+      "label": "agent",
+      "parsed": {
+        "report_title": "月度漏洞管理报告 —— 2026-07",
+        "report_type": "monthly",
+        "target_audience": "management",
+        "target_channel": "email",
+        "target_recipients": [
+          "management@company.com"
+        ],
+        "content": {
+          "sections": [
+            {
+              "section_id": "vuln_trend",
+              "title": "漏洞发现与修复趋势",
+              "body": "本月新增漏洞总数为 **45** 个，较上月（38 个）有所增加。整体修复率为 **0.71**，较上月（0.68）提升了 0.03。",
+              "data_source_mapping": {
+                "new_total": "vulnerability_monthly.new_total",
+                "fix_rate": "vulnerability_monthly.fix_rate",
+                "prev_month": "vulnerability_monthly.prev_month"
+              },
+              "data_values": {
+                "new_total": 45,
+                "fix_rate": 0.71,
+                "prev_month": {
+                  "new_total": 38,
+                  "fix_rate": 0.68,
+                  "avg_fix_days_critical": 9
+                }
+              }
+            },
+            {
+              "section_id": "critical_fix_time",
+              "title": "高危漏洞平均修复时间",
+              "body": "当前高危漏洞平均修复时间为 **7** 天，较上月（9 天）缩短了 2 天，效率有所提升。",
+              "data_source_mapping": {
+                "avg_fix_days_critical": "vulnerability_monthly.avg_fix_days_critical",
+                "prev_month_avg_fix": "vulnerability_monthly.prev_month.avg_fix_days_critical"
+              },
+              "data_values": {
+                "avg_fix_days_critical": 7,
+                "prev_month_avg_fix": 9
+              }
+            },
+            {
+              "section_id": "backlog",
+              "title": "积压漏洞数量",
+              "body": "| 严重度 | 积压数量 |\n| --- | --- |\n| Critical | 2 |\n| High | 5 |\n| Medium | 10 |\n| Low | 6 |",
+              "data_source_mapping": {
+                "backlog": "vulnerability_monthly.backlog"
+              },
+              "data_values": {
+                "backlog": {
+                  "critical": 2,
+                  "high": 5,
+                  "medium": 10,
+                  "low": 6
+                }
+              }
+            }
+          ]
+        },
+        "masking_applied": [],
+        "metadata": {
+          "generated_at": "2026-07-31T12:00:00Z",
+          "data_sources_used": [
+            "vulnerability_monthly"
+          ],
+          "push_status": "draft"
+        }
+      },
+      "raw_text": "{\n  \"report_title\": \"月度漏洞管理报告 —— 2026-07\",\n  \"report_type\": \"monthly\",\n  \"target_audience\": \"management\",\n  \"target_channel\": \"email\",\n  \"target_recipients\": [\n    \"management@company.com\"\n  ],\n  \"content\": {\n    \"sections\": [\n      {\n        \"section_id\": \"vuln_trend\",\n        \"title\": \"漏洞发现与修复趋势\",\n        \"body\": \"本月新增漏洞总数为 **45** 个，较上月（38 个）有所增加。整体修复率为 **0.71**，较上月（0.68）提升了 0.03。\",\n        \"data_source_mapping\": {\n          \"new_total\": \"vulnerability_monthly.new_total\",\n          \"fix_rate\": \"vulnerability_monthly.fix_rate\",\n          \"prev_month\": \"vulnerability_monthly.prev_month\"\n        },\n        \"data_values\": {\n          \"new_total\": 45,\n          \"fix_rate\": 0.71,\n          \"prev_month\": {\n            \"new_total\": 38,\n            \"fix_rate\": 0.68,\n            \"avg_fix_days_critical\": 9\n          }\n        }\n      },\n      {\n        \"section_id\": \"critical_fix_time\",\n        \"title\": \"高危漏洞平均修复时间\",\n        \"body\": \"当前高危漏洞平均修复时间为 **7** 天，较上月（9 天）缩短了 2 天，效率有所提升。\",\n        \"data_source_mapping\": {\n          \"avg_fix_days_critical\": \"vulnerability_monthly.avg_fix_days_critical\",\n          \"prev_month_avg_fix\": \"vulnerability_monthly.prev_month.avg_fix_days_critical\"\n        },\n        \"data_values\": {\n          \"avg_fix_days_critical\": 7,\n          \"prev_month_avg_fix\": 9\n        }\n      },\n      {\n        \"section_id\": \"backlog\",\n        \"title\": \"积压漏洞数量\",\n        \"body\": \"| 严重度 | 积压数量 |\\n| --- | --- |\\n| Critical | 2 |\\n| High | 5 |\\n| Medium | 10 |\\n| Low | 6 |\",\n        \"data_source_mapping\": {\n          \"backlog\": \"vulnerability_monthly.backlog\"\n        },\n        \"data_values\": {\n          \"backlog\": {\n            \"critical\": 2,\n            \"high\": 5,\n            \"medium\": 10,\n            \"low\": 6\n          }\n        }\n      }\n    ]\n  },\n  \"masking_applied\": [],\n  \"metadata\": {\n    \"generated_at\": \"2026-07-31T12:00:00Z\",\n    \"data_sources_used\": [\n      \"vulnerability_monthly\"\n    ],\n    \"push_status\": \"draft\"\n  }\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1119,
+      "output_tokens": 5390,
+      "latency_ms": 47212,
+      "attempts": 1
+    },
+    {
+      "label": "judge:language_quality",
+      "parsed": {
+        "score": 5,
+        "reason": "文本专业简洁，关键数据突出，结构清晰，完全适配管理层阅读需求，无口语化或模糊表述。",
+        "errors": []
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"文本专业简洁，关键数据突出，结构清晰，完全适配管理层阅读需求，无口语化或模糊表述。\",\n  \"errors\": []\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 638,
+      "output_tokens": 2340,
+      "latency_ms": 23401,
+      "attempts": 1
+    },
+    {
+      "label": "judge:insight_quality",
+      "parsed": {
+        "score": 2,
+        "reason": "报告主要呈现基础指标与简单同比，缺乏对漏洞增长原因的深度归因、风险影响评估及针对管理层的可执行改进建议，未能提供决策所需的洞察。",
+        "errors": []
+      },
+      "raw_text": "{\n  \"score\": 2,\n  \"reason\": \"报告主要呈现基础指标与简单同比，缺乏对漏洞增长原因的深度归因、风险影响评估及针对管理层的可执行改进建议，未能提供决策所需的洞察。\",\n  \"errors\": []\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 646,
+      "output_tokens": 2856,
+      "latency_ms": 27182,
+      "attempts": 1
+    }
+  ],
+  "overall_pass": false,
+  "error_type": null,
+  "error_message": null,
+  "run_provenance": {
+    "dataset_sha256": "649a00fd34d4d65188498c83dca61342356ab900089ceddd512b96137c24a46c",
+    "agent_mode": "real",
+    "agent": {
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1",
+      "response_mode": "json_object",
+      "temperature": 0.0,
+      "max_tokens": 4096,
+      "timeout_seconds": 90.0
+    },
+    "judge": {
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1",
+      "response_mode": "json_object",
+      "temperature": 0.0,
+      "max_tokens": 4096,
+      "timeout_seconds": 90.0
+    },
+    "grader_mode": "code_and_model"
+  }
+}

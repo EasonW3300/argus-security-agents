@@ -1,0 +1,342 @@
+{
+  "test_case_id": "S04-011",
+  "scenario": "基于S04-008相同数据生成管理层脱敏版威胁情报周报，脱敏具体IOC和APT攻击手法",
+  "type": "weekly_report",
+  "difficulty": "hard",
+  "is_positive": true,
+  "status": "completed",
+  "final_output": {
+    "report_title": "威胁情报周报（管理层版） —— 2026-W29",
+    "report_type": "weekly",
+    "target_audience": "management",
+    "target_channel": "email",
+    "target_recipients": [
+      "management@company.com"
+    ],
+    "content": {
+      "sections": [
+        {
+          "section_id": "threat_trend",
+          "title": "威胁趋势概览",
+          "body": "本周共发现新威胁情报指标 88 个，其中 IP 45 个、域名 23 个、URL 12 个、Hash 8 个；触发 IOC 命中告警 7 次。",
+          "data_source_mapping": {
+            "new_iocs_breakdown": "threat_intel_summary.new_iocs",
+            "ioc_alerts_count": "threat_intel_summary.iocs_hit_alerts"
+          },
+          "data_values": {
+            "new_iocs_breakdown": {
+              "ip": 45,
+              "domain": 23,
+              "url": 12,
+              "hash": 8
+            },
+            "ioc_alerts_count": 7
+          }
+        },
+        {
+          "section_id": "apt_summary",
+          "title": "活跃攻击组织",
+          "body": "- **APT28**：针对政府/军工行业。近期活动包括利用漏洞针对国防机构发起针对性钓鱼攻击，投放自定义恶意软件。\n- **APT41**：针对金融/科技行业。近期活动包括对多个金融机构的 VPN 设备进行暴力破解并部署 Webshell，C2 域名包括某C2域名和某C2域名。",
+          "data_source_mapping": {
+            "apt_groups_raw": "threat_intel_summary.active_apt_groups"
+          },
+          "data_values": {
+            "apt_groups_raw": [
+              {
+                "name": "APT28",
+                "targeting_sector": "政府/军工",
+                "recent_activity": "利用 CVE-2026-12345 漏洞针对国防机构发起鱼叉式钓鱼攻击，投放自定义恶意软件 X-Agent"
+              },
+              {
+                "name": "APT41",
+                "targeting_sector": "金融/科技",
+                "recent_activity": "对多个金融机构的 VPN 设备进行暴力破解并部署 Webshell，C2 域名包括 evil-c2.xyz 和 update.defender.cc"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "masking_applied": [
+      {
+        "original": "X-Agent",
+        "masked": "恶意软件",
+        "rule": "strip_malware_name"
+      },
+      {
+        "original": "鱼叉式钓鱼攻击",
+        "masked": "针对性钓鱼攻击",
+        "rule": "strip_attack_technique"
+      },
+      {
+        "original": "evil-c2.xyz",
+        "masked": "某C2域名",
+        "rule": "strip_ioc_value"
+      },
+      {
+        "original": "update.defender.cc",
+        "masked": "某C2域名",
+        "rule": "strip_ioc_value"
+      }
+    ],
+    "metadata": {
+      "generated_at": "2026-07-20T12:00:00Z",
+      "data_sources_used": [
+        "threat_intel_summary"
+      ],
+      "push_status": "draft"
+    }
+  },
+  "code_graders": {
+    "data_accuracy": {
+      "passed": false,
+      "reason": "metric mismatch: threat_trend:threat_intel_summary.new_iocs body, threat_trend:threat_intel_summary.iocs_hit_alerts body, apt_summary:threat_intel_summary.active_apt_groups, 新增IP型IOC, unbound body declaration - **APT28**：针对政府/军工行业。近期活动包括利用漏洞针对国防机构发起针对性钓鱼攻击，投放自定义恶意软件。, unbound body declaration - **APT41**：针对金融/科技行业。近期活动包括对多个金融机构的 VPN 设备进行暴力破解并部署 Webshell，C2 域名包括某C2域名和某C2域名。",
+      "expected": [
+        {
+          "metric": "新增IP型IOC",
+          "source_path": "threat_intel_summary.new_iocs.ip",
+          "expected_value": 45
+        }
+      ],
+      "actual": [
+        {
+          "metric": "新增IP型IOC",
+          "source_value": 45,
+          "data_values": []
+        }
+      ]
+    },
+    "template_completeness": {
+      "passed": false,
+      "reason": "section ids, bodies, placeholders, or required data are invalid",
+      "expected": [
+        "threat_trend",
+        "apt_summary"
+      ],
+      "actual": {
+        "section_ids": [
+          "threat_trend",
+          "apt_summary"
+        ],
+        "placeholders": [],
+        "missing_required_data": [
+          "threat_trend:threat_intel_summary.new_iocs body",
+          "threat_trend:threat_intel_summary.iocs_hit_alerts body",
+          "apt_summary:threat_intel_summary.active_apt_groups"
+        ]
+      }
+    },
+    "format_compliance": {
+      "passed": false,
+      "reason": "missing Markdown heading in threat_trend; missing Markdown heading in apt_summary",
+      "expected": "balanced fences, non-skipping headings, consistent table columns",
+      "actual": [
+        "missing Markdown heading in threat_trend",
+        "missing Markdown heading in apt_summary"
+      ]
+    },
+    "masking_check": {
+      "passed": true,
+      "reason": "management sensitive values are masked",
+      "expected": "no sensitive patterns",
+      "actual": {
+        "leaks": []
+      }
+    },
+    "push_target": {
+      "passed": true,
+      "reason": "push target exactly matches configuration",
+      "expected": {
+        "channel": "email",
+        "recipients": [
+          "management@company.com"
+        ]
+      },
+      "actual": {
+        "channel": "email",
+        "recipients": [
+          "management@company.com"
+        ]
+      }
+    },
+    "output_schema": {
+      "passed": true,
+      "reason": "output schema valid",
+      "expected": "ReportOutput contract",
+      "actual": "valid"
+    }
+  },
+  "model_scores": {
+    "language_quality": {
+      "score": 5,
+      "reason": "内容结构清晰，语言风格正式专业，精准适配管理层受众。关键威胁指标与组织活动描述简明扼要，敏感数据（如 C2 域名、样本名）已合规脱敏，兼顾了信息安全与情报传达的有效性。",
+      "errors": []
+    },
+    "insight_quality": {
+      "score": 1,
+      "reason": "报告内容仅包含原始数据统计（IOC 数量）和外部威胁活动的客观描述，缺乏对数据的解读、与公司业务的关联性分析、趋势判断及可操作的管理建议，完全符合'纯数据搬运'的定义。",
+      "errors": [
+        "缺少周环比或月同比的趋势分析",
+        "未评估威胁对公司特定行业/资产的影响",
+        "缺失针对管理层的后续行动建议"
+      ]
+    }
+  },
+  "calls": [
+    {
+      "label": "agent",
+      "parsed": {
+        "report_title": "威胁情报周报（管理层版） —— 2026-W29",
+        "report_type": "weekly",
+        "target_audience": "management",
+        "target_channel": "email",
+        "target_recipients": [
+          "management@company.com"
+        ],
+        "content": {
+          "sections": [
+            {
+              "section_id": "threat_trend",
+              "title": "威胁趋势概览",
+              "body": "本周共发现新威胁情报指标 88 个，其中 IP 45 个、域名 23 个、URL 12 个、Hash 8 个；触发 IOC 命中告警 7 次。",
+              "data_source_mapping": {
+                "new_iocs_breakdown": "threat_intel_summary.new_iocs",
+                "ioc_alerts_count": "threat_intel_summary.iocs_hit_alerts"
+              },
+              "data_values": {
+                "new_iocs_breakdown": {
+                  "ip": 45,
+                  "domain": 23,
+                  "url": 12,
+                  "hash": 8
+                },
+                "ioc_alerts_count": 7
+              }
+            },
+            {
+              "section_id": "apt_summary",
+              "title": "活跃攻击组织",
+              "body": "- **APT28**：针对政府/军工行业。近期活动包括利用漏洞针对国防机构发起针对性钓鱼攻击，投放自定义恶意软件。\n- **APT41**：针对金融/科技行业。近期活动包括对多个金融机构的 VPN 设备进行暴力破解并部署 Webshell，C2 域名包括某C2域名和某C2域名。",
+              "data_source_mapping": {
+                "apt_groups_raw": "threat_intel_summary.active_apt_groups"
+              },
+              "data_values": {
+                "apt_groups_raw": [
+                  {
+                    "name": "APT28",
+                    "targeting_sector": "政府/军工",
+                    "recent_activity": "利用 CVE-2026-12345 漏洞针对国防机构发起鱼叉式钓鱼攻击，投放自定义恶意软件 X-Agent"
+                  },
+                  {
+                    "name": "APT41",
+                    "targeting_sector": "金融/科技",
+                    "recent_activity": "对多个金融机构的 VPN 设备进行暴力破解并部署 Webshell，C2 域名包括 evil-c2.xyz 和 update.defender.cc"
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "masking_applied": [
+          {
+            "original": "X-Agent",
+            "masked": "恶意软件",
+            "rule": "strip_malware_name"
+          },
+          {
+            "original": "鱼叉式钓鱼攻击",
+            "masked": "针对性钓鱼攻击",
+            "rule": "strip_attack_technique"
+          },
+          {
+            "original": "evil-c2.xyz",
+            "masked": "某C2域名",
+            "rule": "strip_ioc_value"
+          },
+          {
+            "original": "update.defender.cc",
+            "masked": "某C2域名",
+            "rule": "strip_ioc_value"
+          }
+        ],
+        "metadata": {
+          "generated_at": "2026-07-20T12:00:00Z",
+          "data_sources_used": [
+            "threat_intel_summary"
+          ],
+          "push_status": "draft"
+        }
+      },
+      "raw_text": "{\n  \"report_title\": \"威胁情报周报（管理层版） —— 2026-W29\",\n  \"report_type\": \"weekly\",\n  \"target_audience\": \"management\",\n  \"target_channel\": \"email\",\n  \"target_recipients\": [\n    \"management@company.com\"\n  ],\n  \"content\": {\n    \"sections\": [\n      {\n        \"section_id\": \"threat_trend\",\n        \"title\": \"威胁趋势概览\",\n        \"body\": \"本周共发现新威胁情报指标 88 个，其中 IP 45 个、域名 23 个、URL 12 个、Hash 8 个；触发 IOC 命中告警 7 次。\",\n        \"data_source_mapping\": {\n          \"new_iocs_breakdown\": \"threat_intel_summary.new_iocs\",\n          \"ioc_alerts_count\": \"threat_intel_summary.iocs_hit_alerts\"\n        },\n        \"data_values\": {\n          \"new_iocs_breakdown\": {\n            \"ip\": 45,\n            \"domain\": 23,\n            \"url\": 12,\n            \"hash\": 8\n          },\n          \"ioc_alerts_count\": 7\n        }\n      },\n      {\n        \"section_id\": \"apt_summary\",\n        \"title\": \"活跃攻击组织\",\n        \"body\": \"- **APT28**：针对政府/军工行业。近期活动包括利用漏洞针对国防机构发起针对性钓鱼攻击，投放自定义恶意软件。\\n- **APT41**：针对金融/科技行业。近期活动包括对多个金融机构的 VPN 设备进行暴力破解并部署 Webshell，C2 域名包括某C2域名和某C2域名。\",\n        \"data_source_mapping\": {\n          \"apt_groups_raw\": \"threat_intel_summary.active_apt_groups\"\n        },\n        \"data_values\": {\n          \"apt_groups_raw\": [\n            {\n              \"name\": \"APT28\",\n              \"targeting_sector\": \"政府/军工\",\n              \"recent_activity\": \"利用 CVE-2026-12345 漏洞针对国防机构发起鱼叉式钓鱼攻击，投放自定义恶意软件 X-Agent\"\n            },\n            {\n              \"name\": \"APT41\",\n              \"targeting_sector\": \"金融/科技\",\n              \"recent_activity\": \"对多个金融机构的 VPN 设备进行暴力破解并部署 Webshell，C2 域名包括 evil-c2.xyz 和 update.defender.cc\"\n            }\n          ]\n        }\n      }\n    ]\n  },\n  \"masking_applied\": [\n    {\n      \"original\": \"X-Agent\",\n      \"masked\": \"恶意软件\",\n      \"rule\": \"strip_malware_name\"\n    },\n    {\n      \"original\": \"鱼叉式钓鱼攻击\",\n      \"masked\": \"针对性钓鱼攻击\",\n      \"rule\": \"strip_attack_technique\"\n    },\n    {\n      \"original\": \"evil-c2.xyz\",\n      \"masked\": \"某C2域名\",\n      \"rule\": \"strip_ioc_value\"\n    },\n    {\n      \"original\": \"update.defender.cc\",\n      \"masked\": \"某C2域名\",\n      \"rule\": \"strip_ioc_value\"\n    }\n  ],\n  \"metadata\": {\n    \"generated_at\": \"2026-07-20T12:00:00Z\",\n    \"data_sources_used\": [\n      \"threat_intel_summary\"\n    ],\n    \"push_status\": \"draft\"\n  }\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1334,
+      "output_tokens": 6048,
+      "latency_ms": 58147,
+      "attempts": 1
+    },
+    {
+      "label": "judge:language_quality",
+      "parsed": {
+        "score": 5,
+        "reason": "内容结构清晰，语言风格正式专业，精准适配管理层受众。关键威胁指标与组织活动描述简明扼要，敏感数据（如 C2 域名、样本名）已合规脱敏，兼顾了信息安全与情报传达的有效性。",
+        "errors": []
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"内容结构清晰，语言风格正式专业，精准适配管理层受众。关键威胁指标与组织活动描述简明扼要，敏感数据（如 C2 域名、样本名）已合规脱敏，兼顾了信息安全与情报传达的有效性。\",\n  \"errors\": []\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 738,
+      "output_tokens": 3353,
+      "latency_ms": 32044,
+      "attempts": 1
+    },
+    {
+      "label": "judge:insight_quality",
+      "parsed": {
+        "score": 1,
+        "reason": "报告内容仅包含原始数据统计（IOC 数量）和外部威胁活动的客观描述，缺乏对数据的解读、与公司业务的关联性分析、趋势判断及可操作的管理建议，完全符合'纯数据搬运'的定义。",
+        "errors": [
+          "缺少周环比或月同比的趋势分析",
+          "未评估威胁对公司特定行业/资产的影响",
+          "缺失针对管理层的后续行动建议"
+        ]
+      },
+      "raw_text": "{\n  \"score\": 1,\n  \"reason\": \"报告内容仅包含原始数据统计（IOC 数量）和外部威胁活动的客观描述，缺乏对数据的解读、与公司业务的关联性分析、趋势判断及可操作的管理建议，完全符合'纯数据搬运'的定义。\",\n  \"errors\": [\n    \"缺少周环比或月同比的趋势分析\",\n    \"未评估威胁对公司特定行业/资产的影响\",\n    \"缺失针对管理层的后续行动建议\"\n  ]\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 746,
+      "output_tokens": 1754,
+      "latency_ms": 15998,
+      "attempts": 1
+    }
+  ],
+  "overall_pass": false,
+  "error_type": null,
+  "error_message": null,
+  "run_provenance": {
+    "dataset_sha256": "649a00fd34d4d65188498c83dca61342356ab900089ceddd512b96137c24a46c",
+    "agent_mode": "real",
+    "agent": {
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1",
+      "response_mode": "json_object",
+      "temperature": 0.0,
+      "max_tokens": 4096,
+      "timeout_seconds": 90.0
+    },
+    "judge": {
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1",
+      "response_mode": "json_object",
+      "temperature": 0.0,
+      "max_tokens": 4096,
+      "timeout_seconds": 90.0
+    },
+    "grader_mode": "code_and_model"
+  }
+}

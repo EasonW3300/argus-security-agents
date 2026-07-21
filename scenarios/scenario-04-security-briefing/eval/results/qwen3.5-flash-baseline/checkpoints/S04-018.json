@@ -1,0 +1,398 @@
+{
+  "test_case_id": "S04-018",
+  "scenario": "安全负责人需要整改跟踪报告，展示所有等保/内部审计发现的问题及整改状态",
+  "type": "special_report",
+  "difficulty": "medium",
+  "is_positive": true,
+  "status": "completed",
+  "final_output": {
+    "report_title": "整改跟踪报告 —— 2026-07-16",
+    "report_type": "special",
+    "target_audience": "security_lead",
+    "target_channel": "email",
+    "target_recipients": [
+      "security-lead@company.com"
+    ],
+    "content": {
+      "sections": [
+        {
+          "section_id": "status_summary",
+          "title": "整改进度总览",
+          "body": "当前共有 4 个整改项：R-001(核心业务部，进行中，高)，R-002(研发中心，未启动，中)，R-003(财务部，延期，高)，R-004(运维部，已完成，中)。",
+          "data_source_mapping": {
+            "remediation_items": "mock_source_data.remediation_items"
+          },
+          "data_values": {
+            "remediation_items": [
+              {
+                "id": "R-001",
+                "description": "核心业务部服务器存在未修复高危漏洞 CVE-2026-19876",
+                "severity": "高",
+                "responsible_dept": "核心业务部",
+                "status": "进行中",
+                "due_date": "2026-07-20"
+              },
+              {
+                "id": "R-002",
+                "description": "研发中心代码仓库访问权限未定期复核",
+                "severity": "中",
+                "responsible_dept": "研发中心",
+                "status": "未启动",
+                "due_date": "2026-08-01"
+              },
+              {
+                "id": "R-003",
+                "description": "财务部终端防病毒软件安装率低于 90%",
+                "severity": "高",
+                "responsible_dept": "财务部",
+                "status": "延期",
+                "due_date": "2026-07-10"
+              },
+              {
+                "id": "R-004",
+                "description": "运维部堡垒机审计日志保留不足 1 年",
+                "severity": "中",
+                "responsible_dept": "运维部",
+                "status": "已完成",
+                "due_date": "2026-07-15"
+              }
+            ]
+          }
+        },
+        {
+          "section_id": "remediation_table",
+          "title": "整改项清单",
+          "body": "| ID | 描述 | 严重程度 | 责任部门 | 状态 | 计划日期 |\n| --- | --- | --- | --- | --- | --- |\n| R-001 | 核心业务部服务器存在未修复高危漏洞 CVE-2026-19876 | 高 | 核心业务部 | 进行中 | 2026-07-20 |\n| R-002 | 研发中心代码仓库访问权限未定期复核 | 中 | 研发中心 | 未启动 | 2026-08-01 |\n| R-003 | 财务部终端防病毒软件安装率低于 90% | 高 | 财务部 | 延期 | 2026-07-10 |\n| R-004 | 运维部堡垒机审计日志保留不足 1 年 | 中 | 运维部 | 已完成 | 2026-07-15 |",
+          "data_source_mapping": {
+            "remediation_items": "mock_source_data.remediation_items"
+          },
+          "data_values": {
+            "remediation_items": [
+              {
+                "id": "R-001",
+                "description": "核心业务部服务器存在未修复高危漏洞 CVE-2026-19876",
+                "severity": "高",
+                "responsible_dept": "核心业务部",
+                "status": "进行中",
+                "due_date": "2026-07-20"
+              },
+              {
+                "id": "R-002",
+                "description": "研发中心代码仓库访问权限未定期复核",
+                "severity": "中",
+                "responsible_dept": "研发中心",
+                "status": "未启动",
+                "due_date": "2026-08-01"
+              },
+              {
+                "id": "R-003",
+                "description": "财务部终端防病毒软件安装率低于 90%",
+                "severity": "高",
+                "responsible_dept": "财务部",
+                "status": "延期",
+                "due_date": "2026-07-10"
+              },
+              {
+                "id": "R-004",
+                "description": "运维部堡垒机审计日志保留不足 1 年",
+                "severity": "中",
+                "responsible_dept": "运维部",
+                "status": "已完成",
+                "due_date": "2026-07-15"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "masking_applied": [],
+    "metadata": {
+      "generated_at": "2026-07-16T09:00:00Z",
+      "data_sources_used": [
+        "mock_source_data"
+      ],
+      "push_status": "draft"
+    }
+  },
+  "code_graders": {
+    "data_accuracy": {
+      "passed": false,
+      "reason": "metric mismatch: status_summary:remediation_items, remediation_table:remediation_items, 整改项总数, unbound body declaration 当前共有 4 个整改项：R-001(核心业务部，进行中，高)，R-002(研发中心，未启动，中)，R-003(财务部，延期，高)，R-004(运维部，已完成，中)。",
+      "expected": [
+        {
+          "metric": "整改项总数",
+          "source_path": "remediation_items.length",
+          "expected_value": 4
+        }
+      ],
+      "actual": [
+        {
+          "metric": "整改项总数",
+          "source_value": 4,
+          "data_values": []
+        }
+      ]
+    },
+    "template_completeness": {
+      "passed": false,
+      "reason": "section ids, bodies, placeholders, or required data are invalid",
+      "expected": [
+        "status_summary",
+        "remediation_table"
+      ],
+      "actual": {
+        "section_ids": [
+          "status_summary",
+          "remediation_table"
+        ],
+        "placeholders": [],
+        "missing_required_data": [
+          "status_summary:remediation_items",
+          "remediation_table:remediation_items"
+        ]
+      }
+    },
+    "format_compliance": {
+      "passed": false,
+      "reason": "missing Markdown heading in status_summary; missing Markdown heading in remediation_table",
+      "expected": "balanced fences, non-skipping headings, consistent table columns",
+      "actual": [
+        "missing Markdown heading in status_summary",
+        "missing Markdown heading in remediation_table"
+      ]
+    },
+    "masking_check": {
+      "passed": true,
+      "reason": "security-lead technical values retained",
+      "expected": [
+        "CVE-2026-19876",
+        "未启动"
+      ],
+      "actual": {
+        "removed": []
+      }
+    },
+    "push_target": {
+      "passed": true,
+      "reason": "push target exactly matches configuration",
+      "expected": {
+        "channel": "email",
+        "recipients": [
+          "security-lead@company.com"
+        ]
+      },
+      "actual": {
+        "channel": "email",
+        "recipients": [
+          "security-lead@company.com"
+        ]
+      }
+    },
+    "output_schema": {
+      "passed": true,
+      "reason": "output schema valid",
+      "expected": "ReportOutput contract",
+      "actual": "valid"
+    }
+  },
+  "model_scores": {
+    "language_quality": {
+      "score": 5,
+      "reason": "语言专业规范，术语使用准确（如 CVE、堡垒机），结构清晰且逻辑严密，语气客观正式，完全符合安全负责人的阅读需求。",
+      "errors": []
+    },
+    "insight_quality": {
+      "score": 2,
+      "reason": "简报仅罗列整改状态数据，缺乏针对高风险及延期项的具体改进建议或行动指引，未体现对安全负责人的决策支持价值。",
+      "errors": [
+        "第一部分和第二部分包含重复数据",
+        "未针对延期项 R-003 提供具体改进行动建议",
+        "缺少高危项的风险影响分析"
+      ]
+    }
+  },
+  "calls": [
+    {
+      "label": "agent",
+      "parsed": {
+        "report_title": "整改跟踪报告 —— 2026-07-16",
+        "report_type": "special",
+        "target_audience": "security_lead",
+        "target_channel": "email",
+        "target_recipients": [
+          "security-lead@company.com"
+        ],
+        "content": {
+          "sections": [
+            {
+              "section_id": "status_summary",
+              "title": "整改进度总览",
+              "body": "当前共有 4 个整改项：R-001(核心业务部，进行中，高)，R-002(研发中心，未启动，中)，R-003(财务部，延期，高)，R-004(运维部，已完成，中)。",
+              "data_source_mapping": {
+                "remediation_items": "mock_source_data.remediation_items"
+              },
+              "data_values": {
+                "remediation_items": [
+                  {
+                    "id": "R-001",
+                    "description": "核心业务部服务器存在未修复高危漏洞 CVE-2026-19876",
+                    "severity": "高",
+                    "responsible_dept": "核心业务部",
+                    "status": "进行中",
+                    "due_date": "2026-07-20"
+                  },
+                  {
+                    "id": "R-002",
+                    "description": "研发中心代码仓库访问权限未定期复核",
+                    "severity": "中",
+                    "responsible_dept": "研发中心",
+                    "status": "未启动",
+                    "due_date": "2026-08-01"
+                  },
+                  {
+                    "id": "R-003",
+                    "description": "财务部终端防病毒软件安装率低于 90%",
+                    "severity": "高",
+                    "responsible_dept": "财务部",
+                    "status": "延期",
+                    "due_date": "2026-07-10"
+                  },
+                  {
+                    "id": "R-004",
+                    "description": "运维部堡垒机审计日志保留不足 1 年",
+                    "severity": "中",
+                    "responsible_dept": "运维部",
+                    "status": "已完成",
+                    "due_date": "2026-07-15"
+                  }
+                ]
+              }
+            },
+            {
+              "section_id": "remediation_table",
+              "title": "整改项清单",
+              "body": "| ID | 描述 | 严重程度 | 责任部门 | 状态 | 计划日期 |\n| --- | --- | --- | --- | --- | --- |\n| R-001 | 核心业务部服务器存在未修复高危漏洞 CVE-2026-19876 | 高 | 核心业务部 | 进行中 | 2026-07-20 |\n| R-002 | 研发中心代码仓库访问权限未定期复核 | 中 | 研发中心 | 未启动 | 2026-08-01 |\n| R-003 | 财务部终端防病毒软件安装率低于 90% | 高 | 财务部 | 延期 | 2026-07-10 |\n| R-004 | 运维部堡垒机审计日志保留不足 1 年 | 中 | 运维部 | 已完成 | 2026-07-15 |",
+              "data_source_mapping": {
+                "remediation_items": "mock_source_data.remediation_items"
+              },
+              "data_values": {
+                "remediation_items": [
+                  {
+                    "id": "R-001",
+                    "description": "核心业务部服务器存在未修复高危漏洞 CVE-2026-19876",
+                    "severity": "高",
+                    "responsible_dept": "核心业务部",
+                    "status": "进行中",
+                    "due_date": "2026-07-20"
+                  },
+                  {
+                    "id": "R-002",
+                    "description": "研发中心代码仓库访问权限未定期复核",
+                    "severity": "中",
+                    "responsible_dept": "研发中心",
+                    "status": "未启动",
+                    "due_date": "2026-08-01"
+                  },
+                  {
+                    "id": "R-003",
+                    "description": "财务部终端防病毒软件安装率低于 90%",
+                    "severity": "高",
+                    "responsible_dept": "财务部",
+                    "status": "延期",
+                    "due_date": "2026-07-10"
+                  },
+                  {
+                    "id": "R-004",
+                    "description": "运维部堡垒机审计日志保留不足 1 年",
+                    "severity": "中",
+                    "responsible_dept": "运维部",
+                    "status": "已完成",
+                    "due_date": "2026-07-15"
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "masking_applied": [],
+        "metadata": {
+          "generated_at": "2026-07-16T09:00:00Z",
+          "data_sources_used": [
+            "mock_source_data"
+          ],
+          "push_status": "draft"
+        }
+      },
+      "raw_text": "{\n  \"report_title\": \"整改跟踪报告 —— 2026-07-16\",\n  \"report_type\": \"special\",\n  \"target_audience\": \"security_lead\",\n  \"target_channel\": \"email\",\n  \"target_recipients\": [\n    \"security-lead@company.com\"\n  ],\n  \"content\": {\n    \"sections\": [\n      {\n        \"section_id\": \"status_summary\",\n        \"title\": \"整改进度总览\",\n        \"body\": \"当前共有 4 个整改项：R-001(核心业务部，进行中，高)，R-002(研发中心，未启动，中)，R-003(财务部，延期，高)，R-004(运维部，已完成，中)。\",\n        \"data_source_mapping\": {\n          \"remediation_items\": \"mock_source_data.remediation_items\"\n        },\n        \"data_values\": {\n          \"remediation_items\": [\n            {\n              \"id\": \"R-001\",\n              \"description\": \"核心业务部服务器存在未修复高危漏洞 CVE-2026-19876\",\n              \"severity\": \"高\",\n              \"responsible_dept\": \"核心业务部\",\n              \"status\": \"进行中\",\n              \"due_date\": \"2026-07-20\"\n            },\n            {\n              \"id\": \"R-002\",\n              \"description\": \"研发中心代码仓库访问权限未定期复核\",\n              \"severity\": \"中\",\n              \"responsible_dept\": \"研发中心\",\n              \"status\": \"未启动\",\n              \"due_date\": \"2026-08-01\"\n            },\n            {\n              \"id\": \"R-003\",\n              \"description\": \"财务部终端防病毒软件安装率低于 90%\",\n              \"severity\": \"高\",\n              \"responsible_dept\": \"财务部\",\n              \"status\": \"延期\",\n              \"due_date\": \"2026-07-10\"\n            },\n            {\n              \"id\": \"R-004\",\n              \"description\": \"运维部堡垒机审计日志保留不足 1 年\",\n              \"severity\": \"中\",\n              \"responsible_dept\": \"运维部\",\n              \"status\": \"已完成\",\n              \"due_date\": \"2026-07-15\"\n            }\n          ]\n        }\n      },\n      {\n        \"section_id\": \"remediation_table\",\n        \"title\": \"整改项清单\",\n        \"body\": \"| ID | 描述 | 严重程度 | 责任部门 | 状态 | 计划日期 |\\n| --- | --- | --- | --- | --- | --- |\\n| R-001 | 核心业务部服务器存在未修复高危漏洞 CVE-2026-19876 | 高 | 核心业务部 | 进行中 | 2026-07-20 |\\n| R-002 | 研发中心代码仓库访问权限未定期复核 | 中 | 研发中心 | 未启动 | 2026-08-01 |\\n| R-003 | 财务部终端防病毒软件安装率低于 90% | 高 | 财务部 | 延期 | 2026-07-10 |\\n| R-004 | 运维部堡垒机审计日志保留不足 1 年 | 中 | 运维部 | 已完成 | 2026-07-15 |\",\n        \"data_source_mapping\": {\n          \"remediation_items\": \"mock_source_data.remediation_items\"\n        },\n        \"data_values\": {\n          \"remediation_items\": [\n            {\n              \"id\": \"R-001\",\n              \"description\": \"核心业务部服务器存在未修复高危漏洞 CVE-2026-19876\",\n              \"severity\": \"高\",\n              \"responsible_dept\": \"核心业务部\",\n              \"status\": \"进行中\",\n              \"due_date\": \"2026-07-20\"\n            },\n            {\n              \"id\": \"R-002\",\n              \"description\": \"研发中心代码仓库访问权限未定期复核\",\n              \"severity\": \"中\",\n              \"responsible_dept\": \"研发中心\",\n              \"status\": \"未启动\",\n              \"due_date\": \"2026-08-01\"\n            },\n            {\n              \"id\": \"R-003\",\n              \"description\": \"财务部终端防病毒软件安装率低于 90%\",\n              \"severity\": \"高\",\n              \"responsible_dept\": \"财务部\",\n              \"status\": \"延期\",\n              \"due_date\": \"2026-07-10\"\n            },\n            {\n              \"id\": \"R-004\",\n              \"description\": \"运维部堡垒机审计日志保留不足 1 年\",\n              \"severity\": \"中\",\n              \"responsible_dept\": \"运维部\",\n              \"status\": \"已完成\",\n              \"due_date\": \"2026-07-15\"\n            }\n          ]\n        }\n      }\n    ]\n  },\n  \"masking_applied\": [],\n  \"metadata\": {\n    \"generated_at\": \"2026-07-16T09:00:00Z\",\n    \"data_sources_used\": [\n      \"mock_source_data\"\n    ],\n    \"push_status\": \"draft\"\n  }\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1143,
+      "output_tokens": 6966,
+      "latency_ms": 61726,
+      "attempts": 1
+    },
+    {
+      "label": "judge:language_quality",
+      "parsed": {
+        "score": 5,
+        "reason": "语言专业规范，术语使用准确（如 CVE、堡垒机），结构清晰且逻辑严密，语气客观正式，完全符合安全负责人的阅读需求。",
+        "errors": []
+      },
+      "raw_text": "{\n  \"score\": 5,\n  \"reason\": \"语言专业规范，术语使用准确（如 CVE、堡垒机），结构清晰且逻辑严密，语气客观正式，完全符合安全负责人的阅读需求。\",\n  \"errors\": []\n}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1118,
+      "output_tokens": 1858,
+      "latency_ms": 18180,
+      "attempts": 1
+    },
+    {
+      "label": "judge:insight_quality",
+      "parsed": {
+        "score": 2,
+        "reason": "简报仅罗列整改状态数据，缺乏针对高风险及延期项的具体改进建议或行动指引，未体现对安全负责人的决策支持价值。",
+        "errors": [
+          "第一部分和第二部分包含重复数据",
+          "未针对延期项 R-003 提供具体改进行动建议",
+          "缺少高危项的风险影响分析"
+        ]
+      },
+      "raw_text": "{\"score\": 2, \"reason\": \"简报仅罗列整改状态数据，缺乏针对高风险及延期项的具体改进建议或行动指引，未体现对安全负责人的决策支持价值。\", \"errors\": [\"第一部分和第二部分包含重复数据\", \"未针对延期项 R-003 提供具体改进行动建议\", \"缺少高危项的风险影响分析\"]}",
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "response_mode": "json_object",
+      "input_tokens": 1120,
+      "output_tokens": 2700,
+      "latency_ms": 24377,
+      "attempts": 1
+    }
+  ],
+  "overall_pass": false,
+  "error_type": null,
+  "error_message": null,
+  "run_provenance": {
+    "dataset_sha256": "649a00fd34d4d65188498c83dca61342356ab900089ceddd512b96137c24a46c",
+    "agent_mode": "real",
+    "agent": {
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1",
+      "response_mode": "json_object",
+      "temperature": 0.0,
+      "max_tokens": 4096,
+      "timeout_seconds": 90.0
+    },
+    "judge": {
+      "provider": "qwen",
+      "model": "qwen3.5-flash",
+      "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1",
+      "response_mode": "json_object",
+      "temperature": 0.0,
+      "max_tokens": 4096,
+      "timeout_seconds": 90.0
+    },
+    "grader_mode": "code_and_model"
+  }
+}
