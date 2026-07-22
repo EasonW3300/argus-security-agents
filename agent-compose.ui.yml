@@ -6,9 +6,8 @@ env_file:
 workspaces:
   argus-source:
     provider: git
-    url: ${GITHUB_REPOSITORY_URL}
-    ref: ${GITHUB_REPOSITORY_REF}
-    token: ${GITHUB_READ_TOKEN}
+    url: https://github.com/EasonW3300/argus-security-agents.git
+    ref: feature/scenario-o2-eval
 
 agents:
   alert-analysis-agent:

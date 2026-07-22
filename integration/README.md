@@ -45,16 +45,9 @@ DASHSCOPE_API_KEY=你的DashScope密钥
 `agent-compose.yml` 使用本地文件工作区，适合此前的 CLI 验证；Web UI 使用
 `agent-compose.ui.yml`，从 GitHub 拉取 `feature/scenario-o2-eval` 分支。
 
-在将本分支推送至 GitHub 后，编辑**本机**的 `integration/.env`：
-
-```dotenv
-GITHUB_REPOSITORY_URL=https://github.com/EasonW3300/argus-security-agents.git
-GITHUB_REPOSITORY_REF=feature/scenario-o2-eval
-GITHUB_READ_TOKEN=你的GitHub只读Fine-grained-token
-```
-
-Token 只授予此私有仓库的 `Contents: Read-only` 权限。不要将 Token 写进
-`.env.example`、YAML、README 或提交记录。
+仓库地址和 `feature/scenario-o2-eval` 分支已固定在 `agent-compose.ui.yml`。
+当前 GitHub 仓库为公开仓库，因此 Web UI 无需 GitHub Token；不要将任何 Token
+写进 `.env.example`、YAML、README 或提交记录。
 
 在运行 Web UI 的 `agent-compose` 工程目录中注册项目：
 
