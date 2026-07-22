@@ -13,7 +13,8 @@ htmlcov/
 /plan_file/
 /.superpowers/
 /docs/superpowers/
+/agent-compose-results/*
+!/agent-compose-results/.gitkeep
 
 # 运行时新生成的结果；正式基线放在 eval/results/ 下
 scenarios/**/eval/output/
-

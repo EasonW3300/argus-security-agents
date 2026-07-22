@@ -1,0 +1,178 @@
+name: argus-security-agents
+
+env_file:
+  - integration/.env
+
+workspaces:
+  argus-source:
+    provider: file
+    path: .
+
+agents:
+  alert-analysis-agent:
+    display_name: "场景一：安全告警分析"
+    description: 在隔离沙箱中运行场景一 Eval Harness 或离线测试。
+    provider: opencode
+    image: "local/argus-security-agents:latest"
+    build:
+      context: .
+      dockerfile: integration/Dockerfile
+      tags: ["local/argus-security-agents:latest"]
+    driver:
+      docker: {}
+    workspace:
+      name: argus-source
+    volumes:
+      - type: bind
+        source: ./agent-compose-results
+        target: /workspace/agent-compose-results
+        read_only: false
+    env:
+      AGENT_PROVIDER: ${AGENT_PROVIDER}
+      AGENT_MODEL: ${AGENT_MODEL}
+      AGENT_API_KEY:
+        value: ${AGENT_API_KEY}
+        secret: true
+      AGENT_BASE_URL: ${AGENT_BASE_URL}
+      AGENT_RESPONSE_MODE: ${AGENT_RESPONSE_MODE}
+      AGENT_REQUEST_TIMEOUT_SECONDS: ${AGENT_REQUEST_TIMEOUT_SECONDS}
+      DASHSCOPE_API_KEY:
+        value: ${DASHSCOPE_API_KEY}
+        secret: true
+      DEEPSEEK_API_KEY:
+        value: ${DEEPSEEK_API_KEY}
+        secret: true
+      OPENAI_API_KEY:
+        value: ${OPENAI_API_KEY}
+        secret: true
+      JUDGE_PROVIDER: ${JUDGE_PROVIDER}
+      JUDGE_MODEL: ${JUDGE_MODEL}
+      JUDGE_API_KEY:
+        value: ${JUDGE_API_KEY}
+        secret: true
+
+  document-rag-agent:
+    display_name: "场景二：安全文档 RAG"
+    description: 在隔离沙箱中运行场景二 Eval Harness、Mock Agent 或离线测试。
+    provider: opencode
+    image: "local/argus-security-agents:latest"
+    build:
+      context: .
+      dockerfile: integration/Dockerfile
+      tags: ["local/argus-security-agents:latest"]
+    driver:
+      docker: {}
+    workspace:
+      name: argus-source
+    volumes:
+      - type: bind
+        source: ./agent-compose-results
+        target: /workspace/agent-compose-results
+        read_only: false
+    env:
+      AGENT_PROVIDER: ${AGENT_PROVIDER}
+      AGENT_MODEL: ${AGENT_MODEL}
+      AGENT_API_KEY:
+        value: ${AGENT_API_KEY}
+        secret: true
+      AGENT_BASE_URL: ${AGENT_BASE_URL}
+      AGENT_RESPONSE_MODE: ${AGENT_RESPONSE_MODE}
+      AGENT_REQUEST_TIMEOUT_SECONDS: ${AGENT_REQUEST_TIMEOUT_SECONDS}
+      DASHSCOPE_API_KEY:
+        value: ${DASHSCOPE_API_KEY}
+        secret: true
+      DEEPSEEK_API_KEY:
+        value: ${DEEPSEEK_API_KEY}
+        secret: true
+      OPENAI_API_KEY:
+        value: ${OPENAI_API_KEY}
+        secret: true
+      JUDGE_PROVIDER: ${JUDGE_PROVIDER}
+      JUDGE_MODEL: ${JUDGE_MODEL}
+      JUDGE_API_KEY:
+        value: ${JUDGE_API_KEY}
+        secret: true
+
+  security-tool-agent:
+    display_name: "场景三：安全工具调用"
+    description: 在隔离沙箱中运行场景三工具调用 Agent 原型或 Eval Harness。
+    provider: opencode
+    image: "local/argus-security-agents:latest"
+    build:
+      context: .
+      dockerfile: integration/Dockerfile
+      tags: ["local/argus-security-agents:latest"]
+    driver:
+      docker: {}
+    workspace:
+      name: argus-source
+    volumes:
+      - type: bind
+        source: ./agent-compose-results
+        target: /workspace/agent-compose-results
+        read_only: false
+    env:
+      AGENT_PROVIDER: ${AGENT_PROVIDER}
+      AGENT_MODEL: ${AGENT_MODEL}
+      AGENT_API_KEY:
+        value: ${AGENT_API_KEY}
+        secret: true
+      AGENT_BASE_URL: ${AGENT_BASE_URL}
+      AGENT_RESPONSE_MODE: ${AGENT_RESPONSE_MODE}
+      AGENT_REQUEST_TIMEOUT_SECONDS: ${AGENT_REQUEST_TIMEOUT_SECONDS}
+      DASHSCOPE_API_KEY:
+        value: ${DASHSCOPE_API_KEY}
+        secret: true
+      DEEPSEEK_API_KEY:
+        value: ${DEEPSEEK_API_KEY}
+        secret: true
+      OPENAI_API_KEY:
+        value: ${OPENAI_API_KEY}
+        secret: true
+      JUDGE_PROVIDER: ${JUDGE_PROVIDER}
+      JUDGE_MODEL: ${JUDGE_MODEL}
+      JUDGE_API_KEY:
+        value: ${JUDGE_API_KEY}
+        secret: true
+
+  security-briefing-agent:
+    display_name: "场景四：安全简报生成与推送"
+    description: 在隔离沙箱中运行场景四简报 Agent 原型或 Eval Harness。
+    provider: opencode
+    image: "local/argus-security-agents:latest"
+    build:
+      context: .
+      dockerfile: integration/Dockerfile
+      tags: ["local/argus-security-agents:latest"]
+    driver:
+      docker: {}
+    workspace:
+      name: argus-source
+    volumes:
+      - type: bind
+        source: ./agent-compose-results
+        target: /workspace/agent-compose-results
+        read_only: false
+    env:
+      AGENT_PROVIDER: ${AGENT_PROVIDER}
+      AGENT_MODEL: ${AGENT_MODEL}
+      AGENT_API_KEY:
+        value: ${AGENT_API_KEY}
+        secret: true
+      AGENT_BASE_URL: ${AGENT_BASE_URL}
+      AGENT_RESPONSE_MODE: ${AGENT_RESPONSE_MODE}
+      AGENT_REQUEST_TIMEOUT_SECONDS: ${AGENT_REQUEST_TIMEOUT_SECONDS}
+      DASHSCOPE_API_KEY:
+        value: ${DASHSCOPE_API_KEY}
+        secret: true
+      DEEPSEEK_API_KEY:
+        value: ${DEEPSEEK_API_KEY}
+        secret: true
+      OPENAI_API_KEY:
+        value: ${OPENAI_API_KEY}
+        secret: true
+      JUDGE_PROVIDER: ${JUDGE_PROVIDER}
+      JUDGE_MODEL: ${JUDGE_MODEL}
+      JUDGE_API_KEY:
+        value: ${JUDGE_API_KEY}
+        secret: true

@@ -6,6 +6,8 @@
 
 当前已完成场景一：安全告警分析与处置建议；场景二：安全文档 RAG；场景三：安全工具调用。
 
+> agent-compose 接入说明：本仓库的隔离快照已提供四个命令型 Agent 定义、统一适配器和 Docker guest 配置。请先阅读 [integration/README.md](integration/README.md)，其中包含构建、启动、运行与关闭的完整命令。该接入不改变原始四个场景的 Eval 契约。
+
 职责边界如下：
 
 - 本仓库负责 Eval 数据、评分体系、可运行的评测原型和 Agent 外部架构契约；
